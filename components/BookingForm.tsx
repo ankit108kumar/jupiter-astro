@@ -108,13 +108,28 @@ export default function BookingForm() {
     e.preventDefault();
     setPending(true);
     const fd = new FormData(e.currentTarget);
+    
+    // Format DOB to strictly YYYY-MM-DD
+    const formattedDate = dob 
+      ? `${dob.getFullYear()}-${String(dob.getMonth() + 1).padStart(2, '0')}-${String(dob.getDate()).padStart(2, '0')}` 
+      : "";
+
+    // Format TOB to strictly Time (e.g., 02:30 PM)
+    const formattedTime = tob 
+      ? tob.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) 
+      : "";
+
+    // Strictly enforce Lat/Lng for birthplace if coords exist
+    const locationData = coords ? `${coords.lat}, ${coords.lng}` : pob;
+
     fd.set("phone",   phone   ?? "");
-    fd.set("dob",     dob     ? dob.toISOString() : "");
-    fd.set("tob",     tob     ? tob.toISOString() : "");
-    fd.set("pob",     pob);
+    fd.set("dob",     formattedDate);
+    fd.set("tob",     formattedTime);
+    fd.set("pob",     locationData); 
     fd.set("lat",     String(coords?.lat ?? ""));
     fd.set("lng",     String(coords?.lng ?? ""));
     fd.set("service", service === "Other" ? customSvc : service);
+    
     try {
       await new Promise(r => setTimeout(r, 1200)); // simulated delay
       setSubmitted(true);
@@ -212,6 +227,14 @@ export default function BookingForm() {
                       <select name="country" defaultValue="India" className={inp}>
                         <option value="India">🇮🇳 India</option>
                         <option value="United States">🇺🇸 United States</option>
+                        <option value="United Kingdom">🇬🇧 United Kingdom (Britain)</option>
+                        <option value="Canada">🇨🇦 Canada</option>
+                        <option value="Australia">🇦🇺 Australia</option>
+                        <option value="Germany">🇩🇪 Germany</option>
+                        <option value="France">🇫🇷 France</option>
+                        <option value="UAE">🇦🇪 UAE</option>
+                        <option value="Singapore">🇸🇬 Singapore</option>
+                        <option value="New Zealand">🇳🇿 New Zealand</option>
                         <option value="Other">🌍 Other</option>
                       </select>
                     </Field>
