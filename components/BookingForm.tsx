@@ -37,8 +37,6 @@ const SERVICES = [
 ];
 
 // ── Lazy MapPicker ────────────────────────────────────────────────────────────
-// ── Lazy MapPicker ────────────────────────────────────────────────────────────
-// ── Lazy MapPicker ────────────────────────────────────────────────────────────
 const MapPicker = dynamic(() => import("@/components/lib/mappicker"), {
   ssr: false,
   loading: () => (
@@ -228,7 +226,7 @@ export default function BookingForm() {
                       <Field label="Date of Birth">
                         <DatePicker
                           selected={dob}
-                          onChange={d => setDob(d)}
+                          onChange={(d: Date | null) => setDob(d)}
                           showYearDropdown
                           scrollableYearDropdown
                           yearDropdownItemNumber={120}
@@ -240,7 +238,7 @@ export default function BookingForm() {
                       <Field label="Time of Birth" hint="Leave blank if unknown.">
                         <DatePicker
                           selected={tob}
-                          onChange={d => setTob(d)}
+                          onChange={(d: Date | null) => setTob(d)}
                           showTimeSelect
                           showTimeSelectOnly
                           timeIntervals={5}
