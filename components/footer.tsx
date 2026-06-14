@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
-
+import { motion, Variants } from "framer-motion";
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const customEase = [0.16, 1, 0.3, 1];
+
+
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -18,14 +19,17 @@ export default function Footer() {
     },
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { duration: 0.6, ease: customEase } 
-    },
-  };
+const itemVariants: Variants = {  // <-- Add ": Variants" here
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      duration: 0.6, 
+      ease: [0.16, 1, 0.3, 1] 
+    } 
+  }
+};
 
   return (
     <footer className="bg-white dark:bg-[#07090f] border-t border-gray-100 dark:border-white/[0.06] pt-20 pb-8 text-gray-600 dark:text-gray-400 font-sans">

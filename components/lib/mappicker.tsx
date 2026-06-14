@@ -25,13 +25,25 @@ export default function MapPicker({ initialCoords, onSelect }: MapPickerProps) {
   };
 
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    if ((el as any)._leaflet_id) (el as any)._leaflet_id = undefined;
-    if (mapRef.current) { mapRef.current.remove(); mapRef.current = null; }
+    let isMounted = true; // <-- Flag to prevent async race conditions
 
     import("leaflet").then((L) => {
-      if (!containerRef.current) return;
+      // If the component unmounted while Leaflet was loading, abort!
+      if (!isMounted || !containerRef.current) return;
+
+      const el = containerRef.current;
+      
+      // Clear out any stray Leaflet IDs just in case
+      if ((el as any)._leaflet_id) {
+        (el as any)._leaflet_id = null;
+      }
+      
+      // If a map reference somehow exists, destroy it
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+
       delete (L.Icon.Default.prototype as any)._getIconUrl;
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
@@ -39,7 +51,7 @@ export default function MapPicker({ initialCoords, onSelect }: MapPickerProps) {
         shadowUrl:     "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
       });
 
-      const map = L.map(containerRef.current, {
+      const map = L.map(el, {
         center: [initialCoords.lat, initialCoords.lng],
         zoom: 5,
       });
@@ -68,7 +80,13 @@ export default function MapPicker({ initialCoords, onSelect }: MapPickerProps) {
       markerRef.current = marker;
     });
 
-    return () => { mapRef.current?.remove(); mapRef.current = null; };
+    return () => {
+      isMounted = false; // Flag that the component has unmounted
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -96,35 +114,35 @@ export default function MapPicker({ initialCoords, onSelect }: MapPickerProps) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-[#0f1117] transition-colors">
+    <div className="flex flex-col h-full bg-white dark:bg-[#0f1117] transition-colors relative z-0">
       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossOrigin="" />
 
-      {/* Search bar — blended background */}
-      <div className="relative flex gap-2 p-2.5 bg-gray-50 dark:bg-[#0f1117] border-b border-gray-200 dark:border-white/[0.06] flex-shrink-0 transition-colors">
+      {/* Search bar */}
+      <div className="relative flex gap-2 p-2.5 bg-gray-50/80 dark:bg-[#1a1a1a]/80 backdrop-blur-sm border-b border-gray-200 dark:border-white/[0.06] flex-shrink-0 z-10">
         <input
           value={query}
           onChange={e => setQuery(e.target.value)}
           onKeyDown={e => e.key === "Enter" && searchPlace()}
           placeholder="Search city or place…"
-          className="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-white/[0.08] bg-white dark:bg-[#1a1a1a] text-gray-950 dark:text-gray-200 placeholder:text-gray-500 dark:placeholder:text-gray-600 outline-none focus:ring-2 focus:ring-[#fc4c02]/20 focus:border-[#fc4c02]/40 transition"
+          className="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-white/[0.08] bg-white dark:bg-[#0f1117] text-gray-950 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:ring-2 focus:ring-[#fc4c02]/20 focus:border-[#fc4c02]/40 transition shadow-sm"
         />
         <button
           type="button"
           onClick={searchPlace}
           disabled={searching}
-          className="px-4 py-2 rounded-lg bg-[#fc4c02] text-white text-sm font-medium hover:bg-[#e04400] transition disabled:opacity-40"
+          className="px-4 py-2 rounded-lg bg-[#fc4c02] text-white text-sm font-semibold hover:bg-[#e04400] transition disabled:opacity-40 shadow-md shadow-[#fc4c02]/20"
         >
           {searching ? "…" : "Search"}
         </button>
 
         {results.length > 0 && (
-          <div className="absolute top-full left-2.5 right-2.5 z-[9999] bg-white dark:bg-[#1a1a1a] border border-gray-300 dark:border-white/[0.08] rounded-xl shadow-2xl mt-1 max-h-52 overflow-y-auto">
+          <div className="absolute top-[110%] left-2.5 right-2.5 z-[9999] bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/[0.08] rounded-xl shadow-2xl overflow-hidden max-h-52 overflow-y-auto">
             {results.map((r, i) => (
               <button
                 key={i}
                 type="button"
                 onClick={() => selectResult(r)}
-                className="w-full text-left px-4 py-2.5 text-xs text-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/[0.05] border-b border-gray-100 dark:border-white/[0.04] last:border-none transition"
+                className="w-full text-left px-4 py-3 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/[0.05] border-b border-gray-100 dark:border-white/[0.04] last:border-none transition font-medium"
               >
                 {r.display_name}
               </button>
@@ -134,7 +152,7 @@ export default function MapPicker({ initialCoords, onSelect }: MapPickerProps) {
       </div>
 
       {/* Map */}
-      <div ref={containerRef} className="flex-1" style={{ minHeight: 0 }} />
+      <div ref={containerRef} className="flex-1 z-0" style={{ minHeight: 0 }} />
     </div>
   );
 }
