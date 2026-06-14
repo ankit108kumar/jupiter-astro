@@ -235,7 +235,7 @@ export default function Navbar() {
                 </Link>
               ))}
               <Link
-                href="#book"
+                href="/book"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block mt-4 text-center px-4 py-3.5 rounded-xl text-white text-[15px] font-semibold active:scale-[0.98] transition-transform shadow-md"
                 style={{ background: "linear-gradient(135deg, #fc4c02 0%, #d43f00 100%)" }}

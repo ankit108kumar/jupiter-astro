@@ -5,7 +5,8 @@ import BookingForm from "@/components/BookingForm"; // Adjust if your form is el
 
 export default function BookConsultationPage() {
   return (
-    <main className="relative min-h-screen bg-gray-50 dark:bg-[#07090f] flex items-center justify-center p-4 md:p-8 overflow-hidden transition-colors duration-300 z-0 ">
+    <main className="relative min-h-screen bg-gray-50 dark:bg-[#07090f] flex items-center justify-center p-4 md:p-8 overflow-hidden transition-colors  p-4 md:p-8 
+  pt-20 md:pt-8 duration-300 z-0 ">
       
       {/* ── Professional Background Elements ── */}
       {/* Subtle Grid */}
