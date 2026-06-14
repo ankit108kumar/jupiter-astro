@@ -15,13 +15,14 @@ export default function Navbar() {
   const lastScrollY = useRef(0);
   
   const pathname = usePathname();
-  const isActive = (path) => pathname === path;
+  const isActive = (path: string) => pathname === path;
 
   // Initialize Theme
   useEffect(() => {
     const saved = localStorage.getItem("theme");
     if (saved === "dark" || (!saved && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
       document.documentElement.classList.add("dark");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsDark(true);
     }
   }, []);
