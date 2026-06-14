@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, Variants } from "framer-motion";
 
 export default function Cta() {
   const customEase = [0.16, 1, 0.3, 1];
@@ -17,14 +17,17 @@ export default function Cta() {
     },
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { duration: 0.8, ease: customEase } 
-    },
-  };
+const itemVariants: Variants = {  // <-- Add ": Variants" right here
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      duration: 0.6, 
+      ease: [0.16, 1, 0.3, 1] 
+    } 
+  }
+};
 
   return (
     <section className="relative py-32 bg-white dark:bg-[#07090f] overflow-hidden flex items-center justify-center font-sans">
