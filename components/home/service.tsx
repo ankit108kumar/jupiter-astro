@@ -78,7 +78,7 @@ const servicesList = [
 ];
 
 export default function Services() {
-  const customEase = [0.16, 1, 0.3, 1];
+ const customEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
   const containerVariants = {
     hidden: { opacity: 0 },
