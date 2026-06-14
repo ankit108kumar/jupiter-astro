@@ -4,6 +4,8 @@ import { useState, useCallback } from "react";
 import PhoneInput from "react-phone-number-input";
 import DatePicker from "react-datepicker";
 import dynamic from "next/dynamic";
+// import { submitBooking } from "@/app/actions/submitBooking"; 
+import { submitBooking } from "@/app/actions/book";
 
 import "react-phone-number-input/style.css";
 import "react-datepicker/dist/react-datepicker.css";
@@ -22,7 +24,7 @@ const I = {
   close:   <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>,
   send:    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>,
   spin:    <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" strokeLinecap="round"/></svg>,
-  success: <svg className="w-14 h-14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg>,
+  success: <svg className="w-24 h-24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg>,
 };
 
 const SERVICES = [
@@ -65,23 +67,16 @@ function Section({ icon, title }: { icon: React.ReactNode; title: string }) {
   );
 }
 
-function SuccessScreen({ onReset }: { onReset: () => void }) {
+function SuccessScreen() {
   return (
-    <div className="flex flex-col items-center justify-center text-center py-16 px-8 gap-5">
-      <div className="text-[#fc4c02]">{I.success}</div>
+    <div className="flex flex-col items-center justify-center text-center py-40 px-8 gap-8">
+      <div className="text-[#fc4c02] drop-shadow-2xl scale-110">{I.success}</div>
       <div>
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Request Sent!</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400 max-w-sm">
+        <h3 className="text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-6 tracking-tight">Request Sent!</h3>
+        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-md mx-auto leading-relaxed">
           Thank you for reaching out. We've received your consultation request and will contact you shortly.
         </p>
       </div>
-      <button
-        type="button"
-        onClick={onReset}
-        className="mt-2 px-6 py-2.5 rounded-xl border border-gray-300 dark:border-white/10 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition"
-      >
-        Submit another request
-      </button>
     </div>
   );
 }
@@ -109,9 +104,9 @@ export default function BookingForm() {
     setPending(true);
     const fd = new FormData(e.currentTarget);
     
-    // Format DOB to strictly YYYY-MM-DD
+    // Format DOB to strictly DD-MM-YYYY (Indian Format)
     const formattedDate = dob 
-      ? `${dob.getFullYear()}-${String(dob.getMonth() + 1).padStart(2, '0')}-${String(dob.getDate()).padStart(2, '0')}` 
+      ? `${String(dob.getDate()).padStart(2, '0')}-${String(dob.getMonth() + 1).padStart(2, '0')}-${dob.getFullYear()}` 
       : "";
 
     // Format TOB to strictly Time (e.g., 02:30 PM)
@@ -122,26 +117,30 @@ export default function BookingForm() {
     // Strictly enforce Lat/Lng for birthplace if coords exist
     const locationData = coords ? `${coords.lat}, ${coords.lng}` : pob;
 
+    // Apply formatted data to FormData object
     fd.set("phone",   phone   ?? "");
     fd.set("dob",     formattedDate);
     fd.set("tob",     formattedTime);
     fd.set("pob",     locationData); 
-    fd.set("lat",     String(coords?.lat ?? ""));
-    fd.set("lng",     String(coords?.lng ?? ""));
     fd.set("service", service === "Other" ? customSvc : service);
     
     try {
-      await new Promise(r => setTimeout(r, 1200)); // simulated delay
-      setSubmitted(true);
-    } catch {
-      alert("Something went wrong. Please try again.");
+      // Call our Next.js Server Action
+      const result = await submitBooking(fd);
+      
+      if (result?.error) {
+        alert(result.error);
+      } else {
+        // Show success screen only if it actually worked
+        setSubmitted(true); 
+      }
+      
+    } catch (error) {
+      console.error(error);
+      alert("Network error. Please check your connection and try again.");
+    } finally {
+      setPending(false);
     }
-    setPending(false);
-  };
-
-  const reset = () => {
-    setPhone(undefined); setDob(null); setTob(null); setPob(""); setCoords(null);
-    setShowMap(false); setService(""); setCustomSvc(""); setSubmitted(false);
   };
 
   const inp =
@@ -185,14 +184,8 @@ export default function BookingForm() {
       {/* Container — blended background, no border/shadow */}
       <div className="w-full max-w-5xl mx-auto overflow-hidden">
 
-        {/* Header */}
-        <div className="px-6 md:px-10 py-5">
-          <h2 className="text-xl md:text-2xl font-bold text-gray-950 dark:text-white">Book Your Session</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-500 mt-0.5">Fill in your details to begin your cosmic journey.</p>
-        </div>
-
         {submitted ? (
-          <SuccessScreen onReset={reset} />
+          <SuccessScreen />
         ) : (
           <form onSubmit={handleSubmit}>
             <input type="text" name="website" className="hidden" tabIndex={-1} autoComplete="off" />
@@ -254,7 +247,8 @@ export default function BookingForm() {
                           scrollableYearDropdown
                           yearDropdownItemNumber={120}
                           maxDate={new Date()}
-                          placeholderText="Select date"
+                          dateFormat="dd-MM-yyyy"
+                          placeholderText="DD-MM-YYYY"
                           className={inp}
                         />
                       </Field>
@@ -264,7 +258,7 @@ export default function BookingForm() {
                           onChange={(d: Date | null) => setTob(d)}
                           showTimeSelect
                           showTimeSelectOnly
-                          timeIntervals={5}
+                          timeIntervals={1}
                           timeCaption="Time"
                           dateFormat="h:mm aa"
                           placeholderText="Select time"
@@ -296,7 +290,7 @@ export default function BookingForm() {
                       </div>
                       {coords && (
                         <p className="text-[11px] text-gray-600 dark:text-gray-500 mt-1">
-                          📍 {coords.lat.toFixed(4)}, {coords.lng.toFixed(4)}{pob && ` — ${pob}`}
+                          📍 {coords.lat.toFixed(4)}, {coords.lng.toFixed(4)}
                         </p>
                       )}
                     </Field>
@@ -386,7 +380,7 @@ export default function BookingForm() {
                         }`}
                       >
                         {pending ? I.spin : I.send}
-                        {pending ? "Sending…" : "Request Consultation"}
+                        {pending ? "Sending…" : "Submit details"}
                       </button>
                       <p className="text-[11px] text-center text-gray-600 dark:text-gray-600">
                         We'll reach out to confirm your session details.
