@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export default function OpenLetter() {
   // Smooth, spring-like ease used in high-end interfaces
-  const customEase = [0.16, 1, 0.3, 1];
+const customEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
   const containerVariants = {
     hidden: { opacity: 0 },
