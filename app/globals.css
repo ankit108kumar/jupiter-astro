@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
 
 :root {
   --background: #ffffff;
@@ -10,8 +11,8 @@
   --color-foreground: var(--foreground);
   /* Map Tailwind's font-sans to your custom Nocturn font */
   --font-sans: var(--font-nocturn), ui-sans-serif, system-ui, sans-serif;
-  /* Add your brand color */
-  --color-brand: #C26E4D;
+  /* Updated Brand Color */
+  --color-persimmon: #fc4c02;
 }
 
 body {
@@ -54,3 +55,17 @@ body {
 .delay-1000 { animation-delay: 1s; }
 .delay-2000 { animation-delay: 2s; }
 .delay-3000 { animation-delay: 3s; }
+
+@keyframes marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(-25%, 0, 0);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 120s linear infinite;
+}

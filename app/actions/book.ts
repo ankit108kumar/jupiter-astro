@@ -1,36 +1,27 @@
 "use server";
-
-import { redirect } from "next/navigation";
+import { redirect } from 'next/navigation';
 
 export async function submitBooking(formData: FormData) {
-  // 1. Extract data from the native form
+  // 1. HoneyPot Trap: If 'website' is filled, it's a bot.
+  if (formData.get("website")) return; 
+
   const data = {
     name: formData.get("name"),
     phone: formData.get("phone"),
     dob: formData.get("dob"),
+    tob: formData.get("tob"),
+    pob: formData.get("pob"),
+    country: formData.get("country"),
     service: formData.get("service"),
-    timestamp: new Date().toISOString(),
+    problem: formData.get("problem"),
+    key: process.env.SUBMISSION_SECRET // Secret is handled on server
   };
 
-  // 2. Push to Google Sheets
-  // The easiest way to do this without complex OAuth is to use a Google Apps Script Web App webhook, 
-  // or a tool like SheetDB/Stein. 
-  const SHEET_WEBHOOK_URL = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
+  await fetch(process.env.GOOGLE_SCRIPT_URL!, {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: { "Content-Type": "application/json" },
+  });
 
-  if (SHEET_WEBHOOK_URL) {
-    try {
-      await fetch(SHEET_WEBHOOK_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-    } catch (error) {
-      console.error("Failed to save to Google Sheets:", error);
-      // You might want to handle this gracefully in production
-    }
-  }
-
-  // 3. Redirect the user directly to your WhatsApp Group/Chat
-  // The execution stops here and pushes the user to the provided URL
-  redirect("https://chat.whatsapp.com/YOUR_INVITE_LINK_HERE");
+  redirect("https://wa.me/919876543210?text=Hi!%20I%20have%20booked%20a%20consultation.");
 }
