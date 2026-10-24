@@ -835,6 +835,21 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
   form .field.namef, form .field.place, form .btn { grid-column: 1 / -1; }
 }
 
+  @media (max-width: 768px) {
+  form {
+    grid-template-columns: 1fr !important;
+  }
+  .panchang-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .wrap {
+    padding-inline: 12px;
+  }
+  .panel, .research-chart {
+    padding: 14px;
+  }
+}
+  
 /* Remove unwanted horizontal lines when the Quill editor is focused */
 .field:has(.desc-editor:focus-within) {
   border-top: none !important;
