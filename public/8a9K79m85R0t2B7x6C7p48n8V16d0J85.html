@@ -134,6 +134,54 @@
   --pop-bg: #FFFFFF;
 }
 
+/* Palette: Golden Ivory (Light) */
+[data-palette="ivory"] {
+  --paper: #FAF6EE;
+  --surface: #FFFFFF;
+  --surface-alt: #F0E7D4;
+  --ink: #1B1B1F;
+  --muted: #6B6354;
+  --line: #E8DFC9;
+  --line-strong: #D9CEB2;
+  --saffron: #E09A12;
+  --saffron-soft: rgba(244, 183, 60, 0.18);
+  --indigo-soft: rgba(224, 154, 18, 0.12);
+  --al: #B06E10;
+  /* Feedback Colors */
+  --good: #059669;
+  --good-soft: rgba(5, 150, 105, 0.12);
+  --bad: #DC2626;
+  --bad-soft: rgba(220, 38, 38, 0.12);
+  --amber: #D97706;
+  --amber-soft: rgba(217, 119, 6, 0.12);
+  /* UI & Chart Additions */
+  --brand-bg: rgba(250, 246, 238, 0.88);
+  --chart-bg: #FFFFFF;
+  --chart-lagna-bg: #FFF8E8;
+  --chart-line: #D9CEB2;
+  --pop-bg: #FFFFFF;
+}
+
+[data-theme="light"] .boot {
+  background: linear-gradient(135deg, #FAF6EE, #F0E7D4);
+  border: 1px solid var(--gold);
+  color: var(--tx);
+}
+[data-theme="light"] .boot p {
+  color: var(--mut);
+}
+[data-theme="light"] .feat,
+[data-theme="light"] .schip,
+[data-theme="light"] .wrow,
+[data-theme="light"] .abcard {
+  background: var(--card);
+  border-color: var(--line2);
+  box-shadow: var(--shadow);
+}
+[data-theme="light"] .feat:hover {
+  border-color: var(--gold);
+}
+
 /* Palette: Cyber Lime (Dark) */
 [data-palette="lime"] {
   --paper: #050B05;
@@ -850,6 +898,54 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
   }
 }
   
+
+
+/* Lal Kitab / Varshphal navigation button */
+.tabs button.lal-kitab-varshphal-btn,
+.tabs button.lal-kitab-varshphal-btn:visited {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 12px;
+  border: 1px solid #dc2626;
+  border-radius: 999px;
+  background: transparent;
+  color: #dc2626 !important;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700 !important;
+  line-height: 1.5;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(220, 38, 38, 0.16);
+  transition: background-color 0.2s ease,
+              color 0.2s ease,
+              border-color 0.2s ease,
+              box-shadow 0.2s ease;
+}
+
+/* Hover: red background, white bold text */
+.tabs button.lal-kitab-varshphal-btn:hover {
+  background-color: #dc2626 !important;
+  border-color: #dc2626 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 3px 8px rgba(220, 38, 38, 0.28);
+}
+
+/* Keyboard focus */
+.tabs button.lal-kitab-varshphal-btn:focus-visible {
+  outline: 2px solid #dc2626;
+  outline-offset: 3px;
+}
+
+/* Visible keyboard focus */
+.lal-kitab-varshphal-btn:focus-visible {
+  outline: 2px solid #dc2626;
+  outline-offset: 3px;
+}
+
+
 /* Remove unwanted horizontal lines when the Quill editor is focused */
 .field:has(.desc-editor:focus-within) {
   border-top: none !important;
@@ -960,14 +1056,14 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
 
     <!-- 3. Tithi & Paksha -->
     <div class="panchang-item">
-      <span class="panchang-label">Tithi & Paksha</span>
+      <span class="panchang-label">Tithi (Lunar Day)</span>
       <span class="panchang-value" id="pTithi">—</span>
       <span class="panchang-sub" id="pTithiEnds">Active</span>
     </div>
 
     <!-- 4. Nakshatra -->
     <div class="panchang-item highlight">
-      <span class="panchang-label">Nakshatra</span>
+      <span class="panchang-label">Moon Nakshatra (Star)</span>
       <span class="panchang-value" id="pNakshatra">—</span>
       <span class="panchang-sub" id="pNakEnds">—</span>
     </div>
@@ -1067,6 +1163,7 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
       <select id="paletteSelect" aria-label="Select Palette">
         <option value="">Default</option>
         <option value="mint">Pastel Mint</option>
+	<option value="ivory">Golden Ivory</option>
         <option value="ocean">Ocean Blue</option>
         <option value="lime">Cyber Lime</option>
         <option value="lilac">White Lilac</option>
@@ -1813,6 +1910,17 @@ const PLANETS_ORDER = [
   'Sun', 'Venus', 'Mercury', 'Moon', 'Saturn', 'Jupiter', 'Mars'
 ];
 
+// Add HORA_TRAITS here globally
+const HORA_TRAITS = {
+  Sun: 'Vigorous',
+  Moon: 'Gentle',
+  Mars: 'Aggressive',
+  Mercury: 'Quick',
+  Jupiter: 'Fruitful',
+  Venus: 'Beneficial',
+  Saturn: 'Sluggish'
+};
+
 // Weekday lord's index in PLANETS_ORDER
 const WEEKDAY_LORD_IDX = {
   0: 0, // Sunday - Sun
@@ -1834,7 +1942,11 @@ function getActiveChaughadiyaAndHora(
 ) {
   const fallback = {
     chaughadia: 'Labh',
-    hora: PLANETS_ORDER[WEEKDAY_LORD_IDX[weekday] ?? 0]
+    hora: PLANETS_ORDER[WEEKDAY_LORD_IDX[weekday] ?? 0],
+    chughStart: 0,
+    chughEnd: 0,
+    horaStart: 0,
+    horaEnd: 0
   };
 
   try {
@@ -1888,11 +2000,16 @@ function getActiveChaughadiyaAndHora(
     }
 
     const elapsed = currentTimeMs - intervalStart;
+    
+    // Chaughadia slots (8 per interval)
     const slotDuration = duration / 8;
     const slotIndex = Math.min(
       7,
       Math.max(0, Math.floor(elapsed / slotDuration))
     );
+
+    const chughStart = intervalStart + (slotIndex * slotDuration);
+    const chughEnd = chughStart + slotDuration;
 
     // The weekday supplied must be the active Vedic weekday.
     const dayStartIndex = DAY_START_INDEX[weekday] ?? 0;
@@ -1905,30 +2022,39 @@ function getActiveChaughadiyaAndHora(
     const chaughadia =
       CHOGHADIYA_CYCLE[(startIndex + slotIndex) % 7];
 
-    // Each day and night is divided into 12 planetary hours.
+    // Each day and night is divided into 12 planetary hours (Horas).
     const horaDuration = duration / 12;
     const horaIndex = Math.min(
       11,
       Math.max(0, Math.floor(elapsed / horaDuration))
     );
 
+    const hrSlotStart = intervalStart + (horaIndex * horaDuration);
+    const hrSlotEnd = hrSlotStart + horaDuration;
+
     const weekdayLord = WEEKDAY_LORD_IDX[weekday] ?? 0;
 
     // Night hours continue the same planetary sequence after 12 day hours.
-    const horaStart = isDaytime
+    const horaStartSeq = isDaytime
       ? weekdayLord
       : (weekdayLord + 12) % 7;
 
-    const hora = PLANETS_ORDER[(horaStart + horaIndex) % 7];
+    const hora = PLANETS_ORDER[(horaStartSeq + horaIndex) % 7];
 
-    return { chaughadia, hora };
+    return { 
+      chaughadia, 
+      hora, 
+      chughStart, 
+      chughEnd, 
+      horaStart: hrSlotStart, 
+      horaEnd: hrSlotEnd 
+    };
 
   } catch (e) {
     console.warn('Chaughadiya/Hora calculation error:', e);
     return fallback;
   }
 }
-
 
 /* ================= LIVE VEDIC PANCHANG UPDATER ================= */
 
@@ -1999,6 +2125,31 @@ function calculateSunEventUTC(dayStartMs, latitude, longitude, isSunrise) {
   return dayStartMs + eventUTCMinutes * 60000;
 }
 
+// --- ADD THIS HELPER FUNCTION GLOBALLY ---
+function findTransitionTime(startJd, targetDeg, isNakshatra = false) {
+  let low = startJd - 0.5; 
+  let high = startJd + 0.5; 
+  
+  for (let i = 0; i < 20; i++) {
+    const mid = (low + high) / 2;
+    const d = mid - 2451543.5;
+    const sun = sunPos(d);
+    const moon = moonLon(d, sun);
+    const aya = lahiri(mid);
+    const sidLon = rev(moon - aya);
+    
+    let currentVal = isNakshatra ? sidLon : rev(sidLon - sun.lon);
+    
+    if (Math.abs(targetDeg - currentVal) > 180) {
+      if (currentVal > targetDeg) targetDeg += 360;
+      else currentVal += 360;
+    }
+    
+    if (currentVal < targetDeg) low = mid;
+    else high = mid;
+  }
+  return jdToMs((low + high) / 2);
+}
 
 function updatePrashnaLivePanchang() {
   try {
@@ -2195,6 +2346,8 @@ const nextSunriseMs =
       return `${pad(h)}:${pad(min)} ${ampm}`;
     };
 
+
+
     // Selected calendar date's daylight duration.
     const durMs = sunsetMs - sunriseMs;
     const durHrs = Math.floor(durMs / 3600e3);
@@ -2293,11 +2446,12 @@ const nextSunriseMs =
     }
 
     if (safeGet('pChaughadia')) {
-      safeGet('pChaughadia').textContent = timing.chaughadia;
+      safeGet('pChaughadia').textContent = `${timing.chaughadia} (${fmtTime(timing.chughStart, activeTz)} - ${fmtTime(timing.chughEnd, activeTz)})`;
     }
 
     if (safeGet('pHora')) {
-      safeGet('pHora').textContent = `Current Hora: ${timing.hora}`;
+      const trait = HORA_TRAITS[timing.hora] || '';
+      safeGet('pHora').textContent = `Hora: ${timing.hora}${trait ? ' - ' + trait : ''} (${fmtTime(timing.horaStart, activeTz)} - ${fmtTime(timing.horaEnd, activeTz)})`;
     }
 
     if (safeGet('pRahuKaal')) {
@@ -2383,6 +2537,7 @@ const PALETTE_CHART_COLORS = {
   lilac: { surf: '#FFFFFF', soft: '#EEF2FF', line: '#C7D2FE', ink: '#111439', muted: '#62658A', sa: '#4F46E5', al: '#2563EB', good: '#0D9488', bad: '#E11D48' },
   mint:  { surf: '#FFFFFF', soft: '#D4F9DC', line: '#A2EAB1', ink: '#10341B', muted: '#4B6E54', sa: '#15803D', al: '#0284C7', good: '#16A34A', bad: '#DC2626' },
   cream: { surf: '#FFFFFF', soft: '#FFEE99', line: '#E6D785', ink: '#332B00', muted: '#7A7040', sa: '#B8860B', al: '#2563EB', good: '#059669', bad: '#DC2626' },
+ivory: { surf: '#FFFFFF', soft: '#FFF8E8', line: '#D9CEB2', ink: '#1B1B1F', muted: '#6B6354', sa: '#E09A12', al: '#B06E10', good: '#059669', bad: '#DC2626' },
   turquoise: { surf: '#FFFFFF', soft: '#E0F8F6', line: '#40E0D0', ink: '#0A3633', muted: '#417370', sa: '#00A896', al: '#0284C7', good: '#059669', bad: '#DC2626' }
 };
 
@@ -2893,19 +3048,27 @@ function renderKundaliComponent(
         <span class="chip"><span>Rashi</span>${SIGNS[kData.moonSign][1]}</span>
         <span class="chip"><span>Nakshatra</span>${NAK[nk.i][0]} (Pada ${nk.pada})</span>
         <span class="chip"><span>Dasha</span>${dNow}</span>
-      </div>
-      <nav class="tabs" role="tablist">
-        <button role="tab" class="tab-btn" data-v="overview" aria-selected="true">Overview</button>
-        <button role="tab" class="tab-btn" data-v="promises" aria-selected="false">Life Promises</button>
-        <button role="tab" class="tab-btn" data-v="vargas" aria-selected="false">Divisional Charts</button>
-        <button role="tab" class="tab-btn" data-v="planets" aria-selected="false">Planets</button>
-        <button role="tab" class="tab-btn" data-v="dasha" aria-selected="false">Dasha</button>
-        <button role="tab" class="tab-btn" data-v="transit" aria-selected="false">Transits & Sade Sati</button>
-        <button role="tab" class="tab-btn" data-v="ashtaka" aria-selected="false">Ashtakavarga</button>
-        <button role="tab" class="tab-btn" data-v="arudha" aria-selected="false">Arudha Padas</button>
-      </nav>
-    </div>
-    <div class="tab-body" style="padding-top:16px;"></div>
+      
+</div>
+<nav class="tabs" role="tablist">
+  <button role="tab" class="tab-btn" data-v="overview" aria-selected="true">Overview</button>
+  <button role="tab" class="tab-btn" data-v="promises" aria-selected="false">Life Promises</button>
+  <button role="tab" class="tab-btn" data-v="vargas" aria-selected="false">Divisional Charts</button>
+  <button role="tab" class="tab-btn" data-v="planets" aria-selected="false">Planets</button>
+  <button role="tab" class="tab-btn" data-v="dasha" aria-selected="false">Dasha</button>
+  <button role="tab" class="tab-btn" data-v="transit" aria-selected="false">Transits &amp; Sade Sati</button>
+  <button role="tab" class="tab-btn" data-v="ashtaka" aria-selected="false">Ashtakavarga</button>
+  <button role="tab" class="tab-btn" data-v="arudha" aria-selected="false">Arudha Padas</button>
+
+  <!-- New Lal Kitab / Varshphal button -->
+  <button
+    type="button"
+    id="lalKitabVarshphalBtn"
+    class="lal-kitab-varshphal-btn"
+  >Lal Kitab / Varshphal</button>
+</nav>
+</div>
+<div class="tab-body" style="padding-top:16px;"></div>
   `;
 
   const body = targetEl.querySelector('.tab-body');
