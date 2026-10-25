@@ -2019,8 +2019,11 @@ function getActiveChaughadiyaAndHora(
       ? dayStartIndex
       : (dayStartIndex + 5) % 7;
 
-    const chaughadia =
-      CHOGHADIYA_CYCLE[(startIndex + slotIndex) % 7];
+    
+const chaughadia = CHOGHADIYA_CYCLE[
+  (startIndex + slotIndex * (isDaytime ? 1 : 5)) % 7
+];
+
 
     // Each day and night is divided into 12 planetary hours (Horas).
     const horaDuration = duration / 12;
