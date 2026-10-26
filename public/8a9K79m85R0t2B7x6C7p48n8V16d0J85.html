@@ -13,6 +13,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hind:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Marcellus&display=swap">
 
+<!-- Google Fonts CDN: 20 Curated Typefaces -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Comfortaa:wght@500&family=Cormorant+Garamond:ital,wght@0,600;1,400&family=Dancing+Script:wght@600&family=Great+Vibes&family=Inconsolata:wght@500&family=Inter:wght@400;500&family=Lora:ital,wght@0,500;1,400&family=Merriweather:wght@400;700&family=Montserrat:wght@400;600&family=Nunito:wght@400;600&family=Outfit:wght@400;600&family=Pacifico&family=Playfair+Display:ital,wght@0,600;1,400&family=Poppins:wght@400;600&family=Quicksand:wght@500&family=Roboto+Mono:wght@400;500&family=Roboto:wght@400;500&family=Sacramento&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
+
 <!-- Quill CSS -->
 <link
   href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css"
@@ -385,6 +390,92 @@
   width: 100%;
 }
 
+.panchang-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.time-travel-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.step-group {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: #ffffff;
+  border: 1px solid #dcdfe4;
+  border-radius: 6px;
+  padding: 2px 4px;
+}
+
+.group-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #5f6368;
+  margin: 0 4px;
+}
+
+.btn-step {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 6px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: #f1f3f4;
+  color: #202124;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-step:hover {
+  background: #e2e5e9;
+  border-color: #c4c7cc;
+}
+
+.btn-now {
+  background: #e8f0fe;
+  color: #1a73e8;
+  border: 1px solid #aecbfa;
+}
+
+.btn-now:hover {
+  background: #d2e3fc;
+}
+
+/* Sync Badge Variants */
+.badge-synced {
+  background: #d4edda;
+  color: #155724;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.badge-stepped {
+  background: #fff3cd;
+  color: #856404;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
 /* Live Ephemeris & Panchang Card */
 .panchang-card {
   background: var(--surface-alt);
@@ -442,34 +533,42 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 12px;
 }
+
+/* Identical white cards with no outlines */
 .panchang-item {
-  background: var(--surface);
-  border: 1px solid var(--line);
+  background: #ffffff !important;
+  border: none !important;
+  outline: none !important;
   border-radius: 8px;
   padding: 10px 14px;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
+
+/* Neutralize the highlight variant so every card remains uniform */
 .panchang-item.highlight {
-  border-color: var(--brand, #d97706);
-  background: rgba(217, 119, 6, 0.04);
+  background: #ffffff !important;
+  border: none !important;
+  outline: none !important;
 }
+
 .panchang-label {
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--muted);
+  color: #64748b !important;
   font-weight: 600;
 }
 .panchang-value {
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--ink);
+  color: #0f172a !important;
 }
 .panchang-sub {
   font-size: 0.72rem;
-  color: var(--muted);
+  color: #64748b !important;
 }
 
 /* Header Display Above Generated Research Chart */
@@ -968,6 +1067,99 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
   box-shadow: none !important;
 }
 
+/* Quill 20-Font Dropdown Styles */
+.ql-snow .ql-picker.ql-font {
+  width: 140px;
+}
+.ql-snow .ql-picker.ql-font .ql-picker-options {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+/* --- Clean Modern Sans-Serif --- */
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="roboto"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="roboto"]::before { content: 'Roboto'; font-family: 'Roboto', sans-serif; }
+.ql-font-roboto { font-family: 'Roboto', sans-serif !important; }
+
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="inter"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="inter"]::before { content: 'Inter'; font-family: 'Inter', sans-serif; }
+.ql-font-inter { font-family: 'Inter', sans-serif !important; }
+
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="poppins"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="poppins"]::before { content: 'Poppins'; font-family: 'Poppins', sans-serif; }
+.ql-font-poppins { font-family: 'Poppins', sans-serif !important; }
+
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="montserrat"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="montserrat"]::before { content: 'Montserrat'; font-family: 'Montserrat', sans-serif; }
+.ql-font-montserrat { font-family: 'Montserrat', sans-serif !important; }
+
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="outfit"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="outfit"]::before { content: 'Outfit'; font-family: 'Outfit', sans-serif; }
+.ql-font-outfit { font-family: 'Outfit', sans-serif !important; }
+
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="nunito"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="nunito"]::before { content: 'Nunito'; font-family: 'Nunito', sans-serif; }
+.ql-font-nunito { font-family: 'Nunito', sans-serif !important; }
+
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="comfortaa"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="comfortaa"]::before { content: 'Comfortaa'; font-family: 'Comfortaa', cursive; }
+.ql-font-comfortaa { font-family: 'Comfortaa', cursive !important; }
+
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="quicksand"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="quicksand"]::before { content: 'Quicksand'; font-family: 'Quicksand', sans-serif; }
+.ql-font-quicksand { font-family: 'Quicksand', sans-serif !important; }
+
+/* --- Elegant Serifs --- */
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="playfair"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="playfair"]::before { content: 'Playfair Display'; font-family: 'Playfair Display', serif; }
+.ql-font-playfair { font-family: 'Playfair Display', serif !important; }
+
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="merriweather"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="merriweather"]::before { content: 'Merriweather'; font-family: 'Merriweather', serif; }
+.ql-font-merriweather { font-family: 'Merriweather', serif !important; }
+
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="lora"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="lora"]::before { content: 'Lora'; font-family: 'Lora', serif; }
+.ql-font-lora { font-family: 'Lora', serif !important; }
+
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="cormorant"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="cormorant"]::before { content: 'Cormorant'; font-family: 'Cormorant Garamond', serif; }
+.ql-font-cormorant { font-family: 'Cormorant Garamond', serif !important; }
+
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="cinzel"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="cinzel"]::before { content: 'Cinzel Classical'; font-family: 'Cinzel', serif; }
+.ql-font-cinzel { font-family: 'Cinzel', serif !important; }
+
+/* --- Monospace / Tech --- */
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="robotomono"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="robotomono"]::before { content: 'Roboto Mono'; font-family: 'Roboto Mono', monospace; }
+.ql-font-robotomono { font-family: 'Roboto Mono', monospace !important; }
+
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="firasource"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="firasource"]::before { content: 'Source Code'; font-family: 'Source Code Pro', monospace; }
+.ql-font-firasource { font-family: 'Source Code Pro', monospace !important; }
+
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="inconsolata"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="inconsolata"]::before { content: 'Inconsolata'; font-family: 'Inconsolata', monospace; }
+.ql-font-inconsolata { font-family: 'Inconsolata', monospace !important; }
+
+/* --- Handwritten / Calligraphy --- */
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="dancing"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="dancing"]::before { content: 'Dancing Script'; font-family: 'Dancing Script', cursive; }
+.ql-font-dancing { font-family: 'Dancing Script', cursive !important; }
+
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="pacific"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="pacific"]::before { content: 'Pacifico'; font-family: 'Pacifico', cursive; }
+.ql-font-pacific { font-family: 'Pacifico', cursive !important; }
+
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="greatvibes"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="greatvibes"]::before { content: 'Great Vibes'; font-family: 'Great Vibes', cursive; }
+.ql-font-greatvibes { font-family: 'Great Vibes', cursive !important; }
+
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="sacramento"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="sacramento"]::before { content: 'Sacramento'; font-family: 'Sacramento', cursive; }
+.ql-font-sacramento { font-family: 'Sacramento', cursive !important; }
+
 /* Quill text box: minimum 100px, maximum 200px */
 .desc-editor.ql-container.ql-snow {
   height: auto !important;
@@ -990,6 +1182,31 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
   overflow-wrap: anywhere;
   white-space: pre-wrap;
   box-sizing: border-box;
+}
+
+/* Custom history, color pickers, and delete controls */
+.desc-toolbar.ql-toolbar.ql-snow .ql-undo,
+.desc-toolbar.ql-toolbar.ql-snow .ql-redo,
+.desc-toolbar.ql-toolbar.ql-snow .ql-clear-description {
+  width: 28px;
+  min-width: 28px;
+  padding: 0 3px;
+  color: var(--ink);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1;
+}
+.desc-toolbar.ql-toolbar.ql-snow .ql-clear-description {
+  color: #dc2626;
+  font-size: 20px;
+}
+.desc-toolbar.ql-toolbar.ql-snow .ql-clear-description:hover {
+  color: #b91c1c;
+  background: rgba(220, 38, 38, 0.10);
+}
+.desc-toolbar.ql-toolbar.ql-snow .ql-color,
+.desc-toolbar.ql-toolbar.ql-snow .ql-background {
+  max-width: 34px;
 }
 
 /* Subtle scrollbar */
@@ -1030,13 +1247,38 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
     </button>
   </div>
 </header>
-
 <div class="panchang-card">
-  <div class="panchang-header" style="justify-content: Left;">
-    <h3>
-      <span>Panchang</span>
-      <span class="live-badge" id="liveClockBadge">SYNCED</span>
-    </h3>
+  <!-- Top Header Row: Title & Badge on Left, Buttons on Right -->
+  <div class="panchang-header">
+    <div class="panchang-title-group">
+      <h3>
+        <span>Panchang</span>
+        <span class="live-badge" id="liveClockBadge">SYNCED</span>
+      </h3>
+    </div>
+
+    <!-- Time Step Controls Aligned Right -->
+    <div class="time-travel-toolbar">
+      <button type="button" class="btn-step btn-now" onclick="resetToCurrentTime()">Now</button>
+
+      <div class="step-group">
+        <span class="group-label">Date:</span>
+        <button type="button" class="btn-step" onclick="shiftTime(0, -7)">-7d</button>
+        <button type="button" class="btn-step" onclick="shiftTime(0, -1)">-1d</button>
+        <button type="button" class="btn-step" onclick="shiftTime(0, +1)">+1d</button>
+        <button type="button" class="btn-step" onclick="shiftTime(0, +7)">+7d</button>
+      </div>
+
+      <div class="step-group">
+        <span class="group-label">Time:</span>
+        <button type="button" class="btn-step" onclick="shiftTime(-60, 0)">-1h</button>
+        <button type="button" class="btn-step" onclick="shiftTime(-10, 0)">-10m</button>
+        <button type="button" class="btn-step" onclick="shiftTime(-1, 0)">-1m</button>
+        <button type="button" class="btn-step" onclick="shiftTime(+1, 0)">+1m</button>
+        <button type="button" class="btn-step" onclick="shiftTime(+10, 0)">+10m</button>
+        <button type="button" class="btn-step" onclick="shiftTime(+60, 0)">+1h</button>
+      </div>
+    </div>
   </div>
 
   <div class="panchang-grid" style="grid-template-columns: repeat(4, minmax(0, 1fr)); text-align: center;">
@@ -1063,7 +1305,7 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
 
     <!-- 4. Nakshatra -->
     <div class="panchang-item highlight">
-      <span class="panchang-label">Moon Nakshatra (Star)</span>
+      <span class="panchang-label">Nakshatra (Star)</span>
       <span class="panchang-value" id="pNakshatra">—</span>
       <span class="panchang-sub" id="pNakEnds">—</span>
     </div>
@@ -1084,15 +1326,16 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
 
     <!-- 7. Inauspicious Kaal -->
     <div class="panchang-item" style="border-color: rgba(220, 53, 69, 0.4);">
-      <span class="panchang-label" style="color: var(--bad);">Inauspicious Kaal</span>
-      <span class="panchang-value" id="pRahuKaal">Rahu: —</span>
-      <span class="panchang-sub" id="pGulikKaal">Gulik: —</span>
+      <span class="panchang-label" style="color: var(--bad);">Inauspicious</span>
+      <span class="panchang-value" id="pRahuKaal">Rahu Kaal: —</span>
+      <span class="panchang-sub" id="pGulikKaal">Gulik Kaal: —</span>
     </div>
 
-    <!-- 8. Sensitive Gandanta -->
-    <div class="panchang-item" style="border-color: rgba(220, 53, 69, 0.4);">
-      <span class="panchang-label" style="color: var(--bad);">Sensitive Gandanta</span>
-      <span class="panchang-value" id="pGandanta">—</span>
+    <!-- 8. Auspicious Time: Abhijit Muhurta -->
+    <div class="panchang-item highlight">
+      <span class="panchang-label" style="color: var(--good, #34d399);">ABHIJIT MUHURTA</span>
+      <span class="panchang-value" id="pAbhijit">—</span>
+      <span class="panchang-sub" id="pAbhijitDuration">Abhijit: —</span>
     </div>
   </div>
 </div>
@@ -1100,7 +1343,6 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
 <main class="wrap">
   <!-- PRIMARY BENCHMARK FORM -->
   <section class="panel">
-    <h2 style="margin-top:0;">Prashna Kundali (Query Chart)</h2>
     <form id="mainForm" novalidate>
       <div class="field namef">
         <label for="nm">Name</label>
@@ -1793,6 +2035,96 @@ function saturnCycles(moonSign, jdBirth) {
 }
 const GOCHAR_GOOD = { Sun: [3, 6, 10, 11], Moon: [1, 3, 6, 7, 10, 11], Mars: [3, 6, 11], Mercury: [2, 4, 6, 8, 10, 11], Jupiter: [2, 5, 7, 9, 11], Venus: [1, 2, 3, 4, 5, 8, 9, 11, 12], Saturn: [3, 6, 11], Rahu: [3, 6, 11], Ketu: [3, 6, 11] };
 
+// Purnimanta lunar-month calculation with Adhik/Kshaya detection.
+function getHinduLunarMonth(targetMs) {
+  const MONTHS = [
+    'Chaitra', 'Vaishakha', 'Jyeshtha', 'Ashadha',
+    'Shravana', 'Bhadrapada', 'Ashwin', 'Kartik',
+    'Margashirsha', 'Pausha', 'Magha', 'Phalguna'
+  ];
+
+  const phaseAt = jd => {
+    const d = jd - 2451543.5;
+    const sun = sunPos(d);
+    return rev(moonLon(d, sun) - sun.lon);
+  };
+
+  const findNewMoon = (fromJd, direction) => {
+    let outer = fromJd;
+    let outerPhase = phaseAt(outer);
+
+    for (let i = 1; i <= 70; i++) {
+      const inner = fromJd + direction * i * 0.5;
+      const innerPhase = phaseAt(inner);
+
+      const crossed = direction < 0
+        ? (outerPhase < 180 && innerPhase > 180)
+        : (outerPhase > 180 && innerPhase < 180);
+
+      if (crossed) {
+        let lo = Math.min(outer, inner);
+        let hi = Math.max(outer, inner);
+
+        for (let j = 0; j < 30; j++) {
+          const mid = (lo + hi) / 2;
+          if (phaseAt(mid) > 180) lo = mid;
+          else hi = mid;
+        }
+        return (lo + hi) / 2;
+      }
+      outer = inner;
+      outerPhase = innerPhase;
+    }
+    return NaN;
+  };
+
+  const siderealSunSignAt = jd => {
+    const sun = sunPos(jd - 2451543.5);
+    return Math.floor(rev(sun.lon - lahiri(jd)) / 30);
+  };
+
+  const targetJd = msToJd(targetMs);
+  const previousNewMoon = findNewMoon(targetJd, -1);
+  const nextNewMoon = findNewMoon(targetJd, 1);
+
+  if (!Number.isFinite(previousNewMoon) || !Number.isFinite(nextNewMoon)) {
+    return { name: '', label: '' };
+  }
+
+  const startSign = siderealSunSignAt(previousNewMoon + 0.01);
+  const amantaMonthIndex = (startSign + 1) % 12;
+
+  let ingressCount = 0;
+  let priorSign = startSign;
+
+  for (let jd = previousNewMoon + 0.25; jd <= nextNewMoon; jd += 0.25) {
+    const currentSign = siderealSunSignAt(jd);
+    const forwardSteps = (currentSign - priorSign + 12) % 12;
+    if (forwardSteps > 0) ingressCount += forwardSteps;
+    priorSign = currentSign;
+  }
+
+  let label = '';
+  if (ingressCount === 0) {
+    label = 'Adhik Maas';
+  } else if (ingressCount >= 2) {
+    label = 'Kshaya Maas';
+  }
+
+  const phase = phaseAt(targetJd);
+  const isKrishnaPaksha = phase >= 180;
+
+  let displayMonthIndex = amantaMonthIndex;
+  if (isKrishnaPaksha && !label) {
+    displayMonthIndex = (amantaMonthIndex + 1) % 12;
+  }
+
+  return {
+    name: [],
+    label
+  };
+}
+
 /* ================= PANCHANG & LIFE PROMISES ================= */
 function panchangAt(sunLon, moonLon) {
   const diff = rev(moonLon - sunLon);
@@ -2376,32 +2708,11 @@ const nextSunriseMs =
 
     const gEnd = gStart + octet;
 
-    // Abhijit Muhurta: eighth daytime Muhurta.
+    // Abhijit Muhurta: eighth daytime Muhurta and duration.
     const muhurta = activeDurMs / 15;
     const abhijitStart = activeDaySunrise + 7 * muhurta;
     const abhijitEnd = activeDaySunrise + 8 * muhurta;
-
-    // Gandanta check.
-    const moonLon = ch.planets.Moon.lon;
-    const sign = Math.floor(moonLon / 30);
-    const degInSign = moonLon % 30;
-
-    const isWaterJunction =
-      [3, 7, 11].includes(sign) && degInSign >= 27;
-
-    const isFireJunction =
-      [0, 4, 8].includes(sign) && degInSign <= 3;
-
-    const signNames = [
-      'Aries', 'Taurus', 'Gemini', 'Cancer',
-      'Leo', 'Virgo', 'Libra', 'Scorpio',
-      'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
-    ];
-
-    const gandantaStatus =
-      isWaterJunction || isFireJunction
-        ? `Active (${signNames[sign]} Junction)`
-        : 'Tithi & Nakshatra Clear';
+    const abhijitDurationMins = Math.round(muhurta / 60000);
 
     // Update displayed values.
     const liveDate = safeGet('pLiveDateTime');
@@ -2411,9 +2722,13 @@ const nextSunriseMs =
     }
 
     const vaar = safeGet('pVaar');
-    if (vaar && typeof VARA !== 'undefined') {
-      vaar.textContent = `${VARA[activeWd].split(' ')[0]} · Vaar`;
-    }
+if (vaar && typeof VARA !== 'undefined') {
+  const englishWeekdays = [
+    'Sunday', 'Monday', 'Tuesday', 'Wednesday',
+    'Thursday', 'Friday', 'Saturday'
+  ];
+  vaar.textContent = `${VARA[activeWd].split(' ')[0]} (${englishWeekdays[activeWd]})`;
+}
 
     const sunTimes = safeGet('pSunTimes');
     if (sunTimes) {
@@ -2428,8 +2743,19 @@ const nextSunriseMs =
     }
 
     if (safeGet('pTithi')) {
-      safeGet('pTithi').textContent = p.tithi;
-    }
+  const lunarMonth = getHinduLunarMonth(targetMs);
+  const monthText = lunarMonth.name
+    ? `${lunarMonth.name} ${lunarMonth.label ? `(${lunarMonth.label}) ` : ''}`
+    : '';
+  safeGet('pTithi').textContent = `${monthText}${p.tithi}`;
+}
+
+// Approximate illuminated fraction of the Moon from Sun–Moon elongation.
+if (safeGet('pTithiEnds')) {
+  const elongationRad = rev(ch.planets.Moon.lon - ch.planets.Sun.lon) * RAD;
+  const illumination = Math.round((1 - Math.cos(elongationRad)) * 50);
+  safeGet('pTithiEnds').textContent = `Illumination: ${illumination}%`;
+}
 
     if (safeGet('pNakshatra') && typeof NAK !== 'undefined') {
       safeGet('pNakshatra').textContent = NAK[nk.i][0];
@@ -2459,27 +2785,26 @@ const nextSunriseMs =
 
     if (safeGet('pRahuKaal')) {
       safeGet('pRahuKaal').textContent =
-        `Rahu: ${fmtTime(rStart)} - ${fmtTime(rEnd)}`;
+        `Rahu Kaal: ${fmtTime(rStart)} - ${fmtTime(rEnd)}`;
     }
 
     if (safeGet('pGulikKaal')) {
       safeGet('pGulikKaal').textContent =
-        `Gulik: ${fmtTime(gStart)} - ${fmtTime(gEnd)}`;
+        `Gulik Kaal: ${fmtTime(gStart)} - ${fmtTime(gEnd)}`;
     }
 
     if (safeGet('pAbhijit')) {
       safeGet('pAbhijit').textContent =
         activeWd === 3
-          ? 'Not on Wednesday'
+          ? '--'
           : `${fmtTime(abhijitStart)} - ${fmtTime(abhijitEnd)}`;
     }
 
-    if (safeGet('pGandanta')) {
-      safeGet('pGandanta').textContent = gandantaStatus;
-      safeGet('pGandanta').style.color =
-        gandantaStatus.includes('Active')
-          ? 'var(--bad)'
-          : 'var(--ink)';
+    if (safeGet('pAbhijitDuration')) {
+      safeGet('pAbhijitDuration').textContent =
+        activeWd === 3
+          ? 'Not applicable'
+          : `${abhijitDurationMins}m`;
     }
 
   } catch (err) {
@@ -2671,6 +2996,59 @@ function bindAspectHooks(boxId, noteId, lagna, items) {
     note.innerHTML = `<b>${p}</b> (House ${h}) casts aspects on House${hs.length > 1 ? 's' : ''} ${hs.join(', ')}.`;
   };
   box.onmouseleave = clear;
+}
+
+/* Floating confirmation banner placed directly inside the Quill editor box */
+function showEditorConfirm(quillInstance, message, onConfirm) {
+  // 1. Target the Quill editor container directly
+  const container = quillInstance.container;
+  if (!container) return;
+
+  // Make sure the editor can hold absolute children
+  container.style.position = 'relative';
+
+  // Remove any duplicate if clicked repeatedly
+  const existing = container.querySelector('.editor-inline-confirm');
+  if (existing) existing.remove();
+
+  const popup = document.createElement('div');
+  popup.className = 'editor-inline-confirm';
+
+  // Position it inside the editor: top-right corner with a sleek chip layout
+  popup.style.cssText = `
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    z-index: 20;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--bad);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(8px);
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+    animation: fadeIn 0.15s ease-out;
+  `;
+
+  popup.innerHTML = `
+    <span>${message}</span>
+    <button type="button" class="btn" style="padding: 2px 10px; font-size: 0.75rem; background: #dc2626; color: #fff; border: 0; border-radius: 6px; cursor: pointer; font-weight: 600;">Clear</button>
+    <button type="button" class="close-btn" style="background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.85rem; padding: 0 2px; line-height: 1;">✕</button>
+  `;
+
+  popup.querySelector('.close-btn').onclick = () => popup.remove();
+  popup.querySelector('.btn').onclick = () => {
+    popup.remove();
+    onConfirm();
+  };
+
+  container.appendChild(popup);
 }
 
 /* ================= COMPREHENSIVE KUNDALI BUNDLE ================= */
@@ -2913,7 +3291,7 @@ dasha(k, prefix, evalMs = Date.now()) {
 
 <!-- ADD TIMELINE SCALE CONTAINER HERE -->
       <article class="card" style="margin-bottom: 14px;">
-        <header><h3>Vimshottari Mahadasha timeline</h3><span id="${prefix}-tl-sub">365.25-day years · tap a block to inspect</span></header>
+        <header><h3>Vimshottari Mahadasha timeline</h3>
         <div class="tl" id="${prefix}-tl"></div>
       </article>
 
@@ -2921,11 +3299,27 @@ dasha(k, prefix, evalMs = Date.now()) {
     `;
   },
       
-  transit(k, prefix, evalMs = Date.now()) {
+  transit(k, prefix, evalMs = Date.now(), selectedVarga = (window.trSelectedVarga || 9)) {
+    // 1. Generate Natal D1 Birth Chart data
+    const d1 = getVargaItems(k, 1);
     const evalJd = msToJd(evalMs);
     const tr = siderealAt(evalJd).planets;
     const titems = PL.map(([p, , ab]) => ({ t: ab, p, sign: signOf(tr[p].lon) }));
     titems.push({ t: 'JM', sign: k.moonSign, al: true });
+
+    // Calculate transit ascendant for the rising marker
+    const trAsc = rev(ascendant(evalJd, k.input.lat, k.input.lon) - lahiri(evalJd));
+
+    // 2. Divisional (Varga) Calculations (Default: D9 Navamsa)
+    const natalVarga = getVargaItems(k, selectedVarga);
+    const trVargaItems = PL.map(([p, , ab]) => ({ t: ab, p, sign: vargaSign(tr[p].lon, selectedVarga) }));
+    trVargaItems.push({ t: 'JM', sign: vargaSign(k.ch.planets.Moon.lon, selectedVarga), al: true });
+    trVargaItems.push({ t: 'TrAs', sign: vargaSign(trAsc, selectedVarga), asc: true });
+
+    const currentVargaTitle = (VARGAS.find(v => v[0] === selectedVarga) || [selectedVarga, `D${selectedVarga}`])[1];
+    const vargaOptions = VARGAS.filter(([n]) => n > 1).map(([n, title]) => 
+      `<option value="${n}" ${n === selectedVarga ? 'selected' : ''}>D${n} · ${title}</option>`
+    ).join('');
 
     const evalDate = new Date(evalMs);
     const pad = n => String(n).padStart(2, '0');
@@ -2958,34 +3352,127 @@ dasha(k, prefix, evalMs = Date.now()) {
     `).join('');
 
     return `
-      <!-- GOCHAR EVENT DATE SELECTOR -->
-      <div style="background:var(--surface); border:1px solid var(--line-strong); border-radius:10px; padding:10px 14px; margin-bottom:14px; display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end;">
-        <div class="field" style="min-width:140px;">
+      <!-- GOCHAR EVENT DATE SELECTOR WITH TIME TRAVEL -->
+      <div style="background:var(--surface); border:1px solid var(--line-strong); border-radius:10px; padding:10px 14px; margin-bottom:14px; display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end;">
+        <div class="field" style="min-width:130px;">
           <label style="font-size:0.72rem; color:var(--muted); font-weight:600;">GOCHAR DATE</label>
-          <input type="date" id="${prefix}-trEvalDate" value="${dStr}" style="padding:6px 10px; font-size:0.85rem;">
+          <input type="date" id="${prefix}-trEvalDate" value="${dStr}" style="padding:5px 8px; font-size:0.85rem;">
         </div>
-        <div class="field" style="min-width:90px;">
+        <div class="field" style="min-width:85px;">
           <label style="font-size:0.72rem; color:var(--muted); font-weight:600;">TIME</label>
-          <input type="time" id="${prefix}-trEvalTime" value="${tStr}" style="padding:6px 10px; font-size:0.85rem;">
+          <input type="time" id="${prefix}-trEvalTime" value="${tStr}" style="padding:5px 8px; font-size:0.85rem;">
         </div>
-        <button type="button" class="btn ghost" id="${prefix}-trNowBtn" style="padding:6px 12px; font-size:0.8rem;">Current Transits</button>
-        <span style="font-size:0.82rem; color:var(--muted); margin-left:auto; align-self:center;">Showing Gochar for: <b>${fmtDate(evalMs, true)}</b></span>
+
+        <!-- Replaces 'Current Transits' with 'Now' button -->
+        <button type="button" class="btn-step btn-now" id="${prefix}-trNowBtn" style="height:31px; padding:0 12px; margin-bottom:1px;">Now</button>
+
+        <!-- Date Steppers -->
+        <div class="step-group" style="height:31px; margin-bottom:1px;">
+          <span class="group-label">Date:</span>
+          <button type="button" class="btn-step" data-tr-day="-7">-7d</button>
+          <button type="button" class="btn-step" data-tr-day="-1">-1d</button>
+          <button type="button" class="btn-step" data-tr-day="1">+1d</button>
+          <button type="button" class="btn-step" data-tr-day="7">+7d</button>
+        </div>
+
+        <!-- Time Steppers -->
+        <div class="step-group" style="height:31px; margin-bottom:1px;">
+          <span class="group-label">Time:</span>
+          <button type="button" class="btn-step" data-tr-min="-60">-1h</button>
+          <button type="button" class="btn-step" data-tr-min="-10">-10m</button>
+          <button type="button" class="btn-step" data-tr-min="-1">-1m</button>
+          <button type="button" class="btn-step" data-tr-min="1">+1m</button>
+          <button type="button" class="btn-step" data-tr-min="10">+10m</button>
+          <button type="button" class="btn-step" data-tr-min="60">+1h</button>
+        </div>
+
+        <span style="font-size:0.82rem; color:var(--muted); margin-left:auto; align-self:center;">Showing Gochar for: <b>${fmtDate(evalMs)}</b></span>
       </div>
 
+      <!-- ROW 1: D1 BIRTH CHART (LEFT) vs D1 GOCHAR KUNDALI (RIGHT) -->
       <div class="two">
+        <!-- LEFT: NATAL BIRTH CHART (D1) -->
         <article class="card kchart">
-          <header><h3>Gochar (${fmtDate(evalMs)})</h3></header>
-          <div>${drawNorthChart(k.ascSign, titems, 'Transits')}</div>
+          <header style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>Rashi Chart (D1)</h3>
+            <span style="font-size:0.82rem; color:var(--muted);">
+              Lagna: <b style="color:var(--saffron);">${SIGNS[k.ascSign][1]} (${dms(k.ch.asc % 30, false)})</b>
+            </span>
+          </header>
+          <div>${drawNorthChart(d1.lagna, d1.items, 'Natal D1')}</div>
+          <p style="text-align:center; font-size:0.75rem; color:var(--muted); margin:4px 0 0;">
+            Birth: <b>${String(k.input.d).padStart(2,'0')}/${String(k.input.m).padStart(2,'0')}/${k.input.y} ${String(k.input.hh).padStart(2,'0')}:${String(k.input.mm).padStart(2,'0')}</b> · Moon: <b>${SIGNS[k.moonSign][1]}</b>
+          </p>
         </article>
-        <article class="card">
-          <header><h3>Transit Judgement from Natal Moon</h3></header>
-          <div class="scroll"><table><thead><tr><th>Graha</th><th>Sign</th><th>Lagna</th><th>Moon</th><th>BAV</th><th>SAV</th><th>Result</th></tr></thead><tbody>${trRows}</tbody></table></div>
+
+        <!-- RIGHT: TRANSIT (GOCHAR) KUNDALI (D1) -->
+        <article class="card kchart">
+          <header style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>Gochar (Transit D1) (${fmtDate(evalMs)})</h3>
+          </header>
+          <div>${drawNorthChart(k.ascSign, titems, 'Transits')}</div>
+          <p style="text-align:center; font-size:0.75rem; color:var(--muted); margin:4px 0 0;">
+            JM = Janma Moon · Dynamic planetary transits
+          </p>
         </article>
       </div>
-      <article class="card" style="margin-top:14px;">
-        <header><h3>Sade Sati & Dhaiya Lifecycle</h3></header>
-        <div class="scroll"><table><thead><tr><th>Phase</th><th>Starts</th><th>Ends</th><th>Duration</th></tr></thead><tbody>${ssRows}</tbody></table></div>
-      </article>
+
+      <!-- ROW 2: DIVISIONAL CHARTS (LEFT: NATAL VARGA, RIGHT: TRANSIT VARGA) -->
+      <div class="two" style="margin-top:14px;">
+        <!-- LEFT: NATAL DIVISIONAL CHART WITH SELECTOR -->
+        <article class="card kchart">
+          <header style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+            <h3>D${selectedVarga} · Natal ${currentVargaTitle}</h3>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <label for="${prefix}-vargaSelect" style="font-size:0.72rem; color:var(--muted); font-weight:600;">SELECT:</label>
+              <select id="${prefix}-vargaSelect" style="font-size:0.8rem; font-weight:600; padding:3px 8px; border-radius:6px; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); cursor:pointer;">
+                ${vargaOptions}
+              </select>
+            </div>
+          </header>
+          <div>${drawNorthChart(natalVarga.lagna, natalVarga.items, `Natal D${selectedVarga}`)}</div>
+          <p style="text-align:center; font-size:0.75rem; color:var(--muted); margin:4px 0 0;">
+            Natal D${selectedVarga} Lagna: <b>${SIGNS[natalVarga.lagna][1]}</b>
+          </p>
+        </article>
+
+        <!-- RIGHT: TRANSIT IN DIVISIONAL CHART -->
+        <article class="card kchart">
+          <header style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>D${selectedVarga} · Gochar (${currentVargaTitle})</h3>
+            <span style="font-size:0.82rem; color:var(--muted);">
+              From Natal D${selectedVarga} Lagna
+            </span>
+          </header>
+          <div>${drawNorthChart(natalVarga.lagna, trVargaItems, `Transit D${selectedVarga}`)}</div>
+          <p style="text-align:center; font-size:0.75rem; color:var(--muted); margin:4px 0 0;">
+            JM = Natal Moon in D${selectedVarga} · TrAs = Transit Lagna
+          </p>
+        </article>
+      </div>
+
+      <!-- ROW 3: COMPARATIVE TABLES BELOW BOTH CHARTS -->
+      <div class="two" style="margin-top:14px;">
+        <article class="card">
+          <header><h3>Transit (Natal Moon D1)</h3></header>
+          <div class="scroll">
+            <table>
+              <thead><tr><th>Graha</th><th>Sign</th><th>Lagna</th><th>Moon</th><th>BAV</th><th>SAV</th><th>Result</th></tr></thead>
+              <tbody>${trRows}</tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="card">
+          <header><h3>Sade Sati &amp; Dhaiya Lifecycle</h3></header>
+          <div class="scroll">
+            <table>
+              <thead><tr><th>Phase</th><th>Starts</th><th>Ends</th><th>Duration</th></tr></thead>
+              <tbody>${ssRows}</tbody>
+            </table>
+          </div>
+        </article>
+      </div>
     `;
   },
 
@@ -3181,28 +3668,74 @@ function renderKundaliComponent(
       };
       renderDashaDrill();
 
-    } else if (tabKey === 'transit') {
+   } else if (tabKey === 'transit') {
       const trDateIn = document.getElementById(`${prefix}-trEvalDate`);
       const trTimeIn = document.getElementById(`${prefix}-trEvalTime`);
       const trNowBtn = document.getElementById(`${prefix}-trNowBtn`);
+      const vargaSelect = document.getElementById(`${prefix}-vargaSelect`);
 
-      const updateTr = () => {
+      // Default to D9 Navamsa if not previously selected
+      if (typeof window.trSelectedVarga === 'undefined') {
+        window.trSelectedVarga = 9;
+      }
+
+      // Read current values from the input fields as the calculation baseline
+      const getSelectedMs = () => {
+        if (!trDateIn || !trTimeIn || !trDateIn.value) return currentEvalMs;
         const [yr, mo, da] = trDateIn.value.split('-').map(Number);
-        const [hr, mi] = trTimeIn.value.split(':').map(Number);
-        currentEvalMs = new Date(yr, mo - 1, da, hr || 0, mi || 0).getTime();
+        const [hr, mi] = (trTimeIn.value || '00:00').split(':').map(Number);
+        if (!isNaN(yr) && !isNaN(mo) && !isNaN(da)) {
+          return new Date(yr, mo - 1, da, hr || 0, mi || 0, 0).getTime();
+        }
+        return currentEvalMs;
+      };
+
+      const updateTransitView = (ms, varga = window.trSelectedVarga) => {
+        currentEvalMs = ms;
+        window.trSelectedVarga = varga;
         openTab('transit');
       };
 
+      // Manual input change listeners
       if (trDateIn && trTimeIn) {
-        trDateIn.addEventListener('change', updateTr);
-        trTimeIn.addEventListener('change', updateTr);
+        trDateIn.addEventListener('change', () => updateTransitView(getSelectedMs()));
+        trTimeIn.addEventListener('change', () => updateTransitView(getSelectedMs()));
       }
+
+      // "Now" snapback button
       if (trNowBtn) {
         trNowBtn.addEventListener('click', () => {
-          currentEvalMs = Date.now();
-          openTab('transit');
+          updateTransitView(Date.now());
         });
       }
+
+      // Divisional Chart dropdown selector listener
+      if (vargaSelect) {
+        vargaSelect.addEventListener('change', (e) => {
+          const chosenVarga = parseInt(e.target.value, 10) || 9;
+          updateTransitView(getSelectedMs(), chosenVarga);
+        });
+      }
+
+      // Day shifter buttons (-7d, -1d, +1d, +7d)
+      targetEl.querySelectorAll('[data-tr-day]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const days = parseInt(btn.dataset.trDay, 10) || 0;
+          const dt = new Date(getSelectedMs());
+          dt.setDate(dt.getDate() + days);
+          updateTransitView(dt.getTime());
+        });
+      });
+
+      // Minute/Hour shifter buttons (-1h, -10m, -1m, +1m, +10m, +1h)
+      targetEl.querySelectorAll('[data-tr-min]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const mins = parseInt(btn.dataset.trMin, 10) || 0;
+          const dt = new Date(getSelectedMs());
+          dt.setMinutes(dt.getMinutes() + mins);
+          updateTransitView(dt.getTime());
+        });
+      });
     }
   }
 
@@ -3658,7 +4191,6 @@ addBtn.addEventListener('click', () => {
 <!-- TAG DESCRIPTION OR NOTES: KEEP OUTSIDE THE COLLAPSIBLE CONTAINER -->
 
 <div class="field" style="grid-column: 1 / -1; width: 100%; min-width: 0; box-sizing: border-box;">
-  <label>Tag Description or Notes</label>
 
 <!-- Format toggle, Label, Toolbar, and Update Button all in one row -->
   <div class="desc-format-row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
@@ -3671,18 +4203,49 @@ addBtn.addEventListener('click', () => {
     </button>
 
     <!-- 2. Toolbar -->
-    <div id="desc-toolbar${n}"
-         class="desc-toolbar is-hidden" style="display: flex; align-items: center; gap: 4px;">
-      <button type="button" class="ql-bold" title="Bold"></button>
-      <button type="button" class="ql-italic" title="Italic"></button>
-      <button type="button" class="ql-underline" title="Underline"></button>
-      <button type="button" class="ql-list"
-              value="bullet" title="Bullet list"></button>
-      <button type="button" class="ql-list"
-              value="ordered" title="Numbered list"></button>
-      <button type="button" class="ql-link"
-              title="Insert hyperlink"></button>
-    </div>
+    <div id="desc-toolbar${n}" class="desc-toolbar is-hidden" style="display: flex; align-items: center; gap: 4px;">
+  <!-- 20-Font Selection Dropdown -->
+  <select class="ql-font" title="Select Font" aria-label="Select Font">
+    <option selected>Default</option>
+    <!-- Sans-Serif -->
+    <option value="roboto">Roboto</option>
+    <option value="inter">Inter</option>
+    <option value="poppins">Poppins</option>
+    <option value="montserrat">Montserrat</option>
+    <option value="outfit">Outfit</option>
+    <option value="nunito">Nunito</option>
+    <option value="comfortaa">Comfortaa</option>
+    <option value="quicksand">Quicksand</option>
+    <!-- Serif -->
+    <option value="playfair">Playfair Display</option>
+    <option value="merriweather">Merriweather</option>
+    <option value="lora">Lora</option>
+    <option value="cormorant">Cormorant Garamond</option>
+    <option value="cinzel">Cinzel</option>
+    <!-- Monospace -->
+    <option value="robotomono">Roboto Mono</option>
+    <option value="firasource">Source Code Pro</option>
+    <option value="inconsolata">Inconsolata</option>
+    <!-- Script / Handwritten -->
+    <option value="dancing">Dancing Script</option>
+    <option value="pacific">Pacifico</option>
+    <option value="greatvibes">Great Vibes</option>
+    <option value="sacramento">Sacramento</option>
+  </select>
+
+  <!-- Format Buttons -->
+  <button type="button" class="ql-bold" title="Bold"></button>
+  <button type="button" class="ql-italic" title="Italic"></button>
+  <button type="button" class="ql-underline" title="Underline" aria-label="Underline"></button>
+  <select class="ql-color" title="Font color" aria-label="Font color"></select>
+  <select class="ql-background" title="Text highlight color" aria-label="Text highlight color"></select>
+  <button type="button" class="ql-list" value="bullet" title="Bullet list" aria-label="Bullet list"></button>
+  <button type="button" class="ql-list" value="ordered" title="Numbered list" aria-label="Numbered list"></button>
+  <button type="button" class="ql-link" title="Insert hyperlink" aria-label="Insert hyperlink"></button>
+  <button type="button" class="ql-undo" title="Undo" aria-label="Undo">↶</button>
+  <button type="button" class="ql-redo" title="Redo" aria-label="Redo">↷</button>
+  <button type="button" class="ql-clear-description" title="Clear description" aria-label="Clear description">✕</button>
+</div>
 
     <!-- 3. Sharp Rectangle Update Notes Button (Pushed to the right using margin-left: auto) -->
     <button id="updateNotesBtn" style="margin-left: auto; border-radius: 4px; padding: 6px 16px; font-size: 0.85rem; font-weight: 500; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); opacity: 0.4; pointer-events: none; cursor: not-allowed; transition: opacity 0.2s;" disabled>Update Note</button>
@@ -3707,6 +4270,16 @@ addBtn.addEventListener('click', () => {
 
   seriesContainer.appendChild(sec);
 
+// Whitelist 20 CDN fonts for Quill
+const FontAttributor = Quill.import('attributors/class/font');
+FontAttributor.whitelist = [
+  'roboto', 'inter', 'poppins', 'montserrat', 'outfit', 'nunito', 'comfortaa', 'quicksand',
+  'playfair', 'merriweather', 'lora', 'cormorant', 'cinzel',
+  'robotomono', 'firasource', 'inconsolata',
+  'dancing', 'pacific', 'greatvibes', 'sacramento'
+];
+Quill.register(FontAttributor, true);
+
 // Rich Text Format (Quill) Initialization
 const descEditor = sec.querySelector(`#desc-editor${n}`);
 const descToolbar = sec.querySelector(`#desc-toolbar${n}`);
@@ -3722,9 +4295,29 @@ if (descEditor && descToolbar && descInput && formatToggle) {
 
   const descQuill = new Quill(descEditor, {
     theme: 'snow',
-    placeholder: 'Add specific case notes or questions...',
+    placeholder: 'Add specific case notes, your observations, doubts etc.',
     modules: {
-      toolbar: descToolbar
+      toolbar: {
+        container: descToolbar,
+        handlers: {
+          undo: function () { this.quill.history.undo(); },
+          redo: function () { this.quill.history.redo(); },
+          'clear-description': function () {
+            const editor = this.quill;
+            if (!editor.getText().trim()) return;
+            
+            showEditorConfirm(editor, 'Clear entire note?', () => {
+              editor.setText('');
+              editor.setSelection(0, 0, 'silent');
+            });
+          }
+        }
+      },
+      history: {
+        delay: 500,
+        maxStack: 100,
+        userOnly: true
+      }
     }
   });
 
@@ -4001,6 +4594,94 @@ if (data.desc && data.desc.trim()) {
     }
   });
 });
+
+/* ================= MUHURTA / TIME-TRAVEL CONTROLLER ================= */
+let activeDate = new Date();
+let isLiveSynced = true;
+
+function shiftTime(minutesDelta, daysDelta) {
+  isLiveSynced = false;
+  updateSyncBadge(false);
+
+  // Read current input values first in case the user edited them manually
+  syncActiveDateFromInputs();
+
+  if (minutesDelta !== 0) {
+    activeDate.setMinutes(activeDate.getMinutes() + minutesDelta);
+  }
+  if (daysDelta !== 0) {
+    activeDate.setDate(activeDate.getDate() + daysDelta);
+  }
+
+  applyDateToUI();
+}
+
+function resetToCurrentTime() {
+  activeDate = new Date();
+  isLiveSynced = true;
+  updateSyncBadge(true);
+  applyDateToUI();
+}
+
+function applyDateToUI() {
+  const pad = n => String(n).padStart(2, '0');
+
+  const d = pad(activeDate.getDate());
+  const m = pad(activeDate.getMonth() + 1);
+  const y = activeDate.getFullYear();
+  const hr = pad(activeDate.getHours());
+  const min = pad(activeDate.getMinutes());
+  const sec = pad(activeDate.getSeconds());
+
+  const dobInput = document.getElementById('dob');
+  const tobInput = document.getElementById('tob');
+
+  if (dobInput) dobInput.value = `${d}/${m}/${y}`;
+  if (tobInput) tobInput.value = `${hr}:${min}:${sec}`;
+
+  // Recalculate Panchang
+  if (typeof updatePrashnaLivePanchang === 'function') {
+    updatePrashnaLivePanchang();
+  }
+
+  // Recalculate Prashna Kundali (D1, D9, Dasha, etc.)
+  const mainForm = document.getElementById('mainForm');
+  if (mainForm) {
+    mainForm.dispatchEvent(new Event('submit'));
+  }
+}
+
+function syncActiveDateFromInputs() {
+  const dobInput = document.getElementById('dob');
+  const tobInput = document.getElementById('tob');
+  if (!dobInput || !tobInput) return;
+
+  const parsed = parseDmy(dobInput.value);
+  const tParts = (tobInput.value || '00:00:00').split(':').map(Number);
+
+  if (parsed) {
+    activeDate = new Date(
+      parsed.y,
+      parsed.m - 1,
+      parsed.d,
+      tParts[0] || 0,
+      tParts[1] || 0,
+      tParts[2] || 0
+    );
+  }
+}
+
+function updateSyncBadge(synced) {
+  const badge = document.getElementById('liveClockBadge');
+  if (!badge) return;
+  if (synced) {
+    badge.className = 'live-badge';
+    badge.textContent = 'SYNCED';
+  } else {
+    badge.className = 'live-badge';
+    badge.textContent = 'CUSTOM';
+  }
+}
  
 /* Auto-generate Prashna Kundali on initial load */
 window.addEventListener('DOMContentLoaded', () => {
