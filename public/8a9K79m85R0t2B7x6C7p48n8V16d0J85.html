@@ -1015,12 +1015,36 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
 .remove-chart { background: var(--bad-soft); color: var(--bad); border: 1px solid var(--bad); border-radius: 999px; padding: 3px 12px; cursor: pointer; font-weight: 600; font-size: .8rem; }
 .remove-chart:hover { background: var(--bad); color: #fff; }
 
-@media (max-width: 980px) {
-  .two, .three, .vfeature, .lp-grid { grid-template-columns: 1fr; }
-  form { grid-template-columns: 1fr 1fr; }
-  form .field.namef, form .field.place, form .btn { grid-column: 1 / -1; }
+/* Prashna Kundali: match the Research Kundali frame */
+#mainChartResult {
+  margin-top: 20px;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--saffron);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
 }
 
+@media (max-width: 980px) {
+  .two, .three, .vfeature, .lp-grid {
+    grid-template-columns: 1fr;
+  }
+
+  form {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  form .field.namef,
+  form .field.place {
+    grid-column: 1 / -1;
+  }
+
+  form .btn {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: auto;
+  }
+}
   @media (max-width: 768px) {
   form {
     grid-template-columns: 1fr !important;
@@ -1036,8 +1060,66 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
   }
 }
   
-
-
+/* SAV Square iPhone-Style Toggle Button */
+.sav-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-alt);
+  color: var(--muted);
+  font-family: var(--font-data);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  opacity: 0.45;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.sav-toggle-btn:hover {
+  opacity: 0.8;
+  border-color: #3b82f6;
+}
+.sav-toggle-btn.active {
+  opacity: 1;
+  background: rgba(59, 130, 246, 0.18);
+  border-color: #3b82f6;
+  color: #3b82f6;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+/* 'D' Degree Toggle Button with thin dark border */
+.deg-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid #111111; /* Clear thin black/dark border */
+  background: var(--surface-alt);
+  color: var(--muted);
+  font-family: var(--font-data);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  opacity: 0.45;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.deg-toggle-btn:hover {
+  opacity: 0.85;
+  border-color: #3b82f6;
+}
+.deg-toggle-btn.active {
+  opacity: 1;
+  background: rgba(59, 130, 246, 0.18);
+  border-color: #3b82f6;
+  color: #3b82f6;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
 /* Lal Kitab / Varshphal navigation button */
 .tabs button.lal-kitab-varshphal-btn,
 .tabs button.lal-kitab-varshphal-btn:visited {
@@ -1055,20 +1137,19 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
   line-height: 1.5;
   white-space: nowrap;
   cursor: pointer;
-  box-shadow: 0 2px 5px rgba(220, 38, 38, 0.16);
   transition: background-color 0.2s ease,
               color 0.2s ease,
               border-color 0.2s ease,
               box-shadow 0.2s ease;
 }
 
-/* Hover: red background, white bold text */
-.tabs button.lal-kitab-varshphal-btn:hover {
+/* Hover or Active/Open State: solid crimson red with white bold text */
+.tabs button.lal-kitab-varshphal-btn:hover,
+.tabs button.lal-kitab-varshphal-btn[aria-selected="true"] {
   background-color: #dc2626 !important;
   border-color: #dc2626 !important;
   color: #ffffff !important;
   font-weight: 700 !important;
-  box-shadow: 0 3px 8px rgba(220, 38, 38, 0.28);
 }
 
 /* Keyboard focus */
@@ -3001,10 +3082,18 @@ const ASPECTS = { Sun: [7], Moon: [7], Mars: [4, 7, 8], Mercury: [7], Jupiter: [
 const aspHouses = (p, house) => (ASPECTS[p] || [7]).map(k => ((house + k - 2) % 12) + 1);
 
 const NORTH = {
-  1: { c: [150, 72], n: [150, 134] }, 2: { c: [75, 24], n: [75, 62] }, 3: { c: [24, 75], n: [62, 75] },
-  4: { c: [72, 150], n: [134, 150] }, 5: { c: [24, 225], n: [62, 225] }, 6: { c: [75, 276], n: [75, 238] },
-  7: { c: [150, 228], n: [150, 166] }, 8: { c: [225, 276], n: [225, 238] }, 9: { c: [276, 225], n: [238, 225] },
-  10: { c: [228, 150], n: [166, 150] }, 11: { c: [276, 75], n: [238, 75] }, 12: { c: [225, 24], n: [225, 62] }
+  1: { c: [150, 72], n: [150, 134], sav: [150, 18] },
+  2: { c: [75, 24],  n: [75, 62],   sav: [75, 12] },
+  3: { c: [24, 75],  n: [62, 75],   sav: [12, 75] },
+  4: { c: [72, 150], n: [134, 150], sav: [18, 150] },
+  5: { c: [24, 225], n: [62, 225],  sav: [12, 225] },
+  6: { c: [75, 276], n: [75, 238],  sav: [75, 288] },
+  7: { c: [150, 228],n: [150, 166], sav: [150, 282] },
+  8: { c: [225, 276],n: [225, 238], sav: [225, 288] },
+  9: { c: [276, 225],n: [238, 225], sav: [288, 225] },
+  10: { c: [228, 150],n: [166, 150], sav: [282, 150] },
+  11: { c: [276, 75], n: [238, 75],  sav: [288, 75] },
+  12: { c: [225, 24], n: [225, 62],  sav: [225, 12] }
 };
 const NORTH_POLY = { 
   1: '150,0 225,75 150,150 75,75', 2: '0,0 150,0 75,75', 3: '0,0 75,75 0,150', 
@@ -3013,7 +3102,7 @@ const NORTH_POLY = {
   10: '300,150 225,225 150,150 225,75', 11: '300,150 225,75 300,0', 12: '300,0 225,75 150,0' 
 };
 
-function drawNorthChart(lagnaSign, placements, title, fs = 12) {
+function drawNorthChart(lagnaSign, placements, title, fs = 12, savList = null) {
   const C = getChartColors();
   const byHouse = {};
   placements.forEach(p => { 
@@ -3030,6 +3119,11 @@ function drawNorthChart(lagnaSign, placements, title, fs = 12) {
   for (let h = 1; h <= 12; h++) {
     const g = NORTH[h], sign = (lagnaSign + h - 1) % 12;
     s += `<text x="${g.n[0]}" y="${g.n[1]}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="${C.muted}">${sign + 1}</text>`;
+    if (savList && Array.isArray(savList) && g.sav) {
+      const val = savList[sign];
+      const col = val < 25 ? '#dc2626' : val > 29 ? '#16a34a' : '#2563eb';
+      s += `<text x="${g.sav[0]}" y="${g.sav[1]}" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700" fill="${col}" fill-opacity="0.75" font-family="var(--font-data)">${val}</text>`;
+    }
     const items = byHouse[h] || [];
     if (items.length) {
       const perRow = 2;
@@ -3041,7 +3135,14 @@ function drawNorthChart(lagnaSign, placements, title, fs = 12) {
           const marks = (it.marks || []).map(m => 
             `<tspan fill="${m === 'ex' ? C.good : m === 'deb' ? C.bad : C.sa}" font-size="${fs - 2}">${m === 'ex' ? '↑' : m === 'deb' ? '↓' : m === 'R' ? '℞' : m === 'C' ? 'c' : 'V'}</tspan>`
           ).join('');
-          return `<tspan data-p="${it.p || ''}" fill="${it.asc ? C.sa : it.al ? C.al : C.ink}" font-weight="${it.asc || it.al ? 700 : 500}">${esc(it.t)}</tspan>${marks}`;
+
+          // Degree number as superscript with no degree symbol
+          // Render degree only when globally enabled
+          const degSup = (window.jaShowDeg && it.deg !== undefined && it.deg !== null)
+            ? `<tspan font-size="${Math.max(7, fs - 4)}" dy="-3" fill="${C.muted}">${it.deg}</tspan><tspan dy="3"></tspan>`
+            : '';
+
+          return `<tspan data-p="${it.p || ''}" fill="${it.asc ? C.sa : it.al ? C.al : C.ink}" font-weight="${it.asc || it.al ? 700 : 500}">${esc(it.t)}</tspan>${degSup}${marks}`;
         }).join(' ');
         s += `<text x="${g.c[0]}" y="${y0 + r * 14}" text-anchor="middle" dominant-baseline="central" font-size="${fs}">${str}</text>`;
       });
@@ -3170,15 +3271,33 @@ function buildCompleteKundali(input, offsetDays = 0) {
   return kBundle;
 }
 
+// Calculates 0 to 29 degrees proportionally for any divisional chart (D1, D9, D10, etc.)
+function getVargaDeg(lon, n) {
+  if (!n || n === 1) return Math.floor(lon % 30);
+  const slice = 30 / n;
+  const rem = (lon % 30) % slice;
+  return Math.floor((rem / slice) * 30);
+}
+
 function getVargaItems(kData, n) {
   const posN = {};
   PL.forEach(([p]) => { posN[p] = typeof n === 'number' ? vargaSign(kData.ch.planets[p].lon, n) : kData.pos1[p]; });
   const ascN = typeof n === 'number' ? vargaSign(kData.ch.asc, n) : kData.ascSign;
   const al = arudhaOf(ascN, posN, kData.deg);
   const items = [
-    { t: 'As', sign: ascN, asc: true },
+    { 
+      t: 'As', 
+      sign: ascN, 
+      asc: true, 
+      deg: getVargaDeg(kData.ch.asc, n) 
+    },
     ...PL.map(([p, , ab]) => {
-      return { t: ab, p, sign: posN[p] };
+      return { 
+        t: ab, 
+        p, 
+        sign: posN[p], 
+        deg: getVargaDeg(kData.ch.planets[p].lon, n) 
+      };
     }),
     { t: 'AL', sign: al.sign, al: true }
   ];
@@ -3335,8 +3454,14 @@ const RenderTabs = {
     return `
       <div class="two">
         <article class="card kchart">
-          <header><h3>D1 · Rashi Chart</h3></header>
-          <div id="${prefix}-ov-d1">${drawNorthChart(d1.lagna, d1.items, 'D1')}</div>
+          <header style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>D1 · Rashi Chart</h3>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <button type="button" class="deg-toggle-btn ${window.jaShowDeg ? 'active' : ''}" id="${prefix}-degToggleBtn" title="Toggle Planetary Degrees">D</button>
+              <button type="button" class="sav-toggle-btn ${window.jaShowSavD1 ? 'active' : ''}" id="${prefix}-savToggleBtn" title="Toggle Sarvashtakavarga (SAV)">SAV</button>
+            </div>
+          </header>
+          <div id="${prefix}-ov-d1">${drawNorthChart(d1.lagna, d1.items, 'D1', 12, window.jaShowSavD1 ? k.av.sav : null)}</div>
           <p class="aspect-note" id="${prefix}-ov-d1-asp">Hover over any planet to inspect aspects.</p>
         </article>
         <article class="card kchart">
@@ -3360,7 +3485,7 @@ const RenderTabs = {
           <header><h3>Birth Panchang</h3></header>
           <dl class="kv">
             <dt>Tithi</dt><dd>${pc.tithi}</dd>
-            <dt>Yoga</dt><dd>${pc.yoga}</dd>
+          <dt>Yoga</dt><dd>${pc.yoga}</dd>
             <dt>Karana</dt><dd>${pc.karana}</dd>
             <dt>Nakshatra</dt><dd>${NAK[nk.i][0]} (Pada ${nk.pada})</dd>
           </dl>
@@ -3374,6 +3499,20 @@ const RenderTabs = {
             <dt>Dasha Balance</dt><dd>${k.md.firstLord} (${fmtSpan(k.md.balanceYrs * 365.25 * 864e5)})</dd>
           </dl>
         </article>
+      </div>
+
+      <!-- Planetary table toggle -->
+      <div style="display:flex; justify-content:flex-end; align-items:center; margin-top:10px;">
+        <button
+          type="button"
+          class="deg-toggle-btn"
+          id="${prefix}-planetTableToggleBtn"
+          title="Show planetary table">P</button>
+      </div>
+
+      <!-- Hidden planetary table -->
+      <div id="${prefix}-overviewPlanetTable" hidden>
+        ${RenderTabs.planets(k)}
       </div>
     `;
   },
@@ -3521,17 +3660,42 @@ dasha(k, prefix, evalMs = Date.now()) {
     const d1 = getVargaItems(k, 1);
     const evalJd = msToJd(evalMs);
     const tr = siderealAt(evalJd).planets;
-    const titems = PL.map(([p, , ab]) => ({ t: ab, p, sign: signOf(tr[p].lon) }));
-    titems.push({ t: 'JM', sign: k.moonSign, al: true });
+    const titems = PL.map(([p, , ab]) => ({ 
+      t: ab, 
+      p, 
+      sign: signOf(tr[p].lon),
+      deg: Math.floor(tr[p].lon % 30)
+    }));
+    titems.push({ 
+      t: 'JM', 
+      sign: k.moonSign, 
+      al: true,
+      deg: Math.floor(k.ch.planets.Moon.lon % 30)
+    });
 
     // Calculate transit ascendant for the rising marker
     const trAsc = rev(ascendant(evalJd, k.input.lat, k.input.lon) - lahiri(evalJd));
 
     // 2. Divisional (Varga) Calculations (Default: D9 Navamsa)
     const natalVarga = getVargaItems(k, selectedVarga);
-    const trVargaItems = PL.map(([p, , ab]) => ({ t: ab, p, sign: vargaSign(tr[p].lon, selectedVarga) }));
-    trVargaItems.push({ t: 'JM', sign: vargaSign(k.ch.planets.Moon.lon, selectedVarga), al: true });
-    trVargaItems.push({ t: 'TrAs', sign: vargaSign(trAsc, selectedVarga), asc: true });
+    const trVargaItems = PL.map(([p, , ab]) => ({ 
+      t: ab, 
+      p, 
+      sign: vargaSign(tr[p].lon, selectedVarga),
+      deg: getVargaDeg(tr[p].lon, selectedVarga)
+    }));
+    trVargaItems.push({ 
+      t: 'JM', 
+      sign: vargaSign(k.ch.planets.Moon.lon, selectedVarga), 
+      al: true,
+      deg: getVargaDeg(k.ch.planets.Moon.lon, selectedVarga)
+    });
+    trVargaItems.push({ 
+      t: 'TrAs', 
+      sign: vargaSign(trAsc, selectedVarga), 
+      asc: true,
+      deg: getVargaDeg(trAsc, selectedVarga)
+    });
 
     const currentVargaTitle = (VARGAS.find(v => v[0] === selectedVarga) || [selectedVarga, `D${selectedVarga}`])[1];
     const vargaOptions = VARGAS.filter(([n]) => n > 1).map(([n, title]) => 
@@ -3586,10 +3750,14 @@ dasha(k, prefix, evalMs = Date.now()) {
         <!-- Date Steppers -->
         <div class="step-group" style="height:31px; margin-bottom:1px;">
           <span class="group-label">Date:</span>
+          <button type="button" class="btn-step" data-tr-year="-1">-1y</button>
+          <button type="button" class="btn-step" data-tr-day="-30">-30d</button>
           <button type="button" class="btn-step" data-tr-day="-7">-7d</button>
           <button type="button" class="btn-step" data-tr-day="-1">-1d</button>
           <button type="button" class="btn-step" data-tr-day="1">+1d</button>
           <button type="button" class="btn-step" data-tr-day="7">+7d</button>
+          <button type="button" class="btn-step" data-tr-day="30">+30d</button>
+          <button type="button" class="btn-step" data-tr-year="1">+1y</button>
         </div>
 
         <!-- Time Steppers -->
@@ -3603,7 +3771,7 @@ dasha(k, prefix, evalMs = Date.now()) {
           <button type="button" class="btn-step" data-tr-min="60">+1h</button>
         </div>
 
-        <span style="font-size:0.82rem; color:var(--muted); margin-left:auto; align-self:center;">Showing Gochar for: <b>${fmtDate(evalMs)}</b></span>
+        <span style="font-size:0.82rem; color:var(--muted); margin-left:auto; align-self:center;">Gochar: <b>${fmtDate(evalMs)}</b></span>
       </div>
 
       <!-- ROW 1: D1 BIRTH CHART (LEFT) vs D1 GOCHAR KUNDALI (RIGHT) -->
@@ -3611,12 +3779,16 @@ dasha(k, prefix, evalMs = Date.now()) {
         <!-- LEFT: NATAL BIRTH CHART (D1) -->
         <article class="card kchart">
           <header style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>Rashi Chart (D1)</h3>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <h3>Rashi Chart (D1)</h3>
+              <button type="button" class="deg-toggle-btn ${window.jaShowDeg ? 'active' : ''}" id="${prefix}-trDegToggleBtn" title="Toggle Planetary Degrees">D</button>
+              <button type="button" class="sav-toggle-btn ${window.jaShowSavD1 ? 'active' : ''}" id="${prefix}-trSavToggleBtn" title="Toggle Sarvashtakavarga (SAV)">SAV</button>
+            </div>
             <span style="font-size:0.82rem; color:var(--muted);">
               Lagna: <b style="color:var(--saffron);">${SIGNS[k.ascSign][1]} (${dms(k.ch.asc % 30, false)})</b>
             </span>
           </header>
-          <div>${drawNorthChart(d1.lagna, d1.items, 'Natal D1')}</div>
+          <div id="${prefix}-tr-natal-d1">${drawNorthChart(d1.lagna, d1.items, 'Natal D1', 12, window.jaShowSavD1 ? k.av.sav : null)}</div>
           <p style="text-align:center; font-size:0.75rem; color:var(--muted); margin:4px 0 0;">
             Birth: <b>${String(k.input.d).padStart(2,'0')}/${String(k.input.m).padStart(2,'0')}/${k.input.y} ${String(k.input.hh).padStart(2,'0')}:${String(k.input.mm).padStart(2,'0')}</b> · Moon: <b>${SIGNS[k.moonSign][1]}</b>
           </p>
@@ -3627,7 +3799,7 @@ dasha(k, prefix, evalMs = Date.now()) {
           <header style="display:flex; justify-content:space-between; align-items:center;">
             <h3>Gochar (Transit D1) (${fmtDate(evalMs)})</h3>
           </header>
-          <div>${drawNorthChart(k.ascSign, titems, 'Transits')}</div>
+          <div id="${prefix}-tr-gochar-d1">${drawNorthChart(k.ascSign, titems, 'Transits', 12, window.jaShowSavD1 ? k.av.sav : null)}</div>
           <p style="text-align:center; font-size:0.75rem; color:var(--muted); margin:4px 0 0;">
             JM = Janma Moon · Dynamic planetary transits
           </p>
@@ -3800,7 +3972,7 @@ const activeYear = (typeof window.trSelectedLkYear === 'number' && window.trSele
 
           <div style="display:flex; gap:6px; margin-top:16px;">
             <button type="button" class="btn ghost" id="${prefix}-lkPrevYr" style="padding:5px 10px; font-size:0.8rem;">‹ Prev Year</button>
-            <button type="button" class="btn-step btn-now" id="${prefix}-lkNowYr" style="height:31px; padding:0 12px;">Current Year</button>
+            <button type="button" class="sav-toggle-btn ${activeYear === currentRunningYear ? 'active' : ''}" id="${prefix}-lkNowYr" style="font-family: inherit; width: auto; height: 32px; padding: 0 12px; font-size: 0.82rem;" title="Reset to Current Running Year">Current Year</button>
             <button type="button" class="btn ghost" id="${prefix}-lkNextYr" style="padding:5px 10px; font-size:0.8rem;">Next Year ›</button>
           </div>
         </div>
@@ -3871,7 +4043,7 @@ const activeYear = (typeof window.trSelectedLkYear === 'number' && window.trSele
     SEVEN.forEach(p => {
       avRows += `<tr><td><b>${p}</b></td>${k.av.bav[p].map(v => `<td class="num c">${v}</td>`).join('')}<td class="num c">${k.av.bav[p].reduce((a, b) => a + b, 0)}</td></tr>`;
     });
-    avRows += `<tr class="lagna"><td><b>SAV</b></td>${k.av.sav.map(v => `<td class="num c"><b>${v}</b></td>`).join('')}<td class="num c"><b>337</b></td></tr>`;
+    avRows += `<tr class="lagna"><td><b>SV</b></td>${k.av.sav.map(v => `<td class="num c"><b>${v}</b></td>`).join('')}<td class="num c"><b>337</b></td></tr>`;
     return `
       <div class="vfeature">
         <article class="card kchart"><header><h3>Sarvashtakavarga Chart</h3></header><div>${drawNorthChart(k.ascSign, savItems, 'SAV', 14)}</div></article>
@@ -3933,7 +4105,6 @@ function renderKundaliComponent(
   <button role="tab" class="tab-btn" data-v="overview" aria-selected="true">Overview</button>
   <button role="tab" class="tab-btn" data-v="promises" aria-selected="false">Life Promises</button>
   <button role="tab" class="tab-btn" data-v="vargas" aria-selected="false">Divisional Charts</button>
-  <button role="tab" class="tab-btn" data-v="planets" aria-selected="false">Planets</button>
   <button role="tab" class="tab-btn" data-v="dasha" aria-selected="false">Dasha</button>
   <button role="tab" class="tab-btn" data-v="transit" aria-selected="false">Transits &amp; Sade Sati</button>
   <button role="tab" class="tab-btn" data-v="ashtaka" aria-selected="false">Ashtakavarga</button>
@@ -3956,13 +4127,50 @@ function renderKundaliComponent(
   function openTab(tabKey) {
     activeTabKey = tabKey;
     // Pass currentEvalMs to render the selected event date
-    body.innerHTML = RenderTabs[tabKey](kData, prefix, currentEvalMs);
+    body.innerHTML = tabKey === 'transit'
+  ? RenderTabs[tabKey](kData, prefix, currentEvalMs, window.trSelectedVarga || 9)
+  : RenderTabs[tabKey](kData, prefix, currentEvalMs);
 
     if (tabKey === 'overview') {
       const d1 = getVargaItems(kData, 1);
       const d9 = getVargaItems(kData, 9);
       bindAspectHooks(`${prefix}-ov-d1`, `${prefix}-ov-d1-asp`, d1.lagna, d1.items);
       bindAspectHooks(`${prefix}-ov-d9`, `${prefix}-ov-d9-asp`, d9.lagna, d9.items);
+
+      const savBtn = document.getElementById(`${prefix}-savToggleBtn`);
+      if (savBtn) {
+        savBtn.addEventListener('click', () => {
+          window.jaShowSavD1 = !window.jaShowSavD1;
+          openTab('overview');
+        });
+      }
+      const degBtn = document.getElementById(`${prefix}-degToggleBtn`);
+      if (degBtn) {
+        degBtn.addEventListener('click', () => {
+          window.jaShowDeg = !window.jaShowDeg;
+          openTab('overview');
+        });
+      }
+            const planetTableBtn =
+        document.getElementById(`${prefix}-planetTableToggleBtn`);
+
+      const planetTable =
+        document.getElementById(`${prefix}-overviewPlanetTable`);
+
+      if (planetTableBtn && planetTable) {
+        planetTableBtn.addEventListener('click', () => {
+          planetTable.hidden = !planetTable.hidden;
+
+          planetTableBtn.classList.toggle(
+            'active',
+            !planetTable.hidden
+          );
+
+          planetTableBtn.title = planetTable.hidden
+            ? 'Show planetary table'
+            : 'Hide planetary table';
+        });
+      }
     } else if (tabKey === 'vargas') {
       const vFocus = document.getElementById(`${prefix}-vfocus`);
       const vTitle = document.getElementById(`${prefix}-vtitle`);
@@ -4061,6 +4269,30 @@ function renderKundaliComponent(
       const trDateIn = document.getElementById(`${prefix}-trEvalDate`);
       const trTimeIn = document.getElementById(`${prefix}-trEvalTime`);
       const trNowBtn = document.getElementById(`${prefix}-trNowBtn`);
+      const vargaSelect = document.getElementById(`${prefix}-vargaSelect`);
+      const trSavBtn = document.getElementById(`${prefix}-trSavToggleBtn`);
+
+      if (vargaSelect) {
+        vargaSelect.addEventListener('change', () => {
+          window.trSelectedVarga = Number(vargaSelect.value);
+          openTab('transit');
+        });
+      }
+
+      // Toggle SAV points and refresh Transit tab
+      if (trSavBtn) {
+        trSavBtn.addEventListener('click', () => {
+          window.jaShowSavD1 = !window.jaShowSavD1;
+          openTab('transit');
+        });
+      }
+      const trDegBtn = document.getElementById(`${prefix}-trDegToggleBtn`);
+      if (trDegBtn) {
+        trDegBtn.addEventListener('click', () => {
+          window.jaShowDeg = !window.jaShowDeg;
+          openTab('transit');
+        });
+      }
 
       // Read current values from the input fields as the calculation baseline
       const getSelectedMs = () => {
@@ -4092,15 +4324,22 @@ function renderKundaliComponent(
         });
       }
 
-      // Day shifter buttons (-7d, -1d, +1d, +7d)
-      targetEl.querySelectorAll('[data-tr-day]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const days = parseInt(btn.dataset.trDay, 10) || 0;
+      // Date shifter buttons (-1y, -30d, -7d, -1d, +1d, +7d, +30d, +1y)
+      targetEl.querySelectorAll('[data-tr-day], [data-tr-year]').forEach(btn => {
+          btn.addEventListener('click', () => {
           const dt = new Date(getSelectedMs());
-          dt.setDate(dt.getDate() + days);
-          updateTransitView(dt.getTime());
-        });
-      });
+
+    if (btn.hasAttribute('data-tr-year')) {
+      const years = parseInt(btn.dataset.trYear, 10) || 0;
+      dt.setFullYear(dt.getFullYear() + years);
+    } else {
+      const days = parseInt(btn.dataset.trDay, 10) || 0;
+      dt.setDate(dt.getDate() + days);
+    }
+
+    updateTransitView(dt.getTime());
+  });
+});
 
       // Minute/Hour shifter buttons (-1h, -10m, -1m, +1m, +10m, +1h)
       targetEl.querySelectorAll('[data-tr-min]').forEach(btn => {
