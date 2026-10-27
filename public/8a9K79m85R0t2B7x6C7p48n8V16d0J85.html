@@ -594,9 +594,9 @@
   font-size: 0.85rem;
   font-style: italic;
   max-width: 50ch;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 /* Bottom Right Palette Chooser */
@@ -1265,6 +1265,59 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
 
 .desc-editor .ql-editor::-webkit-scrollbar-track {
   background: transparent;
+}
+
+
+/* ===== Mobile Overflow Fix: iPhone, Android & Tablets ===== */
+@media (max-width: 768px) {
+
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .research-chart,
+  .research-chart form,
+  .research-chart .field,
+  .research-chart .coords-row,
+  .research-chart .tag-desc-row {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .research-chart form {
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100%;
+  }
+
+  .research-chart .coords-row,
+  .research-chart .tag-desc-row {
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100%;
+  }
+
+  .research-chart input,
+  .research-chart select,
+  .research-chart textarea,
+  .research-chart .desc-editor,
+  .research-chart .desc-toolbar {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .research-chart .sugg {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .research-chart .desc-toolbar {
+    flex-wrap: wrap;
+  }
 }
 
 </style>
@@ -4953,7 +5006,7 @@ if (data.desc && data.desc.trim()) {
       : cleanDesc;
 
     // Hover 'title' attribute has been removed
-    metaHtml += `<span style="color:var(--muted); font-size:0.85rem; font-style:italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">— ${esc(truncatedDesc)}</span>`;
+    metaHtml += `<span style="color:var(--muted); font-size:0.85rem; font-style:italic; white-space:normal; overflow-wrap:anywhere; min-width:0;">— ${esc(truncatedDesc)}</span>`;
   }
 }
     headerMeta.innerHTML = metaHtml;
