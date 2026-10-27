@@ -4249,8 +4249,24 @@ if (chartSection) {
     if (p.lat) form.querySelector('input[name="lat"]').value = p.lat;
     if (p.lon) form.querySelector('input[name="lon"]').value = p.lon;
     if (p.tz) form.querySelector('input[name="tz"]').value = p.tz;
-    if (p.desc) form.querySelector('input[name="desc"]').value = p.desc;
-    
+
+
+// Restore saved Tag Description in both the hidden input and Quill editor
+const descField = form.querySelector('input[name="desc"]');
+const descEditorBox = form.querySelector('.desc-editor');
+const savedDesc = p.desc && p.desc !== 'None' ? p.desc : '';
+
+if (descField) {
+  descField.value = savedDesc;
+}
+
+if (descEditorBox && descEditorBox.__quill) {
+  if (savedDesc.trim()) {
+    descEditorBox.__quill.clipboard.dangerouslyPasteHTML(savedDesc, 'silent');
+  } else {
+    descEditorBox.__quill.setText('', 'silent');
+  }
+}    
     // Auto-populate tag pills via simulated clicks
     if (p.tags && p.tags !== 'None') {
       const savedTagsArr = p.tags.split(';').map(t => t.trim());
@@ -4690,6 +4706,9 @@ if (descEditor && descToolbar && descInput && formatToggle) {
       }
     }
   });
+
+  // Make the Quill instance accessible when loading a saved chart
+  descEditor.__quill = descQuill;
 
   // Show or hide formatting toolbar
   formatToggle.addEventListener('click', function () {
