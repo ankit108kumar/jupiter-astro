@@ -943,6 +943,61 @@ input:focus-visible { border-color: var(--saffron); }
 .kchart svg { display: block; width: 100%; height: auto; max-width: 440px; margin: 0 auto; border-radius: 8px; }
 .kchart svg text { font-family: var(--font-body); }
 .kchart svg [data-p] { cursor: pointer; }
+/* Zodiac Sign Hover Information Card */
+.zodiac-hover-card {
+  position: fixed;
+  z-index: 9999;
+  width: 260px;
+  max-width: calc(100vw - 24px);
+  padding: 12px 14px;
+  background: color-mix(in srgb, var(--surface) 30%, transparent);
+  color: var(--ink);
+  border: 1px solid rgba(212, 160, 74, 0.25);
+  border-left: 2px solid rgba(212, 160, 74, 0.45);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-size: 12px;
+  line-height: 1.5;
+  pointer-events: none;
+}
+
+.zodiac-hover-card[hidden] {
+  display: none !important;
+}
+
+.zodiac-hover-card .zh-title {
+  margin: 0 0 2px;
+  color: var(--saffron);
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.zodiac-hover-card .zh-subtitle {
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.zodiac-hover-card .zh-row {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr);
+  gap: 7px;
+  padding: 3px 0;
+  border-top: 1px solid var(--line);
+}
+
+.zodiac-hover-card .zh-label {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.zodiac-hover-card .zh-value {
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
 .aspect-note { font-size: .82rem; color: var(--muted); text-align: center; min-height: 2em; margin-top: 6px; }
 .aspect-note b { color: var(--al); }
 
@@ -1018,7 +1073,7 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
 /* Prashna Kundali: match the Research Kundali frame */
 #mainChartResult {
   margin-top: 20px;
-  padding: 20px;
+  padding: 8px 20px 20px;
   background: var(--surface);
   border: 1px solid var(--saffron);
   border-radius: var(--radius);
@@ -3102,6 +3157,121 @@ const NORTH_POLY = {
   10: '300,150 225,225 150,150 225,75', 11: '300,150 225,75 300,0', 12: '300,0 225,75 150,0' 
 };
 
+
+/* ================= ZODIAC SIGN HOVER DATA ================= */
+const ZODIAC_HOVER_DATA = {
+  1: {
+    name: "Aries", sanskrit: "Mesha",
+    element: "Fiery", polarity: "Odd", modality: "Movable",
+    deity: "Agni", symbol: "Triangle",
+    nature: "Active, Bold, Adventurous",
+    themes: "Self-effort, courage, physical body, blood",
+    body: "Head",
+    nakshatras: "Ashvini, Bharani, Krittika (1st pada)"
+  },
+  2: {
+    name: "Taurus", sanskrit: "Vrishabha",
+    element: "Earthy", polarity: "Even", modality: "Fixed",
+    deity: "Brahma", symbol: "Square",
+    nature: "Stable, Practical, Comfort-Loving",
+    themes: "Wealth, family, food, voice",
+    body: "Face, neck",
+    nakshatras: "Krittika (2nd–4th padas), Rohini, Mrigashira (1st–2nd padas)"
+  },
+  3: {
+    name: "Gemini", sanskrit: "Mithuna",
+    element: "Airy", polarity: "Odd", modality: "Dual",
+    deity: "Vishnu", symbol: "Hexagon",
+    nature: "Talkative, Curious, Playful",
+    themes: "Learning, siblings, writing, exchange",
+    body: "Arms, shoulders, hands",
+    nakshatras: "Mrigashira (3rd–4th padas), Ardra, Punarvasu (1st–3rd padas)"
+  },
+  4: {
+    name: "Cancer", sanskrit: "Karka",
+    element: "Watery", polarity: "Even", modality: "Movable",
+    deity: "Parvati", symbol: "Crescent",
+    nature: "Emotional, Protective, Homely",
+    themes: "Home, mother, comfort, emotional security",
+    body: "Chest, breasts, stomach",
+    nakshatras: "Punarvasu (4th pada), Pushya, Ashlesha"
+  },
+  5: {
+    name: "Leo", sanskrit: "Simha",
+    element: "Fiery", polarity: "Odd", modality: "Fixed",
+    deity: "Shiva", symbol: "Circle",
+    nature: "Royal, Confident, Proud",
+    themes: "Leadership, recognition, children, self-expression",
+    body: "Heart, upper back",
+    nakshatras: "Magha, Purva Phalguni, Uttara Phalguni (1st pada)"
+  },
+  6: {
+    name: "Virgo", sanskrit: "Kanya",
+    element: "Earthy", polarity: "Even", modality: "Dual",
+    deity: "Saraswati", symbol: "Square",
+    nature: "Practical, Analytical, Perfectionist",
+    themes: "Work, health, routines, skills",
+    body: "Intestines, digestive system",
+    nakshatras: "Uttara Phalguni (2nd–4th padas), Hasta, Chitra (1st–2nd padas)"
+  },
+  7: {
+    name: "Libra", sanskrit: "Tula",
+    element: "Airy", polarity: "Odd", modality: "Movable",
+    deity: "Lakshmi", symbol: "Hexagon",
+    nature: "Balanced, Social, Artistic",
+    themes: "Partnerships, agreements, beauty, social relations",
+    body: "Lower back, kidneys",
+    nakshatras: "Chitra (3rd–4th padas), Swati, Vishakha (1st–3rd padas)"
+  },
+  8: {
+    name: "Scorpio", sanskrit: "Vrishchika",
+    element: "Watery", polarity: "Even", modality: "Fixed",
+    deity: "Kali", symbol: "Arrow",
+    nature: "Intense, Mysterious, Powerful",
+    themes: "Research, hidden matters, crisis, regeneration",
+    body: "Reproductive organs",
+    nakshatras: "Vishakha (4th pada), Anuradha, Jyeshtha"
+  },
+  9: {
+    name: "Sagittarius", sanskrit: "Dhanu",
+    element: "Fiery", polarity: "Odd", modality: "Dual",
+    deity: "Vishnu", symbol: "Arrowhead",
+    nature: "Spiritual, Adventurous, Optimistic",
+    themes: "Higher learning, philosophy, travel, beliefs",
+    body: "Thighs, hips",
+    nakshatras: "Mula, Purva Ashadha, Uttara Ashadha (1st pada)"
+  },
+  10: {
+    name: "Capricorn", sanskrit: "Makara",
+    element: "Earthy", polarity: "Even", modality: "Movable",
+    deity: "Yama", symbol: "Crooked Line",
+    nature: "Serious, Practical, Disciplined",
+    themes: "Career, responsibility, status, long-term goals",
+    body: "Knees, bones",
+    nakshatras: "Uttara Ashadha (2nd–4th padas), Shravana, Dhanishta (1st–2nd padas)"
+  },
+  11: {
+    name: "Aquarius", sanskrit: "Kumbha",
+    element: "Airy", polarity: "Odd", modality: "Fixed",
+    deity: "Varuna", symbol: "Waves",
+    nature: "Humanitarian, Thoughtful, Unconventional",
+    themes: "Groups, networks, society, unconventional ideas",
+    body: "Ankles, lower legs",
+    nakshatras: "Dhanishta (3rd–4th padas), Shatabhisha, Purva Bhadrapada (1st–3rd padas)"
+  },
+  12: {
+    name: "Pisces", sanskrit: "Meena",
+    element: "Watery", polarity: "Even", modality: "Dual",
+    deity: "Vishnu", symbol: "Fish Tail",
+    nature: "Emotional, Dreamy, Spiritual",
+    themes: "Spirituality, dreams, retreat, transcendence",
+    body: "Feet",
+    nakshatras: "Purva Bhadrapada (4th pada), Uttara Bhadrapada, Revati"
+  }
+};
+/* ========================================================== */
+
+
 function drawNorthChart(lagnaSign, placements, title, fs = 12, savList = null) {
   const C = getChartColors();
   const byHouse = {};
@@ -3118,7 +3288,7 @@ function drawNorthChart(lagnaSign, placements, title, fs = 12, savList = null) {
 
   for (let h = 1; h <= 12; h++) {
     const g = NORTH[h], sign = (lagnaSign + h - 1) % 12;
-    s += `<text x="${g.n[0]}" y="${g.n[1]}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="${C.muted}">${sign + 1}</text>`;
+    s += `<text class="sign-number" data-sign="${sign + 1}" x="${g.n[0]}" y="${g.n[1]}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="${C.muted}" style="cursor:help">${sign + 1}</text>`;
     if (savList && Array.isArray(savList) && g.sav) {
       const val = savList[sign];
       const col = val < 25 ? '#dc2626' : val > 29 ? '#16a34a' : '#2563eb';
@@ -3150,6 +3320,118 @@ function drawNorthChart(lagnaSign, placements, title, fs = 12, savList = null) {
   }
   return s + '</svg>';
 }
+
+/* ================= ZODIAC SIGN HOVER INTERACTION ================= */
+(function initZodiacHoverCard() {
+  if (document.getElementById('zodiacHoverCard')) return;
+
+  const card = document.createElement('div');
+  card.id = 'zodiacHoverCard';
+  card.className = 'zodiac-hover-card';
+  card.hidden = true;
+  document.body.appendChild(card);
+
+  let activeSign = null;
+
+  function positionCard(x, y) {
+    const margin = 12;
+    const gap = 14;
+    const rect = card.getBoundingClientRect();
+
+    let left = x + gap;
+    let top = y + gap;
+
+    if (left + rect.width > window.innerWidth - margin) {
+      left = x - rect.width - gap;
+    }
+
+    if (top + rect.height > window.innerHeight - margin) {
+      top = y - rect.height - gap;
+    }
+
+    left = Math.max(margin, Math.min(left, window.innerWidth - rect.width - margin));
+    top = Math.max(margin, Math.min(top, window.innerHeight - rect.height - margin));
+
+    card.style.left = left + 'px';
+    card.style.top = top + 'px';
+  }
+
+  function showCard(sign, x, y) {
+    const d = ZODIAC_HOVER_DATA[sign];
+    if (!d) return;
+
+    activeSign = sign;
+
+    card.innerHTML = `
+      <div class="zh-title">${d.name} (${d.sanskrit})</div>
+      <div class="zh-subtitle">
+        ${d.element} · ${d.polarity} · ${d.modality}
+      </div>
+      <div class="zh-row">
+        <span class="zh-label">Deity</span>
+        <span class="zh-value">${d.deity}</span>
+      </div>
+      <div class="zh-row">
+        <span class="zh-label">Symbol</span>
+        <span class="zh-value">${d.symbol}</span>
+      </div>
+      <div class="zh-row">
+        <span class="zh-label">Nature</span>
+        <span class="zh-value">${d.nature}</span>
+      </div>
+      <div class="zh-row">
+        <span class="zh-label">Life themes</span>
+        <span class="zh-value">${d.themes}</span>
+      </div>
+      <div class="zh-row">
+        <span class="zh-label">Body</span>
+        <span class="zh-value">${d.body}</span>
+      </div>
+      <div class="zh-row">
+        <span class="zh-label">Nakshatras</span>
+        <span class="zh-value">${d.nakshatras}</span>
+      </div>
+    `;
+
+    card.hidden = false;
+    positionCard(x, y);
+  }
+
+  function hideCard() {
+    activeSign = null;
+    card.hidden = true;
+  }
+
+  document.addEventListener('pointerover', function (e) {
+    const target = e.target.closest('.sign-number');
+    if (!target) return;
+
+    const sign = Number(target.dataset.sign);
+    if (sign >= 1 && sign <= 12) {
+      showCard(sign, e.clientX, e.clientY);
+    }
+  });
+
+  document.addEventListener('pointermove', function (e) {
+    if (activeSign !== null && !card.hidden) {
+      positionCard(e.clientX, e.clientY);
+    }
+  });
+
+  document.addEventListener('pointerout', function (e) {
+    const target = e.target.closest('.sign-number');
+    if (!target) return;
+
+    const next = e.relatedTarget;
+    if (next && next.closest && next.closest('.sign-number')) return;
+
+    hideCard();
+  });
+
+  window.addEventListener('scroll', hideCard, true);
+  window.addEventListener('blur', hideCard);
+})();
+/* ================================================================ */
 
 let arrowSeq = 0;
 function bindAspectHooks(boxId, noteId, lagna, items) {
@@ -3458,7 +3740,7 @@ const RenderTabs = {
             <h3>D1 · Rashi Chart</h3>
             <div style="display:flex; align-items:center; gap:6px;">
               <button type="button" class="deg-toggle-btn ${window.jaShowDeg ? 'active' : ''}" id="${prefix}-degToggleBtn" title="Toggle Planetary Degrees">D</button>
-              <button type="button" class="sav-toggle-btn ${window.jaShowSavD1 ? 'active' : ''}" id="${prefix}-savToggleBtn" title="Toggle Sarvashtakavarga (SAV)">SAV</button>
+              <button type="button" class="sav-toggle-btn ${window.jaShowSavD1 ? 'active' : ''}" id="${prefix}-savToggleBtn" title="Toggle Sarvashtakavarga (SAV)">SV</button>
             </div>
           </header>
           <div id="${prefix}-ov-d1">${drawNorthChart(d1.lagna, d1.items, 'D1', 12, window.jaShowSavD1 ? k.av.sav : null)}</div>
@@ -3782,7 +4064,7 @@ dasha(k, prefix, evalMs = Date.now()) {
             <div style="display:flex; align-items:center; gap:6px;">
               <h3>Rashi Chart (D1)</h3>
               <button type="button" class="deg-toggle-btn ${window.jaShowDeg ? 'active' : ''}" id="${prefix}-trDegToggleBtn" title="Toggle Planetary Degrees">D</button>
-              <button type="button" class="sav-toggle-btn ${window.jaShowSavD1 ? 'active' : ''}" id="${prefix}-trSavToggleBtn" title="Toggle Sarvashtakavarga (SAV)">SAV</button>
+              <button type="button" class="sav-toggle-btn ${window.jaShowSavD1 ? 'active' : ''}" id="${prefix}-trSavToggleBtn" title="Toggle Sarvashtakavarga (SAV)">SV</button>
             </div>
             <span style="font-size:0.82rem; color:var(--muted);">
               Lagna: <b style="color:var(--saffron);">${SIGNS[k.ascSign][1]} (${dms(k.ch.asc % 30, false)})</b>
@@ -4926,7 +5208,7 @@ addBtn.addEventListener('click', () => {
 </div>
 
     <!-- 3. Sharp Rectangle Update Notes Button (Pushed to the right using margin-left: auto) -->
-    <button id="updateNotesBtn" style="margin-left: auto; border-radius: 4px; padding: 6px 16px; font-size: 0.85rem; font-weight: 500; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); opacity: 0.4; pointer-events: none; cursor: not-allowed; transition: opacity 0.2s;" disabled>Update Note</button>
+    <button id="updateNotesBtn" style="margin-left: auto; border-radius: 4px; padding: 6px 16px; font-size: 0.85rem; font-weight: 500; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); opacity: 0.4; pointer-events: none; cursor: not-allowed; transition: opacity 0.2s;" disabled>Update</button>
 
   </div>
 
