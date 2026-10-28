@@ -3693,11 +3693,13 @@ s += `<rect x="0" y="0" width="300" height="300"
 
   for (let h = 1; h <= 12; h++) {
     const g = NORTH[h], sign = (lagnaSign + h - 1) % 12;
-    s += `<text class="sign-number" data-sign="${sign + 1}" x="${g.n[0]}" y="${g.n[1]}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="${C.muted}" style="cursor:help">${sign + 1}</text>`;
+    s += `<text class="sign-number" data-sign="${sign + 1}" data-layout-house="${h}" data-layout-type="sign" x="${g.n[0]}" y="${g.n[1]}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="${C.muted}" style="cursor:help">${sign + 1}</text>`;
     if (savList && Array.isArray(savList) && g.sav) {
       const val = savList[sign];
       const col = val < 25 ? '#dc2626' : val > 29 ? '#16a34a' : '#2563eb';
-      s += `<text x="${g.sav[0]}" y="${g.sav[1]}" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700" fill="${col}" fill-opacity="0.75" font-family="var(--font-data)">${val}</text>`;
+      
+s += `<text data-layout-house="${h}" data-layout-type="sav" x="${g.sav[0]}" y="${g.sav[1]}" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700" fill="${col}" fill-opacity="0.75" font-family="var(--font-data)">${val}</text>`;
+
     }
     const items = byHouse[h] || [];
     if (items.length) {
@@ -3719,12 +3721,193 @@ s += `<rect x="0" y="0" width="300" height="300"
 
           return `<tspan data-p="${it.p || ''}" fill="${it.asc ? C.sa : it.al ? C.al : C.ink}" font-weight="${it.asc || it.al ? 700 : 500}">${esc(it.t)}</tspan>${degSup}${marks}`;
         }).join(' ');
-        s += `<text x="${g.c[0]}" y="${y0 + r * 14}" text-anchor="middle" dominant-baseline="central" font-size="${fs}">${str}</text>`;
+        
+s += `<text data-layout-house="${h}" data-layout-type="planet-row" x="${g.c[0]}" y="${y0 + r * 14}" text-anchor="middle" dominant-baseline="central" font-size="${fs}">${str}</text>`;
+
       });
     }
   }
   return s + '</svg>';
 }
+
+
+/* ================= SVG TEXT COLLISION PREVENTION ================= */
+(function initSvgCollisionPrevention() {
+  if (window.__jaSvgCollisionPreventionReady) return;
+  window.__jaSvgCollisionPreventionReady = true;
+
+  const pad = 1.5;
+  const offsets = [
+    [0,0], [0,-7], [0,7], [-8,0], [8,0],
+    [0,-14], [0,14], [-8,-7], [8,-7],
+    [-8,7], [8,7], [-14,0], [14,0],
+    [-14,-7], [14,-7], [-14,7], [14,7],
+    [0,-21], [0,21], [-8,-14], [8,-14],
+    [-8,14], [8,14], [-18,0], [18,0]
+  ];
+
+  function parsePolygon(points) {
+    return points.trim().split(/\s+/)
+      .map(pair => pair.split(',').map(Number));
+  }
+
+  function insidePolygon(x, y, poly) {
+    let inside = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const [xi, yi] = poly[i], [xj, yj] = poly[j];
+      const crosses = ((yi > y) !== (yj > y)) &&
+        (x < (xj - xi) * (y - yi) / ((yj - yi) || 0.000001) + xi);
+      if (crosses) inside = !inside;
+    }
+    return inside;
+  }
+
+  function boxesOverlap(a, b) {
+    return a.x < b.x + b.width - pad &&
+      a.x + a.width > b.x + pad &&
+      a.y < b.y + b.height - pad &&
+      a.y + a.height > b.y + pad;
+  }
+
+  function bbox(el) {
+    try { return el.getBBox(); }
+    catch (_) { return null; }
+  }
+
+  const chartOffsets = [];
+  for (let radius = 6; radius <= 90; radius += 6) {
+    for (let dx = -radius; dx <= radius; dx += 6) {
+      const dyAbs = radius - Math.abs(dx);
+      chartOffsets.push([dx, -dyAbs]);
+      if (dyAbs) chartOffsets.push([dx, dyAbs]);
+    }
+  }
+
+  chartOffsets.sort((a, b) =>
+    (a[0] ** 2 + a[1] ** 2) - (b[0] ** 2 + b[1] ** 2)
+  );
+
+  function layoutSvg(svg) {
+    if (!svg || !svg.isConnected) return;
+
+    const labels = [
+      ...svg.querySelectorAll(
+        'text[data-layout-house][data-layout-type]'
+      )
+    ];
+
+    if (labels.length < 2) return;
+
+    const occupied = [];
+    const rank = { 'planet-row': 0, sav: 1, sign: 2 };
+
+    labels.sort((a, b) =>
+      (rank[a.dataset.layoutType] ?? 3) -
+      (rank[b.dataset.layoutType] ?? 3)
+    );
+
+    labels.forEach(el => {
+      const house = Number(el.dataset.layoutHouse);
+      const polygon = NORTH_POLY && NORTH_POLY[house]
+        ? parsePolygon(NORTH_POLY[house])
+        : null;
+
+      const x0 = Number(el.getAttribute('x'));
+      const y0 = Number(el.getAttribute('y'));
+
+      if (!Number.isFinite(x0) || !Number.isFinite(y0)) return;
+
+      const originalTransform = el.getAttribute('transform') || '';
+      let placed = false;
+
+      const tryCandidates = (candidates, requireHouse) => {
+        for (const [dx, dy] of candidates) {
+          el.setAttribute('x', String(x0 + dx));
+          el.setAttribute('y', String(y0 + dy));
+          el.setAttribute('transform', originalTransform);
+
+          const b = bbox(el);
+          if (!b || b.width <= 0 || b.height <= 0) continue;
+
+          const cx = b.x + b.width / 2;
+          const cy = b.y + b.height / 2;
+
+          if (b.x < 0 || b.y < 0 ||
+              b.x + b.width > 300 ||
+              b.y + b.height > 300) continue;
+
+          if (requireHouse && polygon &&
+              !insidePolygon(cx, cy, polygon)) continue;
+
+          if (occupied.some(prev => boxesOverlap(b, prev.box))) continue;
+
+          occupied.push({ box: b, house });
+          return true;
+        }
+        return false;
+      };
+
+      placed = tryCandidates(offsets, true);
+
+      if (!placed) {
+        placed = tryCandidates(chartOffsets, false);
+      }
+
+      if (!placed) {
+        el.setAttribute('x', String(x0));
+        el.setAttribute('y', String(y0));
+        el.setAttribute('transform', originalTransform);
+
+        const b = bbox(el);
+        if (b) occupied.push({ box: b, house });
+
+        el.setAttribute('data-layout-overflow', 'true');
+      } else {
+        el.removeAttribute('data-layout-overflow');
+      }
+    });
+  }
+
+  let pending = false;
+
+  function schedule(root = document) {
+    if (pending) return;
+    pending = true;
+
+    requestAnimationFrame(() => {
+      pending = false;
+      root.querySelectorAll?.('svg').forEach(layoutSvg);
+    });
+  }
+
+  const observer = new MutationObserver(records => {
+    if (records.some(record =>
+      [...record.addedNodes].some(node =>
+        node.nodeType === 1 &&
+        (node.matches?.('svg') || node.querySelector?.('svg'))
+      )
+    )) {
+      schedule();
+    }
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+
+  window.addEventListener('resize', () => schedule());
+
+  if (window.ResizeObserver) {
+    const resizeObserver = new ResizeObserver(() => schedule());
+    document.querySelectorAll('svg').forEach(svg =>
+      resizeObserver.observe(svg)
+    );
+  }
+
+  window.jaRelayoutSvgCollisions = schedule;
+})();
+
 
 /* ================= ZODIAC SIGN HOVER INTERACTION ================= */
 (function initZodiacHoverCard() {
