@@ -448,13 +448,35 @@
 }
 
 .btn-now {
-  background: #e8f0fe;
-  color: #1a73e8;
-  border: 1px solid #aecbfa;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 30px;
+  padding: 0;
+  background: var(--surface-alt);
+  color: var(--saffron);
+  border: 0px solid var(--muted);
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow:
+    0 0 0 2px var(--saffron-soft),
+    0 0 10px var(--saffron-soft);
+  transition: all 0.2s ease;
 }
 
 .btn-now:hover {
-  background: #d2e3fc;
+  background: var(--saffron-soft);
+  box-shadow:
+    0 0 0 3px var(--saffron-soft),
+    0 0 16px var(--saffron-soft);
+}
+
+.btn-now:active {
+  transform: scale(0.96);
 }
 
 /* Sync Badge Variants */
@@ -534,41 +556,45 @@
   gap: 12px;
 }
 
-/* Identical white cards with no outlines */
+
+/* Panchang Cards — Theme Adaptive */
 .panchang-item {
-  background: #ffffff !important;
-  border: none !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--line) !important;
   outline: none !important;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 10px 14px;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
-/* Neutralize the highlight variant so every card remains uniform */
+
 .panchang-item.highlight {
-  background: #ffffff !important;
-  border: none !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--line) !important;
   outline: none !important;
 }
+
 
 .panchang-label {
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #64748b !important;
+  color: var(--muted) !important;
   font-weight: 600;
 }
+
 .panchang-value {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #0f172a !important;
+  color: var(--ink) !important;
 }
+
 .panchang-sub {
   font-size: 0.72rem;
-  color: #64748b !important;
+  color: var(--muted) !important;
 }
 
 /* Header Display Above Generated Research Chart */
@@ -616,45 +642,6 @@
   border: 1px solid var(--line-strong);
   cursor: pointer;
   outline: none;
-}
-
-/* ================= LAL KITAB DYNAMIC RED THEME ================= */
-body.lal-kitab-theme {
-  --saffron: #c5161d;
-  --line-strong: rgba(197, 22, 29, 0.45);
-  --line-soft: rgba(197, 22, 29, 0.22);
-}
-
-/* Red accents on chart cards & containers */
-body.lal-kitab-theme .kchart,
-body.lal-kitab-theme .card {
-  border-color: rgba(197, 22, 29, 0.38) !important;
-  box-shadow: 0 4px 18px rgba(197, 22, 29, 0.06);
-}
-
-/* Red line strokes in SVG Kundali diagrams */
-body.lal-kitab-theme svg line,
-body.lal-kitab-theme svg rect,
-body.lal-kitab-theme svg polygon {
-  stroke: #c5161d !important;
-}
-
-/* Subtle red background tint for the Lal Kitab charts */
-body.lal-kitab-theme .kchart {
-  background: linear-gradient(180deg, rgba(197, 22, 29, 0.035) 0%, rgba(197, 22, 29, 0.01) 100%);
-}
-
-/* Table headers & active indicator accents in red */
-body.lal-kitab-theme table thead th {
-  color: #c5161d;
-  border-bottom: 2px solid rgba(197, 22, 29, 0.4) !important;
-}
-
-body.lal-kitab-theme .btn-now,
-body.lal-kitab-theme .btn-step:hover {
-  background: #c5161d !important;
-  color: #fff !important;
-  border-color: #a01016 !important;
 }
 
 /* Vimshottari Timeline Scale Styling */
