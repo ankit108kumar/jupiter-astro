@@ -1003,7 +1003,6 @@ html[data-palette="celestial"] body {
 .tl-ticks { position: relative; height: 18px; font-size: .7rem; color: var(--muted); font-family: var(--font-data); }
 .tl-ticks span { position: absolute; transform: translateX(-50%); top: 2px; white-space: nowrap; }
 
-/
 /* ===== Jupiter Astrology: Theme-Synced Quill Editor ===== */
 
 .desc-editor,
@@ -2283,6 +2282,24 @@ function clearInlineError(inputEl) {
   }
 }
 
+function showButtonError(el, message) {
+  if (!el) return;
+  // If the element is an input inside a field, display the red floating popup
+  const field = el.closest('.field');
+  if (field) {
+    showInlineError(el, message);
+    return;
+  }
+  // If it is a standalone button (like "+ Add Next Chart"), briefly display error text
+  const originalText = el.textContent;
+  el.textContent = message;
+  el.style.borderColor = 'var(--bad)';
+  setTimeout(() => {
+    el.textContent = originalText;
+    el.style.borderColor = '';
+  }, 2500);
+}
+
 document.addEventListener('blur', e => {
   const el = e.target;
   const form = el.closest('form');
@@ -2313,15 +2330,19 @@ document.addEventListener('blur', e => {
 
   // Control Submit Button State for this specific form
   if (submitBtn) {
-    const bothFilledAndValid = dateVal && timeVal && dateValid && timeValid;
-    if (bothFilledAndValid) {
-      submitBtn.disabled = false;
-      submitBtn.style.opacity = '1';
-      submitBtn.style.cursor = 'pointer';
-    } else {
-      submitBtn.disabled = true;
-      submitBtn.style.opacity = '0.3';
-      submitBtn.style.cursor = 'not-allowed';
+    // If the form has already been saved or locked, do not auto-reactivate on blur
+    const isSaved = form.closest('.research-chart')?.dataset.chartSaved === 'true';
+    if (!isSaved) {
+      const bothFilledAndValid = dateVal && timeVal && dateValid && timeValid;
+      if (bothFilledAndValid) {
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+        submitBtn.style.cursor = 'pointer';
+      } else {
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.3';
+        submitBtn.style.cursor = 'not-allowed';
+      }
     }
   }
 }, true);
@@ -4114,6 +4135,66 @@ function showEditorConfirm(quillInstance, message, onConfirm) {
   container.appendChild(popup);
 }
 
+function showUpdateConfirm(anchorBtn, recordId, onConfirm) {
+  const existing = document.querySelector('.update-confirm-popup');
+  if (existing) existing.remove();
+
+  const popup = document.createElement('div');
+  popup.className = 'update-confirm-popup';
+  popup.style.cssText = `
+    position: absolute;
+    bottom: calc(100% + 8px);
+    right: 0;
+    z-index: 100;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--saffron);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+    animation: fadeIn 0.15s ease-out;
+  `;
+
+  popup.innerHTML = `
+    <span>Overwrite <b>${recordId}</b>?</span>
+    <button type="button" class="btn" style="padding: 3px 10px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; background: var(--saffron); color: #fff; border: 0;">Update</button>
+    <button type="button" class="btn ghost" style="padding: 3px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer;">✕</button>
+  `;
+
+  const parent = anchorBtn.parentElement;
+  if (parent) {
+    parent.style.position = 'relative';
+    parent.appendChild(popup);
+  }
+
+  const dismiss = () => popup.remove();
+
+  popup.querySelector('.btn:not(.ghost)').onclick = () => {
+    dismiss();
+    onConfirm();
+  };
+  popup.querySelector('.btn.ghost').onclick = dismiss;
+
+  // Auto-dismiss if clicking anywhere outside the popup
+  setTimeout(() => {
+    const handleOutside = (e) => {
+      if (!popup.contains(e.target) && e.target !== anchorBtn) {
+        dismiss();
+        document.removeEventListener('pointerdown', handleOutside);
+      }
+    };
+    document.addEventListener('pointerdown', handleOutside);
+  }, 10);
+}
+
 /* ================= COMPREHENSIVE KUNDALI BUNDLE ================= */
 function buildCompleteKundali(input, offsetDays = 0) {
   const ch = computeChart(input);
@@ -5323,18 +5404,39 @@ function formatForForm(dobString) {
   return !isNaN(m) && !isNaN(y) ? `${pad(parts[0])}/${pad(m)}/${y}` : dobString;
 }
 
-// Global cache so we only download the sheet data once per page load
+// Persistent cache in browser localStorage (persists until browser data is cleared)
+const PROFILES_STORAGE_KEY = 'ja_saved_profiles_cache';
 let savedProfilesCache = null;
 
-async function fetchSavedProfiles() {
-  if (savedProfilesCache !== null) return savedProfilesCache;
+async function fetchSavedProfiles(forceRefresh = false) {
+  if (!forceRefresh) {
+    if (savedProfilesCache !== null) return savedProfilesCache;
+    try {
+      const stored = localStorage.getItem(PROFILES_STORAGE_KEY);
+      if (stored) {
+        savedProfilesCache = JSON.parse(stored);
+        return savedProfilesCache;
+      }
+    } catch (e) {
+      console.warn("Could not read localStorage cache:", e);
+    }
+  }
+
   try {
-    const response = await fetch(WEB_APP_URL);
-    savedProfilesCache = await response.json();
-    return savedProfilesCache;
+    const response = await fetch(WEB_APP_URL + (forceRefresh ? '?_=' + Date.now() : ''));
+    const data = await response.json();
+    if (Array.isArray(data)) {
+      savedProfilesCache = data;
+      try {
+        localStorage.setItem(PROFILES_STORAGE_KEY, JSON.stringify(data));
+      } catch (e) {
+        console.warn("Could not save to localStorage:", e);
+      }
+    }
+    return savedProfilesCache || [];
   } catch (err) {
     console.error("Failed to fetch profiles:", err);
-    return [];
+    return savedProfilesCache || [];
   }
 }
 
@@ -5374,92 +5476,109 @@ async function findSavedProfileAfterSave(payload, attempts = 10) {
 
 function bindNameAutocomplete(inp, list, form, selectedTagsSet) {
   let items = [], idx = -1;
-  const close = () => { list.hidden = true; inp.setAttribute('aria-expanded', 'false'); idx = -1; };
+  let searchSeq = 0; // Discards stale async queries
   
+  const close = () => {
+    list.hidden = true;
+    list.innerHTML = '';
+    inp.setAttribute('aria-expanded', 'false');
+    idx = -1;
+  };
+
+  // Close dropdown on any outside pointerdown or click
+  const handleOutsideClick = (e) => {
+    if (!inp.contains(e.target) && !list.contains(e.target)) {
+      close();
+    }
+  };
+  document.addEventListener('pointerdown', handleOutsideClick);
+  document.addEventListener('click', handleOutsideClick);
+
   const pick = p => {
     if (!p) return;
     inp.value = p.name;
 
-// Remember the ID of the selected saved profile from Google Sheets
-const chartSection = form.closest('.research-chart');
+    // Track ID on the chart section
+    const chartSection = form.closest('.research-chart');
+    if (chartSection) {
+      chartSection.dataset.chartId = p.id || '';
+      const saveBtn = chartSection.querySelector('[id^="saveBtn"]');
+      if (saveBtn) {
+        saveBtn.textContent = 'Already saved ✓';
+        saveBtn.disabled = true;
+        saveBtn.style.opacity = '0.4';
+        saveBtn.style.cursor = 'not-allowed';
+        saveBtn.dataset.savedProfile = p.id ? 'true' : 'false';
+      }
+    }
 
-if (chartSection) {
-  chartSection.dataset.chartId = p.id || '';
-
-  const saveBtn = chartSection.querySelector('[id^="saveBtn"]');
-
-  if (saveBtn) {
-    saveBtn.textContent = p.id
-      ? `Already saved (${p.id}) ✓`
-      : 'Already saved ✓';
-
-    saveBtn.disabled = true;
-    saveBtn.style.opacity = '0.4';
-    saveBtn.style.cursor = 'not-allowed';
-
-    // Remember that this is an existing saved profile
-    saveBtn.dataset.savedProfile = p.id ? 'true' : 'false';
-  }
-}
-
-    // Auto-populate text fields
-    // Translates DD-MMM-YYYY back to DD/MM/YYYY
+    // Auto-populate form fields
     if (p.dob) form.querySelector('input[name="dob"]').value = formatForForm(p.dob);
-    
     if (p.tob) form.querySelector('input[name="tob"]').value = p.tob;
     if (p.pob) form.querySelector('input[name="pob"]').value = p.pob;
     if (p.lat) form.querySelector('input[name="lat"]').value = p.lat;
     if (p.lon) form.querySelector('input[name="lon"]').value = p.lon;
     if (p.tz) form.querySelector('input[name="tz"]').value = p.tz;
 
+    // Restore saved Tag Description in hidden input and Quill editor
+    const descField = form.querySelector('input[name="desc"]');
+    const descEditorBox = form.querySelector('.desc-editor');
+    const savedDesc = p.desc && p.desc !== 'None' ? p.desc : '';
 
-// Restore saved Tag Description in both the hidden input and Quill editor
-const descField = form.querySelector('input[name="desc"]');
-const descEditorBox = form.querySelector('.desc-editor');
-const savedDesc = p.desc && p.desc !== 'None' ? p.desc : '';
-
-if (descField) {
-  descField.value = savedDesc;
-}
-
-if (descEditorBox && descEditorBox.__quill) {
-  if (savedDesc.trim()) {
-    descEditorBox.__quill.clipboard.dangerouslyPasteHTML(savedDesc, 'silent');
-  } else {
-    descEditorBox.__quill.setText('', 'silent');
-  }
-}    
-    // Auto-populate tag pills via simulated clicks
+    if (descField) descField.value = savedDesc;
+    if (descEditorBox && descEditorBox.__quill) {
+      if (savedDesc.trim()) {
+        descEditorBox.__quill.clipboard.dangerouslyPasteHTML(savedDesc, 'silent');
+      } else {
+        descEditorBox.__quill.setText('', 'silent');
+      }
+    }    
+    
+    // Auto-populate tag pills
     if (p.tags && p.tags !== 'None') {
       const savedTagsArr = p.tags.split(';').map(t => t.trim());
       form.querySelectorAll('.tag-pill').forEach(pill => {
         const tag = pill.dataset.tag;
         const isSelected = selectedTagsSet.has(tag);
         const shouldBeSelected = savedTagsArr.includes(tag);
-        // If state doesn't match what's in the DB, click it to toggle
         if (isSelected !== shouldBeSelected) pill.click();
       });
     }
     
-    // Expand advanced settings automatically to show auto-filled data
+    // Expand collapsible coordinates if closed
     const collapseBox = form.querySelector('.collapsible-fields');
     if (collapseBox && collapseBox.style.maxHeight === '0px') {
-        form.querySelector('.collapse-toggle-bar').click();
+      form.querySelector('.collapse-toggle-bar').click();
     }
+
+    // Immediately close dropdown and release focus
     close();
+    inp.blur();
   };
 
   inp.addEventListener('input', async () => {
+    const currentSeq = ++searchSeq;
     const q = inp.value.trim().toLowerCase();
+    
     if (q.length < 1) return close();
     
     const profiles = await fetchSavedProfiles();
-    if (profiles.error || !profiles.length) return close();
+    
+    // GUARD 1: If user clicked outside or focused another input while loading, cancel
+    if (document.activeElement !== inp) return;
+
+    // GUARD 2: If a newer keystroke was typed while this was fetching, cancel
+    if (currentSeq !== searchSeq) return;
+
+    if (!profiles || profiles.error || !profiles.length) return close();
 
     items = profiles.filter(c => {
       const matchName = c.name && c.name.toLowerCase().includes(q);
       const matchPob = c.pob && c.pob.toLowerCase().includes(q);
-      const matchesQuery = matchName || matchPob;
+      const cleanDesc = c.desc && c.desc !== 'None' ? c.desc.replace(/<[^>]*>?/gm, '').toLowerCase() : '';
+      const matchDesc = cleanDesc.includes(q);
+
+      const matchesQuery = matchName || matchPob || matchDesc;
 
       if (selectedTagsSet && selectedTagsSet.size > 0) {
         if (!c.tags || c.tags === 'None') return false;
@@ -5467,12 +5586,24 @@ if (descEditorBox && descEditorBox.__quill) {
         return matchesQuery && Array.from(selectedTagsSet).every(t => profileTags.includes(t));
       }
       return matchesQuery;
-    }).slice(0, 8);
-    idx = items.length ? 0 : -1;
-    
-    list.innerHTML = items.length
-      ? items.map((p, i) => `<li role="option" data-i="${i}" aria-selected="${i === idx}" style="display:flex; justify-content:space-between; align-items:center; gap:16px;"><span style="font-weight:600; white-space:nowrap;">${esc(p.name)}</span><small style="color:var(--muted); text-align:right; white-space:nowrap;">${esc(p.dob)} &nbsp;·&nbsp; <b>${esc(p.pob || '')}</b> ${p.id ? `· <span style="color:var(--saffron);">${esc(p.id)}</span>` : ''}</small></li>`).join('')
-      : `<li class="none">No saved match</li>`;
+    }).slice(0, 12);
+
+    // Double check focus right before writing to DOM
+    if (document.activeElement !== inp) return;
+
+    if (!items.length) {
+      close();
+      return;
+    }
+
+    idx = 0;
+    list.innerHTML = items.map((p, i) => `
+      <li role="option" data-i="${i}" aria-selected="${i === idx}" style="display:flex; justify-content:space-between; align-items:center; gap:16px;">
+        <span style="font-weight:600; white-space:nowrap;">${esc(p.name)}</span>
+        <small style="color:var(--muted); text-align:right; white-space:nowrap;">
+          ${esc(p.dob)} &nbsp;·&nbsp; <b>${esc(p.pob || '')}</b>
+        </small>
+      </li>`).join('');
 
     list.hidden = false;
     inp.setAttribute('aria-expanded', 'true');
@@ -5480,16 +5611,30 @@ if (descEditorBox && descEditorBox.__quill) {
 
   inp.addEventListener('keydown', e => {
     if (list.hidden || !items.length) return;
-    if (e.key === 'ArrowDown') { e.preventDefault(); idx = (idx + 1) % items.length; list.querySelectorAll('li').forEach((li, k) => li.setAttribute('aria-selected', String(k === idx))); } 
-    else if (e.key === 'ArrowUp') { e.preventDefault(); idx = (idx - 1 + items.length) % items.length; list.querySelectorAll('li').forEach((li, k) => li.setAttribute('aria-selected', String(k === idx))); } 
-    else if (e.key === 'Enter') { e.preventDefault(); if (items[idx]) pick(items[idx]); } 
-    else if (e.key === 'Escape') close();
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      idx = (idx + 1) % items.length;
+      list.querySelectorAll('li').forEach((li, k) => li.setAttribute('aria-selected', String(k === idx)));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      idx = (idx - 1 + items.length) % items.length;
+      list.querySelectorAll('li').forEach((li, k) => li.setAttribute('aria-selected', String(k === idx)));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (items[idx]) pick(items[idx]);
+    } else if (e.key === 'Escape') {
+      close();
+    }
   });
 
   list.addEventListener('mousedown', e => {
     const li = e.target.closest('li[data-i]');
-    if (li) { e.preventDefault(); pick(items[+li.dataset.i]); }
+    if (li) {
+      e.preventDefault();
+      pick(items[+li.dataset.i]);
+    }
   });
+
   inp.addEventListener('blur', () => setTimeout(close, 150));
 }
 
@@ -5557,27 +5702,6 @@ function parseDmy(str) {
   const d = parseInt(p[0], 10), m = parseInt(p[1], 10), y = parseInt(p[2], 10);
   if (isNaN(d) || isNaN(m) || isNaN(y) || y < 1800 || y > 2100 || m < 1 || m > 12 || d < 1 || d > 31) return null;
   return { y, m, d };
-}
-
-function updateNotesButtonState() {
-  const generateKundaliBtn = document.querySelector('#generateKundaliBtn');
-  const updateNotesBtn = document.querySelector('#updateNotesBtn');
-
-  if (!updateNotesBtn) return;
-
-  const isGenerateFaded = generateKundaliBtn && (generateKundaliBtn.disabled || generateKundaliBtn.style.opacity === '0.4' || generateKundaliBtn.classList.contains('faded'));
-
-  if (isGenerateFaded) {
-    updateNotesBtn.disabled = false;
-    updateNotesBtn.style.opacity = '1';
-    updateNotesBtn.style.pointerEvents = 'auto';
-    updateNotesBtn.style.cursor = 'pointer';
-  } else {
-    updateNotesBtn.disabled = true;
-    updateNotesBtn.style.opacity = '0.4';
-    updateNotesBtn.style.pointerEvents = 'none';
-    updateNotesBtn.style.cursor = 'not-allowed';
-  }
 }
 
 /* ================= INITIALIZATION & HANDLERS ================= */
@@ -5795,8 +5919,8 @@ addBtn.addEventListener('click', () => {
   <button type="button" class="ql-clear-description" title="Clear description" aria-label="Clear description">✕</button>
 </div>
 
-    <!-- 3. Sharp Rectangle Update Notes Button (Pushed to the right using margin-left: auto) -->
-    <button id="updateNotesBtn" style="margin-left: auto; border-radius: 4px; padding: 6px 16px; font-size: 0.85rem; font-weight: 500; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); opacity: 0.4; pointer-events: none; cursor: not-allowed; transition: opacity 0.2s;" disabled>Update</button>
+   <!-- Unique per-chart Update Button -->
+    <button type="button" id="updateBtn${n}" style="margin-left: auto; border-radius: 4px; padding: 6px 16px; font-size: 0.85rem; font-weight: 500; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); opacity: 0.4; pointer-events: none; cursor: not-allowed; transition: opacity 0.2s;" disabled>Update</button>
 
   </div>
 
@@ -5878,11 +6002,14 @@ if (descEditor && descToolbar && descInput && formatToggle) {
     formatToggle.setAttribute('aria-expanded', String(!isHidden));
   });
 
-  // Sync description with the hidden input
-  function syncDescription() {
+  // Sync description with the hidden input and notify edit state
+  function syncDescription(delta, oldDelta, source) {
     descInput.value = descQuill.getText().trim()
       ? descQuill.root.innerHTML
       : '';
+    if (source === 'user' && typeof markProfileAsEdited === 'function') {
+      markProfileAsEdited();
+    }
   }
 
   descQuill.on('text-change', syncDescription);
@@ -5921,11 +6048,15 @@ saveBtn.addEventListener('click', async () => {
     saveBtn.textContent = 'Saving...';
     saveBtn.disabled = true;
 
-    // 1. Send data to Google Sheets immediately
+    // 1. Send data to Google Sheets immediately & invalidate cache
     fetch(WEB_APP_URL, {
       method: 'POST',
       mode: 'no-cors',
       body: JSON.stringify(payload)
+    }).then(() => {
+      // Invalidate cache so fresh records are synced
+      localStorage.removeItem(PROFILES_STORAGE_KEY);
+      savedProfilesCache = null;
     }).catch(err => console.warn('Background save note:', err));
 
     // 2. Fade generate button
@@ -5967,6 +6098,56 @@ saveBtn.addEventListener('click', async () => {
     }
   });
 
+// Handle Update Button with confirmation
+  const updateBtn = sec.querySelector(`#updateBtn${n}`);
+  if (updateBtn) {
+    updateBtn.addEventListener('click', () => {
+      const recordId = sec.dataset.chartId;
+      if (!recordId) return;
+
+      showUpdateConfirm(updateBtn, recordId, () => {
+        updateBtn.disabled = true;
+        updateBtn.textContent = 'Updating...';
+
+        const payload = {
+          action: 'update',
+          id: recordId,
+          name: sec.querySelector('input[name="name"]').value || 'N/A',
+          dob: formatForSheet(sec.querySelector('input[name="dob"]').value) || 'N/A',
+          tob: sec.querySelector('input[name="tob"]').value || 'N/A',
+          pob: sec.querySelector('input[name="pob"]').value || 'N/A',
+          lat: sec.querySelector('input[name="lat"]').value || '',
+          lon: sec.querySelector('input[name="lon"]').value || '',
+          tz: sec.querySelector('input[name="tz"]').value || '',
+          tags: Array.from(selectedTags).join('; ') || 'None',
+          desc: sec.querySelector('input[name="desc"]').value || 'None'
+        };
+
+        fetch(WEB_APP_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          body: JSON.stringify(payload)
+        }).then(() => {
+          localStorage.removeItem(PROFILES_STORAGE_KEY);
+          savedProfilesCache = null;
+
+          updateBtn.textContent = 'Updated ✓';
+          setTimeout(() => {
+            updateBtn.textContent = 'Update';
+            updateBtn.disabled = true;
+            updateBtn.style.opacity = '0.4';
+            updateBtn.style.pointerEvents = 'none';
+            updateBtn.style.cursor = 'not-allowed';
+          }, 2000);
+        }).catch(err => {
+          console.warn('Update failed:', err);
+          updateBtn.textContent = 'Error';
+          updateBtn.disabled = false;
+        });
+      });
+    });
+  }
+
 // Toggle Collapse on click
 toggleBar.addEventListener('click', () => {
   const isCollapsed = collapseBox.style.maxHeight === '0px';
@@ -6002,6 +6183,7 @@ toggleBar.addEventListener('click', () => {
         pill.style.borderColor = 'var(--saffron)';
         pill.textContent = `✓ ${tag}`;
       }
+      markProfileAsEdited();
     });
   });
 
@@ -6011,19 +6193,51 @@ toggleBar.addEventListener('click', () => {
 // Editing a saved profile means this form is no longer the
 // unchanged saved record. Require chart regeneration before saving.
 function markProfileAsEdited() {
-  sec.dataset.chartId = '';
+  delete sec.dataset.chartSaved;
 
-  const btn = sec.querySelector(`#saveBtn${n}`);
+  const saveB = sec.querySelector(`#saveBtn${n}`);
+  const updateB = sec.querySelector(`#updateBtn${n}`);
+  const genB = sec.querySelector(`#genBtn${n}`);
 
-  if (btn) {
-    btn.disabled = true;
-    btn.style.opacity = '0.4';
-    btn.style.cursor = 'not-allowed';
-    btn.textContent = 'Save details';
+  // Re-enable Generate Kundali because details were modified
+  if (genB) {
+    genB.disabled = false;
+    genB.style.opacity = '1';
+    genB.style.cursor = 'pointer';
+  }
+
+  // If record already exists in Google Sheets, enable Update and lock duplicate Save
+  if (sec.dataset.chartId) {
+    if (saveB) {
+      saveB.disabled = true;
+      saveB.style.opacity = '0.4';
+      saveB.style.cursor = 'not-allowed';
+      saveB.textContent = 'Already saved ✓';
+    }
+    if (updateB) {
+      updateB.disabled = false;
+      updateB.style.opacity = '1';
+      updateB.style.pointerEvents = 'auto';
+      updateB.style.cursor = 'pointer';
+    }
+  } else {
+    // Unsaved chart: require regeneration before saving
+    if (saveB) {
+      saveB.disabled = true;
+      saveB.style.opacity = '0.4';
+      saveB.style.cursor = 'not-allowed';
+      saveB.textContent = 'Save details';
+    }
+    if (updateB) {
+      updateB.disabled = true;
+      updateB.style.opacity = '0.4';
+      updateB.style.pointerEvents = 'none';
+      updateB.style.cursor = 'not-allowed';
+    }
   }
 }
 
-// A manually edited field clears the selected saved ID.
+// Monitor inputs and textareas for edits
 sec.querySelectorAll('input, textarea').forEach(field => {
   field.addEventListener('input', markProfileAsEdited);
   field.addEventListener('change', markProfileAsEdited);
@@ -6045,19 +6259,27 @@ sec.querySelectorAll('input, textarea').forEach(field => {
 
 sec.querySelector('form').addEventListener('submit', ev => {
     ev.preventDefault();
-    const data = Object.fromEntries(new FormData(ev.currentTarget).entries());
+    const formEl = ev.currentTarget;
+    const data = Object.fromEntries(new FormData(formEl).entries());
     const dateObj = parseDmy(data.dob);
+
+    const dobInput = formEl.querySelector('input[name="dob"]');
+    const tobInput = formEl.querySelector('input[name="tob"]');
+    const pobInput = formEl.querySelector('input[name="pob"]');
     
     if (!dateObj) {
-      showButtonError(submitBtn, 'Enter valid Date (DD/MM/YYYY).');
+      showButtonError(dobInput, 'Enter valid Date (DD/MM/YYYY).');
+      dobInput?.focus();
       return;
     }
     if (!data.tob) {
-      showButtonError(submitBtn, 'Enter Time of birth.');
+      showButtonError(tobInput, 'Enter Time of birth.');
+      tobInput?.focus();
       return;
     }
     if (!data.pob && (!data.lat || !data.lon)) {
-      showButtonError(submitBtn, 'Enter Place of birth or coordinates.');
+      showButtonError(pobInput, 'Enter Place of birth or coordinates.');
+      pobInput?.focus();
       return;
     }
 
@@ -6136,12 +6358,39 @@ if (data.desc && data.desc.trim()) {
       sec.dataset.chartId || '' // <--- Passes the unique ID to render beside the name
     );
 
-// Unlock the "Save details" button now that generation is successful
+// Handle Save vs Update state post-generation
     const activeSaveBtn = sec.querySelector(`#saveBtn${n}`);
-    if (activeSaveBtn) {
-      activeSaveBtn.disabled = false;
-      activeSaveBtn.style.opacity = '1';
-      activeSaveBtn.style.cursor = 'pointer';
+    const activeUpdateBtn = sec.querySelector(`#updateBtn${n}`);
+    const isExisting = Boolean(sec.dataset.chartId);
+
+    if (isExisting) {
+      // Keep save disabled to prevent duplicates; activate Update instead
+      if (activeSaveBtn) {
+        activeSaveBtn.textContent = 'Already saved ✓';
+        activeSaveBtn.disabled = true;
+        activeSaveBtn.style.opacity = '0.4';
+        activeSaveBtn.style.cursor = 'not-allowed';
+      }
+      if (activeUpdateBtn) {
+        activeUpdateBtn.disabled = false;
+        activeUpdateBtn.style.opacity = '1';
+        activeUpdateBtn.style.pointerEvents = 'auto';
+        activeUpdateBtn.style.cursor = 'pointer';
+      }
+    } else {
+      // Brand new unsaved chart: allow saving
+      if (activeSaveBtn) {
+        activeSaveBtn.textContent = 'Save details';
+        activeSaveBtn.disabled = false;
+        activeSaveBtn.style.opacity = '1';
+        activeSaveBtn.style.cursor = 'pointer';
+      }
+      if (activeUpdateBtn) {
+        activeUpdateBtn.disabled = true;
+        activeUpdateBtn.style.opacity = '0.4';
+        activeUpdateBtn.style.pointerEvents = 'none';
+        activeUpdateBtn.style.cursor = 'not-allowed';
+      }
     }
   });
 });
