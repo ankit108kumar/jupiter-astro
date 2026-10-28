@@ -327,6 +327,117 @@
   --pop-bg: #FFFFFF;
 }
 
+
+/* ==========================================
+   CELESTIAL PASTEL — LIGHT THEME
+   ========================================== */
+[data-palette="celestial"] {
+  color-scheme: light;
+
+  /* Surfaces */
+  --paper: #F5F3FB;
+  --surface: #FFFFFF;
+  --surface-alt: #F0EDF9;
+
+  /* Text */
+  --ink: #171B46;
+  --muted: #666B91;
+
+  /* Borders */
+  --line: #E2DDED;
+  --line-strong: #CCC5E3;
+
+  /* Violet accent */
+  --saffron: #6040D8;
+  --saffron-soft: rgba(96, 64, 216, 0.10);
+  --indigo-soft: rgba(139, 115, 235, 0.13);
+  --al: #6554C0;
+
+  /* Status colors */
+  --good: #25866B;
+  --good-soft: rgba(37, 134, 107, 0.11);
+  --bad: #C64F62;
+  --bad-soft: rgba(198, 79, 98, 0.10);
+  --amber: #B76B32;
+  --amber-soft: rgba(241, 124, 114, 0.14);
+
+  /* Chart and popup surfaces */
+  --brand-bg: rgba(255, 255, 255, 0.92);
+  --chart-bg: #FFFFFF;
+  --chart-lagna-bg: #F0E8FB;
+  --chart-line: #D8CDEB;
+  --pop-bg: #FFFFFF;
+
+  /* Additional Celestial colors */
+  --celestial-violet: #6040D8;
+  --celestial-purple: #9360CF;
+  --celestial-coral: #F17C72;
+  --celestial-peach: #FBE5D9;
+  --celestial-lavender: #E7E8FA;
+  --celestial-mint: #D9F2E7;
+}
+
+/* Atmospheric background */
+html[data-palette="celestial"] body {
+  background:
+    radial-gradient(
+      ellipse at 8% 0%,
+      rgba(155, 175, 248, 0.13),
+      transparent 36%
+    ),
+    radial-gradient(
+      ellipse at 95% 12%,
+      rgba(241, 124, 114, 0.10),
+      transparent 32%
+    ),
+    linear-gradient(
+      135deg,
+      #F5F3FB 0%,
+      #FFFAF5 55%,
+      #F9F1FA 100%
+    );
+}
+
+/* Violet gradient for ordinary primary buttons */
+[data-palette="celestial"] .btn:not(.ghost) {
+  background: linear-gradient(
+    110deg,
+    #6040D8,
+    #9360CF
+  );
+  color: #FFFFFF;
+  border-color: transparent;
+}
+
+/* Violet active navigation */
+[data-palette="celestial"]
+.tabs button[aria-selected="true"] {
+  background: linear-gradient(
+    110deg,
+    #6040D8,
+    #9360CF
+  );
+  color: #FFFFFF;
+  border-color: transparent;
+}
+
+/* Gradient across every Panchang card */
+[data-palette="celestial"] .panchang-item,
+[data-palette="celestial"] .panchang-item.highlight {
+  background: linear-gradient(
+    135deg,
+    #F0E8FB 0%,
+    #FFF3ED 55%,
+    #FFF8F2 100%
+  ) !important;
+  border-color: #D9C8ED !important;
+}
+
+[data-palette="celestial"] .panchang-item .panchang-value {
+  color: #6040D8 !important;
+}
+
+
 /* Inline Floating Error Popup */
 .inline-error-popup {
   position: absolute;
@@ -937,7 +1048,7 @@ input:focus-visible { border-color: var(--saffron); }
   width: 260px;
   max-width: calc(100vw - 24px);
   padding: 12px 14px;
-  background: color-mix(in srgb, var(--surface) 30%, transparent);
+  background: color-mix(in srgb, var(--surface) 0%, transparent);
   color: var(--ink);
   border: 1px solid rgba(212, 160, 74, 0.25);
   border-left: 2px solid rgba(212, 160, 74, 0.45);
@@ -1619,8 +1730,9 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
       </label>
       <select id="paletteSelect" aria-label="Select Palette">
         <option value="">Default</option>
-        <option value="mint">Pastel Mint</option>
-	<option value="ivory">Golden Ivory</option>
+        <option value="mint">Pastel Mint</option> 
+        <option value="celestial">Celestial Pastel</option>
+	      <option value="ivory">Golden Ivory</option>
         <option value="ocean">Ocean Blue</option>
         <option value="lime">Cyber Lime</option>
         <option value="lilac">White Lilac</option>
@@ -3081,7 +3193,8 @@ const PALETTE_CHART_COLORS = {
   mint:  { surf: '#FFFFFF', soft: '#D4F9DC', line: '#A2EAB1', ink: '#10341B', muted: '#4B6E54', sa: '#15803D', al: '#0284C7', good: '#16A34A', bad: '#DC2626' },
   cream: { surf: '#FFFFFF', soft: '#FFEE99', line: '#E6D785', ink: '#332B00', muted: '#7A7040', sa: '#B8860B', al: '#2563EB', good: '#059669', bad: '#DC2626' },
 ivory: { surf: '#FFFFFF', soft: '#FFF8E8', line: '#D9CEB2', ink: '#1B1B1F', muted: '#6B6354', sa: '#E09A12', al: '#B06E10', good: '#059669', bad: '#DC2626' },
-  turquoise: { surf: '#FFFFFF', soft: '#E0F8F6', line: '#40E0D0', ink: '#0A3633', muted: '#417370', sa: '#00A896', al: '#0284C7', good: '#059669', bad: '#DC2626' }
+  turquoise: { surf: '#FFFFFF', soft: '#E0F8F6', line: '#40E0D0', ink: '#0A3633', muted: '#417370', sa: '#00A896', al: '#0284C7', good: '#059669', bad: '#DC2626' }, 
+  celestial: { surf: '#FFFFFF', soft: 'url(#celestialLagnaGradient)', line: '#D8CDEB', ink: '#171B46', muted: '#666B91', sa: '#6040D8', al: '#6554C0', good: '#25866B', bad: '#C64F62'}
 };
 
 // getChartColors uses the custom palette if set; otherwise respects the top-right light/dark mode
@@ -3267,7 +3380,29 @@ function drawNorthChart(lagnaSign, placements, title, fs = 12, savList = null) {
     (byHouse[h] = byHouse[h] || []).push(p); 
   });
 
-  let s = `<svg viewBox="-6 -6 312 312" role="img" aria-label="${esc(title)}"><rect x="0" y="0" width="300" height="300" fill="${C.surf}"/>`;
+  
+const isCelestial =
+  document.documentElement.getAttribute('data-palette') === 'celestial';
+
+let s = `<svg viewBox="-6 -6 312 312"
+  role="img" aria-label="${esc(title)}">`;
+
+if (isCelestial) {
+  s += `<defs>
+    <linearGradient
+      id="celestialLagnaGradient"
+      x1="0%" y1="0%"
+      x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E7E8FA"/>
+      <stop offset="55%" stop-color="#F0E8FB"/>
+      <stop offset="100%" stop-color="#FBE5D9"/>
+    </linearGradient>
+  </defs>`;
+}
+
+s += `<rect x="0" y="0" width="300" height="300"
+  fill="${C.surf}"/>`;
+
   s += `<polygon points="150,0 225,75 150,150 75,75" fill="${C.soft}"/>`;
   for (let h = 1; h <= 12; h++) s += `<polygon class="hz" data-h="${h}" points="${NORTH_POLY[h]}" fill="transparent"/>`;
   s += `<path d="M0 0L300 300M300 0L0 300M150 0L300 150L150 300L0 150Z" fill="none" stroke="${C.line}" stroke-width="1.2"/>`;
