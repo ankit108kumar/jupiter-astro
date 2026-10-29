@@ -2108,28 +2108,28 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
   }
 }
 
-/* FIX: Quill font/list dropdown appearing behind description box */
+/* FIX: Quill dropdown layering */
+header.brand {
+  position: relative;
+  z-index: 1100;
+}
 
-/* Place the entire toolbar above the editor */
 .desc-toolbar.ql-toolbar.ql-snow {
   position: relative;
   z-index: 1000;
   overflow: visible !important;
 }
 
-/* Raise the active dropdown above the description editor */
 .desc-toolbar.ql-toolbar.ql-snow .ql-picker.ql-expanded {
   position: relative;
   z-index: 1002;
 }
 
-/* Ensure dropdown options remain visible */
 .desc-toolbar.ql-toolbar.ql-snow .ql-picker-options {
   position: absolute;
   z-index: 1003;
 }
 
-/* Keep the description editor below the toolbar */
 .desc-editor.ql-container.ql-snow {
   position: relative;
   z-index: 1;
