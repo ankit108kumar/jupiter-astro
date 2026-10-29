@@ -558,6 +558,323 @@ html[data-palette="lavender-peach"] .panchang-card {
   --pop-bg: #FFFFFF;
 }
 
+/* ==========================================================
+   WOODEN LIQUID GLASS — JupiterAstro
+   Premium wood grain + warm translucent glass
+   ========================================================== */
+
+[data-palette="wooden"] {
+  color-scheme: light;
+
+  /* Core palette */
+  --paper: #3B2416;
+  --surface: rgba(255, 244, 224, 0.66);
+  --surface-alt: rgba(228, 194, 146, 0.42);
+  --ink: #382113;
+  --muted: #765238;
+  --line: rgba(255, 229, 190, 0.56);
+  --line-strong: rgba(164, 104, 52, 0.68);
+
+  /* Brand and status colours */
+  --saffron: #A85E22;
+  --saffron-soft: rgba(168, 94, 34, 0.16);
+  --indigo-soft: rgba(203, 151, 91, 0.18);
+  --al: #276C8C;
+
+  --good: #2E7851;
+  --good-soft: rgba(46, 120, 81, 0.14);
+  --bad: #B83A32;
+  --bad-soft: rgba(184, 58, 50, 0.13);
+  --amber: #A96520;
+  --amber-soft: rgba(169, 101, 32, 0.16);
+
+  /* Chart colours */
+  --brand-bg: rgba(74, 42, 22, 0.72);
+  --chart-bg: rgba(255, 239, 211, 0.94);
+  --chart-lagna-bg: #E8C99B;
+  --chart-line: #9B6739;
+  --pop-bg: rgba(255, 246, 229, 0.96);
+
+  /* Liquid glass */
+  --wood-glass: rgba(255, 239, 211, 0.30);
+  --wood-glass-strong: rgba(255, 239, 211, 0.52);
+  --wood-glass-border: rgba(255, 229, 190, 0.72);
+  --wood-glass-highlight: rgba(255, 250, 238, 0.82);
+  --wood-shadow: 0 12px 32px rgba(27, 13, 5, 0.24);
+  --wood-blur: 18px;
+}
+
+/* Wooden background with lighter warm grain */
+html[data-palette="wooden"] body {
+  color: var(--ink);
+  background-color: #5A3922;
+  background-image:
+    radial-gradient(
+      ellipse at 12% 8%,
+      rgba(255, 213, 157, 0.34),
+      transparent 30%
+    ),
+    radial-gradient(
+      ellipse at 88% 18%,
+      rgba(74, 42, 22, 0.18),
+      transparent 36%
+    ),
+    radial-gradient(
+      ellipse at 52% 100%,
+      rgba(255, 213, 157, 0.25),
+      transparent 44%
+    ),
+    repeating-linear-gradient(
+      2deg,
+      rgba(255, 230, 190, 0.07) 0px,
+      rgba(255, 230, 190, 0.07) 2px,
+      rgba(75, 43, 24, 0.06) 3px,
+      rgba(75, 43, 24, 0.06) 7px,
+      transparent 8px,
+      transparent 17px
+    ),
+    linear-gradient(
+      115deg,
+      #89613F 0%,
+      #5D3C27 42%,
+      #795235 72%,
+      #50321F 100%
+    );
+  background-attachment: fixed;
+}
+
+/* Frosted glass surfaces */
+html[data-palette="wooden"] .panel,
+html[data-palette="wooden"] .card,
+html[data-palette="wooden"] article.card,
+html[data-palette="wooden"] .panchang-card,
+html[data-palette="wooden"] .panchang-item,
+html[data-palette="wooden"] .chip,
+html[data-palette="wooden"] .sugg,
+html[data-palette="wooden"] .zodiac-hover-card,
+html[data-palette="wooden"] .inline-error-popup,
+html[data-palette="wooden"] .desc-editor,
+html[data-palette="wooden"] .desc-toolbar {
+  background-color: var(--wood-glass);
+  border-color: var(--wood-glass-border);
+  box-shadow:
+    inset 0 1px 0 var(--wood-glass-highlight),
+    var(--wood-shadow);
+  -webkit-backdrop-filter: blur(var(--wood-blur)) saturate(145%);
+  backdrop-filter: blur(var(--wood-blur)) saturate(145%);
+}
+
+html[data-palette="wooden"] .panel,
+html[data-palette="wooden"] .card,
+html[data-palette="wooden"] .panchang-card {
+  border-radius: 16px;
+}
+
+/* Remove the square background behind the palette dropdown */
+html[data-palette="wooden"] .palette-chooser {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  padding: 0 !important;
+}
+
+/* Rounded glass palette dropdown */
+html[data-palette="wooden"] .palette-chooser select {
+  border-radius: 999px !important;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 246, 226, 0.94),
+    rgba(224, 197, 157, 0.96)
+  ) !important;
+  color: #3E2819 !important;
+  border: 1px solid rgba(255, 229, 190, 0.9) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 4px 12px rgba(32, 17, 7, 0.20) !important;
+}
+
+/* Warm cream form controls */
+html[data-palette="wooden"] input,
+html[data-palette="wooden"] select,
+html[data-palette="wooden"] textarea,
+html[data-palette="wooden"] .ql-container.ql-snow {
+  color: #382113;
+  background-color: rgba(255, 246, 229, 0.78);
+  border-color: rgba(164, 104, 52, 0.48);
+  box-shadow:
+    inset 0 1px 3px rgba(70, 36, 13, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.48);
+}
+
+html[data-palette="wooden"] input::placeholder,
+html[data-palette="wooden"] textarea::placeholder {
+  color: #89694B;
+}
+/* Wooden Liquid Glass — Footer Visibility Fix */
+html[data-palette="wooden"] footer {
+  color: #F8E6CB !important;
+  border-top: 1px solid rgba(255, 220, 170, 0.42) !important;
+  background: linear-gradient(
+    90deg,
+    rgba(66, 37, 20, 0.38),
+    rgba(130, 87, 49, 0.22),
+    rgba(66, 37, 20, 0.38)
+  );
+}
+
+html[data-palette="wooden"] footer strong {
+  color: #FFF0D6 !important;
+}
+
+html[data-palette="wooden"] footer span {
+  color: #DDB77E !important;
+}
+
+html[data-palette="wooden"] footer a {
+  color: #F5D5A2 !important;
+  text-decoration: none;
+}
+
+html[data-palette="wooden"] footer a:hover {
+  color: #FFFFFF !important;
+  text-decoration: underline;
+}
+
+/* Quill editor toolbar */
+html[data-palette="wooden"] .ql-toolbar.ql-snow {
+  background: rgba(238, 211, 171, 0.78);
+  border-color: rgba(164, 104, 52, 0.48);
+}
+
+html[data-palette="wooden"] .ql-snow .ql-stroke {
+  stroke: #68401F;
+}
+
+html[data-palette="wooden"] .ql-snow .ql-fill {
+  fill: #68401F;
+}
+
+html[data-palette="wooden"] .ql-snow .ql-picker {
+  color: #382113;
+}
+
+/* Buttons */
+html[data-palette="wooden"] button,
+html[data-palette="wooden"] .btn {
+  border-color: rgba(255, 224, 178, 0.70);
+  transition:
+    box-shadow 180ms ease,
+    transform 180ms ease,
+    background-color 180ms ease;
+}
+
+html[data-palette="wooden"] .btn:not(.ghost),
+html[data-palette="wooden"] button.primary {
+  color: #FFF5E4;
+  background: linear-gradient(
+    135deg,
+    #A86B35 0%,
+    #71401F 48%,
+    #9A5D2D 100%
+  );
+  border-color: rgba(255, 220, 169, 0.82);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 245, 224, 0.42),
+    0 5px 14px rgba(42, 20, 8, 0.22);
+}
+
+html[data-palette="wooden"] .btn.ghost {
+  color: #4A2B17;
+  background: rgba(255, 239, 211, 0.36);
+}
+
+html[data-palette="wooden"] button:hover,
+html[data-palette="wooden"] .btn:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    0 7px 18px rgba(30, 14, 5, 0.24);
+}
+
+html[data-palette="wooden"] button:active,
+html[data-palette="wooden"] .btn:active {
+  transform: translateY(1px);
+}
+
+/* Research tags: readable text and premium selection state */
+html[data-palette="wooden"] .tag-pill {
+  color: #432714 !important;
+  background: linear-gradient(
+    135deg,
+    #FFF2D9 0%,
+    #E8C99B 100%
+  ) !important;
+  border: 1px solid #B9854F !important;
+  border-radius: 999px !important;
+  padding: 6px 12px !important;
+  font-size: 0.78rem !important;
+  font-weight: 650 !important;
+  line-height: 1.35 !important;
+  text-shadow: none !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    0 2px 5px rgba(48, 25, 9, 0.12) !important;
+}
+
+html[data-palette="wooden"] .tag-pill:hover {
+  color: #2E190B !important;
+  background: #FFF7E8 !important;
+  border-color: #8B5429 !important;
+}
+
+html[data-palette="wooden"] .tag-pill.is-selected {
+  color: #FFF5E3 !important;
+  background: linear-gradient(
+    135deg,
+    #875126 0%,
+    #4B2A15 100%
+  ) !important;
+  border-color: #F0C783 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 244, 220, 0.25),
+    0 3px 9px rgba(40, 18, 5, 0.24) !important;
+}
+
+/* Add Next Chart button */
+html[data-palette="wooden"] #addChartBtn {
+  color: #FFF6E6 !important;
+  background: linear-gradient(
+    135deg,
+    #A96F37 0%,
+    #70401F 52%,
+    #92572B 100%
+  ) !important;
+  border: 1px solid #E8C18A !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 246, 224, 0.42),
+    0 5px 15px rgba(34, 16, 5, 0.28) !important;
+}
+
+html[data-palette="wooden"] #addChartBtn:hover {
+  background: linear-gradient(
+    135deg,
+    #BD8549 0%,
+    #80502A 52%,
+    #A66A38 100%
+  ) !important;
+}
+
+/* Keep chart text crisp; chart geometry remains unchanged */
+html[data-palette="wooden"] svg text {
+  text-rendering: geometricPrecision;
+}
+
+html[data-palette="wooden"] .panchang-label {
+  color: #765238;
+}
 
 /* ==========================================
    CELESTIAL PASTEL — LIGHT THEME
@@ -1997,6 +2314,7 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
         <option value="mint">Pastel Mint</option> 
         <option value="celestial">Celestial Pastel</option>
         <option value="lavender-peach">Lavender Peach</option>
+        <option value="wooden">Wooden Glass</option>
 	      <option value="ivory">Golden Ivory</option>
         <option value="ocean">Ocean Blue</option>
         <option value="lime">Cyber Lime</option>
@@ -3480,6 +3798,17 @@ const PALETTE_CHART_COLORS = {
   mint:  { surf: '#FFFFFF', soft: '#D4F9DC', line: '#A2EAB1', ink: '#10341B', muted: '#4B6E54', sa: '#15803D', al: '#0284C7', good: '#16A34A', bad: '#DC2626' },
   cream: { surf: '#FFFFFF', soft: '#FFEE99', line: '#E6D785', ink: '#332B00', muted: '#7A7040', sa: '#B8860B', al: '#2563EB', good: '#059669', bad: '#DC2626' },
   ivory: { surf: '#FFFFFF', soft: '#FFF8E8', line: '#D9CEB2', ink: '#1B1B1F', muted: '#6B6354', sa: '#E09A12', al: '#B06E10', good: '#059669', bad: '#DC2626' },
+  wooden: {
+  surf: '#F6E5C7',
+  soft: '#E8C99B',
+  line: '#9B6739',
+  ink: '#3D2414',
+  muted: '#795438',
+  sa: '#A85E22',
+  al: '#276C8C',
+  good: '#2E7851',
+  bad: '#B83A32'
+},
   turquoise: { surf: '#FFFFFF', soft: '#E0F8F6', line: '#40E0D0', ink: '#0A3633', muted: '#417370', sa: '#00A896', al: '#0284C7', good: '#059669', bad: '#DC2626' }, 
   celestial: { surf: '#FFFFFF', soft: 'url(#celestialLagnaGradient)', line: '#D8CDEB', ink: '#171B46', muted: '#666B91', sa: '#6040D8', al: '#6554C0', good: '#25866B', bad: '#C64F62'},
   'lavender-peach': { surf: 'rgba(255,255,255,0.94)', soft: 'url(#lavenderPeachLagnaGradient)', line: '#C7B5E1', ink: '#302541', muted: '#675575', sa: '#8564C9', al: '#9B6AC8', good: '#398C78', bad: '#C45F77'}
