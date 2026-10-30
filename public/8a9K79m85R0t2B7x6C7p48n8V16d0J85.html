@@ -1591,10 +1591,19 @@ input:focus-visible { border-color: var(--saffron); }
 .card h3 { font-size: 1.05rem; margin: 0; }
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 .three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.two + .three { margin-top: 24px; }
 .kchart { position: relative; }
 .kchart svg { display: block; width: 100%; height: auto; max-width: 440px; margin: 0 auto; border-radius: 8px; }
 .kchart svg text { font-family: var(--font-body); }
 .kchart svg [data-p] { cursor: pointer; }
+
+/* Subtle divider above Planetary Table */
+[id$="-overviewPlanetTable"] .scroll {
+  border-top: 1px solid var(--line-strong);
+  padding-top: 14px;
+  margin-top: 8px;
+}
+
 /* Zodiac Sign Hover Information Card */
 .zodiac-hover-card {
   position: fixed;
@@ -1865,13 +1874,6 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
   outline-offset: 3px;
 }
 
-/* Visible keyboard focus */
-.lal-kitab-varshphal-btn:focus-visible {
-  outline: 2px solid #dc2626;
-  outline-offset: 3px;
-}
-
-
 /* Remove unwanted horizontal lines when the Quill editor is focused */
 .field:has(.desc-editor:focus-within) {
   border-top: none !important;
@@ -2036,26 +2038,6 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
   max-width: 34px;
 }
 
-/* Subtle scrollbar */
-.desc-editor .ql-editor {
-  scrollbar-width: thin;
-  scrollbar-color: var(--line-strong) transparent;
-}
-
-.desc-editor .ql-editor::-webkit-scrollbar {
-  width: 6px;
-}
-
-.desc-editor .ql-editor::-webkit-scrollbar-thumb {
-  background: var(--line-strong);
-  border-radius: 10px;
-}
-
-.desc-editor .ql-editor::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-
 /* ===== Mobile Overflow Fix: iPhone, Android & Tablets ===== */
 @media (max-width: 768px) {
 
@@ -2133,6 +2115,47 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
 .desc-editor.ql-container.ql-snow {
   position: relative;
   z-index: 1;
+}
+
+/* =========================================
+   GLOBAL THEME-ADAPTIVE SCROLLBARS
+========================================= */
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--saffron) var(--surface-alt);
+}
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-alt);
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--saffron);
+  border: 2px solid var(--surface-alt);
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink);
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--surface-alt);
+}
+
+[id$="-overviewPlanetTable"]:not([hidden]),
+[id$="-avContent"]:not([hidden]),
+[id$="-apContent"]:not([hidden]) {
+  margin-top: 12px;
 }
 
 </style>
@@ -4781,19 +4804,44 @@ const RenderTabs = {
         </article>
       </div>
 
-      <!-- Planetary table toggle -->
-      <div style="display:flex; justify-content:flex-end; align-items:center; margin-top:10px;">
-        <button
-          type="button"
-          class="deg-toggle-btn"
-          id="${prefix}-planetTableToggleBtn"
-          title="Show planetary table">P</button>
-      </div>
+      <!-- Planetary table toggle buttons -->
+<div
+  id="${prefix}-planetTableControls"
+  style="display:flex; justify-content:flex-end; align-items:center; gap:6px; margin-top:10px;"
+>
+  <button
+    type="button"
+    class="deg-toggle-btn"
+    id="${prefix}-planetTableToggleBtn"
+    title="Show planetary table">P</button>
 
-      <!-- Hidden planetary table -->
-      <div id="${prefix}-overviewPlanetTable" hidden>
-        ${RenderTabs.planets(k)}
-      </div>
+  <button
+    type="button"
+    class="deg-toggle-btn"
+    id="${prefix}-avToggleBtn"
+    title="AV — Function to be added">AV</button>
+
+  <button
+    type="button"
+    class="deg-toggle-btn"
+    id="${prefix}-apToggleBtn"
+    title="AP — Function to be added">AP</button>
+</div>
+
+<!-- Hidden planetary table -->
+<div id="${prefix}-overviewPlanetTable" class="overview-expand-content" hidden>
+  ${RenderTabs.planets(k)}
+</div>
+
+<!-- AV content container -->
+<div id="${prefix}-avContent" hidden>
+  ${RenderTabs.ashtaka(k)}
+</div>
+
+<!-- AP content container -->
+<div id="${prefix}-apContent" hidden>
+  ${RenderTabs.arudha(k)}
+</div>
     `;
   },
 
@@ -5209,7 +5257,7 @@ const activeYear = (typeof window.trSelectedLkYear === 'number' && window.trSele
     // 6. Build Dropdown Options (1 to 120 Years)
     let yearOptions = '';
     for (let y = 1; y <= 120; y++) {
-      const isCur = y === currentRunningYear ? ' [Current Running Year]' : '';
+      const isCur = y === currentRunningYear ? ' [Running]' : '';
       const isSel = y === activeYear ? 'selected' : '';
       yearOptions += '<option value="' + y + '" ' + isSel + '>Year ' + y + ' (Age ' + (y - 1) + '–' + y + ')' + isCur + '</option>';
     }
@@ -5258,11 +5306,8 @@ const activeYear = (typeof window.trSelectedLkYear === 'number' && window.trSele
         </div>
 
         <div style="text-align:right;">
-          <div style="font-size:0.95rem; font-weight:700; color:var(--saffron);">
-            Running Year: ${activeYear} <span style="font-size:0.8rem; color:var(--muted); font-weight:500;">(Age ${activeYear - 1} to ${activeYear})</span>
-          </div>
-          <div style="font-size:0.8rem; color:var(--muted); margin-top:2px;">
-            Span: <b>${dateRangeStr}</b>
+                    <div style="font-size:0.8rem; color:var(--muted); margin-top:2px;">
+            Period: <b>${dateRangeStr}</b>
           </div>
         </div>
       </div>
@@ -5272,8 +5317,7 @@ const activeYear = (typeof window.trSelectedLkYear === 'number' && window.trSele
         <article class="card kchart">
           <header style="display:flex; justify-content:space-between; align-items:center;">
             <h3>Lal Kitab · Natal Chart</h3>
-            <span style="font-size:0.8rem; color:var(--muted);">Fixed Aries (Mesh) Lagna</span>
-          </header>
+            </header>
           <div>${drawNorthChart(0, natalLkItems, 'Natal Lal Kitab')}</div>
           <p style="text-align:center; font-size:0.75rem; color:var(--muted); margin:4px 0 0;">
             Natal Grahas in Fixed Natural Houses
@@ -5386,10 +5430,8 @@ function renderKundaliComponent(
   <button role="tab" class="tab-btn" data-v="promises" aria-selected="false">Life Promises</button>
   <button role="tab" class="tab-btn" data-v="vargas" aria-selected="false">Divisional Charts</button>
   <button role="tab" class="tab-btn" data-v="dasha" aria-selected="false">Dasha</button>
-  <button role="tab" class="tab-btn" data-v="transit" aria-selected="false">Transits &amp; Sade Sati</button>
-  <button role="tab" class="tab-btn" data-v="ashtaka" aria-selected="false">Ashtakavarga</button>
-  <button role="tab" class="tab-btn" data-v="arudha" aria-selected="false">Arudha Padas</button>
-
+  <button role="tab" class="tab-btn" data-v="transit" aria-selected="false">Planetary Transits</button>
+  
   <!-- New Lal Kitab / Varshphal button -->
   <button
     type="button"
@@ -5437,20 +5479,91 @@ function renderKundaliComponent(
       const planetTable =
         document.getElementById(`${prefix}-overviewPlanetTable`);
 
-      if (planetTableBtn && planetTable) {
-        planetTableBtn.addEventListener('click', () => {
-          planetTable.hidden = !planetTable.hidden;
+      const avBtn =
+  document.getElementById(`${prefix}-avToggleBtn`);
 
-          planetTableBtn.classList.toggle(
-            'active',
-            !planetTable.hidden
-          );
+const apBtn =
+  document.getElementById(`${prefix}-apToggleBtn`);
 
-          planetTableBtn.title = planetTable.hidden
-            ? 'Show planetary table'
-            : 'Hide planetary table';
-        });
+const planetTableControls =
+  document.getElementById(`${prefix}-planetTableControls`);
+
+const bottomButtonsSlot =
+  document.getElementById(`${prefix}-bottomButtonsSlot`);
+
+const expandButtons = {
+  P: planetTableBtn,
+  AV: avBtn,
+  AP: apBtn
+};
+
+const expandContents = {
+  P: planetTable,
+  AV: document.getElementById(`${prefix}-avContent`),
+  AP: document.getElementById(`${prefix}-apContent`)
+};
+
+function activateOverviewSection(selected) {
+
+  const isAlreadyOpen =
+    expandContents[selected] &&
+    !expandContents[selected].hidden;
+
+  // Collapse all sections
+  Object.values(expandContents).forEach(content => {
+    if (content) content.hidden = true;
+  });
+
+  // Return all buttons to their original position
+  if (planetTableControls) {
+    Object.values(expandButtons).forEach(btn => {
+      if (btn) planetTableControls.appendChild(btn);
+    });
+  }
+
+  // Reset active button styling
+  Object.values(expandButtons).forEach(btn => {
+    if (btn) btn.classList.remove('active');
+  });
+
+  if (bottomButtonsSlot) {
+    bottomButtonsSlot.style.display = 'none';
+  }
+
+  // Clicking the already-open button collapses it
+  if (isAlreadyOpen) return;
+
+  const selectedContent = expandContents[selected];
+  const selectedButton = expandButtons[selected];
+
+  if (!selectedContent || !selectedButton) return;
+
+  // Expand selected section
+  selectedContent.hidden = false;
+  selectedButton.classList.add('active');
+
+  // Move the other two buttons to the bottom-right
+  if (bottomButtonsSlot) {
+
+    Object.entries(expandButtons).forEach(([key, btn]) => {
+      if (key !== selected && btn) {
+        bottomButtonsSlot.appendChild(btn);
       }
+    });
+
+    bottomButtonsSlot.style.display = 'flex';
+  }
+}
+
+// Attach click listeners to all three buttons
+Object.entries(expandButtons).forEach(([key, btn]) => {
+  if (btn) {
+    btn.addEventListener('click', () => {
+      activateOverviewSection(key);
+    });
+  }
+});
+
     } else if (tabKey === 'vargas') {
       const vFocus = document.getElementById(`${prefix}-vfocus`);
       const vTitle = document.getElementById(`${prefix}-vtitle`);
