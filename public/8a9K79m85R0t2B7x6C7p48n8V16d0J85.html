@@ -2291,6 +2291,191 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
     font-size: 0.82rem;
   }
 }
+
+
+/* ================= COSMIC GLASS THEME ================= */
+
+[data-palette="cosmic"] {
+  color-scheme: dark;
+
+  /* Backgrounds */
+  --paper: #05081A;
+  --surface: rgba(10, 18, 51, 0.82);
+  --surface-alt: rgba(26, 35, 86, 0.72);
+
+  /* Typography */
+  --ink: #FFFFFF;
+  --muted: #C7C9E8;
+
+  /* Borders */
+  --line: rgba(142, 130, 255, 0.22);
+  --line-strong: rgba(142, 130, 255, 0.30);
+
+  /* Brand colours */
+  --saffron: #C636FF;
+  --saffron-soft: rgba(198, 54, 255, 0.16);
+  --indigo-soft: rgba(26, 61, 255, 0.18);
+  --al: #FF8AE6;
+
+  /* Status colours */
+  --good: #69E6C1;
+  --good-soft: rgba(105, 230, 193, 0.13);
+  --bad: #FF729B;
+  --bad-soft: rgba(255, 114, 155, 0.14);
+  --amber: #FFC66D;
+  --amber-soft: rgba(255, 198, 109, 0.14);
+
+  /* Chart colours */
+  --brand-bg: rgba(10, 18, 51, 0.72);
+  --chart-bg: #0B1740;
+  --chart-lagna-bg: url(#cosmicLagnaGradient);
+  --chart-line: rgba(142, 130, 255, 0.42);
+  --pop-bg: rgba(5, 8, 26, 0.96);
+
+  /* Cosmic effects */
+  --cosmic-glass: rgba(10, 18, 51, 0.72);
+  --cosmic-border: rgba(142, 130, 255, 0.30);
+  --cosmic-gradient: linear-gradient(
+    110deg,
+    #1A3DFF 0%,
+    #7A25FF 45%,
+    #FF3EDB 100%
+  );
+}
+
+/* Background */
+html[data-palette="cosmic"] body {
+  color: var(--ink);
+  background-color: #05081A;
+  background-image:
+    radial-gradient(ellipse at 12% 4%, rgba(26, 61, 255, 0.24), transparent 38%),
+    radial-gradient(ellipse at 88% 12%, rgba(255, 62, 219, 0.17), transparent 34%),
+    radial-gradient(ellipse at 52% 100%, rgba(122, 37, 255, 0.16), transparent 42%),
+    linear-gradient(135deg, #05081A 0%, #0A1233 55%, #05081A 100%);
+}
+
+/* Glass surfaces */
+html[data-palette="cosmic"] .panel,
+html[data-palette="cosmic"] .card,
+html[data-palette="cosmic"] article.card,
+html[data-palette="cosmic"] .panchang-card,
+html[data-palette="cosmic"] .panchang-item,
+html[data-palette="cosmic"] .chip,
+html[data-palette="cosmic"] .sugg,
+html[data-palette="cosmic"] .zodiac-hover-card,
+html[data-palette="cosmic"] .inline-error-popup,
+html[data-palette="cosmic"] .desc-editor,
+html[data-palette="cosmic"] .desc-toolbar {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(26, 61, 255, 0.16),
+      rgba(122, 37, 255, 0.15),
+      rgba(255, 62, 219, 0.09)
+    ),
+    rgba(10, 18, 51, 0.72) !important;
+
+  color: var(--ink);
+  border-color: var(--cosmic-border) !important;
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 8px 32px rgba(0, 0, 30, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Panchang gradient */
+html[data-palette="cosmic"] .panchang-item,
+html[data-palette="cosmic"] .panchang-item.highlight {
+  background: linear-gradient(
+    135deg,
+    rgba(26, 61, 255, 0.28),
+    rgba(122, 37, 255, 0.24),
+    rgba(255, 62, 219, 0.16)
+  ) !important;
+
+  border-color: rgba(142, 130, 255, 0.38) !important;
+}
+
+html[data-palette="cosmic"] .panchang-label {
+  color: #C7C9E8 !important;
+}
+
+html[data-palette="cosmic"] .panchang-value {
+  color: #FFFFFF !important;
+}
+
+html[data-palette="cosmic"] .panchang-sub {
+  color: #929BC4 !important;
+}
+
+/* Buttons and active tabs */
+html[data-palette="cosmic"] .btn:not(.ghost),
+html[data-palette="cosmic"] .tabs button[aria-selected="true"],
+html[data-palette="cosmic"] button.primary {
+  background: var(--cosmic-gradient);
+  color: #FFFFFF;
+  border-color: transparent;
+
+  box-shadow:
+    0 0 15px rgba(122, 37, 255, 0.30),
+    0 0 35px rgba(255, 62, 219, 0.12);
+}
+
+/* Form elements */
+html[data-palette="cosmic"] input,
+html[data-palette="cosmic"] select,
+html[data-palette="cosmic"] textarea,
+html[data-palette="cosmic"] .ql-container.ql-snow {
+  background: rgba(5, 8, 26, 0.62) !important;
+  color: #FFFFFF !important;
+  border-color: rgba(142, 130, 255, 0.34) !important;
+}
+
+html[data-palette="cosmic"] input::placeholder,
+html[data-palette="cosmic"] textarea::placeholder {
+  color: #929BC4 !important;
+}
+
+/* Palette selector */
+html[data-palette="cosmic"] .palette-chooser select {
+  background: rgba(10, 18, 51, 0.82);
+  color: #FFFFFF;
+  border-color: rgba(142, 130, 255, 0.42);
+}
+
+/* Footer and SVG */
+html[data-palette="cosmic"] footer {
+  color: #C7C9E8;
+}
+
+html[data-palette="cosmic"] svg text {
+  paint-order: stroke;
+}
+
+/* Reusable glass and glow classes */
+html[data-palette="cosmic"] .cosmic-glass {
+  background: rgba(10, 18, 51, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(142, 130, 255, 0.30);
+  border-radius: 18px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 30, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+html[data-palette="cosmic"] .cosmic-glow {
+  box-shadow:
+    0 0 15px rgba(122, 37, 255, 0.30),
+    0 0 35px rgba(255, 62, 219, 0.12);
+}
+
+/* ================= END COSMIC GLASS THEME ================= */
+
+
 </style>
 </head>
 <body>
@@ -2473,6 +2658,7 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
         <option value="wooden">Wooden Glass</option>
 	      <option value="ivory">Golden Ivory</option>
         <option value="ocean">Ocean Blue</option>
+        <option value="cosmic">Cosmic Glass</option>
         <option value="lime">Cyber Lime</option>
         <option value="lilac">White Lilac</option>
         <option value="turquoise">Turquoise</option>
@@ -3965,6 +4151,17 @@ const PALETTE_CHART_COLORS = {
   good: '#2E7851',
   bad: '#B83A32'
 },
+cosmic: {
+  surf: '#05081A',
+  soft: 'url(#cosmicLagnaGradient)',
+  line: 'rgba(142,130,255,0.42)',
+  ink: '#FFFFFF',
+  muted: '#C7C9E8',
+  sa: '#FF3EDB',
+  al: '#FF8AE6',
+  good: '#69E6C1',
+  bad: '#FF729B'
+},
   turquoise: { surf: '#FFFFFF', soft: '#E0F8F6', line: '#40E0D0', ink: '#0A3633', muted: '#417370', sa: '#00A896', al: '#0284C7', good: '#059669', bad: '#DC2626' }, 
   celestial: { surf: '#FFFFFF', soft: 'url(#celestialLagnaGradient)', line: '#D8CDEB', ink: '#171B46', muted: '#666B91', sa: '#6040D8', al: '#6554C0', good: '#25866B', bad: '#C64F62'},
   'lavender-peach': { surf: 'rgba(255,255,255,0.94)', soft: 'url(#lavenderPeachLagnaGradient)', line: '#C7B5E1', ink: '#302541', muted: '#675575', sa: '#8564C9', al: '#9B6AC8', good: '#398C78', bad: '#C45F77'}
@@ -4174,6 +4371,21 @@ if (isLavenderPeach) {
         <stop offset="100%" stop-color="#FFE2D5"/>
       </linearGradient>
     </defs>`;
+}
+const isCosmic =
+  document.documentElement.getAttribute('data-palette') === 'cosmic';
+
+if (isCosmic) {
+  s += `<defs>
+    <linearGradient
+      id="cosmicLagnaGradient"
+      x1="0%" y1="0%"
+      x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A3DFF" stop-opacity="0.48"/>
+      <stop offset="48%" stop-color="#7A25FF" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="#FF3EDB" stop-opacity="0.28"/>
+    </linearGradient>
+  </defs>`;
 }
 
 if (isCelestial) {
