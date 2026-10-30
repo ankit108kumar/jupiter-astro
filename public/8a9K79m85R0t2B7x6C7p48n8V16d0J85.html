@@ -2158,6 +2158,139 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
   margin-top: 12px;
 }
 
+/* ===== YEARLY / MONTHLY CHART DURATION ===== */
+
+.lk-chart-duration {
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid var(--line-strong);
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* ===== YEARLY / MONTHLY CHART CONTROLS ===== */
+
+.lk-chart-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 7px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Transparent Glass Dropdown */
+.lk-period-select {
+  appearance: none;
+  -webkit-appearance: none;
+  min-width: 175px;
+  height: 40px;
+  padding: 0 32px 0 12px;
+
+  background: rgba(255, 255, 255, 0.10) !important;
+  color: var(--text);
+  border: 1px solid var(--line-strong);
+  border-radius: 9px;
+
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 650;
+  cursor: pointer;
+
+  position: relative;
+  z-index: 0;
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* Dropdown options */
+.lk-period-select option {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Dropdown Hover and Focus */
+.lk-period-select:hover {
+  border-color: var(--accent);
+}
+
+.lk-period-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(128, 128, 128, 0.12);
+}
+
+/* Navigation Buttons */
+.lk-nav-btn {
+  height: 40px;
+  min-width: 90px;
+  padding: 0 12px;
+
+  border: 1px solid var(--line-strong);
+  border-radius: 9px;
+
+  background: var(--glass-bg, rgba(255, 255, 255, 0.12));
+  color: var(--text);
+
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 650;
+  cursor: pointer;
+
+  position: relative;
+  z-index: 0;
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  transition: all 0.2s ease;
+}
+
+/* Button Hover */
+.lk-nav-btn:hover {
+  background: var(--surface-hover, rgba(255, 255, 255, 0.20));
+  border-color: var(--accent);
+}
+
+/* Current Year / Month */
+.lk-nav-btn.current {
+  background: var(--accent-soft, rgba(255, 255, 255, 0.18));
+  color: var(--text);
+  border: 1px solid var(--accent);
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.10);
+}
+
+/* Button Focus */
+.lk-nav-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .lk-chart-controls {
+    justify-content: flex-start;
+    gap: 7px;
+  }
+
+  .lk-period-select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .lk-nav-btn {
+    min-width: 0;
+    flex: 1;
+    padding: 0 9px;
+    font-size: 0.82rem;
+  }
+}
 </style>
 </head>
 <body>
@@ -5123,15 +5256,36 @@ dasha(k, prefix, evalMs = Date.now()) {
         </article>
 
         <!-- RIGHT: TRANSIT (GOCHAR) KUNDALI (D1) -->
-        <article class="card kchart">
-          <header style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>Gochar (Transit D1) (${fmtDate(evalMs)})</h3>
-          </header>
-          <div id="${prefix}-tr-gochar-d1">${drawNorthChart(k.ascSign, titems, 'Transits', 12, window.jaShowSavD1 ? k.av.sav : null)}</div>
-          <p style="text-align:center; font-size:0.75rem; color:var(--muted); margin:4px 0 0;">
-            JM = Janma Moon · Dynamic planetary transits
-          </p>
-        </article>
+<article class="card kchart">
+  <header style="
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  ">
+    <h3 style="margin:0;">Gochar (Transit D1) (${fmtDate(evalMs)})</h3>
+
+    <span class="transit-dasha-indicator" style="
+      font-size:0.85rem;
+      font-weight:600;
+      color:var(--muted);
+      text-align:right;
+      white-space:nowrap;
+    ">
+      ${dashaChain(k.md.list, evalMs, 365.25)
+        .slice(0, 3)
+        .map(p => p.lord)
+        .join(' – ') || '—'}
+    </span>
+  </header>
+
+  <div id="${prefix}-tr-gochar-d1">${drawNorthChart(k.ascSign, titems, 'Transits', 12, window.jaShowSavD1 ? k.av.sav : null)}</div>
+
+  <p style="text-align:center; font-size:0.75rem; color:var(--muted); margin:4px 0 0;">
+    JM = Janma Moon · Dynamic planetary transits
+  </p>
+</article>
       </div>
 
       <!-- ROW 2: DIVISIONAL CHARTS (LEFT: NATAL VARGA, RIGHT: TRANSIT VARGA) -->
@@ -5352,13 +5506,69 @@ const activeYear = (typeof window.trSelectedLkYear === 'number' && window.trSele
                 <th>Status</th>
               </tr>
             </thead>
+            
             <tbody>${tableRows}</tbody>
           </table>
         </div>
       </article>
+
+      <!-- ROW 3: YEARLY AND MONTHLY CHARTS -->
+      <div style="
+        display:grid;
+        grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
+        gap:14px;
+        margin-top:14px;
+      ">
+
+        <!-- YEARLY CHART -->
+        <article class="card kchart">
+          <header style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <h3>Yearly Chart</h3>
+
+            <div style="display:flex; align-items:center; gap:7px;">
+              <button type="button" class="btn ghost"
+                id="${prefix}-lkChartPrevYear">‹</button>
+
+              <select id="${prefix}-lkChartYear" class="lk-period-select">
+                ${yearOptions}
+              </select>
+
+              <button type="button" class="btn ghost"
+                id="${prefix}-lkChartNextYear">›</button>
+            </div>
+          </header>
+
+          <div id="${prefix}-lkYearlyChart"></div>
+          <div id="${prefix}-lkYearlyDuration" class="lk-chart-duration"></div>
+        </article>
+
+        <!-- MONTHLY CHART -->
+        <article class="card kchart">
+          <header style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <h3>Monthly Chart</h3>
+
+            <div style="display:flex; align-items:center; gap:7px;">
+              <button type="button" class="btn ghost"
+                id="${prefix}-lkChartPrevMonth">‹</button>
+
+              <select id="${prefix}-lkChartMonth" class="lk-period-select">
+                ${Array.from({length:12}, (_, i) =>
+                  `<option value="${i + 1}" ${i + 1 === (new Date().getMonth() + 1) ? 'selected' : ''}>Month ${i + 1}</option>`
+                ).join('')}
+              </select>
+
+              <button type="button" class="btn ghost"
+                id="${prefix}-lkChartNextMonth">›</button>
+            </div>
+          </header>
+
+          <div id="${prefix}-lkMonthlyChart"></div>
+          <div id="${prefix}-lkMonthlyDuration" class="lk-chart-duration"></div>
+        </article>
+
+      </div>
     `;
   },
-
 
 
   ashtaka(k) {
@@ -5399,11 +5609,28 @@ function renderKundaliComponent(
   targetEl, kData, prefix, title, subtitle, recordId = ''
 ) {  const nk = nakOf(kData.ch.planets.Moon.lon);
   const nowMs = Date.now();
-  const dNow = kData.chain.length >= 2 ? `${kData.chain[0].lord}–${kData.chain[1].lord}` : '—';
+  const dNow = kData.chain.length
+  ? kData.chain.slice(0, 3).map(p => p.lord).join('–')
+  : '—';
   
   // 1. Initialize evaluation timestamp (defaults to current system time)
   let currentEvalMs = Date.now();
   let activeTabKey = 'overview';
+
+  function updateDashaHeader() {
+  const chain = dashaChain(kData.md.list, currentEvalMs, 365.25);
+
+  const dashaText = chain
+    .slice(0, 3)
+    .map(p => p.lord)
+    .join('–') || '—';
+
+  const chip = targetEl.querySelector(`#${prefix}-dashaChipValue`);
+
+  if (chip) {
+    chip.textContent = dashaText;
+  }
+}
 
   targetEl.innerHTML = `
     <div class="dash-head">
@@ -5422,7 +5649,7 @@ function renderKundaliComponent(
         <span class="chip"><span>Lagna</span>${SIGNS[kData.ascSign][1]}</span>
         <span class="chip"><span>Rashi</span>${SIGNS[kData.moonSign][1]}</span>
         <span class="chip"><span>Nakshatra</span>${NAK[nk.i][0]} (Pada ${nk.pada})</span>
-        <span class="chip"><span>Dasha</span>${dNow}</span>
+        <span class="chip"><span>Dasha</span><b id="${prefix}-dashaChipValue">${dNow}</b></span>
       
 </div>
 <nav class="tabs" role="tablist">
@@ -5581,9 +5808,10 @@ Object.entries(expandButtons).forEach(([key, btn]) => {
       const nowBtn = document.getElementById(`${prefix}-dashaNowBtn`);
 
       const updateEval = (ms) => {
-        currentEvalMs = ms;
-        openTab('dasha');
-      };
+      currentEvalMs = ms;
+      updateDashaHeader();
+      openTab('dasha');
+    };
 
       const getSelectedMs = () => {
         const [yr, mo, da] = dateIn.value.split('-').map(Number);
@@ -5600,25 +5828,44 @@ Object.entries(expandButtons).forEach(([key, btn]) => {
       }
 
       // 2. Dasha Rectification Stepper (+/- N Days)
-      targetEl.querySelectorAll('[data-shift]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const shiftVal = parseInt(btn.dataset.shift, 10);
-          const newOffset = shiftVal === 0 ? 0 : (kData.offsetDays || 0) + shiftVal;
-          kData.md = mahadashas(kData.ch.planets.Moon.lon, kData.birthMs, 365.25, newOffset);
-          kData.offsetDays = newOffset;
-          openTab('dasha');
-        });
-      });
+targetEl.querySelectorAll('[data-shift]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const shiftVal = parseInt(btn.dataset.shift, 10);
+    const newOffset = shiftVal === 0 ? 0 : (kData.offsetDays || 0) + shiftVal;
 
-      const offsetInput = document.getElementById(`${prefix}-dashaOffsetInput`);
-      if (offsetInput) {
-        offsetInput.addEventListener('change', () => {
-          const newOffset = parseInt(offsetInput.value, 10) || 0;
-          kData.md = mahadashas(kData.ch.planets.Moon.lon, kData.birthMs, 365.25, newOffset);
-          kData.offsetDays = newOffset;
-          openTab('dasha');
-        });
-      }
+    kData.md = mahadashas(
+      kData.ch.planets.Moon.lon,
+      kData.birthMs,
+      365.25,
+      newOffset
+    );
+
+    kData.offsetDays = newOffset;
+
+    updateDashaHeader();
+    openTab('dasha');
+  });
+});
+
+const offsetInput = document.getElementById(`${prefix}-dashaOffsetInput`);
+
+if (offsetInput) {
+  offsetInput.addEventListener('change', () => {
+    const newOffset = parseInt(offsetInput.value, 10) || 0;
+
+    kData.md = mahadashas(
+      kData.ch.planets.Moon.lon,
+      kData.birthMs,
+      365.25,
+      newOffset
+    );
+
+    kData.offsetDays = newOffset;
+
+    updateDashaHeader();
+    openTab('dasha');
+  });
+}
 
       // 3. Drill-down tree rendering
       let curPath = [];
@@ -5778,6 +6025,142 @@ Object.entries(expandButtons).forEach(([key, btn]) => {
         nowBtn.addEventListener('click', () => {
           updateLkView(null);
         });
+      }
+
+      
+      // Yearly and Monthly D1 charts: natal planet signs stay fixed;
+      // only the Lagna reference rotates.
+      const chartYearSelect = document.getElementById(`${prefix}-lkChartYear`);
+      const chartMonthSelect = document.getElementById(`${prefix}-lkChartMonth`);
+      const chartPrevYear = document.getElementById(`${prefix}-lkChartPrevYear`);
+      const chartNextYear = document.getElementById(`${prefix}-lkChartNextYear`);
+      const chartPrevMonth = document.getElementById(`${prefix}-lkChartPrevMonth`);
+      const chartNextMonth = document.getElementById(`${prefix}-lkChartNextMonth`);
+      const yearlyChartEl = document.getElementById(`${prefix}-lkYearlyChart`);
+      const monthlyChartEl = document.getElementById(`${prefix}-lkMonthlyChart`);
+
+      if (chartYearSelect && chartMonthSelect && yearlyChartEl && monthlyChartEl) {
+        const natalD1 = getVargaItems(kData, 1);
+        const natalPlanetsAndAL = natalD1.items.filter(item => !item.asc);
+
+        const renderRotatedD1 = (lagnaSign, chartTitle) => {
+          const placements = [
+            ...natalPlanetsAndAL,
+            { t: 'As', sign: lagnaSign, asc: true }
+          ];
+          return drawNorthChart(lagnaSign, placements, chartTitle, 12);
+        };
+
+        const renderYearAndMonthCharts = () => {
+          const selectedYear = Math.max(
+            1, Math.min(120, parseInt(chartYearSelect.value, 10) || 1)
+          );
+          const selectedMonth = Math.max(
+            1, Math.min(12, parseInt(chartMonthSelect.value, 10) || 1)
+          );
+
+          // Year 1 = natal Lagna; Year 2 = next sign; ... Year 12 = 12th sign.
+          const yearlyLagna = (natalD1.lagna + selectedYear - 1) % 12;
+
+          // Month 1 = selected yearly Lagna; every next month advances one sign.
+          const monthlyLagna = (yearlyLagna + selectedMonth - 1) % 12;
+          // Calculate date ranges from native's date of birth
+const birthDay = kData.input.d;
+const birthMonth = kData.input.m - 1;
+const birthYear = kData.input.y;
+
+const makeClampedDate = (year, month, day) => {
+  const lastDay = new Date(year, month + 1, 0).getDate();
+  return new Date(year, month, Math.min(day, lastDay));
+};
+
+const formatDate = date =>
+  `${String(date.getDate()).padStart(2, '0')}/` +
+  `${String(date.getMonth() + 1).padStart(2, '0')}/` +
+  `${date.getFullYear()}`;
+
+const yearlyStart = makeClampedDate(
+  birthYear + selectedYear - 1, birthMonth, birthDay
+);
+
+const yearlyEnd = makeClampedDate(
+  birthYear + selectedYear, birthMonth, birthDay
+);
+
+// Monthly dates within the selected yearly period
+const monthStart = makeClampedDate(
+  yearlyStart.getFullYear(),
+  yearlyStart.getMonth() + selectedMonth - 1,
+  birthDay
+);
+
+const monthEnd = makeClampedDate(
+  yearlyStart.getFullYear(),
+  yearlyStart.getMonth() + selectedMonth,
+  birthDay
+);
+
+          yearlyChartEl.innerHTML = renderRotatedD1(
+            yearlyLagna, `Year ${selectedYear} D1`
+          );
+          monthlyChartEl.innerHTML = renderRotatedD1(
+            monthlyLagna, `Year ${selectedYear} · Month ${selectedMonth} D1`
+          );
+
+          // Display duration below both charts
+document.getElementById(`${prefix}-lkYearlyDuration`).textContent =
+  `${formatDate(yearlyStart)} to ${formatDate(yearlyEnd)}`;
+
+document.getElementById(`${prefix}-lkMonthlyDuration`).textContent =
+  `${formatDate(monthStart)} to ${formatDate(monthEnd)}`;
+        };
+
+        chartYearSelect.addEventListener('change', () => {
+          chartMonthSelect.value = '1';
+          renderYearAndMonthCharts();
+        });
+
+        chartMonthSelect.addEventListener('change', renderYearAndMonthCharts);
+
+        if (chartPrevYear) {
+          chartPrevYear.addEventListener('click', () => {
+            chartYearSelect.value = String(
+              Math.max(1, (parseInt(chartYearSelect.value, 10) || 1) - 1)
+            );
+            chartMonthSelect.value = '1';
+            renderYearAndMonthCharts();
+          });
+        }
+
+        if (chartNextYear) {
+          chartNextYear.addEventListener('click', () => {
+            chartYearSelect.value = String(
+              Math.min(120, (parseInt(chartYearSelect.value, 10) || 1) + 1)
+            );
+            chartMonthSelect.value = '1';
+            renderYearAndMonthCharts();
+          });
+        }
+
+        if (chartPrevMonth) {
+          chartPrevMonth.addEventListener('click', () => {
+            chartMonthSelect.value = String(
+              Math.max(1, (parseInt(chartMonthSelect.value, 10) || 1) - 1)
+            );
+            renderYearAndMonthCharts();
+          });
+        }
+
+        if (chartNextMonth) {
+          chartNextMonth.addEventListener('click', () => {
+            chartMonthSelect.value = String(
+              Math.min(12, (parseInt(chartMonthSelect.value, 10) || 1) + 1)
+            );
+            renderYearAndMonthCharts();
+          });
+        }
+
+        renderYearAndMonthCharts();
       }
     }
   }
