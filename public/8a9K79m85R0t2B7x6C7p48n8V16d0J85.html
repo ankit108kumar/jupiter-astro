@@ -4429,17 +4429,23 @@ s += `<text data-layout-house="${h}" data-layout-type="sav" x="${g.sav[0]}" y="$
       const y0 = g.c[1] - (rows.length - 1) * 7;
       rows.forEach((row, r) => {
         const str = row.map(it => {
-          const marks = (it.marks || []).map(m => 
-            `<tspan fill="${m === 'ex' ? C.good : m === 'deb' ? C.bad : C.sa}" font-size="${fs - 2}">${m === 'ex' ? '↑' : m === 'deb' ? '↓' : m === 'R' ? '℞' : m === 'C' ? 'c' : 'V'}</tspan>`
-          ).join('');
+          // Combine all active marks into a single inline string
+          const marksStr = (it.marks || []).map(m => {
+            if (m === 'ex') return '↑';
+            if (m === 'deb') return '↓';
+            if (m === 'R') return '[R]';
+            if (m === 'C') return '[C]';
+            if (m === 'V') return 'V';
+            return '';
+          }).join('');
 
-          // Degree number as superscript with no degree symbol
-          // Render degree only when globally enabled
-          const degSup = (window.jaShowDeg && it.deg !== undefined && it.deg !== null)
-            ? `<tspan font-size="${Math.max(7, fs - 4)}" dy="-3" fill="${C.muted}">${it.deg}</tspan><tspan dy="3"></tspan>`
+          // Render degree and marks together inside a single superscript tag
+          const hasDeg = window.jaShowDeg && it.deg !== undefined && it.deg !== null;
+          const combinedSup = (hasDeg || marksStr) 
+            ? `<tspan font-size="${Math.max(7, fs - 4)}" dy="-3" fill="${C.muted}">${hasDeg ? it.deg : ''}${marksStr}</tspan><tspan dy="3"></tspan>` 
             : '';
 
-          return `<tspan data-p="${it.p || ''}" fill="${it.asc ? C.sa : it.al ? C.al : C.ink}" font-weight="${it.asc || it.al ? 700 : 500}">${esc(it.t)}</tspan>${degSup}${marks}`;
+          return `<tspan data-p="${it.p || ''}" fill="${it.asc ? C.sa : it.al ? C.al : C.ink}" font-weight="${it.asc || it.al ? 700 : 500}">${esc(it.t)}</tspan>${combinedSup}`;
         }).join(' ');
         
 s += `<text data-layout-house="${h}" data-layout-type="planet-row" x="${g.c[0]}" y="${y0 + r * 14}" text-anchor="middle" dominant-baseline="central" font-size="${fs}">${str}</text>`;
@@ -4929,6 +4935,19 @@ function getVargaDeg(lon, n) {
   return Math.floor((rem / slice) * 30);
 }
 
+function getPlanetMarks(p, sign, kData) {
+  const marks = [];
+  if (!p || p === 'Rahu' || p === 'Ketu') return marks;
+  if (kData.ch.planets[p] && kData.ch.planets[p].retro) marks.push('R');
+  if (kData.combust && kData.combust[p]) marks.push('C');
+  const dg = dignity(p, sign);
+  if (dg) {
+    if (dg[0] === 'ex') marks.push('ex');
+    if (dg[0] === 'deb') marks.push('deb');
+  }
+  return marks;
+}
+
 function getVargaItems(kData, n) {
   const posN = {};
   PL.forEach(([p]) => { posN[p] = typeof n === 'number' ? vargaSign(kData.ch.planets[p].lon, n) : kData.pos1[p]; });
@@ -4946,7 +4965,8 @@ function getVargaItems(kData, n) {
         t: ab, 
         p, 
         sign: posN[p], 
-        deg: getVargaDeg(kData.ch.planets[p].lon, n) 
+        deg: getVargaDeg(kData.ch.planets[p].lon, n),
+        marks: getPlanetMarks(p, posN[p], kData) 
       };
     }),
     { t: 'AL', sign: al.sign, al: true }
@@ -5335,12 +5355,18 @@ dasha(k, prefix, evalMs = Date.now()) {
     const d1 = getVargaItems(k, 1);
     const evalJd = msToJd(evalMs);
     const tr = siderealAt(evalJd).planets;
-    const titems = PL.map(([p, , ab]) => ({ 
-      t: ab, 
-      p, 
-      sign: signOf(tr[p].lon),
-      deg: Math.floor(tr[p].lon % 30)
-    }));
+    const titems = PL.map(([p, , ab]) => {
+      const sign = signOf(tr[p].lon);
+      // Construct a temporary mock kData object for transit planets check
+      const mockK = { ch: { planets: tr }, combust: { [p]: isCombust(p, tr) } };
+      return { 
+        t: ab, 
+        p, 
+        sign: sign,
+        deg: Math.floor(tr[p].lon % 30),
+        marks: getPlanetMarks(p, sign, mockK)
+      };
+    });
     titems.push({ 
       t: 'JM', 
       sign: k.moonSign, 
@@ -5353,12 +5379,17 @@ dasha(k, prefix, evalMs = Date.now()) {
 
     // 2. Divisional (Varga) Calculations (Default: D9 Navamsa)
     const natalVarga = getVargaItems(k, selectedVarga);
-    const trVargaItems = PL.map(([p, , ab]) => ({ 
-      t: ab, 
-      p, 
-      sign: vargaSign(tr[p].lon, selectedVarga),
-      deg: getVargaDeg(tr[p].lon, selectedVarga)
-    }));
+    const trVargaItems = PL.map(([p, , ab]) => {
+      const sign = vargaSign(tr[p].lon, selectedVarga);
+      const mockK = { ch: { planets: tr }, combust: { [p]: isCombust(p, tr) } };
+      return { 
+        t: ab, 
+        p, 
+        sign: sign,
+        deg: getVargaDeg(tr[p].lon, selectedVarga),
+        marks: getPlanetMarks(p, sign, mockK)
+      };
+    });
     trVargaItems.push({ 
       t: 'JM', 
       sign: vargaSign(k.ch.planets.Moon.lon, selectedVarga), 
