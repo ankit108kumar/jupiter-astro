@@ -4657,7 +4657,7 @@ s += `<text data-layout-house="${h}" data-layout-type="planet-row" x="${g.c[0]}"
     if (labels.length < 2) return;
 
     const occupied = [];
-    const rank = { 'planet-row': 0, sav: 1, sign: 2 };
+    const rank = { sign: 0, 'planet-row': 1, sav: 2 };
 
     labels.sort((a, b) =>
       (rank[a.dataset.layoutType] ?? 3) -
@@ -4674,6 +4674,17 @@ s += `<text data-layout-house="${h}" data-layout-type="planet-row" x="${g.c[0]}"
       const y0 = Number(el.getAttribute('y'));
 
       if (!Number.isFinite(x0) || !Number.isFinite(y0)) return;
+
+      // FIXED SIGN POSITION — Never move sign numbers
+if (el.dataset.layoutType === 'sign') {
+  const b = bbox(el);
+  if (b) occupied.push({
+    box: b,
+    house: Number(el.dataset.layoutHouse)
+  });
+  el.removeAttribute('data-layout-overflow');
+  return;
+}
 
       const originalTransform = el.getAttribute('transform') || '';
       let placed = false;
@@ -4694,8 +4705,24 @@ s += `<text data-layout-house="${h}" data-layout-type="planet-row" x="${g.c[0]}"
               b.x + b.width > 300 ||
               b.y + b.height > 300) continue;
 
-          if (requireHouse && polygon &&
-              !insidePolygon(cx, cy, polygon)) continue;
+          // STRICT HOUSE BOUNDARY CHECK
+// Entire planetary label must remain inside its own house.
+if (requireHouse && polygon) {
+  const inset = 2;
+
+  const corners = [
+    [b.x + inset, b.y + inset],
+    [b.x + b.width - inset, b.y + inset],
+    [b.x + inset, b.y + b.height - inset],
+    [b.x + b.width - inset, b.y + b.height - inset]
+  ];
+
+  const fullyInside = corners.every(([x, y]) =>
+    insidePolygon(x, y, polygon)
+  );
+
+  if (!fullyInside) continue;
+}
 
           if (occupied.some(prev => boxesOverlap(b, prev.box))) continue;
 
@@ -4705,24 +4732,25 @@ s += `<text data-layout-house="${h}" data-layout-type="planet-row" x="${g.c[0]}"
         return false;
       };
 
-      placed = tryCandidates(offsets, true);
+      // First attempt: Normal positioning within the same house
+placed = tryCandidates(offsets, true);
 
-      if (!placed) {
-        placed = tryCandidates(chartOffsets, false);
-      }
+// Second attempt: Wider search, but STRICTLY within the same house
+if (!placed) {
+  placed = tryCandidates(chartOffsets, true);
+}
 
-      if (!placed) {
-        el.setAttribute('x', String(x0));
-        el.setAttribute('y', String(y0));
-        el.setAttribute('transform', originalTransform);
+// Never move a planet into another house
+if (!placed) {
+  el.setAttribute('x', String(x0));
+  el.setAttribute('y', String(y0));
+  el.setAttribute('transform', originalTransform);
 
-        const b = bbox(el);
-        if (b) occupied.push({ box: b, house });
+  const b = bbox(el);
+  if (b) occupied.push({ box: b, house });
 
-        el.setAttribute('data-layout-overflow', 'true');
-      } else {
-        el.removeAttribute('data-layout-overflow');
-      }
+  el.removeAttribute('data-layout-overflow');
+}
     });
   }
 
