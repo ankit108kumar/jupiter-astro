@@ -5990,6 +5990,7 @@ const activeYear = (typeof window.trSelectedLkYear === 'number' && window.trSele
 
   ashtaka(k) {
     const savItems = k.av.sav.map((v, s) => ({ t: String(v), sign: s }));
+    const bavColor = v => v >= 6 ? '#16a34a' : v <= 3 ? '#dc2626' : '#2563eb';
     const rahuRules = {
   Sun: [1,2,3,5,7,8,10],
   Moon: [1,3,5,7,8,9,10],
@@ -6008,10 +6009,10 @@ const rahuBav = Array.from({ length: 12 }, (_, s) =>
 );
     let avRows = `<tr><td class="sub">House</td>${SHORT.map((_, s) => `<td class="num c sub">${houseFrom(s, k.ascSign)}</td>`).join('')}<td></td></tr>`;
     SEVEN.forEach(p => {
-      avRows += `<tr><td><b>${p}</b></td>${k.av.bav[p].map(v => `<td class="num c">${v}</td>`).join('')}<td class="num c">${k.av.bav[p].reduce((a, b) => a + b, 0)}</td></tr>`;
+      avRows += `<tr><td><b>${p}</b></td>${k.av.bav[p].map(v => `<td class="num c" style="color:${bavColor(v)}">${v}</td>`).join('')}<td class="num c">${k.av.bav[p].reduce((a, b) => a + b, 0)}</td></tr>`;
     });
     avRows += `<tr class="lagna"><td><b>SAV</b></td>${k.av.sav.map(v => `<td class="num c"><b>${v}</b></td>`).join('')}<td class="num c"><b>337</b></td></tr>`;
-    avRows += `<tr><td><b>Rahu</b></td>${rahuBav.map(v => `<td class="num c">${v}</td>`).join('')}<td class="num c">${rahuBav.reduce((a, b) => a + b, 0)}</td></tr>`;
+    avRows += `<tr><td><b>Rahu</b></td>${rahuBav.map(v => `<td class="num c" style="color:${bavColor(v)}">${v}</td>`).join('')}<td class="num c">${rahuBav.reduce((a, b) => a + b, 0)}</td></tr>`;
     return `
       <div class="vfeature">
         <article class="card kchart"><header><h3>Sarvashtakavarga Chart</h3></header><div>${drawNorthChart(k.ascSign, savItems, 'SAV', 14)}</div></article>
