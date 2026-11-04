@@ -1630,7 +1630,7 @@ input:focus-visible { border-color: var(--saffron); }
   margin: 4px 0 0;
   padding: 4px;
   list-style: none;
-  background: rgba(232, 210, 173, 0.95) !important;
+  var(--surface);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);  border: 1px solid var(--line-strong);
   border-radius: 10px;
   box-shadow: 0 12px 28px rgba(0,0,0,.35);
@@ -1658,7 +1658,7 @@ input:focus-visible { border-color: var(--saffron); }
 
 .sugg li[aria-selected="true"],
 .sugg li:hover {
-  background: var(--indigo-soft);
+  background: var(--surface);
 }
 
 .sugg li.none {
@@ -2605,7 +2605,7 @@ html[data-palette="cosmic"] .cosmic-glow {
 .chart-dd {
   position: relative;
   min-width: 190px;
-  z-index: 1000;
+  z-index: 100;
 }
 
 .chart-dd-trigger {
@@ -2638,11 +2638,11 @@ html[data-palette="cosmic"] .cosmic-glow {
   padding: 5px;
   border: 1px solid var(--line-strong);
   border-radius: 12px;
-  background: rgba(232, 210, 173, 0.70);
+  background: var(--surface);
   backdrop-filter: blur(18px) saturate(145%);
   -webkit-backdrop-filter: blur(18px) saturate(145%);
   box-shadow: 0 12px 28px rgba(0,0,0,.30);
-  z-index: 9999;
+  z-index: 100;
 }
 
 .chart-dd-menu[hidden] {
