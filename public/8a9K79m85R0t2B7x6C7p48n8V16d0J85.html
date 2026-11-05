@@ -6888,6 +6888,7 @@ function formatForForm(dobString) {
   return !isNaN(m) && !isNaN(y) ? `${pad(parts[0])}/${pad(m)}/${y}` : dobString;
 }
 
+
 // Persistent cache in browser localStorage (persists until browser data is cleared)
 const PROFILES_STORAGE_KEY = 'ja_saved_profiles_cache';
 let savedProfilesCache = null;
@@ -6923,6 +6924,39 @@ async function fetchSavedProfiles(forceRefresh = false) {
     return savedProfilesCache || [];
   }
 }
+
+
+// ================= AUTOMATIC GOOGLE SHEETS SYNC =================
+
+const PROFILE_SYNC_INTERVAL = 15 * 60 * 1000;
+let lastProfileSync = 0;
+
+// Refresh immediately when the webpage opens
+fetchSavedProfiles(true).then(() => {
+  lastProfileSync = Date.now();
+});
+
+// Refresh every 15 minutes while the tab is active
+setInterval(() => {
+  if (document.visibilityState === 'visible') {
+    fetchSavedProfiles(true).then(() => {
+      lastProfileSync = Date.now();
+    });
+  }
+}, PROFILE_SYNC_INTERVAL);
+
+// Refresh when returning to the tab after 15 minutes
+document.addEventListener('visibilitychange', () => {
+  if (
+    document.visibilityState === 'visible' &&
+    Date.now() - lastProfileSync >= PROFILE_SYNC_INTERVAL
+  ) {
+    fetchSavedProfiles(true).then(() => {
+      lastProfileSync = Date.now();
+    });
+  }
+});
+
 
 async function findSavedProfileAfterSave(payload, attempts = 10) {
   for (let i = 0; i < attempts; i++) {
