@@ -5127,65 +5127,290 @@ function showEditorConfirm(quillInstance, message, onConfirm) {
   container.appendChild(popup);
 }
 
-function showUpdateConfirm(anchorBtn, recordId, onConfirm) {
-  const existing = document.querySelector('.update-confirm-popup');
-  if (existing) existing.remove();
 
-  const popup = document.createElement('div');
-  popup.className = 'update-confirm-popup';
-  popup.style.cssText = `
-    position: absolute;
-    bottom: calc(100% + 8px);
-    right: 0;
-    z-index: 100;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    background: var(--surface);
-    color: var(--ink);
-    border: 1px solid var(--saffron);
-    border-radius: 10px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    font-size: 0.78rem;
-    font-weight: 600;
-    white-space: nowrap;
-    animation: fadeIn 0.15s ease-out;
-  `;
 
-  popup.innerHTML = `
-    <span>Overwrite <b>${recordId}</b>?</span>
-    <button type="button" class="btn" style="padding: 3px 10px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; background: var(--saffron); color: #fff; border: 0;">Update</button>
-    <button type="button" class="btn ghost" style="padding: 3px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer;">✕</button>
-  `;
 
-  const parent = anchorBtn.parentElement;
-  if (parent) {
-    parent.style.position = 'relative';
-    parent.appendChild(popup);
-  }
 
-  const dismiss = () => popup.remove();
+function showProfileReviewConfirm(mode, currentData, newData) {
+  return new Promise(resolve => {
 
-  popup.querySelector('.btn:not(.ghost)').onclick = () => {
-    dismiss();
-    onConfirm();
-  };
-  popup.querySelector('.btn.ghost').onclick = dismiss;
+    const isUpdate = mode === 'update';
 
-  // Auto-dismiss if clicking anywhere outside the popup
-  setTimeout(() => {
-    const handleOutside = (e) => {
-      if (!popup.contains(e.target) && e.target !== anchorBtn) {
-        dismiss();
-        document.removeEventListener('pointerdown', handleOutside);
+    const fields = [
+      ['Name', 'name'],
+      ['Date of Birth', 'dob'],
+      ['Time of Birth', 'tob'],
+      ['Place of Birth', 'pob'],
+      ['Latitude', 'lat'],
+      ['Longitude', 'lon'],
+      ['UTC Difference (hrs)', 'tz'],
+      ['Tags', 'tags'],
+      ['Description', 'desc']
+    ];
+
+    document.querySelector('.profile-review-overlay')?.remove();
+
+    const overlay = document.createElement('div');
+    overlay.className = 'profile-review-overlay';
+
+    overlay.style.cssText = `
+      position:fixed;
+      inset:0;
+      z-index:99999;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      background:rgba(20,15,30,.55);
+      backdrop-filter:blur(7px);
+    `;
+
+    const modal = document.createElement('div');
+
+    modal.style.cssText = `
+      width:max-content;
+      min-width:min(420px, calc(100vw - 32px));
+      max-width:min(820px, calc(100vw - 32px));
+      height:fit-content;
+      max-height:88vh;
+      overflow-y:auto;
+      padding:20px;
+      background:var(--surface);
+      color:var(--ink);
+      border:1px solid var(--line);
+      border-radius:17px;
+      box-shadow:0 24px 70px rgba(0,0,0,.28);
+    `;
+
+    function displayValue(value) {
+      if (value === null || value === undefined || value === '') {
+        return '—';
       }
+
+      const div = document.createElement('div');
+      div.innerHTML = String(value);
+      return div.textContent.trim() || '—';
+    }
+
+    // Determine which fields actually changed
+    const visibleFields = fields.filter(([label, key]) => {
+      if (!isUpdate) return true;
+
+      return displayValue(currentData?.[key]) !==
+             displayValue(newData?.[key]);
+    });
+
+    const hasChanges = visibleFields.length > 0;
+
+    modal.innerHTML = `
+      <div style="display:flex;justify-content:space-between;
+                  align-items:flex-start;gap:15px;margin-bottom:16px;">
+        <div>
+          <h2 style="font-size:1.12rem;margin:0;color:var(--ink);">
+            ${isUpdate ? 'Review Profile Changes' : 'Review Details Before Saving'}
+          </h2>
+          <p style="font-size:.79rem;color:var(--muted);margin:5px 0 0;">
+            ${isUpdate
+              ? (hasChanges
+                  ? `${visibleFields.length} field(s) modified. Review before updating.`
+                  : 'No changes detected in this record.')
+              : 'Verify the details before saving.'}
+          </p>
+        </div>
+
+        <button type="button" class="review-close"
+          style="border:0;background:none;color:var(--muted);
+                 font-size:1.4rem;cursor:pointer;">×</button>
+      </div>
+
+      <div class="review-headings"
+        style="display:grid;
+        grid-template-columns:repeat(${isUpdate ? 2 : 1},minmax(0,1fr));
+        gap:10px;margin-bottom:9px;">
+        ${isUpdate && hasChanges ? `
+          <div style="font-size:.72rem;font-weight:700;color:var(--muted);">
+            EXISTING
+          </div>
+          <div style="font-size:.72rem;font-weight:700;color:var(--saffron);">
+            NEW
+          </div>
+        ` : (!isUpdate ? `
+          <div style="font-size:.72rem;font-weight:700;color:var(--saffron);">
+            NEW RECORD
+          </div>
+        ` : '')}
+      </div>
+
+      <div class="review-fields"></div>
+
+      <div style="display:flex;justify-content:flex-end;gap:9px;
+                  margin-top:16px;padding-top:13px;
+                  border-top:1px solid var(--line);">
+        <button type="button" class="review-cancel"
+          style="padding:9px 17px;border:1px solid var(--line);
+                 border-radius:9px;background:var(--surface);
+                 color:var(--ink);cursor:pointer;">
+          ${hasChanges || !isUpdate ? 'Cancel' : 'Close'}
+        </button>
+
+        <button type="button" class="review-confirm"
+          ${isUpdate && !hasChanges ? 'disabled' : ''}
+          style="padding:9px 19px;border:0;border-radius:9px;
+                 background:var(--saffron);color:white;
+                 font-weight:700;cursor:${isUpdate && !hasChanges ? 'not-allowed' : 'pointer'};
+                 opacity:${isUpdate && !hasChanges ? '.5' : '1'};">
+          ${isUpdate ? 'Confirm Update' : 'Confirm Save'}
+        </button>
+      </div>
+    `;
+
+    const fieldsBox = modal.querySelector('.review-fields');
+
+    // Save: two-column grid.
+    // Update: one comparison row per changed field.
+    fieldsBox.style.cssText = `
+      display:grid;
+      grid-template-columns:${isUpdate ? '1fr' : 'repeat(2,minmax(0,1fr))'};
+      gap:8px;
+    `;
+
+    function createCell(label, value, changed, isDescription) {
+      const cell = document.createElement('div');
+
+      cell.style.cssText = `
+        min-width:0;
+        padding:${isDescription ? '11px 13px' : '8px 11px'};
+        border:1px solid ${changed ? 'var(--saffron)' : 'var(--line)'};
+        border-radius:9px;
+        overflow-wrap:anywhere;
+        white-space:pre-wrap;
+      `;
+
+      cell.style.backgroundColor = changed
+        ? 'color-mix(in srgb, var(--saffron) 14%, var(--surface))'
+        : 'var(--surface)';
+
+      cell.style.color = 'var(--ink)';
+
+      const heading = document.createElement('div');
+      heading.textContent = label + (changed ? '  •  CHANGED' : '');
+
+      heading.style.cssText = `
+        font-size:.69rem;
+        font-weight:700;
+        margin-bottom:3px;
+        color:${changed ? 'var(--saffron)' : 'var(--muted)'};
+      `;
+
+      const content = document.createElement('div');
+      content.textContent = value;
+
+      content.style.cssText = `
+        font-size:.83rem;
+        line-height:1.45;
+        overflow-wrap:anywhere;
+        color:var(--ink);
+        ${isDescription ? 'min-height:24px;' : ''}
+      `;
+
+      cell.append(heading, content);
+
+      return cell;
+    }
+
+    if (isUpdate && !hasChanges) {
+      const noChanges = document.createElement('div');
+
+      noChanges.textContent = 'All saved information is already identical to the current form.';
+
+      noChanges.style.cssText = `
+        padding:16px;
+        text-align:center;
+        border:1px solid var(--line);
+        border-radius:10px;
+        color:var(--muted);
+        font-size:.85rem;
+      `;
+
+      fieldsBox.appendChild(noChanges);
+    }
+
+    visibleFields.forEach(([label, key]) => {
+
+      const oldValue = displayValue(currentData?.[key]);
+      const newValue = displayValue(newData?.[key]);
+
+      const isDescription = key === 'desc';
+      const changed = isUpdate && oldValue !== newValue;
+
+      const group = document.createElement('div');
+
+      group.style.cssText = `
+        min-width:0;
+        ${isDescription ? 'grid-column:1 / -1;' : ''}
+        display:grid;
+        grid-template-columns:repeat(${isUpdate ? 2 : 1},minmax(0,1fr));
+        gap:8px;
+      `;
+
+      if (isUpdate) {
+        group.appendChild(
+          createCell(
+            isDescription ? 'Existing Description' : label,
+            oldValue,
+            false,
+            isDescription
+          )
+        );
+      }
+
+      group.appendChild(
+        createCell(
+          isDescription ? 'New Description' : label,
+          newValue,
+          changed,
+          isDescription
+        )
+      );
+
+      fieldsBox.appendChild(group);
+    });
+
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    const close = confirmed => {
+      overlay.remove();
+      resolve(confirmed);
     };
-    document.addEventListener('pointerdown', handleOutside);
-  }, 10);
+
+    modal.querySelector('.review-close').onclick = () => close(false);
+    modal.querySelector('.review-cancel').onclick = () => close(false);
+    modal.querySelector('.review-confirm').onclick = () => {
+      if (isUpdate && !hasChanges) return;
+      close(true);
+    };
+
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) close(false);
+    });
+
+    // Responsive layout
+    if (window.innerWidth < 600) {
+      fieldsBox.style.gridTemplateColumns = '1fr';
+
+      fieldsBox.querySelectorAll(':scope > div').forEach(group => {
+        group.style.gridColumn = '1';
+        group.style.gridTemplateColumns = '1fr';
+      });
+
+      modal.querySelector('.review-headings').style.gridTemplateColumns = '1fr';
+    }
+  });
 }
+
+
+
 
 /* ================= COMPREHENSIVE KUNDALI BUNDLE ================= */
 function buildCompleteKundali(input, offsetDays = 0) {
@@ -7563,6 +7788,15 @@ saveBtn.addEventListener('click', async () => {
       desc: sec.querySelector('input[name="desc"]').value || 'None'
     };
 
+    // Show new data for review before saving
+const confirmed = await showProfileReviewConfirm(
+  'save',
+  null,
+  payload
+);
+
+if (!confirmed) return;
+
     saveBtn.textContent = 'Saving...';
     saveBtn.disabled = true;
 
@@ -7616,55 +7850,83 @@ saveBtn.addEventListener('click', async () => {
     }
   });
 
-// Handle Update Button with confirmation
-  const updateBtn = sec.querySelector(`#updateBtn${n}`);
-  if (updateBtn) {
-    updateBtn.addEventListener('click', () => {
-      const recordId = sec.dataset.chartId;
-      if (!recordId) return;
 
-      showUpdateConfirm(updateBtn, recordId, () => {
+// Handle Update Button with Current vs New Data confirmation
+const updateBtn = sec.querySelector(`#updateBtn${n}`);
+
+if (updateBtn) {
+  updateBtn.addEventListener('click', async () => {
+
+    const recordId = sec.dataset.chartId;
+    if (!recordId) return;
+
+    // Fetch latest saved record from Google Sheets
+    const profiles = await fetchSavedProfiles(true);
+
+    const currentProfile = profiles.find(p =>
+      String(p.id).trim() === String(recordId).trim()
+    );
+
+    if (!currentProfile) {
+      alert('Could not find the existing record. Please refresh and try again.');
+      return;
+    }
+
+    // Collect newly edited data
+    const payload = {
+      action: 'update',
+      id: recordId,
+      name: sec.querySelector('input[name="name"]').value || 'N/A',
+      dob: formatForSheet(sec.querySelector('input[name="dob"]').value) || 'N/A',
+      tob: sec.querySelector('input[name="tob"]').value || 'N/A',
+      pob: sec.querySelector('input[name="pob"]').value || 'N/A',
+      lat: sec.querySelector('input[name="lat"]').value || '',
+      lon: sec.querySelector('input[name="lon"]').value || '',
+      tz: sec.querySelector('input[name="tz"]').value || '',
+      tags: Array.from(selectedTags).join('; ') || 'None',
+      desc: sec.querySelector('input[name="desc"]').value || 'None'
+    };
+
+    // Show Current vs New data
+    const confirmed = await showProfileReviewConfirm(
+      'update',
+      currentProfile,
+      payload
+    );
+
+    if (!confirmed) return;
+
+    // Continue with existing update operation
+    updateBtn.disabled = true;
+    updateBtn.textContent = 'Updating...';
+
+    fetch(WEB_APP_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: JSON.stringify(payload)
+    }).then(() => {
+
+      localStorage.removeItem(PROFILES_STORAGE_KEY);
+      savedProfilesCache = null;
+
+      updateBtn.textContent = 'Updated ✓';
+
+      setTimeout(() => {
+        updateBtn.textContent = 'Update';
         updateBtn.disabled = true;
-        updateBtn.textContent = 'Updating...';
+        updateBtn.style.opacity = '0.4';
+        updateBtn.style.pointerEvents = 'none';
+        updateBtn.style.cursor = 'not-allowed';
+      }, 2000);
 
-        const payload = {
-          action: 'update',
-          id: recordId,
-          name: sec.querySelector('input[name="name"]').value || 'N/A',
-          dob: formatForSheet(sec.querySelector('input[name="dob"]').value) || 'N/A',
-          tob: sec.querySelector('input[name="tob"]').value || 'N/A',
-          pob: sec.querySelector('input[name="pob"]').value || 'N/A',
-          lat: sec.querySelector('input[name="lat"]').value || '',
-          lon: sec.querySelector('input[name="lon"]').value || '',
-          tz: sec.querySelector('input[name="tz"]').value || '',
-          tags: Array.from(selectedTags).join('; ') || 'None',
-          desc: sec.querySelector('input[name="desc"]').value || 'None'
-        };
-
-        fetch(WEB_APP_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          body: JSON.stringify(payload)
-        }).then(() => {
-          localStorage.removeItem(PROFILES_STORAGE_KEY);
-          savedProfilesCache = null;
-
-          updateBtn.textContent = 'Updated ✓';
-          setTimeout(() => {
-            updateBtn.textContent = 'Update';
-            updateBtn.disabled = true;
-            updateBtn.style.opacity = '0.4';
-            updateBtn.style.pointerEvents = 'none';
-            updateBtn.style.cursor = 'not-allowed';
-          }, 2000);
-        }).catch(err => {
-          console.warn('Update failed:', err);
-          updateBtn.textContent = 'Error';
-          updateBtn.disabled = false;
-        });
-      });
+    }).catch(err => {
+      console.warn('Update failed:', err);
+      updateBtn.textContent = 'Error';
+      updateBtn.disabled = false;
     });
-  }
+  });
+}
+
 
 // Toggle Collapse on click
 toggleBar.addEventListener('click', () => {
