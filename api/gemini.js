@@ -1,5 +1,6 @@
 
 export default async function handler(req, res) {
+console.log("JUPITER GEMINI HANDLER:", req.method);
 
   // 1. Allow only POST requests
   if (req.method !== "POST") {
