@@ -1165,17 +1165,18 @@ html[data-palette="celestial"] body {
 /* Live Ephemeris & Panchang Card */
 .panchang-card {
   background: var(--surface-alt);
+  max-width: 1140px;
   border: 1px solid var(--line-strong);
+  align-items: center;
   border-radius: 14px;
   padding: 20px;
-  margin-bottom: 24px;
+  margin: 0 auto 24px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.15);
 }
 .panchang-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
   gap: 16px;
   border-bottom: 1px solid var(--line);
   padding-bottom: 14px;
@@ -1185,7 +1186,6 @@ html[data-palette="celestial"] body {
   margin: 0;
   font-size: 1.1rem;
   color: var(--ink);
-  display: flex;
   align-items: center;
   gap: 8px;
 }
@@ -2677,6 +2677,42 @@ html[data-palette="cosmic"] .cosmic-glow {
   background: var(--indigo-soft);
 }
 
+.header-quick-icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.header-icon-btn {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  opacity: 0.55;
+  cursor: pointer;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.header-icon-btn svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.header-icon-btn:hover {
+  opacity: 0.9;
+}
+
+
 </style>
 </head>
 <body>
@@ -2689,11 +2725,26 @@ html[data-palette="cosmic"] .cosmic-glow {
         Co-powered by <span style="color: var(--saffron); font-weight: 700;">Blissbond Astrology</span>
       </span>
     </div>
-     
+     <div class="header-quick-icons">
+  <!-- Location Pin -->
+  <button class="header-icon-btn" type="button" title="Location">
+    <svg viewBox="0 0 24 24">
+      <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/>
+      <circle cx="12" cy="10" r="2.5"/>
+    </svg>
+  </button>
+
+  <!-- Account -->
+  <button class="header-icon-btn" type="button" title="Account">
+    <svg viewBox="0 0 24 24">
+      <circle cx="12" cy="8" r="4"/>
+      <path d="M5 21a7 7 0 0 1 14 0"/>
+    </svg>
+  </button>
+</div>
     <div style="display: flex; align-items: center; gap: 8px;">
       <button type="button" class="theme-toggle-btn" id="themeToggle" aria-label="Toggle theme">
         <span id="themeIcon">☼</span>
-        <span id="themeText">Light</span>
       </button>
       
       <!-- New Panchang Collapse/Expand Button -->
@@ -2900,11 +2951,11 @@ const Theme = {
     const text = document.getElementById('themeText');
     
     if (mode === 'light') {
-      if (icon) icon.textContent = '☾'; // Moon icon to indicate switching to Dark
-      if (text) text.textContent = 'Dark';
+      if (icon) icon.textContent = '🌙'; // Moon icon to indicate switching to Dark
+      if (text) text.textContent ='';
     } else {
-      if (icon) icon.textContent = '☼'; // Sun icon to indicate switching to Light
-      if (text) text.textContent = 'Light';
+      if (icon) icon.textContent = '🔆'; // Sun icon to indicate switching to Light
+      if (text) text.textContent ='';
     }
     
     try { localStorage.setItem('ja-theme', mode); } catch (e) {}
