@@ -2712,6 +2712,511 @@ html[data-palette="cosmic"] .cosmic-glow {
   opacity: 0.9;
 }
 
+/* ============================================
+   JUPITER AI — THEME-ADAPTIVE LIQUID GLASS
+============================================ */
+
+/* 1. THEME VARIABLES */
+
+#jupiter-ai-widget {
+  --ai-accent: var(--saffron);
+  --ai-accent-dark: var(--al);
+  --ai-accent-text: #ffffff;
+  --ai-text: var(--ink);
+  --ai-border: var(--line);
+  --ai-surface: var(--surface);
+  --ai-bg: var(--paper);
+
+  position: fixed !important;
+  left: 20px !important;
+  right: auto !important;
+  bottom: 20px !important;
+  z-index: 99999 !important;
+  font-family: inherit;
+  color: var(--ai-text);
+}
+
+/* ============================================
+   2. FLOATING ICON
+============================================ */
+
+#jupiter-ai-toggle {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  padding: 0 !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--ai-border);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ai-accent) 88%, transparent);
+  color: var(--ai-accent-text);
+
+  font-size: 23px;
+  cursor: pointer;
+
+  backdrop-filter: blur(14px) saturate(170%);
+  -webkit-backdrop-filter: blur(14px) saturate(170%);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.30),
+    0 4px 14px rgba(0,0,0,.14);
+
+  transition: transform .22s ease, box-shadow .22s ease;
+}
+
+#jupiter-ai-toggle:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.35),
+    0 7px 20px rgba(0,0,0,.20);
+}
+
+#jupiter-ai-toggle:active {
+  transform: scale(.94);
+}
+
+#jupiter-ai-toggle .ai-icon {
+  font-size: 23px;
+  line-height: 1;
+}
+
+/* Hover label */
+
+#jupiter-ai-toggle::after {
+  content: "Assistant";
+  position: absolute;
+  left: 56px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  padding: 6px 11px;
+  border-radius: 9px;
+
+  background: var(--ai-accent-dark);
+  color: var(--ai-accent-text);
+
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .2s ease;
+}
+
+#jupiter-ai-toggle:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ============================================
+   3. CHAT WINDOW
+============================================ */
+
+#jupiter-ai-window {
+  position: absolute;
+  left: 0 !important;
+  right: auto !important;
+  bottom: 60px;
+
+  width: 350px;
+  max-width: calc(100vw - 36px);
+
+  height: 420px;
+  max-height: min(65dvh, 500px);
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  background: color-mix(in srgb, var(--ai-surface) 82%, transparent);
+  color: var(--ai-text);
+
+  border: 1px solid var(--ai-border);
+  border-radius: 24px;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.16),
+    inset 0 1px 0 rgba(255,255,255,.45);
+
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+
+  opacity: 0;
+  visibility: hidden;
+
+  transform: translateY(12px) scale(.97);
+  transform-origin: bottom left;
+
+  transition:
+    opacity .22s ease,
+    transform .22s ease,
+    visibility .22s;
+}
+
+#jupiter-ai-window.ai-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+/* ============================================
+   4. HEADER
+============================================ */
+
+#jupiter-ai-header {
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  min-height: 0;
+  padding: 12px 18px;
+
+  background: color-mix(in srgb, var(--ai-accent) 88%, transparent);
+  color: var(--ai-accent-text);
+
+  border-bottom: 1px solid var(--ai-border);
+  border-radius: 22px 22px 0 0;
+
+  backdrop-filter: blur(18px) saturate(165%);
+  -webkit-backdrop-filter: blur(18px) saturate(165%);
+
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.25);
+}
+
+#jupiter-ai-header::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,.13),
+    transparent 48%,
+    rgba(255,255,255,.035)
+  );
+}
+
+#jupiter-ai-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  font-size: 1.1rem;
+  line-height: 1.3;
+  font-weight: 650;
+}
+
+#jupiter-ai-title span {
+  font-size: 21px;
+}
+
+#jupiter-ai-close {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+
+  color: var(--ai-accent-text);
+  font-size: 23px;
+  cursor: pointer;
+
+  opacity: .85;
+  transition: opacity .2s ease, background .2s ease;
+}
+
+#jupiter-ai-close:hover {
+  opacity: 1;
+  background: rgba(255,255,255,.16);
+}
+
+/* ============================================
+   5. MESSAGE AREA
+============================================ */
+
+#jupiter-ai-messages {
+  flex: 1;
+  min-height: 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding: 12px;
+  background: color-mix(in srgb, var(--ai-bg) 75%, transparent);
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--ai-border) transparent;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+
+#jupiter-ai-messages::-webkit-scrollbar {
+  width: 7px;
+}
+
+#jupiter-ai-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#jupiter-ai-messages::-webkit-scrollbar-thumb {
+  background: var(--ai-border);
+  border-radius: 10px;
+}
+
+/* Message bubbles */
+
+.jupiter-ai-message {
+  width: fit-content;
+  max-width: 88%;
+  box-sizing: border-box;
+
+  padding: 8px 11px;
+  margin-bottom: 9px;
+
+  border-radius: 16px;
+
+  font-size: 12.5px;
+  line-height: 1.65;
+
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.jupiter-ai-message.ai {
+  background: color-mix(in srgb, var(--surface-alt) 85%, transparent);
+  border: 1px solid var(--ai-border);
+  color: var(--ai-text);
+}
+
+.jupiter-ai-message.user {
+  margin-left: auto;
+
+  background: color-mix(in srgb, var(--ai-accent) 88%, transparent);
+  color: var(--ai-accent-text);
+
+  border: 1px solid var(--ai-border);
+
+  backdrop-filter: blur(14px) saturate(165%);
+  -webkit-backdrop-filter: blur(14px) saturate(165%);
+}
+
+/* ============================================
+   6. INPUT AREA
+============================================ */
+
+#jupiter-ai-input-area {
+  flex-shrink: 0;
+
+  padding: 12px 16px;
+
+  border-top: 1px solid var(--ai-border);
+  border-radius: 0 0 22px 22px;
+
+  background: color-mix(in srgb, var(--ai-surface) 85%, transparent);
+}
+
+#jupiter-ai-input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+
+  min-height: 55px;
+  max-height: 100px;
+
+  padding: 10px 11px;
+  resize: vertical;
+
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+
+  outline: none;
+  outline-offset: 2px;
+
+  background: var(--ai-surface);
+  color: var(--ai-text);
+
+  font: inherit;
+  font-size: 13px;
+}
+
+#jupiter-ai-input:focus {
+  border-color: var(--ai-accent);
+  box-shadow: 0 0 0 3px var(--saffron-soft);
+}
+
+#jupiter-ai-input::placeholder {
+  color: var(--muted);
+}
+
+/* ============================================
+   7. SEND ROW AND ARROW BUTTON
+============================================ */
+
+#jupiter-ai-send-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  margin-top: 9px;
+}
+
+#jupiter-ai-status {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+#jupiter-ai-send {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  padding: 0 !important;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid var(--ai-border);
+  border-radius: 50% !important;
+
+  background: color-mix(in srgb, var(--ai-accent) 88%, transparent);
+  color: var(--ai-accent-text);
+
+  font-size: 0 !important;
+  cursor: pointer;
+
+  backdrop-filter: blur(14px) saturate(170%);
+  -webkit-backdrop-filter: blur(14px) saturate(170%);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.30),
+    0 4px 14px rgba(0,0,0,.14);
+
+  transition:
+    opacity .2s ease,
+    transform .2s ease,
+    filter .2s ease;
+}
+
+#jupiter-ai-send svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.2;
+}
+
+#jupiter-ai-send:hover {
+  filter: brightness(1.12) saturate(1.12);
+}
+
+#jupiter-ai-send:disabled {
+  opacity: .99;
+  pointer-events: none;
+  transform: scale(.96);
+  cursor: wait;
+}
+
+/* ============================================
+   8. MONOCHROME PALETTE
+============================================ */
+
+[data-palette="mono"] #jupiter-ai-widget {
+  --ai-accent-text: #000000;
+}
+
+/* ============================================
+   9. MOBILE — FULL SCREEN
+============================================ */
+
+@media (max-width: 600px) {
+
+  #jupiter-ai-widget {
+    left: 12px !important;
+    bottom: 12px !important;
+  }
+
+  #jupiter-ai-window {
+    position: fixed !important;
+    inset: 0 !important;
+
+    width: 100vw !important;
+    max-width: 100vw !important;
+
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+
+    border-radius: 0 !important;
+    transform: translateY(8px);
+    transform-origin: center;
+  }
+
+  #jupiter-ai-window.ai-open {
+    transform: translateY(0);
+  }
+
+  #jupiter-ai-header {
+    min-height: 56px;
+    padding: 10px 15px;
+    padding-top: max(10px, env(safe-area-inset-top));
+    border-radius: 0;
+  }
+
+  #jupiter-ai-close {
+    width: 36px;
+    height: 36px;
+    font-size: 25px;
+  }
+
+  #jupiter-ai-messages {
+    padding: 14px;
+  }
+
+  #jupiter-ai-input-area {
+    padding: 12px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    border-radius: 0;
+  }
+
+  #jupiter-ai-input {
+    min-height: 65px;
+    max-height: 110px;
+    font-size: 14px;
+  }
+
+  #jupiter-ai-toggle::after {
+    display: none;
+  }
+}
+
+/* ============================================
+   10. REDUCED MOTION
+============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  #jupiter-ai-toggle,
+  #jupiter-ai-window,
+  #jupiter-ai-toggle::after,
+  #jupiter-ai-send {
+    transition: none;
+  }
+}
 
 </style>
 </head>
@@ -3048,7 +3553,7 @@ const GEO_READY = (async () => {
 
   const KEY = 'jupiter_geo_cache';
   const GEO_VERSION = '1.0';
-  const URL = '/g0055fd67Kz-database.json';
+  const URL = 'https://www.jupiterastrology108.com/g0055fd67Kz-database.json';
   const TTL = 7 * 24 * 60 * 60 * 1000;
 
   let data = null;
@@ -3193,6 +3698,7 @@ function searchPlaces(q) {
 // LIVE INTERNATIONAL SEARCH - OPENSTREETMAP
 // ============================================================
 
+
 async function searchWorldPlacesLive(query) {
 
   if (!query || query.trim().length < 3) return [];
@@ -3200,7 +3706,7 @@ async function searchWorldPlacesLive(query) {
   try {
 
     const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`
+      `/api/geocode?q=${encodeURIComponent(query.trim())}`
     );
 
     if (!res.ok) {
@@ -3210,17 +3716,18 @@ async function searchWorldPlacesLive(query) {
     const data = await res.json();
 
     return data.map(item => ({
-      label: item.display_name,
-      name: item.name || item.display_name.split(',')[0],
-      lat: parseFloat(item.lat),
-      lon: parseFloat(item.lon),
-      tz: 5.5,
+      label: item.label,
+      name: item.name,
+      lat: item.lat,
+      lon: item.lon,
+      tz: null,
+      placeId: item.placeId,
       isGlobal: true
     }));
 
   } catch (err) {
 
-    console.warn('Live place search failed:', err);
+    console.warn('Google Geocoding search failed:', err);
     return [];
 
   }
@@ -7561,59 +8068,168 @@ function bindNameAutocomplete(inp, list, form, selectedTagsSet) {
   inp.addEventListener('blur', () => setTimeout(close, 150));
 }
 
+
 function bindPlaceAutocomplete(inp, list) {
+
   let items = [], idx = -1;
-  const close = () => { list.hidden = true; inp.setAttribute('aria-expanded', 'false'); idx = -1; };
+  let searchId = 0;
+
+  // Close dropdown
+  const close = () => {
+    list.hidden = true;
+    inp.setAttribute('aria-expanded', 'false');
+    idx = -1;
+  };
+
+
+  // Select a place
   const pick = p => {
     if (!p) return;
+
     inp.value = p.label;
+
     inp.dataset.lat = p.lat;
     inp.dataset.lon = p.lon;
-    inp.dataset.tz = p.tz;
+    inp.dataset.tz = p.tz ?? '';
+
     close();
   };
 
-  inp.addEventListener('input', async () => {
-    const q = inp.value.trim();
-    delete inp.dataset.lat; delete inp.dataset.lon; delete inp.dataset.tz;
-    if (q.length < 2) return close();
-    
-    await GEO_READY;
-    items = searchPlaces(q);
-    items = items.slice(0, 8);
-    
+
+  // Render search results
+  const render = () => {
+
     idx = items.length ? 0 : -1;
+
     list.innerHTML = items.length
       ? items.map((p, i) => `
-          <li role="option" data-i="${i}" aria-selected="${i === idx}" style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+          <li role="option"
+              data-i="${i}"
+              aria-selected="${i === idx}"
+              style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+
             <span>${esc(p.name)}</span>
+
             <small style="color:${p.isGlobal ? 'var(--al)' : 'var(--muted)'};">
-              ${p.isGlobal ? '🌐 Live GPS' : ''} ${esc(p.label)}
+              ${p.isGlobal ? '🌐 Google' : ''} ${esc(p.label)}
             </small>
-          </li>`).join('')
+
+          </li>
+        `).join('')
+
       : `<li class="none">City not found. Enter coordinates manually.</li>`;
+
     list.hidden = false;
     inp.setAttribute('aria-expanded', 'true');
+  };
+
+
+  // ==========================================================
+  // INPUT SEARCH
+  // ==========================================================
+
+  inp.addEventListener('input', async () => {
+
+    const q = inp.value.trim();
+    const currentSearch = ++searchId;
+
+    delete inp.dataset.lat;
+    delete inp.dataset.lon;
+    delete inp.dataset.tz;
+
+    if (q.length < 2) {
+      items = [];
+      return close();
+    }
+
+
+    // 1. Wait for local database
+    await GEO_READY;
+
+    if (currentSearch !== searchId) return;
+
+
+    // 2. Search local database first
+    items = searchPlaces(q);
+
+
+    // 3. Google fallback only if no local result
+    if (!items.length && q.length >= 3) {
+
+      items = await searchWorldPlacesLive(q);
+
+      // Ignore outdated Google responses
+      if (currentSearch !== searchId) return;
+    }
+
+
+    // 4. Display results
+    items = items.slice(0, 8);
+
+    render();
+
   });
+
+
+  // ==========================================================
+  // KEYBOARD NAVIGATION
+  // ==========================================================
 
   inp.addEventListener('keydown', e => {
+
     if (list.hidden || !items.length) return;
+
     if (e.key === 'ArrowDown') {
-      e.preventDefault(); idx = (idx + 1) % items.length;
-      list.querySelectorAll('li').forEach((li, k) => li.setAttribute('aria-selected', String(k === idx)));
+
+      e.preventDefault();
+      idx = (idx + 1) % items.length;
+
     } else if (e.key === 'ArrowUp') {
-      e.preventDefault(); idx = (idx - 1 + items.length) % items.length;
-      list.querySelectorAll('li').forEach((li, k) => li.setAttribute('aria-selected', String(k === idx)));
+
+      e.preventDefault();
+      idx = (idx - 1 + items.length) % items.length;
+
     } else if (e.key === 'Enter') {
-      e.preventDefault(); if (items[idx]) pick(items[idx]);
-    } else if (e.key === 'Escape') close();
+
+      e.preventDefault();
+      if (items[idx]) pick(items[idx]);
+
+    } else if (e.key === 'Escape') {
+
+      close();
+    }
+
+    list.querySelectorAll('li[data-i]').forEach((li, k) => {
+      li.setAttribute('aria-selected', String(k === idx));
+    });
+
   });
 
+
+  // ==========================================================
+  // MOUSE SELECTION
+  // ==========================================================
+
   list.addEventListener('mousedown', e => {
+
     const li = e.target.closest('li[data-i]');
-    if (li) { e.preventDefault(); pick(items[+li.dataset.i]); }
+
+    if (li) {
+      e.preventDefault();
+      pick(items[+li.dataset.i]);
+    }
+
   });
-  inp.addEventListener('blur', () => setTimeout(close, 150));
+
+
+  // ==========================================================
+  // CLOSE ON BLUR
+  // ==========================================================
+
+  inp.addEventListener('blur', () => {
+    setTimeout(close, 150);
+  });
+
 }
 
 function parseDmy(str) {
@@ -7631,7 +8247,7 @@ const mainForm = document.getElementById('mainForm');
 const mainPob = document.getElementById('pob'), mainPobList = document.getElementById('pobList');
 bindPlaceAutocomplete(mainPob, mainPobList);
 
-mainForm.addEventListener('submit', e => {
+mainForm.addEventListener('submit', async e => {
   e.preventDefault();
   const dateObj = parseDmy(document.getElementById('dob').value);
   if (!dateObj) {
@@ -7658,6 +8274,18 @@ let lat = parseFloat(mainPob.dataset.lat), lon = parseFloat(mainPob.dataset.lon)
     }
     lat = found.lat; lon = found.lon; tz = found.tz;
   }
+
+ // India is always IST (UTC +5:30).
+// Call Google Time Zone API only for places without a known timezone.
+if (!Number.isFinite(tz)) {
+  try {
+    tz = await getPlaceTimezone(lat, lon, dateObj, tobVal);
+  } catch (err) {
+    console.error('Timezone lookup failed:', err);
+    showInlineError('Unable to determine the timezone for this location.');
+    return;
+  }
+}
 
   const [hh, mm, ss] = tobVal.split(':').map(Number);
   const input = { y: dateObj.y, m: dateObj.m, d: dateObj.d, hh, mm: mm || 0, ss: ss || 0, tz, lat, lon };
@@ -8483,5 +9111,335 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 
+<!-- ============================================
+     9. FLOATING ASSISTANT HTML
+============================================ -->
+
+<div id="jupiter-ai-widget">
+
+  <!-- CHAT WINDOW -->
+
+  <div
+    id="jupiter-ai-window"
+    role="dialog"
+    aria-label="Jupiter AI Assistant"
+    aria-hidden="true">
+
+    <!-- HEADER -->
+
+    <div id="jupiter-ai-header">
+
+      <div id="jupiter-ai-title">
+
+        <span>✦</span>
+
+        Jupiter AI Assistant
+
+      </div>
+
+      <button
+        id="jupiter-ai-close"
+        type="button"
+        aria-label="Close Assistant">
+
+        &times;
+
+      </button>
+
+    </div>
+
+
+    <!-- MESSAGES -->
+
+    <div id="jupiter-ai-messages">
+
+      <div class="jupiter-ai-message ai">
+        Namaste! I am Jupiter AI.
+
+        Ask me anything about astrology or your research.
+      </div>
+
+    </div>
+
+
+    <!-- INPUT -->
+
+    <div id="jupiter-ai-input-area">
+
+      <textarea
+        id="jupiter-ai-input"
+        placeholder="Type your question..."
+        aria-label="Ask Jupiter AI"
+      ></textarea>
+
+      <div id="jupiter-ai-send-row">
+
+        <span id="jupiter-ai-status">
+          Ready
+        </span>
+
+        <button
+  id="jupiter-ai-send"
+  type="button"
+  aria-label="Send message"
+  title="Send">
+
+  <svg viewBox="0 0 24 24" width="21" height="21"
+       fill="none" stroke="currentColor"
+       stroke-width="2" stroke-linecap="round"
+       stroke-linejoin="round">
+    <path d="M5 12h14M13 5l7 7-7 7"/>
+  </svg>
+
+</button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- FLOATING ICON -->
+
+  <button
+    id="jupiter-ai-toggle"
+    type="button"
+    aria-label="Assistant"
+    aria-expanded="false"
+    aria-controls="jupiter-ai-window"
+    title="Assistant">
+
+    <span class="ai-icon">✦</span>
+
+  </button>
+
+</div>
+
+
+<!-- ============================================
+     10. ASSISTANT JAVASCRIPT
+============================================ -->
+
+<script>
+
+(function () {
+
+  const widget = document.getElementById("jupiter-ai-widget");
+
+  if (!widget || widget.dataset.initialized) return;
+
+  widget.dataset.initialized = "true";
+
+
+  const toggle = document.getElementById("jupiter-ai-toggle");
+
+  const close = document.getElementById("jupiter-ai-close");
+
+  const windowBox = document.getElementById("jupiter-ai-window");
+
+  const input = document.getElementById("jupiter-ai-input");
+
+  const send = document.getElementById("jupiter-ai-send");
+
+  const status = document.getElementById("jupiter-ai-status");
+
+  const messages = document.getElementById("jupiter-ai-messages");
+
+
+  /* ------------------------------------------
+     OPEN ASSISTANT
+  ------------------------------------------ */
+
+  function openAssistant() {
+
+    windowBox.classList.add("ai-open");
+
+    windowBox.setAttribute("aria-hidden", "false");
+
+    toggle.setAttribute("aria-expanded", "true");
+
+    input.focus();
+
+  }
+
+
+  /* ------------------------------------------
+     CLOSE ASSISTANT
+  ------------------------------------------ */
+
+  function closeAssistant() {
+
+    windowBox.classList.remove("ai-open");
+
+    windowBox.setAttribute("aria-hidden", "true");
+
+    toggle.setAttribute("aria-expanded", "false");
+
+  }
+
+
+  toggle.addEventListener("click", function () {
+
+    if (windowBox.classList.contains("ai-open")) {
+
+      closeAssistant();
+
+    } else {
+
+      openAssistant();
+
+    }
+
+  });
+
+
+  close.addEventListener("click", closeAssistant);
+
+
+  document.addEventListener("keydown", function (event) {
+
+    if (event.key === "Escape") {
+
+      closeAssistant();
+
+    }
+
+  });
+
+
+  /* ------------------------------------------
+     ADD CHAT MESSAGE
+  ------------------------------------------ */
+
+  function addMessage(text, type) {
+
+    const message = document.createElement("div");
+
+    message.className = "jupiter-ai-message " + type;
+
+    message.textContent = text;
+
+    messages.appendChild(message);
+
+    messages.scrollTop = messages.scrollHeight;
+
+    return message;
+
+  }
+
+
+  /* ------------------------------------------
+     SEND QUESTION TO GEMINI
+  ------------------------------------------ */
+
+  async function askGemini() {
+
+    const question = input.value.trim();
+
+    if (!question || send.disabled) return;
+
+
+    // Add user's message
+
+    addMessage(question, "user");
+
+    input.value = "";
+
+
+    // Loading state
+
+    send.disabled = true;
+
+    status.textContent = "Gemini is thinking...";
+
+
+    const thinking = addMessage(
+      "Preparing your response...",
+      "ai"
+    );
+
+
+    try {
+
+      const response = await fetch("/api/gemini", {
+
+        method: "POST",
+
+        headers: {
+
+          "Content-Type": "application/json"
+
+        },
+
+        body: JSON.stringify({
+
+          message: question,
+
+          pageContext: {}
+
+        })
+
+      });
+
+
+      
+const responseText = await response.text();
+
+let data = {};
+
+try {
+  data = responseText ? JSON.parse(responseText) : {};
+} catch (parseError) {
+  console.error("Invalid API response:", responseText);
+
+  throw new Error(
+    `Server returned invalid JSON (HTTP ${response.status}).`
+  );
+}
+
+if (!response.ok || !data.success) {
+
+  throw new Error(
+    data.error ||
+    `Gemini API failed (HTTP ${response.status})`
+  );
+
+}
+
+if (!data.answer) {
+  throw new Error("Gemini returned an empty answer.");
+}
+      // Display Gemini response
+      thinking.textContent = data.answer;
+      status.textContent = "Response received";
+    } catch (error) {
+  console.error("Jupiter AI Error:", error);
+  thinking.textContent =
+    "Unable to get a response: " + error.message;
+  status.textContent = "Request failed";
+    } finally {
+      send.disabled = false;
+      messages.scrollTop = messages.scrollHeight;
+      input.focus();
+    }
+  }
+
+  /* ------------------------------------------
+     BUTTON CLICK
+  ------------------------------------------ */
+  send.addEventListener("click", askGemini);
+  /* ------------------------------------------
+     ENTER TO SEND
+     SHIFT + ENTER FOR NEW LINE
+  ------------------------------------------ */
+  input.addEventListener("keydown", function (event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      askGemini();
+    }
+  });
+})();
+</script>
 </body>
 </html>
