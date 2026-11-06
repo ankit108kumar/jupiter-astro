@@ -5750,7 +5750,16 @@ const RenderTabs = {
             <dt>Darakaraka</dt><dd>${k.karakas[k.karakas.length - 1].planet}</dd>
             <dt>Arudha Lagna</dt><dd>${SIGNS[k.padas[0].sign][1]} <span class="sub">house ${houseFrom(k.padas[0].sign, k.ascSign)}</span></dd>
             <dt>Upapada</dt><dd>${SIGNS[k.padas[11].sign][1]} <span class="sub">house ${houseFrom(k.padas[11].sign, k.ascSign)}</span></dd>
-            <dt>Dasha at birth</dt><dd>${k.md.firstLord} <span class="sub">balance ${fmtSpan(k.md.balanceYrs * 365.25 * 864e5)}</span></dd>
+            <dt>Dasha at birth</dt>
+<dd>
+  ${(() => {
+    const birthChain = dashaChain(k.md.list, k.birthMs, 365.25);
+    return birthChain.length >= 3
+      ? birthChain.slice(0, 3).map(p => p.lord).join(' - ')
+      : k.md.firstLord;
+  })()}
+  <span class="sub">balance ${fmtSpan(k.md.balanceYrs * 365.25 * 864e5)}</span>
+</dd>
             <dt>Dasha now</dt><dd>${k.chain.length >= 3 ? `${k.chain[0].lord} - ${k.chain[1].lord} - ${k.chain[2].lord}` : '—'}</dd>
           </dl>
         </article>
