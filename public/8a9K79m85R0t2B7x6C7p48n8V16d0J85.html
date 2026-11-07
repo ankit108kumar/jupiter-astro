@@ -9335,103 +9335,104 @@ function addMessage(text, type) {
 }
 
 
-  /* ------------------------------------------
-     SEND QUESTION TO GEMINI
-  ------------------------------------------ */
+/* ------------------------------------------
+   SEND QUESTION TO GEMINI
+------------------------------------------ */
 
-  async function askGemini() {
+async function askGemini() {
 
-    const question = input.value.trim();
+  const question = input.value.trim();
 
-    if (!question || send.disabled) return;
+  if (!question || send.disabled) return;
 
+  // Add user's message
+  addMessage(question, "user");
 
-    // Add user's message
+  input.value = "";
 
-    addMessage(question, "user");
+  // Loading state
+  send.disabled = true;
 
-    input.value = "";
+  status.textContent = "Gemini is thinking...";
 
+  const thinking = addMessage(
+    "Preparing your response...",
+    "ai"
+  );
 
-    // Loading state
+  try {
 
-    send.disabled = true;
+    const response = await fetch("/api/gemini", {
 
-    status.textContent = "Gemini is thinking...";
+      method: "POST",
 
+      headers: {
+        "Content-Type": "application/json"
+      },
 
-    const thinking = addMessage(
-      "Preparing your response...",
-      "ai"
-    );
+      body: JSON.stringify({
+        message: question,
+        pageContext: {}
+      })
 
+    });
+
+    const responseText = await response.text();
+
+    let data = {};
 
     try {
+      data = responseText ? JSON.parse(responseText) : {};
+    } catch (parseError) {
 
-      const response = await fetch("/api/gemini", {
+      console.error("Invalid API response:", responseText);
 
-        method: "POST",
+      throw new Error(
+        `Server returned invalid JSON (HTTP ${response.status}).`
+      );
 
-        headers: {
-
-          "Content-Type": "application/json"
-
-        },
-
-        body: JSON.stringify({
-
-          message: question,
-
-          pageContext: {}
-
-        })
-
-      });
-
-
-      
-const responseText = await response.text();
-
-let data = {};
-
-try {
-  data = responseText ? JSON.parse(responseText) : {};
-} catch (parseError) {
-  console.error("Invalid API response:", responseText);
-
-  throw new Error(
-    `Server returned invalid JSON (HTTP ${response.status}).`
-  );
-}
-
-if (!response.ok || !data.success) {
-
-  throw new Error(
-    data.error ||
-    `Gemini API failed (HTTP ${response.status})`
-  );
-
-}
-
-if (!data.answer) {
-  throw new Error("Gemini returned an empty answer.");
-}
-      // Display Gemini response
-      thinking.innerHTML = DOMPurify.sanitize(
-  marked.parse(data.answer)
-);
-      status.textContent = "Response received";
-    } catch (error) {
-  console.error("Jupiter AI Error:", error);
-  thinking.textContent =
-    "Unable to get a response: " + error.message;
-  status.textContent = "Request failed";
-    } finally {
-      send.disabled = false;
-      messages.scrollTop = messages.scrollHeight;
-      input.focus();
     }
+
+    if (!response.ok || !data.success) {
+
+      throw new Error(
+        data.error ||
+        `Gemini API failed (HTTP ${response.status})`
+      );
+
+    }
+
+    if (!data.answer) {
+      throw new Error("Gemini returned an empty answer.");
+    }
+
+    // Display Gemini response
+    thinking.innerHTML = DOMPurify.sanitize(
+      marked.parse(data.answer)
+    );
+
+    status.textContent = "Response received";
+
+  } catch (error) {
+
+    console.error("Jupiter AI Error:", error);
+
+    thinking.textContent =
+      "Unable to get a response: " + error.message;
+
+    status.textContent = "Request failed";
+
+  } finally {
+
+    send.disabled = false;
+
+    messages.scrollTop = messages.scrollHeight;
+
+    input.focus();
+
   }
+
+}
 
   /* ------------------------------------------
      BUTTON CLICK
