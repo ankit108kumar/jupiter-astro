@@ -3218,6 +3218,173 @@ html[data-palette="cosmic"] .cosmic-glow {
   }
 }
 
+
+/* ===== GENERAL ANALYSIS GLASS POPUP ===== */
+
+#analysisGuideOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99990;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(10,10,18,.45);
+  backdrop-filter: blur(8px) saturate(130%);
+  -webkit-backdrop-filter: blur(8px) saturate(130%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: .3s ease;
+}
+
+#analysisGuideOverlay.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+#analysisGuidePanel {
+  width: 75vw;
+  max-width: 1200px;
+  height: calc(100vh - 24px);
+  height: calc(100dvh - 24px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--surface) 84%, transparent);
+  border: 1px solid var(--line-strong);
+  border-radius: 20px;
+  box-shadow: 0 20px 70px rgba(0,0,0,.3),
+              inset 0 1px 0 rgba(255,255,255,.2);
+  backdrop-filter: blur(30px) saturate(160%);
+  -webkit-backdrop-filter: blur(30px) saturate(160%);
+  transform: translateY(15px);
+  transition: transform .3s ease;
+}
+
+#analysisGuideOverlay.is-open #analysisGuidePanel {
+  transform: translateY(0);
+}
+
+.analysis-guide-header {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 25px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface-alt) 65%, transparent);
+}
+
+.analysis-guide-header h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.25rem;
+}
+
+.analysis-guide-header p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: .8rem;
+}
+
+#analysisGuideClose {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-alt);
+  color: var(--ink);
+  font-size: 25px;
+  cursor: pointer;
+}
+
+#analysisGuideClose:hover {
+  color: var(--saffron);
+}
+
+.analysis-guide-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 25px 38px 45px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+  overscroll-behavior: contain;
+}
+
+.analysis-guide-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.analysis-guide-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--saffron) 40%, transparent);
+  border-radius: 20px;
+}
+
+.analysis-guide-content {
+  max-width: 950px;
+  margin: auto;
+  color: var(--ink);
+  line-height: 1.8;
+  text-align: justify;
+  text-justify: inter-word;
+  overflow-wrap: anywhere;
+}
+
+.analysis-guide-content h1,
+.analysis-guide-content h2,
+.analysis-guide-content h3 {
+  text-align: left;
+}
+
+.analysis-guide-content h1,
+.analysis-guide-content h2 {
+  color: var(--saffron);
+}
+
+.analysis-guide-content h2 {
+  margin-top: 32px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.analysis-guide-content h3 {
+  margin-top: 22px;
+}
+
+.analysis-guide-content li {
+  margin-bottom: 5px;
+}
+
+.analysis-guide-content strong {
+  color: var(--saffron);
+}
+
+@media(max-width:768px) {
+  #analysisGuideOverlay {
+    padding: 0;
+  }
+
+  #analysisGuidePanel {
+    width: 100%;
+    max-width: 100%;
+    height: 100dvh;
+    border-radius: 0;
+  }
+
+  .analysis-guide-scroll {
+    padding: 20px;
+  }
+
+  .analysis-guide-header {
+    padding: 13px 17px;
+  }
+}
+
+
 </style>
 </head>
 <body>
@@ -3231,6 +3398,18 @@ html[data-palette="cosmic"] .cosmic-glow {
       </span>
     </div>
      <div class="header-quick-icons">
+
+
+<!-- Temporary Analysis Guide Button -->
+<button class="header-icon-btn"
+        type="button"
+        id="analysisGuideOpen"
+        title="General Analysis Reference"
+        aria-label="Open General Analysis Reference">
+  <span style="font-size:19px;font-weight:700;">i</span>
+</button>
+
+
   <!-- Location Pin -->
   <button class="header-icon-btn" type="button" title="Location">
     <svg viewBox="0 0 24 24">
@@ -3390,6 +3569,42 @@ html[data-palette="cosmic"] .cosmic-glow {
     </button>
   </div>
 </main>
+
+
+<!-- GENERAL ANALYSIS REFERENCE POPUP -->
+
+<div id="analysisGuideOverlay" aria-hidden="true">
+
+  <section id="analysisGuidePanel"
+           role="dialog"
+           aria-modal="true"
+           aria-labelledby="analysisGuideTitle">
+
+    <div class="analysis-guide-header">
+      <div>
+        <h2 id="analysisGuideTitle">General Analysis of Chart</h2>
+        <p>Comprehensive Reference & Revision Framework · v1.1</p>
+      </div>
+
+      <button id="analysisGuideClose"
+              type="button"
+              aria-label="Close popup">×</button>
+    </div>
+
+    <div class="analysis-guide-scroll">
+      <article id="analysisGuideContent"
+               class="analysis-guide-content">
+      </article>
+    </div>
+
+  </section>
+</div>
+
+<!-- ANALYSIS REFERENCE TEXT -->
+<script type="text/markdown" id="analysisGuideMarkdown">
+    Loading...
+</script>
+
 
 <!-- INSERT FOOTER CODE HERE -->
 <footer style="border-top: 1px solid var(--line); padding: 18px 0; margin-top: 40px; color: var(--muted); font-size: 0.85rem;">
@@ -9446,6 +9661,55 @@ async function askGemini() {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
       askGemini();
+    }
+  });
+})();
+</script>
+
+
+<!-- GENERAL ANALYSIS POPUP CONTROLLER -->
+<script>
+(() => {
+  const overlay = document.getElementById('analysisGuideOverlay');
+  const openBtn = document.getElementById('analysisGuideOpen');
+  const closeBtn = document.getElementById('analysisGuideClose');
+  const content = document.getElementById('analysisGuideContent');
+  const source = document.getElementById('analysisGuideMarkdown');
+
+  if (!overlay || !openBtn || !closeBtn || !content || !source) return;
+
+  let oldOverflow = '';
+
+  // Render reference text once
+  content.innerHTML = DOMPurify.sanitize(
+    marked.parse(source.textContent.trim())
+  );
+
+  function openGuide() {
+    oldOverflow = document.body.style.overflow;
+    overlay.classList.add('is-open');
+    overlay.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    closeBtn.focus();
+  }
+
+  function closeGuide() {
+    overlay.classList.remove('is-open');
+    overlay.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = oldOverflow;
+    openBtn.focus();
+  }
+
+  openBtn.addEventListener('click', openGuide);
+  closeBtn.addEventListener('click', closeGuide);
+
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeGuide();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && overlay.classList.contains('is-open')) {
+      closeGuide();
     }
   });
 })();
