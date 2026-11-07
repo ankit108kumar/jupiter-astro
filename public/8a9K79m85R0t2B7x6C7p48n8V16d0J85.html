@@ -8193,6 +8193,11 @@ async function fetchSavedProfiles(forceRefresh = false) {
   try {
     const response = await fetch(WEB_APP_URL + (forceRefresh ? '?_=' + Date.now() : ''));
     const data = await response.json();
+
+if (typeof data.unknownCount === "number") {
+  unknownQuestionCount = data.unknownCount;
+}
+	
     if (Array.isArray(data)) {
       savedProfilesCache = data;
       try {
@@ -9713,6 +9718,8 @@ function addMessage(text, type) {
    SEND QUESTION TO GEMINI
 ------------------------------------------ */
 
+let unknownQuestionCount = 0;
+	
 async function askGemini() {
 
   const question = input.value.trim();
@@ -9752,9 +9759,10 @@ thinking.innerHTML = `
       },
 
       body: JSON.stringify({
-        message: question,
-        pageContext: {}
-      })
+  message: question,
+  pageContext: pageContext,
+  unknownCount: unknownQuestionCount
+})
 
     });
 
