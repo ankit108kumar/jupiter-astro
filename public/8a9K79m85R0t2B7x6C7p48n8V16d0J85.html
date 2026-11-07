@@ -2827,8 +2827,8 @@ html[data-palette="cosmic"] .cosmic-glow {
   width: 420px;
   max-width: calc(100vw - 36px);
 
-  height: 800px;
-  max-height: min(65dvh, 840px);
+  height: 920px;
+  max-height: min(75dvh, 966px);
 
   display: flex;
   flex-direction: column;
@@ -3128,10 +3128,10 @@ html[data-palette="cosmic"] .cosmic-glow {
   width: 100%;
   box-sizing: border-box;
 
-  min-height: 55px;
-  max-height: 100px;
+  min-height: 45px;
+  max-height: 90px;
 
-  padding: 10px 11px;
+  padding: 10px 55px 42px 11px;
   resize: vertical;
 
   border: 1px solid var(--line-strong);
@@ -3170,8 +3170,7 @@ html[data-palette="cosmic"] .cosmic-glow {
 }
 
 #jupiter-ai-status {
-  font-size: 11px;
-  color: var(--muted);
+  display: none !important;
 }
 
 #jupiter-ai-send {
@@ -3286,11 +3285,12 @@ html[data-palette="cosmic"] .cosmic-glow {
   }
 
   #jupiter-ai-input {
-    min-height: 65px;
-    max-height: 110px;
-    font-size: 14px;
-  }
-
+  min-height: 90px;
+  max-height: 130px;
+  font-size: 14px;
+  padding-right: 58px;
+  padding-bottom: 50px;
+}
   #jupiter-ai-toggle::after {
     display: none;
   }
@@ -3475,7 +3475,74 @@ html[data-palette="cosmic"] .cosmic-glow {
   }
 }
 
+/* Embedded send button */
 
+.jupiter-ai-compose {
+  position: relative;
+}
+
+.jupiter-ai-compose #jupiter-ai-send {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+
+  border-radius: 50% !important;
+  z-index: 2;
+}
+
+
+/* ==========================================
+   JUPITER AI — TYPING INDICATOR
+========================================== */
+
+.ai-typing-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 18px;
+}
+
+.ai-typing-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ai-accent);
+  opacity: .35;
+  animation: jupiterTyping 1.2s infinite ease-in-out;
+}
+
+.ai-typing-dots span:nth-child(2) {
+  animation-delay: .18s;
+}
+
+.ai-typing-dots span:nth-child(3) {
+  animation-delay: .36s;
+}
+
+@keyframes jupiterTyping {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: .35;
+  }
+
+  30% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-typing-dots span {
+    animation: none;
+    opacity: .8;
+  }
+}
+
+	
 </style>
 </head>
 <body>
@@ -9468,38 +9535,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     <!-- INPUT -->
 
-    <div id="jupiter-ai-input-area">
+    
+<div id="jupiter-ai-input-area">
 
-      <textarea
-        id="jupiter-ai-input"
-        placeholder="Type your question..."
-        aria-label="Ask Jupiter AI"
-      ></textarea>
+  <div class="jupiter-ai-compose">
 
-      <div id="jupiter-ai-send-row">
+    <!-- Existing textarea -->
+    <textarea
+      id="jupiter-ai-input"
+      placeholder="Type your question..."
+      aria-label="Ask Jupiter AI"
+    ></textarea>
 
-        <span id="jupiter-ai-status">
-          Ready
-        </span>
+    <!-- Existing send button -->
+    <button
+      id="jupiter-ai-send"
+      type="button"
+      aria-label="Send message"
+      title="Send">
 
-        <button
-  id="jupiter-ai-send"
-  type="button"
-  aria-label="Send message"
-  title="Send">
+      <svg viewBox="0 0 24 24" width="21" height="21"
+           fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round"
+           stroke-linejoin="round">
+        <path d="M5 12h14M13 5l7 7-7 7"/>
+      </svg>
 
-  <svg viewBox="0 0 24 24" width="21" height="21"
-       fill="none" stroke="currentColor"
-       stroke-width="2" stroke-linecap="round"
-       stroke-linejoin="round">
-    <path d="M5 12h14M13 5l7 7-7 7"/>
-  </svg>
+    </button>
 
-</button>
+  </div>
 
-      </div>
+  <!-- Retained for existing JavaScript compatibility -->
+  <span id="jupiter-ai-status" hidden>Ready</span>
 
-    </div>
+</div>
+
 
   </div>
 
@@ -9659,10 +9729,17 @@ async function askGemini() {
 
   status.textContent = "Gemini is thinking...";
 
-  const thinking = addMessage(
-    "Preparing your response...",
-    "ai"
-  );
+  const thinking = addMessage("", "ai");
+
+thinking.classList.add("ai-typing");
+
+thinking.innerHTML = `
+  <span class="ai-typing-dots">
+    <span></span>
+    <span></span>
+    <span></span>
+  </span>
+`;
 
   try {
 
