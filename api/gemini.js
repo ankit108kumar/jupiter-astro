@@ -241,7 +241,7 @@ if (relevance === "allowed") {
   // Neither inclusion nor exclusion keyword found
   updatedUnknownCount++;
 
-  if (updatedUnknownCount > 2) {
+  if (updatedUnknownCount > 1) {
     return res.status(200).json({
       success: false,
       blocked: true,
