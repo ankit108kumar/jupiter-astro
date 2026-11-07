@@ -3600,9 +3600,7 @@ html[data-palette="cosmic"] .cosmic-glow {
   </section>
 </div>
 
-<!-- ANALYSIS REFERENCE TEXT -->
-<script type="text/markdown" id="analysisGuideMarkdown">
-    Loading...
+
 </script>
 
 
@@ -9667,40 +9665,114 @@ async function askGemini() {
 </script>
 
 
+
 <!-- GENERAL ANALYSIS POPUP CONTROLLER -->
 <script>
 (() => {
+
   const overlay = document.getElementById('analysisGuideOverlay');
   const openBtn = document.getElementById('analysisGuideOpen');
   const closeBtn = document.getElementById('analysisGuideClose');
   const content = document.getElementById('analysisGuideContent');
-  const source = document.getElementById('analysisGuideMarkdown');
 
-  if (!overlay || !openBtn || !closeBtn || !content || !source) return;
+  if (!overlay || !openBtn || !closeBtn || !content) return;
+
+  const GUIDE_URL = '/library/analysis-guide.js';
 
   let oldOverflow = '';
+  let guideLoaded = false;
+  let loading = false;
 
-  // Render reference text once
-  content.innerHTML = DOMPurify.sanitize(
-    marked.parse(source.textContent.trim())
-  );
+  // LOAD CONTENT ONLY WHEN REQUIRED
+  async function loadAnalysisGuide() {
 
-  function openGuide() {
-    oldOverflow = document.body.style.overflow;
-    overlay.classList.add('is-open');
-    overlay.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-    closeBtn.focus();
+    if (guideLoaded || loading) return;
+
+    loading = true;
+
+    content.innerHTML = `
+      <p style="text-align:center;color:var(--muted);">
+        Loading analysis framework...
+      </p>
+    `;
+
+    try {
+
+      const response = await fetch(GUIDE_URL, {
+        cache: 'no-cache'
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const markdown = await response.text();
+
+      if (!markdown.trim()) {
+        throw new Error('Analysis framework is empty.');
+      }
+
+      content.innerHTML = DOMPurify.sanitize(
+        marked.parse(markdown)
+      );
+
+      guideLoaded = true;
+
+    } catch (error) {
+
+      console.error('Analysis Guide Error:', error);
+
+      content.innerHTML = `
+        <div style="text-align:center;padding:30px;">
+          <p style="color:var(--bad);">
+            Unable to load the analysis framework.
+          </p>
+          <button type="button"
+                  class="btn"
+                  id="retryAnalysisGuide">
+            Retry
+          </button>
+        </div>
+      `;
+
+      content.querySelector('#retryAnalysisGuide')
+        ?.addEventListener('click', loadAnalysisGuide);
+
+    } finally {
+
+      loading = false;
+
+    }
   }
 
+  // OPEN POPUP
+  async function openGuide() {
+
+    oldOverflow = document.body.style.overflow;
+
+    overlay.classList.add('is-open');
+    overlay.setAttribute('aria-hidden', 'false');
+
+    document.body.style.overflow = 'hidden';
+
+    closeBtn.focus();
+
+    await loadAnalysisGuide();
+  }
+
+  // CLOSE POPUP
   function closeGuide() {
+
     overlay.classList.remove('is-open');
     overlay.setAttribute('aria-hidden', 'true');
+
     document.body.style.overflow = oldOverflow;
+
     openBtn.focus();
   }
 
   openBtn.addEventListener('click', openGuide);
+
   closeBtn.addEventListener('click', closeGuide);
 
   overlay.addEventListener('click', e => {
@@ -9708,11 +9780,18 @@ async function askGemini() {
   });
 
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && overlay.classList.contains('is-open')) {
+
+    if (
+      e.key === 'Escape' &&
+      overlay.classList.contains('is-open')
+    ) {
       closeGuide();
     }
+
   });
+
 })();
 </script>
+
 </body>
 </html>
