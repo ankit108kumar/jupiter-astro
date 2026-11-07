@@ -9220,7 +9220,8 @@ document.addEventListener('DOMContentLoaded', () => {
 <!-- ============================================
      10. ASSISTANT JAVASCRIPT
 ============================================ -->
-
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
 <script>
 
 (function () {
@@ -9312,21 +9313,26 @@ document.addEventListener('DOMContentLoaded', () => {
      ADD CHAT MESSAGE
   ------------------------------------------ */
 
-  function addMessage(text, type) {
+function addMessage(text, type) {
 
-    const message = document.createElement("div");
+  const message = document.createElement("div");
 
-    message.className = "jupiter-ai-message " + type;
+  message.className = "jupiter-ai-message " + type;
 
+  if (type === "ai") {
+    message.innerHTML = DOMPurify.sanitize(
+      marked.parse(text)
+    );
+  } else {
     message.textContent = text;
-
-    messages.appendChild(message);
-
-    messages.scrollTop = messages.scrollHeight;
-
-    return message;
-
   }
+
+  messages.appendChild(message);
+
+  messages.scrollTop = messages.scrollHeight;
+
+  return message;
+}
 
 
   /* ------------------------------------------
@@ -9411,7 +9417,9 @@ if (!data.answer) {
   throw new Error("Gemini returned an empty answer.");
 }
       // Display Gemini response
-      thinking.textContent = data.answer;
+      thinking.innerHTML = DOMPurify.sanitize(
+  marked.parse(data.answer)
+);
       status.textContent = "Response received";
     } catch (error) {
   console.error("Jupiter AI Error:", error);
