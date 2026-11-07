@@ -39,7 +39,7 @@ console.log("JUPITER GEMINI HANDLER:", req.method);
 
 const limitMatch = message.match(/&nlimit(?:=(\d+))?/i);
 
-let wordLimit = 120;
+let wordLimit = 90;
 let userMessage = message;
 
 if (limitMatch) {
