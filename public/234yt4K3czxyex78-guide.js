@@ -613,4 +613,4 @@ Examine planets placed in the following houses:</p>
 <li>Classify them as malefic or benefic.</li>
 
 <hr />
-<p><strong>END OF GENERAL ANALYSIS FRAMEWORK – v 1.1
+<p><strong>END OF ANALYSIS FRAMEWORK – v 1.1
