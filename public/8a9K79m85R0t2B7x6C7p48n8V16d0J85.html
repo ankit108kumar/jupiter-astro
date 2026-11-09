@@ -9515,6 +9515,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 
+
 <!-- ============================================
      9. FLOATING ASSISTANT HTML
 ============================================ -->
@@ -9522,106 +9523,88 @@ document.addEventListener('DOMContentLoaded', () => {
 <div id="jupiter-ai-widget">
 
   <!-- CHAT WINDOW -->
-
-  <div
-    id="jupiter-ai-window"
-    role="dialog"
-    aria-label="Jupiter AI Assistant"
-    aria-hidden="true">
+  <div id="jupiter-ai-window"
+       role="dialog"
+       aria-label="Jupiter AI Assistant"
+       aria-hidden="true">
 
     <!-- HEADER -->
-
     <div id="jupiter-ai-header">
-
       <div id="jupiter-ai-title">
-
         <span>✦</span>
-
         Jupiter Astro AI Assistant
-
       </div>
 
-      <button
-        id="jupiter-ai-close"
-        type="button"
-        aria-label="Close Assistant">
-
+      <button id="jupiter-ai-close"
+              type="button"
+              aria-label="Close Assistant">
         &times;
-
       </button>
-
     </div>
-
 
     <!-- MESSAGES -->
+    <div id="jupiter-ai-messages">
 
-   
-<div id="jupiter-ai-messages">
+      <!-- WELCOME MESSAGE -->
+      <div class="jupiter-ai-message ai">
 
-  <div class="jupiter-ai-message ai">
+        <div style="margin-bottom:18px;">
+          <div style="font-size:1.3rem;font-weight:750;margin-bottom:8px;">
+            Welcome to Jupiter Astrology!
+          </div>
 
-    <div style="margin-bottom:18px;">
-      <div style="font-size:1.3rem;font-weight:750;margin-bottom:8px;">
-        Welcome to Jupiter Astrology!
-      </div>
-
-      <p style="margin:0;line-height:1.7;">
-        Your personal companion for <strong> Kundali interpretation and research.</strong>
-      </p>
-    </div>
-
-    <div style="display:flex;flex-direction:column;gap:14px;">
-
-      <div>
-        <div style="font-weight:700;margin-bottom:3px;">
-          ☸️ Kundali Analysis
+          <p style="margin:0;line-height:1.7;">
+            Your personal companion for
+            <strong>Kundali interpretation and research.</strong>
+          </p>
         </div>
-        <div style="line-height:1.6;">
-          Explore planetary placements, house influences,
-          divisional charts and Dasha periods.
-        </div>
-      </div>
 
-      <div>
-        <div style="font-weight:700;margin-bottom:3px;">
-          ✦ Vedic Astrology Concepts
-        </div>
-        <div style="line-height:1.6;">
-          Understand Yogas, Nakshatras, planetary transits,
-          combinations and classical astrological principles.
-        </div>
-      </div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
 
-      <div>
-        <div style="font-weight:700;margin-bottom:3px;">
-          ◈ Research & Guidance
-        </div>
-        <div style="line-height:1.6;">
-          Explore specific astrological questions, examine
-          chart patterns and develop deeper insights.
-        </div>
-      </div>
+          <!-- KUNDALI ANALYSIS -->
+          <div>
+            <div style="font-weight:700;margin-bottom:3px;">
+              ☸️ Kundali Analysis
+            </div>
+            <div style="line-height:1.6;">
+              Explore planetary placements, house influences,
+              divisional charts and Dasha periods.
+            </div>
+          </div>
 
-    </div>
+          <!-- VEDIC ASTROLOGY -->
+          <div>
+            <div style="font-weight:700;margin-bottom:3px;">
+              ✦ Vedic Astrology Concepts
+            </div>
+            <div style="line-height:1.6;">
+              Understand Yogas, Nakshatras, planetary transits,
+              combinations and classical astrological principles.
+            </div>
+          </div>
 
-    <div style="
-      margin-top:20px;
-      padding:13px 15px;
-      border-radius:12px;
-      background:var(--surface-alt);
-      border:1px solid var(--line);
-      line-height:1.6;
-    ">
-      <strong>Let's begin!</strong>
-      <div style="margin-top:3px;">
-        Share your query to get started.
+          <!-- RESEARCH AND GUIDANCE -->
+          <div>
+            <div style="font-weight:700;margin-bottom:3px;">
+              ◈ Research & Guidance
+            </div>
+            <div style="line-height:1.6;">
+              Explore specific astrological questions, examine
+              chart patterns and develop deeper insights.
+            </div>
+          </div>
+
+        </div>
+
+        <!-- CLOSING INVITATION -->
+        <p style="margin:18px 0 0;line-height:1.6;">
+          <strong>Share your query to get started.</strong>
+        </p>
+
       </div>
     </div>
-
   </div>
-
 </div>
-
 
 
     <!-- INPUT -->
