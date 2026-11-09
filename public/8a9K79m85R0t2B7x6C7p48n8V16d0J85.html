@@ -3567,6 +3567,12 @@ html[data-palette="cosmic"] .cosmic-glow {
   }
 }
 
+#locationPanel {
+  position: fixed;
+  top: 85px;
+  right: 150px;
+  z-index: 99999;
+}	
 	
 </style>
 </head>
@@ -8842,16 +8848,26 @@ document.addEventListener('DOMContentLoaded', () => {
   // Use the existing place autocomplete engine
   bindPlaceAutocomplete(locationInput, locationList);
 
-  // Open / close location panel
-  locationBtn.addEventListener('click', () => {
-    locationPanel.hidden = !locationPanel.hidden;
+// Open / close location panel
+locationBtn.addEventListener('click', () => {
 
-    if (!locationPanel.hidden) {
-      const current = getDefaultLocation();
-      locationInput.value = current.label;
-      locationInput.focus();
-    }
-  });
+  locationPanel.hidden = !locationPanel.hidden;
+
+  if (!locationPanel.hidden) {
+
+    // Position panel below Location button
+    const rect = locationBtn.getBoundingClientRect();
+    locationPanel.style.top = (rect.bottom + 10) + 'px';
+    locationPanel.style.right = (window.innerWidth - rect.right) + 'px';
+
+    // Load current saved location
+    const current = getDefaultLocation();
+    locationInput.value = current.label;
+    locationInput.focus();
+
+  }
+
+});
 
   // Save selected location permanently in localStorage
   saveBtn.addEventListener('click', () => {
