@@ -4089,7 +4089,7 @@ function searchPlaces(q) {
 
   return PLACES
     .filter(p => p.label.toLowerCase().includes(q))
-    .slice(0, 10);
+    .slice(0, 12);
 }
 
 // ============================================================
@@ -8669,7 +8669,7 @@ inp.addEventListener('input', async () => {
 
   // 3. If local results exist, display them immediately
   if (items.length) {
-    items = items.slice(0, 8);
+    items = items.slice(0, 12);
     render();
     return;
   }
@@ -8690,7 +8690,7 @@ inp.addEventListener('input', async () => {
     // Ignore outdated responses
     if (currentSearch !== searchId) return;
 
-    items = items.slice(0, 10);
+    items = items.slice(0, 12);
     render();
 
   }, 500);
