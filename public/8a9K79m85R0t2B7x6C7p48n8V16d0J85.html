@@ -148,7 +148,7 @@ html[data-palette="lavender-peach"] body {
 }
 
 /* Frosted-glass surfaces */
-[data-palette="lavender-peach"] .panel,
+[data-palette="lavender-peach"] ,
 [data-palette="lavender-peach"] .card,
 [data-palette="lavender-peach"] .panchang-card,
 [data-palette="lavender-peach"] .panchang-item,
@@ -171,7 +171,7 @@ html[data-palette="lavender-peach"] body {
   backdrop-filter: blur(22px) saturate(155%);
 }
 
-[data-palette="lavender-peach"] .panel,
+[data-palette="lavender-peach"] ,
 [data-palette="lavender-peach"] .card,
 [data-palette="lavender-peach"] .panchang-card {
   border-radius: 22px;
@@ -642,7 +642,7 @@ html[data-palette="wooden"] body {
 }
 
 /* Frosted glass surfaces */
-html[data-palette="wooden"] .panel,
+html[data-palette="wooden"] ,
 html[data-palette="wooden"] .card,
 html[data-palette="wooden"] article.card,
 html[data-palette="wooden"] .panchang-card,
@@ -662,7 +662,7 @@ html[data-palette="wooden"] .desc-toolbar {
   backdrop-filter: blur(var(--wood-blur)) saturate(145%);
 }
 
-html[data-palette="wooden"] .panel,
+html[data-palette="wooden"] ,
 html[data-palette="wooden"] .card,
 html[data-palette="wooden"] .panchang-card {
   border-radius: 16px;
@@ -1302,7 +1302,7 @@ html[data-palette="celestial"] body {
   margin-bottom: 8px !important;
 }
 
-.panchang-card:has(.panchang-body-wrapper.collapsed) + main.wrap > .panel {
+.panchang-card:has(.panchang-body-wrapper.collapsed) + main.wrap >  {
   margin-top: 0 !important;
 }
 
@@ -1623,9 +1623,9 @@ h1, h2, h3 {
 }
 .theme-toggle-btn:hover { border-color: var(--saffron); color: var(--saffron); }
 
-.panel {
+ {
   position: relative;
-  z-index: 200;
+  z-index: 2;
   overflow: visible;
   background: var(--surface);
   border: 1px solid var(--line-strong);
@@ -1891,7 +1891,7 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
   .wrap {
     padding-inline: 12px;
   }
-  .panel, .research-chart {
+  , .research-chart {
     padding: 14px;
   }
 }
@@ -2475,7 +2475,7 @@ html[data-palette="cosmic"] body {
 }
 
 /* Glass surfaces */
-html[data-palette="cosmic"] .panel,
+html[data-palette="cosmic"] ,
 html[data-palette="cosmic"] .card,
 html[data-palette="cosmic"] article.card,
 html[data-palette="cosmic"] .panchang-card,
