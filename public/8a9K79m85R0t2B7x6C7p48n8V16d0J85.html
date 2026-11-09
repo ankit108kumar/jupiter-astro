@@ -4092,20 +4092,126 @@ function searchPlaces(q) {
     .slice(0, 10);
 }
 
+// ============================================================
+// GLOBAL EXTERNAL SEARCH CONTROL
+// ============================================================
 
+const EXTERNAL_SEARCH_CONFIG = {
+  debounceMs: 500,
+  minQueryLength: 3,
+  minIntervalMs: 1100,
+  maxRequests: 5,
+  windowMs: 20000
+};
+
+// Shared by all autocomplete fields on this page
+const externalSearchCache = new Map();
+const externalRequestTimes = [];
+
+let lastExternalRequestAt = 0;
+let externalRequestQueue = Promise.resolve();
+
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+
+async function runExternalSearchLimited(query) {
+
+  const key = query.trim().toLowerCase();
+
+  // Never request the same query twice, including failed queries
+  if (externalSearchCache.has(key)) {
+    return externalSearchCache.get(key);
+  }
+
+  const requestPromise = externalRequestQueue.then(async () => {
+
+    while (true) {
+
+      const now = Date.now();
+
+      // Remove timestamps outside the rolling 20-second window
+      while (
+        externalRequestTimes.length &&
+        now - externalRequestTimes[0] >= EXTERNAL_SEARCH_CONFIG.windowMs
+      ) {
+        externalRequestTimes.shift();
+      }
+
+      const intervalWait = Math.max(
+        0,
+        EXTERNAL_SEARCH_CONFIG.minIntervalMs -
+        (now - lastExternalRequestAt)
+      );
+
+      const quotaWait = externalRequestTimes.length >=
+        EXTERNAL_SEARCH_CONFIG.maxRequests
+        ? Math.max(
+            0,
+            EXTERNAL_SEARCH_CONFIG.windowMs -
+            (now - externalRequestTimes[0])
+          )
+        : 0;
+
+      const delay = Math.max(intervalWait, quotaWait);
+
+      if (delay > 0) {
+        await wait(delay);
+        continue;
+      }
+
+      break;
+    }
+
+    // Record request immediately before sending it
+    const requestTime = Date.now();
+
+    lastExternalRequestAt = requestTime;
+    externalRequestTimes.push(requestTime);
+
+    return await searchWorldPlacesLiveRequest(key);
+
+  });
+
+  // Keep the queue running even if one request fails
+  externalRequestQueue = requestPromise.catch(() => []);
+
+  // Cache the promise itself, so duplicate queries share one request
+  externalSearchCache.set(key, requestPromise);
+
+  return requestPromise;
+}
+	
 // ============================================================
 // LIVE INTERNATIONAL SEARCH - OPENSTREETMAP
 // ============================================================
 
 
-async function searchWorldPlacesLive(query) {
+// ============================================================
+// EXTERNAL SEARCH — RATE-LIMITED ENTRY POINT
+// ============================================================
 
-  if (!query || query.trim().length < 3) return [];
+function searchWorldPlacesLive(query) {
+
+  query = (query || '').trim();
+
+  if (query.length < EXTERNAL_SEARCH_CONFIG.minQueryLength) {
+    return Promise.resolve([]);
+  }
+
+  return runExternalSearchLimited(query);
+}
+
+
+// ============================================================
+// ACTUAL API REQUEST
+// ============================================================
+
+async function searchWorldPlacesLiveRequest(query) {
 
   try {
 
     const res = await fetch(
-      `/api/geocode?q=${encodeURIComponent(query.trim())}`
+      `/api/geocode?q=${encodeURIComponent(query)}`
     );
 
     if (!res.ok) {
@@ -4126,7 +4232,9 @@ async function searchWorldPlacesLive(query) {
 
   } catch (err) {
 
-    console.warn('Google Geocoding search failed:', err);
+    console.warn('External place search failed:', query, err);
+
+    // Failed query remains cached; it will not retry on every keystroke
     return [];
 
   }
@@ -8477,6 +8585,7 @@ function bindPlaceAutocomplete(inp, list) {
 
   let items = [], idx = -1;
   let searchId = 0;
+  let debounceTimer = null;
 
   // Close dropdown
   const close = () => {
@@ -8532,47 +8641,62 @@ function bindPlaceAutocomplete(inp, list) {
   // INPUT SEARCH
   // ==========================================================
 
-  inp.addEventListener('input', async () => {
 
-    const q = inp.value.trim();
-    const currentSearch = ++searchId;
+inp.addEventListener('input', async () => {
 
-    delete inp.dataset.lat;
-    delete inp.dataset.lon;
-    delete inp.dataset.tz;
+  const q = inp.value.trim();
+  const currentSearch = ++searchId;
 
-    if (q.length < 2) {
-      items = [];
-      return close();
-    }
+  // Cancel the previous pending external search
+  clearTimeout(debounceTimer);
 
+  delete inp.dataset.lat;
+  delete inp.dataset.lon;
+  delete inp.dataset.tz;
 
-    // 1. Wait for local database
-    await GEO_READY;
+  if (q.length < 2) {
+    items = [];
+    return close();
+  }
+
+  // 1. Wait for local database
+  await GEO_READY;
+
+  if (currentSearch !== searchId) return;
+
+  // 2. Search local database immediately
+  items = searchPlaces(q);
+
+  // 3. If local results exist, display them immediately
+  if (items.length) {
+    items = items.slice(0, 8);
+    render();
+    return;
+  }
+
+  // 4. External search only for 3+ characters
+  if (q.length < 3) {
+    items = [];
+    return close();
+  }
+
+  // 5. Wait 500 ms after typing stops
+  debounceTimer = setTimeout(async () => {
 
     if (currentSearch !== searchId) return;
 
+    items = await searchWorldPlacesLive(q);
 
-    // 2. Search local database first
-    items = searchPlaces(q);
+    // Ignore outdated responses
+    if (currentSearch !== searchId) return;
 
-
-    // 3. Google fallback only if no local result
-    if (!items.length && q.length >= 3) {
-
-      items = await searchWorldPlacesLive(q);
-
-      // Ignore outdated Google responses
-      if (currentSearch !== searchId) return;
-    }
-
-
-    // 4. Display results
-    items = items.slice(0, 8);
-
+    items = items.slice(0, 10);
     render();
 
-  });
+  }, 500);
+
+});
+
 
 
   // ==========================================================
