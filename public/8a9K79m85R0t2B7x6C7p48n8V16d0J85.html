@@ -4137,12 +4137,6 @@ padding: 28px 30px;
   <a href="#" id="switchToSignup">Set your password</a>
 </p>
 
-<div id="loginMessage"
-     class="account-message"
-     role="status"
-     aria-live="polite"
-     hidden>
-</div>
 
     </form>
 
@@ -11075,7 +11069,6 @@ signUpForm.addEventListener('submit', async function (e) {
   const api = window.firebaseAuthAPI;
   const auth = window.firebaseAuth;
 
-if (submitButton) submitButton.disabled = true;
   messageBox.textContent = 'Creating your account...';
   messageBox.className = 'account-message';
 
@@ -11172,11 +11165,7 @@ if (submitButton) submitButton.disabled = true;
 
     } finally {
 
-    if (submitButton) {
-      submitButton.disabled = false;
     }
-
-  }
 
 });
 
@@ -11234,29 +11223,17 @@ if (submitButton) submitButton.disabled = true;
 
 
 
+
 function setFormLocked(form, locked) {
 
   if (!form) return;
 
-  // Enable or disable password fields
+  // Only control password fields.
+  // Never disable the submit button.
   form.querySelectorAll('input[type="password"]')
     .forEach(function(field) {
       field.disabled = locked;
     });
-
-  // Enable or disable the submit button
-  const submitButton = form.querySelector('.account-submit');
-
-  if (submitButton) {
-    submitButton.disabled = locked;
-    console.log(
-      form.id,
-      'button disabled:',
-      submitButton.disabled
-    );
-  } else {
-    console.error('Submit button not found in:', form.id);
-  }
 
 }
 
