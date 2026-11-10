@@ -4189,16 +4189,11 @@ padding: 28px 30px;
            required>
   </div>
 
-  <div id="signupMessage"
-       class="account-message"
-       role="status"
-       aria-live="polite"
-       hidden>
-  </div>
-
-  <button type="submit" class="account-submit">
-    Set Password
-  </button>
+   <button type="submit"
+        id="signupSubmitBtn"
+        class="account-submit">
+  Set Password
+</button>
 
   <p class="account-switch">
     Already have a password?
@@ -11042,9 +11037,7 @@ signUpForm.addEventListener('submit', async function (e) {
     document.getElementById('signupMessage');
 
   const submitButton =
-  signUpForm.querySelector(
-    'button[type="submit"], button:not([type]), input[type="submit"]'
-  );
+  document.getElementById('signupSubmitBtn');
 
   // Check password confirmation
   if (password !== confirmPassword) {
@@ -11177,13 +11170,13 @@ if (submitButton) submitButton.disabled = true;
     messageBox.textContent = errorMessage;
     messageBox.className = 'account-message error';
 
-  } finally {
+    } finally {
 
-  if (submitButton) {
-    submitButton.disabled = false;
+    if (submitButton) {
+      submitButton.disabled = false;
+    }
+
   }
-
-}
 
 });
 
@@ -11239,9 +11232,12 @@ if (submitButton) submitButton.disabled = true;
 
 // ============ LOCK / UNLOCK FORM FIELDS ============
 
+
 function setFormLocked(form, locked) {
 
-  // Disable or enable password fields
+  if (!form) return;
+
+  // Lock or unlock password fields
   const passwordFields = form.querySelectorAll(
     'input[type="password"]'
   );
@@ -11250,16 +11246,18 @@ function setFormLocked(form, locked) {
     field.disabled = locked;
   });
 
-  // Disable or enable submit button
-  const submitButton = form.querySelector(
-  'button[type="submit"], button:not([type]), input[type="submit"]'
-);
+  // Lock or unlock the correct submit button
+  const submitButton =
+    form.id === 'signUpForm'
+      ? document.getElementById('signupSubmitBtn')
+      : form.querySelector('button[type="submit"]');
 
   if (submitButton) {
     submitButton.disabled = locked;
   }
 
 }
+
 	
   // ============ MESSAGE DISPLAY ============
 
