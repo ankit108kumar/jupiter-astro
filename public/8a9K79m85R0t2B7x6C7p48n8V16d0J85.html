@@ -3791,8 +3791,10 @@ html[data-palette="cosmic"] .cosmic-glow {
 .account-options {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 
   font-size: 0.82rem;
   color: var(--muted);
@@ -3807,9 +3809,10 @@ html[data-palette="cosmic"] .cosmic-glow {
 }
 
 .account-options label {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
 }
 
 /* Main action button */
@@ -3938,7 +3941,8 @@ html[data-palette="cosmic"] .cosmic-glow {
 
 /* Terms checkbox alignment */
 #signUpForm .account-options {
-  justify-content: flex-start;
+  justify-content: center;
+  flex-wrap: nowrap;
 }
 
 #signUpForm .account-options label {
