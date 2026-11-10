@@ -11346,14 +11346,112 @@ submitButton.style.removeProperty('cursor');
 });
 
 
-  // SIGN IN PLACEHOLDER
-  signInForm.addEventListener('submit', function (e) {
+  
+// FIREBASE SIGN IN
+signInForm.addEventListener('submit', async function (e) {
 
-    e.preventDefault();
+  e.preventDefault();
 
-    alert('The sign-in interface is ready. Authentication still needs to be connected.');
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const rememberMe = document.getElementById('rememberMe').checked;
+  const messageBox = document.getElementById('loginMessage');
 
-  });
+  const submitButton = signInForm.querySelector(
+    'button[type="submit"]'
+  );
+
+  const api = window.firebaseAuthAPI;
+  const auth = window.firebaseAuth;
+
+  if (!api || !auth) {
+    messageBox.textContent =
+      'Authentication is not ready. Please refresh the page.';
+    messageBox.className = 'account-message error';
+    return;
+  }
+
+  submitButton.disabled = true;
+  submitButton.textContent = 'Signing in...';
+
+  messageBox.hidden = false;
+  messageBox.textContent = 'Authenticating your account...';
+  messageBox.className = 'account-message';
+
+  try {
+
+    // Set session persistence according to checkbox
+    await api.setPersistence(
+      auth,
+      rememberMe
+        ? api.browserLocalPersistence
+        : api.browserSessionPersistence
+    );
+
+    // Authenticate using Firebase
+    const credential = await api.signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
+    console.log(
+      'Jupiter Astro: User signed in successfully.',
+      credential.user.email
+    );
+
+    messageBox.textContent = 'Login successful!';
+    messageBox.className = 'account-message success';
+
+    // Firebase onAuthStateChanged will update the Account button
+    // Close popup after successful authentication
+    closeAccount();
+
+  } catch (error) {
+
+    console.error('Firebase Sign In Error:', error);
+
+    let errorMessage = 'Unable to sign in. Please try again.';
+
+    switch (error.code) {
+
+      case 'auth/invalid-credential':
+      case 'auth/wrong-password':
+      case 'auth/user-not-found':
+        errorMessage = 'Incorrect email address or password.';
+        break;
+
+      case 'auth/invalid-email':
+        errorMessage = 'Please enter a valid email address.';
+        break;
+
+      case 'auth/user-disabled':
+        errorMessage = 'This account has been disabled.';
+        break;
+
+      case 'auth/too-many-requests':
+        errorMessage = 'Too many attempts. Please try again later.';
+        break;
+
+      case 'auth/network-request-failed':
+        errorMessage = 'Network error. Please check your connection.';
+        break;
+
+    }
+
+    messageBox.hidden = false;
+    messageBox.textContent = errorMessage;
+    messageBox.className = 'account-message error';
+
+  } finally {
+
+    submitButton.disabled = false;
+    submitButton.textContent = 'Sign In';
+
+  }
+
+});
+
 
   // FORGOT PASSWORD PLACEHOLDER
   document.getElementById('forgotPasswordBtn')
