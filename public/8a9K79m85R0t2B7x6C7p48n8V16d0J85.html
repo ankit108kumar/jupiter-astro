@@ -11446,6 +11446,72 @@ showMessage(
 })();
 </script>
 
+<script type="module">
+
+  // ================= FIREBASE SDK IMPORTS =================
+
+  import { initializeApp } from
+    "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    sendEmailVerification,
+    sendPasswordResetEmail,
+    signOut,
+    onAuthStateChanged,
+    setPersistence,
+    browserLocalPersistence,
+    browserSessionPersistence,
+    reload
+  } from
+    "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+
+
+  // ================= FIREBASE CONFIGURATION =================
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDwXS689Y4gdyuD9-3ThCwsDiSHkyuNFpU",
+    authDomain: "jupiter-astro.firebaseapp.com",
+    projectId: "jupiter-astro",
+    storageBucket: "jupiter-astro.firebasestorage.app",
+    messagingSenderId: "867320173550",
+    appId: "1:867320173550:web:fead03b3b96c8fd01034ff"
+  };
+
+
+  // ================= INITIALIZE FIREBASE =================
+
+  const app = initializeApp(firebaseConfig);
+
+  const auth = getAuth(app);
+
+
+  // ================= EXPOSE AUTHENTICATION FUNCTIONS =================
+
+  window.firebaseAuth = auth;
+
+  window.firebaseAuthAPI = {
+
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    sendEmailVerification,
+    sendPasswordResetEmail,
+    signOut,
+    onAuthStateChanged,
+    setPersistence,
+    browserLocalPersistence,
+    browserSessionPersistence,
+    reload
+
+  };
+
+
+  console.log("Jupiter Astro: Firebase initialized successfully.");
+
+</script>
+
 
 	
 </body>
