@@ -3620,7 +3620,7 @@ html[data-palette="cosmic"] .cosmic-glow {
 /* Main glass panel */
 .account-dialog {
   width: 100%;
-  max-width: 680px;
+  max-width: 560px;
   max-height: calc(100dvh - 40px);
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -3629,8 +3629,7 @@ html[data-palette="cosmic"] .cosmic-glow {
   position: relative;
   min-height: 0;
 
-  padding: 25px;
-
+padding: 28px 30px;
   color: var(--ink);
 
   background: color-mix(
@@ -3801,30 +3800,29 @@ html[data-palette="cosmic"] .cosmic-glow {
 }
 
 /* Remember and forgot password row */
+
 .account-options {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: nowrap;
-  white-space: nowrap;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  width: 100%;
+  box-sizing: border-box;
 
   font-size: 0.82rem;
   color: var(--muted);
 }
 
-.account-options a,
-.account-switch a {
-  color: var(--saffron);
-  font-weight: 600;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
 .account-options label {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.account-options a {
   white-space: nowrap;
 }
 
@@ -3905,20 +3903,21 @@ html[data-palette="cosmic"] .cosmic-glow {
   display: none !important;
 }
 
-/* Two-column layout for Set Password */
+/* Single-column layout for Set Password */
+
 #signUpForm {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: 20px;
-  row-gap: 16px;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 16px;
+  align-items: stretch;
 }
 
-/* Full-width elements in Set Password form */
-#signUpForm .account-submit,
-#signUpForm .account-switch,
-#signUpForm .account-message {
-  grid-column: 1 / -1;
+/* All elements occupy full width */
+
+#signUpForm > * {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Mobile layout */
@@ -3938,12 +3937,15 @@ html[data-palette="cosmic"] .cosmic-glow {
   .account-dialog-brand .logo {
     font-size: 1.35rem;
   }
-
+.account-options {
+  justify-content: flex-start;
+  gap: 12px 20px;
+}
   #signUpForm {
-    grid-template-columns: 1fr;
-    column-gap: 0;
-    row-gap: 13px;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
 
   #signUpForm .account-submit,
   #signUpForm .account-switch,
