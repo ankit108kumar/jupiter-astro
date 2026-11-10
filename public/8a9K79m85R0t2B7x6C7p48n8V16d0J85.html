@@ -11023,25 +11023,167 @@ thinking.innerHTML = `
     }
   });
 
-  // PASSWORD CONFIRMATION
-  signUpForm.addEventListener('submit', function (e) {
+  
+// FIREBASE ACCOUNT CREATION
+signUpForm.addEventListener('submit', async function (e) {
 
-    e.preventDefault();
+  e.preventDefault();
 
-    const password =
-      document.getElementById('signupPassword').value;
+  const email =
+    document.getElementById('signupEmail').value.trim();
 
-    const confirmPassword =
-      document.getElementById('confirmPassword').value;
+  const password =
+    document.getElementById('signupPassword').value;
 
-    if (password !== confirmPassword) {
-      alert('Passwords do not match.');
-      return;
+  const confirmPassword =
+    document.getElementById('confirmPassword').value;
+
+  const messageBox =
+    document.getElementById('signupMessage');
+
+  const submitButton =
+    signUpForm.querySelector('button[type="submit"]');
+
+  // Check password confirmation
+  if (password !== confirmPassword) {
+    messageBox.textContent = 'Passwords do not match.';
+    messageBox.className = 'account-message error';
+    return;
+  }
+
+  // Check Firebase password policy
+  const validPassword =
+    password.length >= 8 &&
+    password.length <= 32 &&
+    /[A-Z]/.test(password) &&
+    /[a-z]/.test(password) &&
+    /[0-9]/.test(password) &&
+    /[^A-Za-z0-9]/.test(password);
+
+  if (!validPassword) {
+    messageBox.textContent =
+      'Password must be 8–32 characters and include uppercase, lowercase, number and special character.';
+
+    messageBox.className = 'account-message error';
+    return;
+  }
+
+  // Check Firebase initialization
+  if (!window.firebaseAuth || !window.firebaseAuthAPI) {
+    messageBox.textContent =
+      'Authentication is not ready. Please refresh the page and try again.';
+
+    messageBox.className = 'account-message error';
+    return;
+  }
+
+  const api = window.firebaseAuthAPI;
+  const auth = window.firebaseAuth;
+
+  submitButton.disabled = true;
+
+  messageBox.textContent = 'Creating your account...';
+  messageBox.className = 'account-message';
+
+  try {
+
+    // Keep the login active only for this browser session
+    await api.setPersistence(
+      auth,
+      api.browserSessionPersistence
+    );
+
+    // Create Firebase account
+    const credential =
+      await api.createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+    // Firebase automatically signs in the newly created user
+    const user = credential.user;
+
+    // Send email verification link
+    try {
+
+      await api.sendEmailVerification(user);
+
+      messageBox.textContent =
+        'Your account has been created successfully. A verification link has been sent to ' +
+        email +
+        '. You are signed in for this browser session.';
+
+      messageBox.className = 'account-message success';
+
+    } catch (verificationError) {
+
+      messageBox.textContent =
+        'Your account was created and you are signed in, but the verification email could not be sent. Please try again later.';
+
+      messageBox.className = 'account-message error';
+
+      console.error(
+        'Email verification error:',
+        verificationError
+      );
+
     }
 
-    alert('The account interface is ready. Authentication still needs to be connected.');
+    // Clear password fields
+    document.getElementById('signupPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
 
-  });
+  } catch (error) {
+
+    let errorMessage = 'Unable to create your account. Please try again.';
+
+    switch (error.code) {
+
+      case 'auth/email-already-in-use':
+        errorMessage =
+          'An account already exists with this email. Please use Sign In.';
+        break;
+
+      case 'auth/invalid-email':
+        errorMessage = 'Please enter a valid email address.';
+        break;
+
+      case 'auth/weak-password':
+        errorMessage =
+          'Your password does not meet the required password policy.';
+        break;
+
+      case 'auth/operation-not-allowed':
+        errorMessage =
+          'Email/password authentication is not enabled.';
+        break;
+
+      case 'auth/network-request-failed':
+        errorMessage =
+          'Network error. Please check your internet connection.';
+        break;
+
+      case 'auth/too-many-requests':
+        errorMessage =
+          'Too many attempts. Please try again later.';
+        break;
+
+      default:
+        console.error('Firebase account creation error:', error);
+    }
+
+    messageBox.textContent = errorMessage;
+    messageBox.className = 'account-message error';
+
+  } finally {
+
+    submitButton.disabled = false;
+
+  }
+
+});
+
 
   // SIGN IN PLACEHOLDER
   signInForm.addEventListener('submit', function (e) {
