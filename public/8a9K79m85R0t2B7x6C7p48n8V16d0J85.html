@@ -3580,6 +3580,323 @@ html[data-palette="cosmic"] .cosmic-glow {
   border: 1px solid rgba(150, 125, 190, 0.25);
   box-shadow: 0 8px 30px rgba(60, 40, 90, 0.15);
 }
+
+	
+/* =========================================
+   JUPITER ASTRO — GLASS ACCOUNT DIALOGUE
+   Automatically adapts to the selected palette
+========================================= */
+
+/* Full-screen overlay: blurs the entire page, including header */
+.account-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(20, 20, 30, 0.24);
+
+  -webkit-backdrop-filter: blur(9px) saturate(125%);
+  backdrop-filter: blur(9px) saturate(125%);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.account-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Main glass panel */
+.account-dialog {
+  width: 100%;
+  max-width: 440px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+
+  position: relative;
+
+  padding: 25px;
+
+  color: var(--ink);
+
+  background: color-mix(
+    in srgb,
+    var(--surface) 76%,
+    transparent
+  );
+
+  border: 1px solid var(--line-strong);
+  border-radius: 24px;
+
+  box-shadow:
+    0 20px 65px rgba(0, 0, 0, 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  backdrop-filter: blur(28px) saturate(160%);
+
+  transform: translateY(15px) scale(0.98);
+  transition: transform 0.25s ease;
+}
+
+.account-overlay.is-open .account-dialog {
+  transform: translateY(0) scale(1);
+}
+
+/* Header */
+.account-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-bottom: 17px;
+  margin-bottom: 22px;
+
+  border-bottom: 1px solid var(--line);
+}
+
+.account-dialog-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.account-dialog-brand .logo {
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.account-dialog-brand small {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.account-dialog-close {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+
+  color: var(--ink);
+  background: var(--surface-alt);
+
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Sign In / Create Account tabs */
+.account-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+
+  padding: 5px;
+  margin-bottom: 22px;
+
+  background: var(--surface-alt);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.account-tab {
+  padding: 11px 8px;
+
+  border: 1px solid transparent;
+  border-radius: 10px;
+
+  background: transparent;
+  color: var(--muted);
+
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.account-tab.active {
+  background: var(--saffron-soft);
+  color: var(--saffron);
+  border-color: var(--line-strong);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+}
+
+/* Form fields */
+.account-form {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.account-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.account-field label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.account-field input {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 13px 14px;
+
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+
+  background: color-mix(
+    in srgb,
+    var(--surface) 78%,
+    transparent
+  );
+
+  color: var(--ink);
+  font: inherit;
+  outline: none;
+}
+
+.account-field input:focus {
+  border-color: var(--saffron);
+  box-shadow: 0 0 0 3px var(--saffron-soft);
+}
+
+.account-field input::placeholder {
+  color: var(--muted);
+  opacity: 0.8;
+}
+
+/* Remember and forgot password row */
+.account-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.account-options a,
+.account-switch a {
+  color: var(--saffron);
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.account-options label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Main action button */
+.account-submit {
+  width: 100%;
+  padding: 13px;
+
+  margin-top: 5px;
+
+  border: 1px solid var(--line-strong);
+  border-radius: 13px;
+
+  background: var(--saffron);
+  color: white;
+
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+
+  box-shadow: 0 6px 18px var(--saffron-soft);
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.account-submit:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+/* Google button */
+.account-google {
+  width: 100%;
+  padding: 12px;
+
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+
+  background: var(--surface-alt);
+  color: var(--ink);
+
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Bottom text */
+.account-switch {
+  margin: 19px 0 0;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.account-security {
+  margin-top: 20px;
+  padding-top: 14px;
+
+  border-top: 1px solid var(--line);
+
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+/* Utility */
+.account-hidden {
+  display: none !important;
+}
+
+/* Mobile layout */
+@media (max-width: 520px) {
+  .account-overlay {
+    padding: 12px;
+  }
+
+  .account-dialog {
+    padding: 20px;
+    border-radius: 20px;
+    max-height: calc(100vh - 24px);
+  }
+
+  .account-dialog-brand .logo {
+    font-size: 1.35rem;
+  }
+}
+
+
+	
 </style>
 </head>
 <body>
@@ -3618,13 +3935,17 @@ html[data-palette="cosmic"] .cosmic-glow {
     </svg>
   </button>
 
-  <!-- Account -->
-  <button class="header-icon-btn" type="button" title="Account">
-    <svg viewBox="0 0 24 24">
-      <circle cx="12" cy="8" r="4"/>
-      <path d="M5 21a7 7 0 0 1 14 0"/>
-    </svg>
-  </button>
+ <!-- Account -->
+<button class="header-icon-btn"
+        type="button"
+        id="accountOpenBtn"
+        title="Account"
+        aria-label="Open account">
+  <svg viewBox="0 0 24 24">
+    <circle cx="12" cy="8" r="4"/>
+    <path d="M5 21a7 7 0 0 1 14 0"/>
+  </svg>
+</button>
 </div>
     <div style="display: flex; align-items: center; gap: 8px;">
       <button type="button" class="theme-toggle-btn" id="themeToggle" aria-label="Toggle theme">
@@ -3636,6 +3957,185 @@ html[data-palette="cosmic"] .cosmic-glow {
     </div>
   </div>
 </header>
+
+	
+<!-- =========================================
+     JUPITER ASTRO ACCOUNT DIALOGUE
+========================================= -->
+
+<div class="account-overlay"
+     id="accountOverlay"
+     aria-hidden="true">
+
+  <section class="account-dialog"
+           role="dialog"
+           aria-modal="true"
+           aria-label="Jupiter Astro account">
+
+    <!-- Dialogue Header -->
+    <div class="account-dialog-header">
+
+      <div class="account-dialog-brand">
+        <a class="logo" href="#">
+ 		 <span class="logo-main">Jupiter&nbsp;Astro</span>
+		  <span class="logo-sub">Research</span>
+		</a>
+        <small>Co-powered by Blissbond Astrology</small>
+      </div>
+
+      <button type="button"
+              class="account-dialog-close"
+              id="accountCloseBtn"
+              aria-label="Close dialogue">
+        &times;
+      </button>
+
+    </div>
+
+    <!-- Tabs -->
+    <div class="account-tabs">
+
+      <button type="button"
+              class="account-tab active"
+              id="signInTab"
+              aria-selected="true">
+        Sign In
+      </button>
+
+      <button type="button"
+              class="account-tab"
+              id="signUpTab"
+              aria-selected="false">
+        Create Account
+      </button>
+
+    </div>
+
+    <!-- SIGN IN FORM -->
+    <form class="account-form" id="signInForm">
+
+      <div class="account-field">
+        <label for="loginEmail">Email Address</label>
+        <input type="email"
+               id="loginEmail"
+               placeholder="Enter your email address"
+               autocomplete="email"
+               required>
+      </div>
+
+      <div class="account-field">
+        <label for="loginPassword">Password</label>
+        <input type="password"
+               id="loginPassword"
+               placeholder="Enter your password"
+               autocomplete="current-password"
+               required>
+      </div>
+
+      <div class="account-options">
+
+        <label>
+          <input type="checkbox" id="rememberMe">
+          Keep me signed in
+        </label>
+
+        <a href="#" id="forgotPasswordBtn">
+          Forgot password?
+        </a>
+
+      </div>
+
+      <button type="submit" class="account-submit">
+        Sign In
+      </button>
+
+      <button type="button" class="account-google">
+        Continue with Google
+      </button>
+
+      <p class="account-switch">
+        New to Jupiter Astro?
+        <a href="#" id="switchToSignup">Create your account</a>
+      </p>
+
+    </form>
+
+    <!-- CREATE ACCOUNT FORM -->
+    <form class="account-form account-hidden"
+          id="signUpForm">
+
+      <div class="account-field">
+        <label for="signupName">Full Name</label>
+        <input type="text"
+               id="signupName"
+               placeholder="Enter your full name"
+               autocomplete="name"
+               required>
+      </div>
+
+      <div class="account-field">
+        <label for="signupEmail">Email Address</label>
+        <input type="email"
+               id="signupEmail"
+               placeholder="Enter your email address"
+               autocomplete="email"
+               required>
+      </div>
+
+      <div class="account-field">
+        <label for="signupMobile">Mobile Number (Optional)</label>
+        <input type="tel"
+               id="signupMobile"
+               placeholder="Enter your mobile number"
+               autocomplete="tel">
+      </div>
+
+      <div class="account-field">
+        <label for="signupPassword">Create Password</label>
+        <input type="password"
+               id="signupPassword"
+               placeholder="Create a password"
+               autocomplete="new-password"
+               minlength="8"
+               required>
+      </div>
+
+      <div class="account-field">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password"
+               id="confirmPassword"
+               placeholder="Re-enter your password"
+               autocomplete="new-password"
+               minlength="8"
+               required>
+      </div>
+
+      <div class="account-options">
+        <label>
+          <input type="checkbox" id="acceptTerms" required>
+          I agree to the Terms & Privacy Policy
+        </label>
+      </div>
+
+      <button type="submit" class="account-submit">
+        Create My Account
+      </button>
+
+      <p class="account-switch">
+        Already have an account?
+        <a href="#" id="switchToSignin">Sign In</a>
+      </p>
+
+    </form>
+
+    <!-- Footer -->
+    <div class="account-security">
+      <span>♧</span>
+      Secure access · Your charts and saved research in one place
+    </div>
+
+  </section>
+</div>
 
 	
 <div id="locationPanel" hidden
@@ -10332,6 +10832,168 @@ thinking.innerHTML = `
 
 })();
 </script>
+<script>
+
+/* =========================================
+   JUPITER ASTRO ACCOUNT DIALOGUE CONTROLLER
+========================================= */
+
+(function () {
+
+  const overlay = document.getElementById('accountOverlay');
+  const openBtn = document.getElementById('accountOpenBtn');
+  const closeBtn = document.getElementById('accountCloseBtn');
+
+  const signInTab = document.getElementById('signInTab');
+  const signUpTab = document.getElementById('signUpTab');
+
+  const signInForm = document.getElementById('signInForm');
+  const signUpForm = document.getElementById('signUpForm');
+
+  const switchToSignup = document.getElementById('switchToSignup');
+  const switchToSignin = document.getElementById('switchToSignin');
+
+  if (!overlay || !openBtn || !closeBtn) {
+    console.warn('Account dialogue elements not found.');
+    return;
+  }
+
+  // OPEN DIALOGUE
+  function openAccount() {
+
+    overlay.classList.add('is-open');
+    overlay.setAttribute('aria-hidden', 'false');
+
+    // Stop background page scrolling
+    document.body.style.overflow = 'hidden';
+
+    // Focus the first input
+    setTimeout(() => {
+      document.getElementById('loginEmail').focus();
+    }, 100);
+
+  }
+
+  // CLOSE DIALOGUE
+  function closeAccount() {
+
+    overlay.classList.remove('is-open');
+    overlay.setAttribute('aria-hidden', 'true');
+
+    // Restore page scrolling
+    document.body.style.overflow = '';
+
+    // Return focus to Account icon
+    openBtn.focus();
+
+  }
+
+  // SWITCH TO SIGN IN
+  function showSignIn() {
+
+    signInForm.classList.remove('account-hidden');
+    signUpForm.classList.add('account-hidden');
+
+    signInTab.classList.add('active');
+    signUpTab.classList.remove('active');
+
+    signInTab.setAttribute('aria-selected', 'true');
+    signUpTab.setAttribute('aria-selected', 'false');
+
+  }
+
+  // SWITCH TO CREATE ACCOUNT
+  function showSignUp() {
+
+    signUpForm.classList.remove('account-hidden');
+    signInForm.classList.add('account-hidden');
+
+    signUpTab.classList.add('active');
+    signInTab.classList.remove('active');
+
+    signUpTab.setAttribute('aria-selected', 'true');
+    signInTab.setAttribute('aria-selected', 'false');
+
+  }
+
+  // BUTTON EVENTS
+  openBtn.addEventListener('click', openAccount);
+  closeBtn.addEventListener('click', closeAccount);
+
+  signInTab.addEventListener('click', showSignIn);
+  signUpTab.addEventListener('click', showSignUp);
+
+  switchToSignup.addEventListener('click', function (e) {
+    e.preventDefault();
+    showSignUp();
+  });
+
+  switchToSignin.addEventListener('click', function (e) {
+    e.preventDefault();
+    showSignIn();
+  });
+
+  // CLICK OUTSIDE THE DIALOGUE TO CLOSE
+  overlay.addEventListener('click', function (e) {
+    if (e.target === overlay) {
+      closeAccount();
+    }
+  });
+
+  // CLOSE USING ESCAPE KEY
+  document.addEventListener('keydown', function (e) {
+    if (
+      e.key === 'Escape' &&
+      overlay.classList.contains('is-open')
+    ) {
+      closeAccount();
+    }
+  });
+
+  // PASSWORD CONFIRMATION
+  signUpForm.addEventListener('submit', function (e) {
+
+    e.preventDefault();
+
+    const password =
+      document.getElementById('signupPassword').value;
+
+    const confirmPassword =
+      document.getElementById('confirmPassword').value;
+
+    if (password !== confirmPassword) {
+      alert('Passwords do not match.');
+      return;
+    }
+
+    alert('The account interface is ready. Authentication still needs to be connected.');
+
+  });
+
+  // SIGN IN PLACEHOLDER
+  signInForm.addEventListener('submit', function (e) {
+
+    e.preventDefault();
+
+    alert('The sign-in interface is ready. Authentication still needs to be connected.');
+
+  });
+
+  // FORGOT PASSWORD PLACEHOLDER
+  document.getElementById('forgotPasswordBtn')
+    .addEventListener('click', function (e) {
+
+      e.preventDefault();
+
+      alert('Password reset functionality has not been connected yet.');
+
+    });
+
+})();
+
+	
+</script>
+	
 
 </body>
 </html>
