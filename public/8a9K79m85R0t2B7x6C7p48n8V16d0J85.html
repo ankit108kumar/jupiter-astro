@@ -11111,9 +11111,23 @@ signUpForm.addEventListener('submit', async function (e) {
 
     }
 
-    // Clear password fields
-    document.getElementById('signupPassword').value = '';
-    document.getElementById('confirmPassword').value = '';
+    
+// Clear and disable password fields after account creation
+const passwordField = document.getElementById('signupPassword');
+const confirmField = document.getElementById('confirmPassword');
+const submitButton = document.getElementById('signupSubmitBtn');
+
+passwordField.value = '';
+confirmField.value = '';
+
+passwordField.disabled = true;
+confirmField.disabled = true;
+submitButton.disabled = true;
+
+// Remove any previous inline button styling
+submitButton.style.removeProperty('opacity');
+submitButton.style.removeProperty('cursor');
+
 
   } catch (error) {
 
