@@ -4143,37 +4143,10 @@ padding: 28px 30px;
   </button>
 
 </div>
-```
+</div>
+</div>
+</header>
 
-## 3. What will improve?
-
-<box border radius="lg" padding={3} gap={3}>
-  <row align="center" justify="end" gap={2}>
-    <box size="38px" radius="lg" align="center" justify="center">
-      <title color="#829486" size="xl">i</title>
-    </box>
-    <box size="38px" radius="lg" align="center" justify="center">
-      <icon name="map-pin" color="#829486" size="21px"/>
-    </box>
-    <box size="40px" radius="lg" background="#E8F0E8" border={{size:1,color:"#668C69"}} align="center" justify="center">
-      <icon name="user-round" color="#477B4B" size="21px"/>
-    </box>
-    <box size="36px" radius="lg" background="#F5F7F4" border={{size:1,color:"#CBD3CA"}} align="center" justify="center">
-      <icon name="minus" color="#829486" size="19px"/>
-    </box>
-  </row>
-  <caption textAlign="center" color="secondary">Illustrative appearance when the Account button is active.</caption>
-</box>
-
-- All buttons have consistent proportions.
-- Icons become clearer without looking oversized.
-- The Account button retains its logged-in indicator.
-- The Panchang button becomes visually integrated.
-- Colors adapt to your existing palette variables.
-
-**Important:** Keep your existing `accountOpenBtn`, `locationButton`, `analysisGuideOpen` and `panchangToggleBtn` IDs unchanged. Their JavaScript functionality will remain connected.
-
-	
 <!-- =========================================
      JUPITER ASTRO ACCOUNT DIALOGUE
 ========================================= -->
@@ -4182,7 +4155,7 @@ padding: 28px 30px;
      id="accountOverlay"
      aria-hidden="true">
 
-  <section class="account-dialog"
+	<section class="account-dialog"
            role="dialog"
            aria-modal="true"
            aria-label="Jupiter Astro account">
