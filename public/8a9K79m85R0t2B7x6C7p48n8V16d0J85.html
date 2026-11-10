@@ -4082,6 +4082,14 @@ padding: 28px 30px;
                required>
       </div>
 
+		<div
+  id="loginMessage"
+  class="account-message"
+  role="status"
+  aria-live="polite"
+  hidden
+></div>
+		
       <div class="account-field">
         <label for="loginPassword">Password</label>
         <input type="password"
@@ -11044,64 +11052,62 @@ thinking.innerHTML = `
 </script>
 	
 
+
 <script>
-// ================= EMAIL VERIFICATION =================
+// ============ SHARED EMAIL VERIFICATION ============
 
 (function () {
 
-  const emailInput = document.getElementById('signupEmail');
-  const messageBox = document.getElementById('signupMessage');
-  const signUpForm = document.getElementById('signUpForm');
-
-  if (!emailInput || !messageBox || !signUpForm) {
-    console.error('Email verification: required HTML elements not found.');
-    return;
-  }
-
-  // Your existing Google Apps Script URL
   const AUTH_CHECK_URL =
     'https://script.google.com/macros/s/AKfycbx02wG3xKMKegEYNYMI-pQbmXhnPiielVJbYtPIXs0waU7150qys4Y1psaulXX1U4qx/exec';
 
-  // Frontend verification controls
+  // Shared cooldown across both forms
   const lastRequestAt = {};
-  let verifiedEmail = '';
+
+  // Keep track of verified emails separately
+  const verifiedEmails = {
+    login: '',
+    signup: ''
+  };
+
+  // Prevent overlapping verification requests
   let requestInProgress = false;
 
-  // Display messages
-  function showMessage(message, type) {
+  // Currently active verification request
+  let activeRequest = null;
 
-    messageBox.hidden = false;
-    messageBox.className = 'account-message ' + (type || '');
-    messageBox.textContent = message;
 
-  }
+  // ============ MESSAGE DISPLAY ============
 
-  // Clear verification whenever email changes
-  function clearVerification() {
+  function showMessage(box, message, type) {
 
-    verifiedEmail = '';
+    box.hidden = false;
+    box.className = 'account-message ' + (type || '');
+    box.textContent = message;
 
   }
 
-  // ================= VERIFY EMAIL =================
 
-  function verifyEmail() {
+  // ============ EMAIL VERIFICATION ============
 
-    const email = emailInput.value.trim().toLowerCase();
+  function verifyEmail(input, messageBox, formType) {
 
-    // Empty field
+    const email = input.value.trim().toLowerCase();
+
+    // Empty email
     if (!email) {
       messageBox.hidden = true;
-      clearVerification();
+      verifiedEmails[formType] = '';
       return;
     }
 
-    // Validate email format before sending request
-    if (!emailInput.checkValidity()) {
+    // Validate email format
+    if (!input.checkValidity()) {
 
-      clearVerification();
+      verifiedEmails[formType] = '';
 
       showMessage(
+        messageBox,
         'Please enter a valid email address.',
         'error'
       );
@@ -11109,8 +11115,8 @@ thinking.innerHTML = `
       return;
     }
 
-    // Do not verify an already verified email again
-    if (verifiedEmail === email) {
+    // Already verified for this form
+    if (verifiedEmails[formType] === email) {
       return;
     }
 
@@ -11119,7 +11125,7 @@ thinking.innerHTML = `
       return;
     }
 
-    // Frontend five-second restriction
+    // Five-second frontend cooldown
     const now = Date.now();
     const previousRequest = lastRequestAt[email] || 0;
     const elapsed = now - previousRequest;
@@ -11129,6 +11135,7 @@ thinking.innerHTML = `
       const remaining = Math.ceil((5000 - elapsed) / 1000);
 
       showMessage(
+        messageBox,
         'Please wait ' + remaining +
         ' second(s) before checking this email again.',
         'error'
@@ -11137,14 +11144,18 @@ thinking.innerHTML = `
       return;
     }
 
-    // Record request timestamp
+    // Record request time
     lastRequestAt[email] = now;
 
     requestInProgress = true;
 
-    showMessage('⏳ Verifying email...', '');
+    showMessage(
+      messageBox,
+      '⏳ Verifying email...',
+      ''
+    );
 
-    // Create a unique callback name for JSONP
+    // Unique JSONP callback
     const callbackName =
       'emailVerificationCallback_' +
       Date.now() + '_' +
@@ -11162,7 +11173,6 @@ thinking.innerHTML = `
 
     let completed = false;
 
-    // Clean up request
     function cleanup() {
 
       if (completed) return;
@@ -11172,6 +11182,7 @@ thinking.innerHTML = `
       clearTimeout(timeout);
 
       requestInProgress = false;
+      activeRequest = null;
 
       script.remove();
 
@@ -11179,34 +11190,43 @@ thinking.innerHTML = `
 
     }
 
-    // Prevent the interface from waiting indefinitely
+    activeRequest = {
+      email: email,
+      input: input,
+      messageBox: messageBox,
+      formType: formType
+    };
+
+    // Timeout protection
     const timeout = setTimeout(function () {
 
       cleanup();
 
       showMessage(
+        messageBox,
         'Verification timed out. Please try again later.',
         'error'
       );
 
     }, 15000);
 
-    // Receive response from Google Apps Script
+
+    // ============ RECEIVE GOOGLE SCRIPT RESPONSE ============
+
     window[callbackName] = function (result) {
 
       cleanup();
 
-      // If email changed while request was running,
-      // verify the newly entered email instead.
-      if (emailInput.value.trim().toLowerCase() !== email) {
-        verifyEmail();
+      // Ignore result if email was changed
+      if (input.value.trim().toLowerCase() !== email) {
         return;
       }
 
-      // Request rejected by backend cooldown
+      // Backend cooldown
       if (result.status === 'rate_limited') {
 
         showMessage(
+          messageBox,
           'Please wait ' + result.retryAfter +
           ' second(s) before trying again.',
           'error'
@@ -11215,12 +11235,13 @@ thinking.innerHTML = `
         return;
       }
 
-      // Authorized email
+      // Authorized
       if (result.success && result.authorized === true) {
 
-        verifiedEmail = email;
+        verifiedEmails[formType] = email;
 
         showMessage(
+          messageBox,
           '✓ Email authorized successfully.',
           'success'
         );
@@ -11228,12 +11249,13 @@ thinking.innerHTML = `
         return;
       }
 
-      // Unauthorized email
+      // Unauthorized
       if (result.success && result.authorized === false) {
 
-        clearVerification();
+        verifiedEmails[formType] = '';
 
         showMessage(
+          messageBox,
           'This email ID ' + email +
           ' is not authorized. Please contact consult@jupiterastrology108.com for authorization.',
           'error'
@@ -11242,20 +11264,25 @@ thinking.innerHTML = `
         return;
       }
 
-      // Other server errors
+      // Server error
+      verifiedEmails[formType] = '';
+
       showMessage(
+        messageBox,
         'Unable to verify email. Please try again later.',
         'error'
       );
 
     };
 
-    // Handle network or script-loading failure
+
+    // Network / script loading error
     script.onerror = function () {
 
       cleanup();
 
       showMessage(
+        messageBox,
         'Verification request failed. Please try again later.',
         'error'
       );
@@ -11266,41 +11293,90 @@ thinking.innerHTML = `
 
   }
 
-  // Trigger verification when user clicks outside
-  // or presses Tab to leave the email field
-  emailInput.addEventListener('blur', verifyEmail);
 
-  // If the user edits the email, remove previous verification
-  emailInput.addEventListener('input', function () {
+  // ============ CONNECT BOTH FORMS ============
 
-    clearVerification();
+  const forms = [
 
-    messageBox.hidden = true;
+    {
+      type: 'login',
+      input: document.getElementById('loginEmail'),
+      message: document.getElementById('loginMessage'),
+      form: document.getElementById('signInForm')
+    },
+
+    {
+      type: 'signup',
+      input: document.getElementById('signupEmail'),
+      message: document.getElementById('signupMessage'),
+      form: document.getElementById('signUpForm')
+    }
+
+  ];
+
+
+  forms.forEach(function (item) {
+
+    if (!item.input || !item.message || !item.form) {
+      console.error(
+        'Email verification elements missing for:',
+        item.type
+      );
+      return;
+    }
+
+    // Verify when user leaves email field
+    // Works with mouse click and Tab
+    item.input.addEventListener('blur', function () {
+
+      verifyEmail(
+        item.input,
+        item.message,
+        item.type
+      );
+
+    });
+
+
+    // Invalidate verification when email is edited
+    item.input.addEventListener('input', function () {
+
+      verifiedEmails[item.type] = '';
+
+      item.message.hidden = true;
+
+    });
+
+
+    // Block form submission until email is verified
+    item.form.addEventListener('submit', function (e) {
+
+      const currentEmail =
+        item.input.value.trim().toLowerCase();
+
+      if (
+        !currentEmail ||
+        currentEmail !== verifiedEmails[item.type]
+      ) {
+
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        showMessage(
+          item.message,
+          'Please verify your email address before proceeding.',
+          'error'
+        );
+
+      }
+
+    }, true);
 
   });
 
-  // Prevent password form submission without authorization
-  signUpForm.addEventListener('submit', function (e) {
-
-    const currentEmail =
-      emailInput.value.trim().toLowerCase();
-
-    if (!currentEmail || currentEmail !== verifiedEmail) {
-
-      e.preventDefault();
-      e.stopImmediatePropagation();
-
-      showMessage(
-        'Please verify your email address before setting your password.',
-        'error'
-      );
-
-    }
-
-  }, true);
-
 })();
 </script>
+
 
 	
 </body>
