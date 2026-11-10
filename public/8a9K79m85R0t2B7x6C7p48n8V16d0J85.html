@@ -2736,6 +2736,29 @@ html[data-palette="cosmic"] .cosmic-glow {
 .header-icon-btn:hover {
   opacity: 0.9;
 }
+/* Account button – logged-in active state */
+.header-icon-btn.is-logged-in {
+  opacity: 1;
+  border: 1px solid var(--saffron);
+  border-radius: 7px;
+  background: var(--saffron-soft);
+  color: var(--saffron);
+
+  box-shadow: 0 0 10px var(--saffron-soft);
+
+  transition: all 0.2s ease;
+}
+
+.header-icon-btn.is-logged-in svg {
+  stroke: var(--saffron);
+}
+
+.header-icon-btn.is-logged-in:hover {
+  opacity: 1;
+  border-color: var(--saffron);
+  background: var(--saffron-soft);
+}
+	
 
 /* ============================================
    JUPITER AI — THEME-ADAPTIVE LIQUID GLASS
@@ -11650,7 +11673,39 @@ showMessage(
 
   };
 
+// ================= ACCOUNT BUTTON LOGIN INDICATOR =================
 
+const accountButton = document.getElementById('accountOpenBtn');
+
+onAuthStateChanged(auth, function(user) {
+
+  if (!accountButton) return;
+
+  if (user) {
+
+    // User is logged in
+    accountButton.classList.add('is-logged-in');
+
+    accountButton.title = 'Logged in: ' + user.email;
+    accountButton.setAttribute(
+      'aria-label',
+      'Account - Logged in'
+    );
+
+  } else {
+
+    // User is logged out
+    accountButton.classList.remove('is-logged-in');
+
+    accountButton.title = 'Account';
+    accountButton.setAttribute(
+      'aria-label',
+      'Open account'
+    );
+
+  }
+
+});
   console.log("Jupiter Astro: Firebase initialized successfully.");
 
 </script>
