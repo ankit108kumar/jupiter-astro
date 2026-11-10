@@ -11207,18 +11207,30 @@ signUpForm.addEventListener('submit', async function (e) {
 
 
 
+
 function setFormLocked(form, locked) {
 
   if (!form) return;
 
-  // Only control password fields.
-  // Never disable the submit button.
+  // Lock / unlock password fields
   form.querySelectorAll('input[type="password"]')
     .forEach(function(field) {
       field.disabled = locked;
     });
 
+  // Lock / unlock the submit button
+  const submitButton = form.querySelector('button[type="submit"]');
+
+  if (submitButton) {
+    submitButton.disabled = locked;
+
+    // Remove old inline styling; CSS handles disabled appearance
+    submitButton.style.removeProperty('opacity');
+    submitButton.style.removeProperty('cursor');
+  }
+
 }
+
 
 
 	
