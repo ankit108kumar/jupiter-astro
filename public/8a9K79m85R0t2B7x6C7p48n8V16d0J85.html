@@ -3581,13 +3581,13 @@ html[data-palette="cosmic"] .cosmic-glow {
   box-shadow: 0 8px 30px rgba(60, 40, 90, 0.15);
 }
 
-	
+
 /* =========================================
    JUPITER ASTRO — GLASS ACCOUNT DIALOGUE
    Automatically adapts to the selected palette
 ========================================= */
 
-/* Full-screen overlay: blurs the entire page, including header */
+/* Full-screen overlay */
 .account-overlay {
   position: fixed;
   inset: 0;
@@ -3621,10 +3621,13 @@ html[data-palette="cosmic"] .cosmic-glow {
 .account-dialog {
   width: 100%;
   max-width: 680px;
-  max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px);
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 
   position: relative;
+  min-height: 0;
 
   padding: 25px;
 
@@ -3703,7 +3706,7 @@ html[data-palette="cosmic"] .cosmic-glow {
   cursor: pointer;
 }
 
-/* Sign In / Create Account tabs */
+/* Sign In / Set Password tabs */
 .account-tabs {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -3749,16 +3752,26 @@ html[data-palette="cosmic"] .cosmic-glow {
   display: flex;
   flex-direction: column;
   gap: 6px;
+
+  width: 100%;
+  min-width: 0;
+  align-items: stretch;
+  text-align: left;
 }
 
 .account-field label {
+  display: block;
+  width: 100%;
+
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--muted);
+  text-align: left;
 }
 
 .account-field input {
   width: 100%;
+  min-width: 0;
   box-sizing: border-box;
 
   padding: 13px 14px;
@@ -3841,22 +3854,6 @@ html[data-palette="cosmic"] .cosmic-glow {
   transform: translateY(-1px);
 }
 
-/* Google button */
-.account-google {
-  width: 100%;
-  padding: 12px;
-
-  border: 1px solid var(--line-strong);
-  border-radius: 12px;
-
-  background: var(--surface-alt);
-  color: var(--ink);
-
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-
 /* Bottom text */
 .account-switch {
   margin: 19px 0 0;
@@ -3876,54 +3873,39 @@ html[data-palette="cosmic"] .cosmic-glow {
   font-size: 0.76rem;
 }
 
+/* Authentication messages */
+.account-message {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 10px 12px;
+  margin-top: 4px;
+
+  border-radius: 8px;
+
+  font-size: 0.85rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.account-message.error {
+  color: var(--bad);
+  background: var(--bad-soft);
+  border: 1px solid var(--bad);
+}
+
+.account-message.success {
+  color: var(--good);
+  background: var(--good-soft);
+  border: 1px solid var(--good);
+}
+
 /* Utility */
 .account-hidden {
   display: none !important;
 }
 
-/* Mobile layout */
-@media (max-width: 520px) {
-  .account-overlay {
-    padding: 12px;
-  }
-
-  .account-dialog {
-    padding: 20px;
-    border-radius: 20px;
-    max-height: calc(100vh - 24px);
-  }
-
-  .account-dialog-brand .logo {
-    font-size: 1.35rem;
-  }
-}
-
-
-/* =========================================
-   ACCOUNT DIALOGUE — WIDER & BETTER ALIGNMENT
-========================================= */
-
-/* Wider dialogue */
-.account-dialog {
-  max-width: 680px;
-  text-align: left;
-}
-
-/* Keep all form fields aligned to the left */
-.account-field {
-  width: 100%;
-  min-width: 0;
-  align-items: stretch;
-  text-align: left;
-}
-
-.account-field label {
-  display: block;
-  width: 100%;
-  text-align: left;
-}
-
-/* Two-column layout for Create Account */
+/* Two-column layout for Set Password */
 #signUpForm {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3932,39 +3914,29 @@ html[data-palette="cosmic"] .cosmic-glow {
   align-items: start;
 }
 
-/* Full-width elements in registration form */
-#signUpForm .account-options,
+/* Full-width elements in Set Password form */
 #signUpForm .account-submit,
-#signUpForm .account-switch {
+#signUpForm .account-switch,
+#signUpForm .account-message {
   grid-column: 1 / -1;
 }
 
-/* Terms checkbox alignment */
-#signUpForm .account-options {
-  justify-content: center;
-  flex-wrap: nowrap;
-}
-
-#signUpForm .account-options label {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 9px;
-  text-align: left;
-}
-
-/* Inputs should occupy their full column */
-#signUpForm .account-field input {
-  width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-}
-
-/* Maintain single-column layout on mobile */
+/* Mobile layout */
 @media (max-width: 600px) {
+
+  .account-overlay {
+    padding: 12px;
+  }
 
   .account-dialog {
     max-width: 100%;
+    max-height: calc(100dvh - 24px);
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .account-dialog-brand .logo {
+    font-size: 1.35rem;
   }
 
   #signUpForm {
@@ -3973,13 +3945,13 @@ html[data-palette="cosmic"] .cosmic-glow {
     row-gap: 13px;
   }
 
-  #signUpForm .account-options,
   #signUpForm .account-submit,
-  #signUpForm .account-switch {
+  #signUpForm .account-switch,
+  #signUpForm .account-message {
     grid-column: 1;
   }
-
 }
+
 
 	
 </style>
@@ -4091,7 +4063,7 @@ html[data-palette="cosmic"] .cosmic-glow {
               class="account-tab"
               id="signUpTab"
               aria-selected="false">
-        Create Account
+        Set Password
       </button>
 
     </div>
@@ -4134,84 +4106,72 @@ html[data-palette="cosmic"] .cosmic-glow {
         Sign In
       </button>
 
-      <button type="button" class="account-google">
-        Continue with Google
-      </button>
-
       <p class="account-switch">
-        New to Jupiter Astro?
-        <a href="#" id="switchToSignup">Create your account</a>
-      </p>
+  First time here?
+  <a href="#" id="switchToSignup">Set your password</a>
+</p>
+
+<div id="loginMessage"
+     class="account-message"
+     role="status"
+     aria-live="polite"
+     hidden>
+</div>
 
     </form>
 
-    <!-- CREATE ACCOUNT FORM -->
-    <form class="account-form account-hidden"
-          id="signUpForm">
+    <!-- Set Password FORM -->
+    
+<!-- SET PASSWORD FORM -->
+<form class="account-form account-hidden"
+      id="signUpForm">
 
-      <div class="account-field">
-        <label for="signupName">Full Name</label>
-        <input type="text"
-               id="signupName"
-               placeholder="Enter your full name"
-               autocomplete="name"
-               required>
-      </div>
+  <div class="account-field">
+    <label for="signupEmail">Authorized Email Address</label>
+    <input type="email"
+           id="signupEmail"
+           placeholder="Enter your authorized email address"
+           autocomplete="email"
+           required>
+  </div>
 
-      <div class="account-field">
-        <label for="signupEmail">Email Address</label>
-        <input type="email"
-               id="signupEmail"
-               placeholder="Enter your email address"
-               autocomplete="email"
-               required>
-      </div>
+  <div class="account-field">
+    <label for="signupPassword">Set Password</label>
+    <input type="password"
+           id="signupPassword"
+           placeholder="Create a password"
+           autocomplete="new-password"
+           minlength="8"
+           required>
+  </div>
 
-      <div class="account-field">
-        <label for="signupMobile">Mobile Number (Optional)</label>
-        <input type="tel"
-               id="signupMobile"
-               placeholder="Enter your mobile number"
-               autocomplete="tel">
-      </div>
+  <div class="account-field">
+    <label for="confirmPassword">Confirm Password</label>
+    <input type="password"
+           id="confirmPassword"
+           placeholder="Re-enter your password"
+           autocomplete="new-password"
+           minlength="8"
+           required>
+  </div>
 
-      <div class="account-field">
-        <label for="signupPassword">Create Password</label>
-        <input type="password"
-               id="signupPassword"
-               placeholder="Create a password"
-               autocomplete="new-password"
-               minlength="8"
-               required>
-      </div>
+  <div id="signupMessage"
+       class="account-message"
+       role="status"
+       aria-live="polite"
+       hidden>
+  </div>
 
-      <div class="account-field">
-        <label for="confirmPassword">Confirm Password</label>
-        <input type="password"
-               id="confirmPassword"
-               placeholder="Re-enter your password"
-               autocomplete="new-password"
-               minlength="8"
-               required>
-      </div>
+  <button type="submit" class="account-submit">
+    Set Password
+  </button>
 
-      <div class="account-options">
-        <label>
-          <input type="checkbox" id="acceptTerms" required>
-          I agree to the Terms & Privacy Policy
-        </label>
-      </div>
+  <p class="account-switch">
+    Already have a password?
+    <a href="#" id="switchToSignin">Sign In</a>
+  </p>
 
-      <button type="submit" class="account-submit">
-        Create My Account
-      </button>
-
-      <p class="account-switch">
-        Already have an account?
-        <a href="#" id="switchToSignin">Sign In</a>
-      </p>
-
-    </form>
+</form>
 
     <!-- Footer -->
     <div class="account-security">
@@ -10987,7 +10947,7 @@ thinking.innerHTML = `
 
   }
 
-  // SWITCH TO CREATE ACCOUNT
+  // SWITCH TO Set Password
   function showSignUp() {
 
     signUpForm.classList.remove('account-hidden');
