@@ -4060,10 +4060,7 @@ padding: 28px 30px;
 </button>
 </div>
     <div style="display: flex; align-items: center; gap: 8px;">
-      <button type="button" class="theme-toggle-btn" id="themeToggle" aria-label="Toggle theme">
-        <span id="themeIcon">☼</span>
-      </button>
-      
+          
       <!-- New Panchang Collapse/Expand Button -->
       <button type="button" class="header-panchang-btn" id="panchangToggleBtn" title="Collapse / Expand Panchang">-</button>
     </div>
@@ -4552,13 +4549,9 @@ const Theme = {
       }
     });
   },
-  toggle() {
-    const cur = document.documentElement.getAttribute('data-theme') || 'dark';
-    this.apply(cur === 'dark' ? 'light' : 'dark');
-  }
+ 
 };
 Theme.apply(Theme.get());
-document.getElementById('themeToggle').addEventListener('click', () => Theme.toggle());
 
   /* ================= MOBILE & DEVICE OPTIMIZATION ENGINE ================= */
 const DeviceOptimizer = {
