@@ -4946,14 +4946,25 @@ function showButtonError(el, message) {
   }, 2500);
 }
 
+
 document.addEventListener('blur', e => {
   const el = e.target;
   const form = el.closest('form');
   if (!form) return;
 
-  const dateInput = form.querySelector('input[name="dob"], input[id*="dob"], input[id*="Date"]');
-  const timeInput = form.querySelector('input[name="tob"], input[id*="tob"], input[id*="Time"]');
+  const dateInput = form.querySelector(
+    'input[name="dob"], input[id*="dob"], input[id*="Date"]'
+  );
+
+  const timeInput = form.querySelector(
+    'input[name="tob"], input[id*="tob"], input[id*="Time"]'
+  );
+
+  // IMPORTANT: Skip forms unrelated to Kundali DOB/TOB validation
+  if (!dateInput || !timeInput) return;
+
   const submitBtn = form.querySelector('button[type="submit"]');
+
 
   const dateVal = dateInput ? dateInput.value.trim() : '';
   const timeVal = timeInput ? timeInput.value.trim() : '';
