@@ -2596,29 +2596,6 @@ html[data-palette="cosmic"] .cosmic-glow {
 /* ================= END COSMIC GLASS THEME ================= */
 
 /* Square iPhone-Style Panchang Toggle Button (matching 'D' button) */
-.header-panchang-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
-  border: 1px solid #111111; /* Clear thin dark border */
-  background: var(--surface-alt);
-  color: var(--muted);
-  font-family: var(--font-data);
-  font-size: 0.75rem;
-  font-weight: 700;
-  cursor: pointer;
-  opacity: 0.45;
-  transition: all 0.2s ease;
-  user-select: none;
-}
-.header-panchang-btn:hover {
-  opacity: 0.85;
-  border-color: #3b82f6;
-  color: #3b82f6;
-}
 .header-panchang-btn.active {
   opacity: 1;
   background: rgba(59, 130, 246, 0.18);
@@ -2702,30 +2679,52 @@ html[data-palette="cosmic"] .cosmic-glow {
   background: var(--indigo-soft);
 }
 
+/* ==========================================
+   JUPITER ASTRO — PREMIUM HEADER ICON TOOLBAR
+========================================== */
+
 .header-quick-icons {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: flex-end;
+  gap: 9px;
   margin-left: auto;
+  flex-shrink: 0;
 }
 
+/* Common icon button */
 .header-icon-btn {
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
   padding: 0;
-  border: none;
+  border: 1px solid transparent;
+  border-radius: 11px;
+
   background: transparent;
   color: var(--muted);
-  opacity: 0.55;
+
+  opacity: 0.88;
   cursor: pointer;
-  transition: opacity 0.2s ease, color 0.2s ease;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
+/* Consistent icon dimensions */
 .header-icon-btn svg {
-  width: 15px;
-  height: 15px;
+  width: 20px;
+  height: 20px;
+
   fill: none;
   stroke: currentColor;
   stroke-width: 1.8;
@@ -2733,31 +2732,105 @@ html[data-palette="cosmic"] .cosmic-glow {
   stroke-linejoin: round;
 }
 
-.header-icon-btn:hover {
-  opacity: 0.9;
+/* Information icon */
+#analysisGuideOpen span {
+  font-size: 20px !important;
+  font-weight: 650 !important;
+  line-height: 1;
 }
-/* Account button – logged-in active state */
+
+/* Hover effect */
+.header-icon-btn:hover {
+  opacity: 1;
+  color: var(--saffron);
+  background: var(--saffron-soft);
+  border-color: var(--line-strong);
+  transform: translateY(-1px);
+}
+
+/* Keyboard accessibility */
+.header-icon-btn:focus-visible,
+.header-panchang-btn:focus-visible {
+  outline: 2px solid var(--saffron);
+  outline-offset: 3px;
+}
+
+/* Account button — logged-in state */
 .header-icon-btn.is-logged-in {
   opacity: 1;
-  border: 0.5px solid var(--saffron);
-  border-radius: 7px;
-  background: var(--saffron-soft);
   color: var(--saffron);
+  background: var(--saffron-soft);
+  border: 1px solid var(--saffron);
+  border-radius: 11px;
 
-  box-shadow: 0 0 10px var(--saffron-soft);
-
-  transition: all 0.2s ease;
+  box-shadow:
+    0 3px 12px var(--saffron-soft),
+    inset 0 1px 0 rgba(255,255,255,0.35);
 }
 
 .header-icon-btn.is-logged-in svg {
-  stroke: var(--saffron);
+  stroke: currentColor;
 }
 
 .header-icon-btn.is-logged-in:hover {
   opacity: 1;
-  border-color: var(--saffron);
+  color: var(--saffron);
   background: var(--saffron-soft);
+  border-color: var(--saffron);
+  transform: translateY(-1px);
 }
+
+/* Panchang collapse button */
+.header-panchang-btn {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+
+  background: var(--surface-alt);
+  color: var(--muted);
+
+  font-family: inherit;
+  font-size: 21px;
+  font-weight: 500;
+  line-height: 1;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.header-panchang-btn:hover {
+  color: var(--saffron);
+  background: var(--saffron-soft);
+  border-color: var(--saffron);
+}
+
+/* Mobile header spacing */
+@media (max-width: 600px) {
+  .header-quick-icons {
+    gap: 4px;
+  }
+
+  .header-icon-btn {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+  }
+
+  .header-panchang-btn {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+  }
+}
+
 	
 
 /* ============================================
@@ -4024,48 +4097,81 @@ padding: 28px 30px;
         Co-powered by <span style="color: var(--saffron); font-weight: 700;">Blissbond Astrology</span>
       </span>
     </div>
-     <div class="header-quick-icons">
+    
+<div class="header-quick-icons">
 
+  <!-- Information -->
+  <button class="header-icon-btn"
+          type="button"
+          id="analysisGuideOpen"
+          title="General Analysis Reference"
+          aria-label="Open General Analysis Reference">
+    <span>i</span>
+  </button>
 
-<!-- Temporary Analysis Guide Button -->
-<button class="header-icon-btn"
-        type="button"
-        id="analysisGuideOpen"
-        title="General Analysis Reference"
-        aria-label="Open General Analysis Reference">
-  <span style="font-size:19px;font-weight:700;">i</span>
-</button>
-
-
-  <!-- Location Pin -->
-  <button class="header-icon-btn" id="locationButton"
-        type="button" title="Change default location"
-        aria-label="Change default location">
+  <!-- Location -->
+  <button class="header-icon-btn"
+          id="locationButton"
+          type="button"
+          title="Change default location"
+          aria-label="Change default location">
     <svg viewBox="0 0 24 24">
       <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/>
       <circle cx="12" cy="10" r="2.5"/>
     </svg>
   </button>
 
- <!-- Account -->
-<button class="header-icon-btn"
-        type="button"
-        id="accountOpenBtn"
-        title="Account"
-        aria-label="Open account">
-  <svg viewBox="0 0 24 24">
-    <circle cx="12" cy="8" r="4"/>
-    <path d="M5 21a7 7 0 0 1 14 0"/>
-  </svg>
-</button>
+  <!-- Account -->
+  <button class="header-icon-btn"
+          type="button"
+          id="accountOpenBtn"
+          title="Account"
+          aria-label="Open account">
+    <svg viewBox="0 0 24 24">
+      <circle cx="12" cy="8" r="4"/>
+      <path d="M5 21a7 7 0 0 1 14 0"/>
+    </svg>
+  </button>
+
+  <!-- Panchang Collapse / Expand -->
+  <button type="button"
+          class="header-panchang-btn"
+          id="panchangToggleBtn"
+          title="Collapse / Expand Panchang"
+          aria-label="Collapse or expand Panchang">
+    −
+  </button>
+
 </div>
-    <div style="display: flex; align-items: center; gap: 8px;">
-          
-      <!-- New Panchang Collapse/Expand Button -->
-      <button type="button" class="header-panchang-btn" id="panchangToggleBtn" title="Collapse / Expand Panchang">-</button>
-    </div>
-  </div>
-</header>
+```
+
+## 3. What will improve?
+
+<box border radius="lg" padding={3} gap={3}>
+  <row align="center" justify="end" gap={2}>
+    <box size="38px" radius="lg" align="center" justify="center">
+      <title color="#829486" size="xl">i</title>
+    </box>
+    <box size="38px" radius="lg" align="center" justify="center">
+      <icon name="map-pin" color="#829486" size="21px"/>
+    </box>
+    <box size="40px" radius="lg" background="#E8F0E8" border={{size:1,color:"#668C69"}} align="center" justify="center">
+      <icon name="user-round" color="#477B4B" size="21px"/>
+    </box>
+    <box size="36px" radius="lg" background="#F5F7F4" border={{size:1,color:"#CBD3CA"}} align="center" justify="center">
+      <icon name="minus" color="#829486" size="19px"/>
+    </box>
+  </row>
+  <caption textAlign="center" color="secondary">Illustrative appearance when the Account button is active.</caption>
+</box>
+
+- All buttons have consistent proportions.
+- Icons become clearer without looking oversized.
+- The Account button retains its logged-in indicator.
+- The Panchang button becomes visually integrated.
+- Colors adapt to your existing palette variables.
+
+**Important:** Keep your existing `accountOpenBtn`, `locationButton`, `analysisGuideOpen` and `panchangToggleBtn` IDs unchanged. Their JavaScript functionality will remain connected.
 
 	
 <!-- =========================================
@@ -4288,7 +4394,7 @@ padding: 28px 30px;
     <ul id="defaultLocationList" class="sugg" hidden></ul>
   </div>
 
-  <div style="display:flex; gap:12px; margin-top:12px;">
+  <div style="display:flex; gap:8px; margin-top:12px;">
     <button type="button" class="btn" id="saveDefaultLocation">
       Save
     </button>
