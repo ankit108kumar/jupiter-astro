@@ -11076,7 +11076,30 @@ thinking.innerHTML = `
   // Currently active verification request
   let activeRequest = null;
 
+// ============ LOCK / UNLOCK FORM FIELDS ============
 
+function setFormLocked(form, locked) {
+
+  // Disable or enable password fields
+  const passwordFields = form.querySelectorAll(
+    'input[type="password"]'
+  );
+
+  passwordFields.forEach(function(field) {
+    field.disabled = locked;
+  });
+
+  // Disable or enable submit button
+  const submitButton = form.querySelector(
+    'button[type="submit"], input[type="submit"]'
+  );
+
+  if (submitButton) {
+    submitButton.disabled = locked;
+  }
+
+}
+	
   // ============ MESSAGE DISPLAY ============
 
   function showMessage(box, message, type) {
@@ -11236,42 +11259,65 @@ thinking.innerHTML = `
       }
 
       // Authorized
-      if (result.success && result.authorized === true) {
+if (result.success && result.authorized === true) {
 
-        verifiedEmails[formType] = email;
+    verifiedEmails[formType] = email;
 
-        showMessage(
-          messageBox,
-          '✓ Email authorized successfully.',
-          'success'
-        );
+    // Enable password fields and submit button
+    const currentForm = document.getElementById(
+      formType === 'login' ? 'signInForm' : 'signUpForm'
+    );
 
-        return;
-      }
+    setFormLocked(currentForm, false);
+
+    showMessage(
+      messageBox,
+      '✓ Email authorized successfully.',
+      'success'
+    );
+
+    return;
+}
 
       // Unauthorized
-      if (result.success && result.authorized === false) {
+if (result.success && result.authorized === false) {
 
-        verifiedEmails[formType] = '';
+  verifiedEmails[formType] = '';
 
-        showMessage(
-          messageBox,
-          'This email ID ' + email +
-          ' is not authorized. Please contact consult@jupiterastrology108.com for authorization.',
-          'error'
-        );
+  // Lock password fields and submit button
+  setFormLocked(
+    document.getElementById(
+      formType === 'login' ? 'signInForm' : 'signUpForm'
+    ),
+    true
+  );
 
-        return;
-      }
+  showMessage(
+    messageBox,
+    'This email ID ' + email +
+    ' is not authorized. Please contact consult@jupiterastrology108.com for authorization.',
+    'error'
+  );
+
+  return;
+}
 
       // Server error
-      verifiedEmails[formType] = '';
+verifiedEmails[formType] = '';
 
-      showMessage(
-        messageBox,
-        'Unable to verify email. Please try again later.',
-        'error'
-      );
+// Lock password fields and submit button
+setFormLocked(
+  document.getElementById(
+    formType === 'login' ? 'signInForm' : 'signUpForm'
+  ),
+  true
+);
+
+showMessage(
+  messageBox,
+  'Unable to verify email. Please try again later.',
+  'error'
+);
 
     };
 
@@ -11325,6 +11371,9 @@ thinking.innerHTML = `
       return;
     }
 
+    // Initially disable password fields and submit button
+    setFormLocked(item.form, true);
+	  
     // Verify when user leaves email field
     // Works with mouse click and Tab
     item.input.addEventListener('blur', function () {
@@ -11341,11 +11390,15 @@ thinking.innerHTML = `
     // Invalidate verification when email is edited
     item.input.addEventListener('input', function () {
 
-      verifiedEmails[item.type] = '';
+    // Invalidate previous verification
+    verifiedEmails[item.type] = '';
 
-      item.message.hidden = true;
+    // Lock password fields again
+    setFormLocked(item.form, true);
 
-    });
+    item.message.hidden = true;
+
+});
 
 
     // Block form submission until email is verified
