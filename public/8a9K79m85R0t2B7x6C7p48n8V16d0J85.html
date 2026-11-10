@@ -3620,7 +3620,7 @@ html[data-palette="cosmic"] .cosmic-glow {
 /* Main glass panel */
 .account-dialog {
   width: 100%;
-  max-width: 440px;
+  max-width: 680px;
   max-height: calc(100vh - 40px);
   overflow-y: auto;
 
@@ -3895,6 +3895,87 @@ html[data-palette="cosmic"] .cosmic-glow {
   }
 }
 
+
+/* =========================================
+   ACCOUNT DIALOGUE — WIDER & BETTER ALIGNMENT
+========================================= */
+
+/* Wider dialogue */
+.account-dialog {
+  max-width: 680px;
+  text-align: left;
+}
+
+/* Keep all form fields aligned to the left */
+.account-field {
+  width: 100%;
+  min-width: 0;
+  align-items: stretch;
+  text-align: left;
+}
+
+.account-field label {
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+
+/* Two-column layout for Create Account */
+#signUpForm {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 20px;
+  row-gap: 16px;
+  align-items: start;
+}
+
+/* Full-width elements in registration form */
+#signUpForm .account-options,
+#signUpForm .account-submit,
+#signUpForm .account-switch {
+  grid-column: 1 / -1;
+}
+
+/* Terms checkbox alignment */
+#signUpForm .account-options {
+  justify-content: flex-start;
+}
+
+#signUpForm .account-options label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 9px;
+  text-align: left;
+}
+
+/* Inputs should occupy their full column */
+#signUpForm .account-field input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Maintain single-column layout on mobile */
+@media (max-width: 600px) {
+
+  .account-dialog {
+    max-width: 100%;
+  }
+
+  #signUpForm {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+    row-gap: 13px;
+  }
+
+  #signUpForm .account-options,
+  #signUpForm .account-submit,
+  #signUpForm .account-switch {
+    grid-column: 1;
+  }
+
+}
 
 	
 </style>
