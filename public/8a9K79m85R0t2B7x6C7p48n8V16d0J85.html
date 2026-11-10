@@ -11042,7 +11042,9 @@ signUpForm.addEventListener('submit', async function (e) {
     document.getElementById('signupMessage');
 
   const submitButton =
-    signUpForm.querySelector('button[type="submit"]');
+  signUpForm.querySelector(
+    'button[type="submit"], button:not([type]), input[type="submit"]'
+  );
 
   // Check password confirmation
   if (password !== confirmPassword) {
@@ -11080,8 +11082,7 @@ signUpForm.addEventListener('submit', async function (e) {
   const api = window.firebaseAuthAPI;
   const auth = window.firebaseAuth;
 
-  submitButton.disabled = true;
-
+if (submitButton) submitButton.disabled = true;
   messageBox.textContent = 'Creating your account...';
   messageBox.className = 'account-message';
 
@@ -11178,9 +11179,11 @@ signUpForm.addEventListener('submit', async function (e) {
 
   } finally {
 
+  if (submitButton) {
     submitButton.disabled = false;
-
   }
+
+}
 
 });
 
@@ -11249,8 +11252,8 @@ function setFormLocked(form, locked) {
 
   // Disable or enable submit button
   const submitButton = form.querySelector(
-    'button[type="submit"], input[type="submit"]'
-  );
+  'button[type="submit"], button:not([type]), input[type="submit"]'
+);
 
   if (submitButton) {
     submitButton.disabled = locked;
