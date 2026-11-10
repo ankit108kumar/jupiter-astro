@@ -11097,8 +11097,10 @@ function openAccount() {
   closeBtn.addEventListener('click', closeAccount);
 
 // FIREBASE LOGOUT
-document.getElementById('logoutBtn')
-  .addEventListener('click', async function () {
+const logoutBtn = document.getElementById('logoutBtn');
+
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', async function () {
 
     const logoutButton = this;
     const api = window.firebaseAuthAPI;
@@ -11955,39 +11957,6 @@ onAuthStateChanged(auth, function(user) {
 
 });
 
-// ================= ACCOUNT BUTTON LOGIN INDICATOR =================
-
-const accountButton = document.getElementById('accountOpenBtn');
-
-onAuthStateChanged(auth, function(user) {
-
-  if (!accountButton) return;
-
-  if (user) {
-
-    // User is logged in
-    accountButton.classList.add('is-logged-in');
-
-    accountButton.title = 'Logged in: ' + user.email;
-    accountButton.setAttribute(
-      'aria-label',
-      'Account - Logged in'
-    );
-
-  } else {
-
-    // User is logged out
-    accountButton.classList.remove('is-logged-in');
-
-    accountButton.title = 'Account';
-    accountButton.setAttribute(
-      'aria-label',
-      'Open account'
-    );
-
-  }
-
-});
   console.log("Jupiter Astro: Firebase initialized successfully.");
 
 </script>
