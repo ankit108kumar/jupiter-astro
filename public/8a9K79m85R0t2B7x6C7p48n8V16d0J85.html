@@ -3977,7 +3977,38 @@ padding: 28px 30px;
   }
 }
 
+/* LOGOUT CONFIRMATION TOAST */
 
+#logoutToast {
+  position: fixed;
+  top: 90px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+
+  z-index: 2000000;
+
+  padding: 12px 22px;
+  border: 1px solid var(--good);
+  border-radius: 10px;
+
+  background: var(--surface);
+  color: var(--good);
+
+  font-size: 0.9rem;
+  font-weight: 700;
+
+  box-shadow: 0 6px 22px rgba(0,0,0,0.15);
+
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s ease;
+}
+
+#logoutToast.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
 </style>
 </head>
 <body>
@@ -4091,7 +4122,42 @@ padding: 28px 30px;
       </button>
 
     </div>
+<!-- LOGGED-IN ACCOUNT VIEW -->
+<div id="loggedInPanel" class="account-hidden">
 
+  <div style="
+    text-align:center;
+    padding:12px 0 20px;
+  ">
+
+    <div style="
+      color:var(--muted);
+      font-size:0.85rem;
+      margin-bottom:6px;
+    ">
+      Currently signed in as
+    </div>
+
+    <div id="loggedInEmail" style="
+      color:var(--ink);
+      font-weight:700;
+      font-size:1rem;
+      overflow-wrap:anywhere;
+      margin-bottom:22px;
+    "></div>
+
+    <button
+      type="button"
+      id="logoutBtn"
+      class="account-submit"
+      style="max-width:180px; margin:auto;"
+    >
+      Logout
+    </button>
+
+  </div>
+
+</div>
     <!-- SIGN IN FORM -->
     <form class="account-form" id="signInForm">
 
@@ -10937,21 +11003,52 @@ thinking.innerHTML = `
     return;
   }
 
-  // OPEN DIALOGUE
-  function openAccount() {
+ // OPEN ACCOUNT DIALOGUE
+function openAccount() {
 
-    overlay.classList.add('is-open');
-    overlay.setAttribute('aria-hidden', 'false');
+  const user = window.jaAuthUser || null;
 
-    // Stop background page scrolling
-    document.body.style.overflow = 'hidden';
+  const tabs = document.querySelector('.account-tabs');
+  const loggedInPanel = document.getElementById('loggedInPanel');
 
-    // Focus the first input
+  if (user) {
+
+    // Show logged-in view
+    tabs.style.display = 'none';
+
+    signInForm.classList.add('account-hidden');
+    signUpForm.classList.add('account-hidden');
+
+    loggedInPanel.classList.remove('account-hidden');
+
+    document.getElementById('loggedInEmail').textContent =
+      user.email || 'Signed-in user';
+
+  } else {
+
+    // Show normal authentication interface
+    tabs.style.display = '';
+
+    loggedInPanel.classList.add('account-hidden');
+
+    showSignIn();
+
+  }
+
+  overlay.classList.add('is-open');
+  overlay.setAttribute('aria-hidden', 'false');
+
+  document.body.style.overflow = 'hidden';
+
+  if (!user) {
     setTimeout(() => {
       document.getElementById('loginEmail').focus();
     }, 100);
-
+  } else {
+    document.getElementById('logoutBtn').focus();
   }
+
+}
 
   // CLOSE DIALOGUE
   function closeAccount() {
@@ -10999,6 +11096,54 @@ thinking.innerHTML = `
   openBtn.addEventListener('click', openAccount);
   closeBtn.addEventListener('click', closeAccount);
 
+// FIREBASE LOGOUT
+document.getElementById('logoutBtn')
+  .addEventListener('click', async function () {
+
+    const logoutButton = this;
+    const api = window.firebaseAuthAPI;
+    const auth = window.firebaseAuth;
+
+    if (!api || !auth) {
+      alert('Authentication is not ready. Please try again.');
+      return;
+    }
+
+    logoutButton.disabled = true;
+    logoutButton.textContent = 'Logging out...';
+
+    try {
+
+      await api.signOut(auth);
+
+      // Close account popup
+      closeAccount();
+
+      // Show logout confirmation
+      const toast = document.getElementById('logoutToast');
+
+      toast.classList.add('show');
+
+      setTimeout(function () {
+        toast.classList.remove('show');
+      }, 3500);
+
+    } catch (error) {
+
+      console.error('Logout error:', error);
+
+      alert('Unable to log out. Please try again.');
+
+    } finally {
+
+      logoutButton.disabled = false;
+      logoutButton.textContent = 'Logout';
+
+    }
+
+  });
+
+	
   signInTab.addEventListener('click', showSignIn);
   signUpTab.addEventListener('click', showSignUp);
 
@@ -11672,6 +11817,45 @@ showMessage(
     reload
 
   };
+
+	// ================= ACCOUNT SESSION SYNCHRONIZATION =================
+
+window.jaAuthUser = null;
+
+const accountButton =
+  document.getElementById('accountOpenBtn');
+
+onAuthStateChanged(auth, function(user) {
+
+  // Maintain current login state globally
+  window.jaAuthUser = user || null;
+
+  // Update Account button appearance
+  if (accountButton) {
+
+    if (user) {
+
+      accountButton.classList.add('is-logged-in');
+      accountButton.title = 'Logged in: ' + user.email;
+      accountButton.setAttribute(
+        'aria-label',
+        'Account - Logged in'
+      );
+
+    } else {
+
+      accountButton.classList.remove('is-logged-in');
+      accountButton.title = 'Account';
+      accountButton.setAttribute(
+        'aria-label',
+        'Open account'
+      );
+
+    }
+
+  }
+
+});
 
 // ================= ACCOUNT BUTTON LOGIN INDICATOR =================
 
