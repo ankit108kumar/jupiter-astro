@@ -4135,6 +4135,14 @@ html[data-palette="cosmic"] .cosmic-glow {
            required>
   </div>
 
+<div
+  id="signupMessage"
+  class="account-message"
+  role="status"
+  aria-live="polite"
+  hidden
+></div>
+	
   <div class="account-field">
     <label for="signupPassword">Set Password</label>
     <input type="password"
@@ -11034,5 +11042,264 @@ thinking.innerHTML = `
 </script>
 	
 
+<script>
+// ================= EMAIL VERIFICATION =================
+
+(function () {
+
+  const emailInput = document.getElementById('signupEmail');
+  const messageBox = document.getElementById('signupMessage');
+  const signUpForm = document.getElementById('signUpForm');
+
+  if (!emailInput || !messageBox || !signUpForm) {
+    console.error('Email verification: required HTML elements not found.');
+    return;
+  }
+
+  // Your existing Google Apps Script URL
+  const AUTH_CHECK_URL =
+    'https://script.google.com/macros/s/AKfycbx02wG3xKMKegEYNYMI-pQbmXhnPiielVJbYtPIXs0waU7150qys4Y1psaulXX1U4qx/exec';
+
+  // Frontend verification controls
+  const lastRequestAt = {};
+  let verifiedEmail = '';
+  let requestInProgress = false;
+
+  // Display messages
+  function showMessage(message, type) {
+
+    messageBox.hidden = false;
+    messageBox.className = 'account-message ' + (type || '');
+    messageBox.textContent = message;
+
+  }
+
+  // Clear verification whenever email changes
+  function clearVerification() {
+
+    verifiedEmail = '';
+
+  }
+
+  // ================= VERIFY EMAIL =================
+
+  function verifyEmail() {
+
+    const email = emailInput.value.trim().toLowerCase();
+
+    // Empty field
+    if (!email) {
+      messageBox.hidden = true;
+      clearVerification();
+      return;
+    }
+
+    // Validate email format before sending request
+    if (!emailInput.checkValidity()) {
+
+      clearVerification();
+
+      showMessage(
+        'Please enter a valid email address.',
+        'error'
+      );
+
+      return;
+    }
+
+    // Do not verify an already verified email again
+    if (verifiedEmail === email) {
+      return;
+    }
+
+    // Prevent simultaneous requests
+    if (requestInProgress) {
+      return;
+    }
+
+    // Frontend five-second restriction
+    const now = Date.now();
+    const previousRequest = lastRequestAt[email] || 0;
+    const elapsed = now - previousRequest;
+
+    if (elapsed < 5000) {
+
+      const remaining = Math.ceil((5000 - elapsed) / 1000);
+
+      showMessage(
+        'Please wait ' + remaining +
+        ' second(s) before checking this email again.',
+        'error'
+      );
+
+      return;
+    }
+
+    // Record request timestamp
+    lastRequestAt[email] = now;
+
+    requestInProgress = true;
+
+    showMessage('⏳ Verifying email...', '');
+
+    // Create a unique callback name for JSONP
+    const callbackName =
+      'emailVerificationCallback_' +
+      Date.now() + '_' +
+      Math.floor(Math.random() * 100000);
+
+    const script = document.createElement('script');
+
+    const params = new URLSearchParams({
+      action: 'verifyEmail',
+      email: email,
+      callback: callbackName
+    });
+
+    script.src = AUTH_CHECK_URL + '?' + params.toString();
+
+    let completed = false;
+
+    // Clean up request
+    function cleanup() {
+
+      if (completed) return;
+
+      completed = true;
+
+      clearTimeout(timeout);
+
+      requestInProgress = false;
+
+      script.remove();
+
+      delete window[callbackName];
+
+    }
+
+    // Prevent the interface from waiting indefinitely
+    const timeout = setTimeout(function () {
+
+      cleanup();
+
+      showMessage(
+        'Verification timed out. Please try again later.',
+        'error'
+      );
+
+    }, 15000);
+
+    // Receive response from Google Apps Script
+    window[callbackName] = function (result) {
+
+      cleanup();
+
+      // If email changed while request was running,
+      // verify the newly entered email instead.
+      if (emailInput.value.trim().toLowerCase() !== email) {
+        verifyEmail();
+        return;
+      }
+
+      // Request rejected by backend cooldown
+      if (result.status === 'rate_limited') {
+
+        showMessage(
+          'Please wait ' + result.retryAfter +
+          ' second(s) before trying again.',
+          'error'
+        );
+
+        return;
+      }
+
+      // Authorized email
+      if (result.success && result.authorized === true) {
+
+        verifiedEmail = email;
+
+        showMessage(
+          '✓ Email authorized successfully.',
+          'success'
+        );
+
+        return;
+      }
+
+      // Unauthorized email
+      if (result.success && result.authorized === false) {
+
+        clearVerification();
+
+        showMessage(
+          'This email ID ' + email +
+          ' is not authorized. Please contact consult@jupiterastrology108.com for authorization.',
+          'error'
+        );
+
+        return;
+      }
+
+      // Other server errors
+      showMessage(
+        'Unable to verify email. Please try again later.',
+        'error'
+      );
+
+    };
+
+    // Handle network or script-loading failure
+    script.onerror = function () {
+
+      cleanup();
+
+      showMessage(
+        'Verification request failed. Please try again later.',
+        'error'
+      );
+
+    };
+
+    document.body.appendChild(script);
+
+  }
+
+  // Trigger verification when user clicks outside
+  // or presses Tab to leave the email field
+  emailInput.addEventListener('blur', verifyEmail);
+
+  // If the user edits the email, remove previous verification
+  emailInput.addEventListener('input', function () {
+
+    clearVerification();
+
+    messageBox.hidden = true;
+
+  });
+
+  // Prevent password form submission without authorization
+  signUpForm.addEventListener('submit', function (e) {
+
+    const currentEmail =
+      emailInput.value.trim().toLowerCase();
+
+    if (!currentEmail || currentEmail !== verifiedEmail) {
+
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      showMessage(
+        'Please verify your email address before setting your password.',
+        'error'
+      );
+
+    }
+
+  }, true);
+
+})();
+</script>
+
+	
 </body>
 </html>
