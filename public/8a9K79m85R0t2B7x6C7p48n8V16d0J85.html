@@ -11136,15 +11136,14 @@ if (logoutBtn) {
 
       alert('Unable to log out. Please try again.');
 
-    } finally {
-
+           } finally {
       logoutButton.disabled = false;
       logoutButton.textContent = 'Logout';
-
     }
 
   });
 
+} // Closes if (logoutBtn)
 	
   signInTab.addEventListener('click', showSignIn);
   signUpTab.addEventListener('click', showSignUp);
