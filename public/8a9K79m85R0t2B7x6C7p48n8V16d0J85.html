@@ -6829,6 +6829,98 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 })();
+
+
+/* ==========================================
+   COPY / EXPORT MENU — OPEN / CLOSE
+========================================== */
+
+document.addEventListener('click', function (e) {
+
+  const trigger = e.target.closest('.copy-export-trigger');
+
+  // Clicked on a Copy / Export button
+  if (trigger) {
+    const control = trigger.closest('.copy-export-control');
+    const menu = control?.querySelector('.copy-export-menu');
+
+    if (!menu) return;
+
+    // Close other open export menus
+    document.querySelectorAll('.copy-export-menu').forEach(otherMenu => {
+      if (otherMenu !== menu) {
+        otherMenu.hidden = true;
+
+        const otherTrigger = otherMenu
+          .closest('.copy-export-control')
+          ?.querySelector('.copy-export-trigger');
+
+        otherTrigger?.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Toggle the clicked menu
+    menu.hidden = !menu.hidden;
+    trigger.setAttribute('aria-expanded', String(!menu.hidden));
+
+    return;
+  }
+
+  // Click outside: close all export menus
+  if (!e.target.closest('.copy-export-control')) {
+    document.querySelectorAll('.copy-export-menu').forEach(menu => {
+      menu.hidden = true;
+
+      const button = menu
+        .closest('.copy-export-control')
+        ?.querySelector('.copy-export-trigger');
+
+      button?.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+});
+
+
+/* ==========================================
+   COPY / EXPORT — RADIO SELECTION
+========================================== */
+
+document.addEventListener('change', function (e) {
+
+  if (!e.target.matches('.copy-export-option input[type="radio"]')) {
+    return;
+  }
+
+  const selectedOption = e.target.value;
+
+  const control = e.target.closest('.copy-export-control');
+
+  if (!control) return;
+
+  const prefix = control.dataset.exportPrefix;
+  const section = control.dataset.exportSection;
+  const targetId = control.dataset.exportTarget;
+
+  const targetElement = document.getElementById(targetId);
+
+  if (!targetElement) {
+    console.warn('Export target not found:', targetId);
+    return;
+  }
+
+  console.log('Copy / Export selection:', {
+    action: selectedOption,
+    prefix,
+    section,
+    targetId,
+    targetElement
+  });
+
+});
+
+
+	
 </script>
 	
 <script type="module" src="/Firebase.js"></script>
