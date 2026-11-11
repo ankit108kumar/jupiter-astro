@@ -7201,13 +7201,15 @@ async function copyExportContent(targetElement) {
    COPY / EXPORT — RADIO SELECTION
 ========================================== */
 
-document.addEventListener('change', async function (e) {
+document.addEventListener('click', async function (e) {
 
-  if (!e.target.matches('.copy-export-option input[type="radio"]')) {
+  const optionButton = e.target.closest('.copy-export-option');
+
+  if (!optionButton) {
     return;
   }
 
-  const selectedOption = e.target.value;
+  const selectedOption = optionButton.dataset.exportAction;
 
   const control = e.target.closest('.copy-export-control');
 
