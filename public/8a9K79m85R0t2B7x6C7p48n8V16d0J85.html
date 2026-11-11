@@ -7329,6 +7329,7 @@ if (selectedOption === 'copy') {
     alert('Copy failed: ' + error.message);
   }
 
+
 } else if (selectedOption === 'png') {
 
   try {
@@ -7341,7 +7342,20 @@ if (selectedOption === 'copy') {
     alert('PNG download failed: ' + error.message);
   }
 
+} else if (selectedOption === 'pdf') {
+
+  try {
+    const result = await downloadChartPDF(targetElement);
+    console.log(result);
+    alert(result);
+
+  } catch (error) {
+    console.error('PDF download failed:', error);
+    alert('PDF download failed: ' + error.message);
+  }
+
 }
+
 
 
 });
