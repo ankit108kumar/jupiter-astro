@@ -7098,9 +7098,10 @@ async function copyExportContent(targetElement) {
    COMMON COPY FUNCTION
 ========================================== */
 
+
 async function copyExportContent(targetElement) {
 
-  // 1. If the target contains a chart, copy it as PNG
+  // 1. If the target contains a chart, copy it as high-resolution PNG
   const svg = targetElement.matches('svg')
     ? targetElement
     : targetElement.querySelector('svg');
@@ -7113,6 +7114,7 @@ async function copyExportContent(targetElement) {
 
     const rect = svg.getBoundingClientRect();
 
+    // Original displayed dimensions
     const width = Math.max(1, Math.ceil(rect.width));
     const height = Math.max(1, Math.ceil(rect.height));
 
@@ -7139,12 +7141,26 @@ async function copyExportContent(targetElement) {
         img.onerror = reject;
       });
 
+      // High-resolution export: 3 times original dimensions
+      const scale = 3;
+
       const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
+
+      canvas.width = width * scale;
+      canvas.height = height * scale;
 
       const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, width, height);
+
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      ctx.drawImage(
+        img,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
 
       const pngBlob = await new Promise(resolve => {
         canvas.toBlob(resolve, 'image/png');
@@ -7158,7 +7174,7 @@ async function copyExportContent(targetElement) {
         new ClipboardItem({ 'image/png': pngBlob })
       ]);
 
-      return 'Chart image copied successfully.';
+      return 'High-resolution chart copied successfully (3× resolution).';
 
     } finally {
       URL.revokeObjectURL(objectUrl);
