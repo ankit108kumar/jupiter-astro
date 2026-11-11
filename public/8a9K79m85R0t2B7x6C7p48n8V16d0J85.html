@@ -6995,6 +6995,7 @@ document.addEventListener('click', function (e) {
 });
 
 
+
 async function downloadPlanetaryTablePDF(targetElement) {
 
   const table = targetElement.querySelector('table');
@@ -7011,39 +7012,30 @@ async function downloadPlanetaryTablePDF(targetElement) {
     format: 'a4'
   });
 
-  // Read colours from the displayed table
-  const getColor = (element, property, fallback) => {
-    const color = window.getComputedStyle(element)
-      .getPropertyValue(property).trim();
+  // Read the currently active website theme
+  const rootStyle = getComputedStyle(document.documentElement);
 
-    return color || fallback;
-  };
+  const themeColor = (variable, fallback) =>
+    rootStyle.getPropertyValue(variable).trim() || fallback;
 
-  const toRGB = (color, fallback) => {
+  // Convert CSS colours to RGB, including transparent colours
+  const toRGB = (color, background) => {
+
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
 
-    ctx.fillStyle = fallback;
+    ctx.fillStyle = background;
+    ctx.fillRect(0, 0, 1, 1);
+
     ctx.fillStyle = color;
+    ctx.fillRect(0, 0, 1, 1);
 
-    const value = ctx.fillStyle;
+    const pixel = ctx.getImageData(0, 0, 1, 1).data;
 
-    if (value.startsWith('#')) {
-      const hex = value.slice(1);
-      return [
-        parseInt(hex.slice(0, 2), 16),
-        parseInt(hex.slice(2, 4), 16),
-        parseInt(hex.slice(4, 6), 16)
-      ];
-    }
-
-    const match = value.match(/\d+/g);
-
-    return match
-      ? match.slice(0, 3).map(Number)
-      : [255, 255, 255];
+    return [pixel[0], pixel[1], pixel[2]];
   };
 
+  // Extract table headings and rows
   const headers = Array.from(
     table.querySelectorAll('thead th')
   );
@@ -7060,27 +7052,22 @@ async function downloadPlanetaryTablePDF(targetElement) {
     )
   );
 
-  const headerStyle = headers[0];
+  // Active theme variables
+  const paper = themeColor('--paper', '#F8FAFC');
+  const surface = themeColor('--surface', paper);
+  const ink = themeColor('--ink', '#0F172A');
+  const muted = themeColor('--muted', ink);
+  const line = themeColor('--line', '#CBD5E1');
+  const lineStrong = themeColor('--line-strong', line);
+  const saffronSoft = themeColor('--saffron-soft', surface);
 
-  const headerBackground = toRGB(
-    getColor(headerStyle, 'background-color', '#f5ebd7'),
-    '#f5ebd7'
-  );
-
-  const headerText = toRGB(
-    getColor(headerStyle, 'color', '#372d23'),
-    '#372d23'
-  );
-
-  const borderColor = toRGB(
-    getColor(table, 'border-color', '#cccccc'),
-    '#cccccc'
-  );
-
-  const textColor = toRGB(
-    getColor(table.querySelector('tbody td'), 'color', '#333333'),
-    '#333333'
-  );
+  // Resolve colours against the active theme
+  const surfaceRGB = toRGB(surface, paper);
+  const headerTextRGB = toRGB(muted, surface);
+  const bodyTextRGB = toRGB(ink, surface);
+  const borderRGB = toRGB(line, surface);
+  const headerBorderRGB = toRGB(lineStrong, surface);
+  const lagnaRGB = toRGB(saffronSoft, surface);
 
   const pdfTitle = 'Planetary Position Table';
 
@@ -7103,19 +7090,29 @@ async function downloadPlanetaryTablePDF(targetElement) {
       cellPadding: 1.5,
       overflow: 'linebreak',
       valign: 'middle',
-      textColor: textColor,
-      lineColor: borderColor,
+      fillColor: surfaceRGB,
+      textColor: bodyTextRGB,
+      lineColor: borderRGB,
       lineWidth: 0.15
     },
 
     headStyles: {
-      fillColor: headerBackground,
-      textColor: headerText,
+      fillColor: surfaceRGB,
+      textColor: headerTextRGB,
+      lineColor: headerBorderRGB,
       fontStyle: 'bold'
     },
 
     alternateRowStyles: {
-      fillColor: [250, 250, 250]
+      fillColor: surfaceRGB
+    },
+
+    didParseCell: function(data) {
+
+      // Highlight Lagna row using active theme accent
+      if (data.section === 'body' && data.row.index === 0) {
+        data.cell.styles.fillColor = lagnaRGB;
+      }
     },
 
     margin: {
@@ -7125,7 +7122,7 @@ async function downloadPlanetaryTablePDF(targetElement) {
       bottom: 12
     },
 
-    didDrawPage: function (data) {
+    didDrawPage: function(data) {
 
       pdf.setFontSize(8);
       pdf.setFont('helvetica', 'normal');
@@ -7149,7 +7146,6 @@ async function downloadPlanetaryTablePDF(targetElement) {
   return 'Planetary table PDF downloaded successfully.';
 }
 	
-
 async function downloadChartPDF(targetElement) {
 
   const svg = targetElement.matches('svg')
