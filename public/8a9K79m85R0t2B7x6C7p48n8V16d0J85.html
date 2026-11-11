@@ -7048,8 +7048,10 @@ async function downloadPlanetaryTablePDF(targetElement) {
 
   const body = rows.map(tr =>
     Array.from(tr.querySelectorAll('td')).map(td =>
-      td.innerText.trim().replace(/\s+/g, ' ')
-    )
+	td.innerText.trim()
+  .replace(/′/g, "'")
+  .replace(/″/g, '"')
+  .replace(/\s+/g, ' ')    )
   );
 
   // Active theme variables
@@ -7097,12 +7099,11 @@ async function downloadPlanetaryTablePDF(targetElement) {
     },
 
     headStyles: {
-      fillColor: surfaceRGB,
-      textColor: headerTextRGB,
-      lineColor: headerBorderRGB,
-      fontStyle: 'bold'
-    },
-
+  fillColor: lagnaRGB,
+  textColor: headerTextRGB,
+  lineColor: headerBorderRGB,
+  fontStyle: 'bold'
+},
     alternateRowStyles: {
       fillColor: surfaceRGB
     },
