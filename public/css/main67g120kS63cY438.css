@@ -1308,15 +1308,77 @@ html[data-palette="celestial"] body {
 }
 
 /* Vimshottari Timeline Scale Styling */
-.tl { position: relative; margin-top: 6px; }
-.tl-bar { display: flex; height: 38px; border-radius: 6px; overflow: hidden; border: 1px solid var(--line-strong); }
-.tl-seg { display: flex; align-items: center; justify-content: center; font-size: .78rem; font-weight: 700; color: #020617; overflow: hidden; white-space: nowrap; border-right: 1px solid rgba(2,6,23,.4); min-width: 0; cursor: pointer; border-top: 0; border-bottom: 0; border-left: 0; padding: 0; }
-.tl-seg:last-child { border-right: 0; }
-.tl-now { position: absolute; top: -6px; bottom: 16px; width: 2px; background: var(--saffron); }
-.tl-now::after { content: "Today"; position: absolute; top: -16px; left: 50%; transform: translateX(-50%); font-size: .68rem; color: var(--saffron); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
-.tl-ticks { position: relative; height: 18px; font-size: .7rem; color: var(--muted); font-family: var(--font-data); }
-.tl-ticks span { position: absolute; transform: translateX(-50%); top: 2px; white-space: nowrap; }
 
+.tl {
+  position: relative;
+  margin-top: 6px;
+}
+
+.tl-bar {
+  display: flex;
+  height: 38px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+}
+
+.tl-seg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .78rem;
+  font-weight: 700;
+  color: #020617;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 1px solid rgba(2,6,23,.4);
+  min-width: 0;
+  cursor: pointer;
+  border-top: 0;
+  border-bottom: 0;
+  border-left: 0;
+  padding: 0;
+}
+
+.tl-seg:last-child {
+  border-right: 0;
+}
+
+.tl-now {
+  position: absolute;
+  top: -6px;
+  bottom: 16px;
+  width: 2px;
+  background: var(--saffron);
+}
+
+.tl-now::after {
+  content: "Today";
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: .68rem;
+  color: var(--saffron);
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.tl-ticks {
+  position: relative;
+  height: 18px;
+  font-size: .7rem;
+  color: var(--muted);
+  font-family: var(--font-data);
+}
+
+.tl-ticks span {
+  position: absolute;
+  transform: translateX(-50%);
+  top: 2px;
+  white-space: nowrap;
+}
 /* ===== Jupiter Astrology: Theme-Synced Quill Editor ===== */
 
 .desc-editor,
@@ -1769,8 +1831,6 @@ tr.lagna td, tr.now td { background: var(--saffron-soft); }
 .vcard b { font-size: .85rem; }
 .vcard small { color: var(--muted); font-size: .72rem; }
 
-.tl-bar { display: flex; height: 32px; border-radius: 6px; overflow: hidden; border: 1px solid var(--line-strong); }
-.tl-seg { display: flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 700; color: #000; overflow: hidden; border-right: 1px solid rgba(0,0,0,.3); cursor: pointer; border-top:0; border-bottom:0; border-left:0; padding:0; }
 .chain { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
 .chain div { padding: 8px 10px; display: grid; gap: 1px; }
 .chain div + div { border-left: 1px solid var(--line); }
