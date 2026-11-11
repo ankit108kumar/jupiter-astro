@@ -7141,8 +7141,8 @@ async function copyExportContent(targetElement) {
         img.onerror = reject;
       });
 
-      // High-resolution export: 3 times original dimensions
-      const scale = 3;
+      // High-resolution export: 5 times original dimensions
+      const scale = 5;
 
       const canvas = document.createElement('canvas');
 
@@ -7174,7 +7174,7 @@ async function copyExportContent(targetElement) {
         new ClipboardItem({ 'image/png': pngBlob })
       ]);
 
-      return 'High-resolution chart copied successfully (3× resolution).';
+      return 'High-resolution chart copied successfully (5× resolution).';
 
     } finally {
       URL.revokeObjectURL(objectUrl);
