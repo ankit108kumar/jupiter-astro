@@ -3535,6 +3535,84 @@ function getSecondaryChart(k, key) {
 }
 
 
+/* ==========================================
+   COMMON COPY / EXPORT CONTROL
+========================================== */
+
+function createCopyExportButton({
+  prefix,
+  section,
+  targetId,
+  options = ['copy', 'png', 'pdf']
+}) {
+
+  const exportOptions = {
+    copy: 'Copy to Clipboard',
+    png: 'Export as PNG',
+    pdf: 'Export as PDF',
+    csv: 'Export as CSV',
+    tsv: 'Export as TSV'
+  };
+
+  // Unique radio group for every chart and section
+  const groupName = `export-${prefix}-${section}`;
+
+  // Unique menu ID
+  const menuId = `${groupName}-menu`;
+
+  const validOptions = options.filter(
+    option => exportOptions[option]
+  );
+
+  if (!validOptions.length) return '';
+
+  return `
+    <div class="copy-export-control"
+         data-export-prefix="${prefix}"
+         data-export-section="${section}"
+         data-export-target="${targetId}">
+
+      <button
+        type="button"
+        class="copy-export-trigger"
+        aria-expanded="false"
+        aria-controls="${menuId}"
+        title="Copy or Export">
+
+        <span>Copy / Export</span>
+        <span class="export-chevron">⌄</span>
+
+      </button>
+
+      <div class="copy-export-menu"
+           id="${menuId}"
+           hidden>
+
+        <div class="copy-export-heading">
+          Choose an action
+        </div>
+
+        ${validOptions.map((option, index) => `
+          <label class="copy-export-option">
+
+            <input
+              type="radio"
+              name="${groupName}"
+              value="${option}"
+              ${index === 0 ? 'checked' : ''}>
+
+            <span>${exportOptions[option]}</span>
+
+          </label>
+        `).join('')}
+
+      </div>
+
+    </div>
+  `;
+}
+	
+
 /* ================= COMPOSITE TAB RENDERERS ================= */
 const RenderTabs = {
   overview(k, prefix) {
