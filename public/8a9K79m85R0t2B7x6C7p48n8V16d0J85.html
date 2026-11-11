@@ -7199,7 +7199,7 @@ async function copyExportContent(targetElement) {
    COPY / EXPORT — RADIO SELECTION
 ========================================== */
 
-document.addEventListener('change', function (e) {
+document.addEventListener('change', async function (e) {
 
   if (!e.target.matches('.copy-export-option input[type="radio"]')) {
     return;
@@ -7222,13 +7222,16 @@ document.addEventListener('change', function (e) {
     return;
   }
 
-  console.log('Copy / Export selection:', {
-    action: selectedOption,
-    prefix,
-    section,
-    targetId,
-    targetElement
-  });
+  if (selectedOption === 'copy') {
+  try {
+    const result = await copyExportContent(targetElement);
+    console.log(result);
+    alert(result);
+  } catch (error) {
+    console.error('Copy failed:', error);
+    alert('Copy failed: ' + error.message);
+  }
+}
 
 });
 
