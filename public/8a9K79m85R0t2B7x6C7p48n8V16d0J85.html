@@ -7322,27 +7322,25 @@ async function downloadChartPNG(targetElement) {
 }
 
 
+
 /* ==========================================
-   AV CHART + TABLE COPY AS IMAGE
+   AV / AP CHART + TABLE COPY AS IMAGE
 ========================================== */
 
-async function copyAVContent(targetElement) {
+async function copyChartAndTableContent(targetElement, section) {
 
   if (typeof html2canvas === 'undefined') {
     throw new Error('Image capture library not loaded.');
   }
 
-  // Capture the complete AV container
   const canvas = await html2canvas(targetElement, {
 
-    scale: 4,
+    scale: 7,
 
     useCORS: true,
 
-backgroundColor: getComputedStyle(targetElement).backgroundColor === 'rgba(0, 0, 0, 0)'
-  ? getComputedStyle(document.querySelector('.vfeature')).backgroundColor
-  : getComputedStyle(targetElement).backgroundColor,
-	  
+    backgroundColor: null,
+
     logging: false,
 
     allowTaint: false,
@@ -7352,23 +7350,23 @@ backgroundColor: getComputedStyle(targetElement).backgroundColor === 'rgba(0, 0,
 
   });
 
-  // Convert captured canvas into PNG
   const pngBlob = await new Promise(resolve => {
     canvas.toBlob(resolve, 'image/png');
   });
 
   if (!pngBlob) {
-    throw new Error('Unable to generate AV image.');
+    throw new Error('Unable to generate image.');
   }
 
-  // Copy PNG image to clipboard
   await navigator.clipboard.write([
     new ClipboardItem({
       'image/png': pngBlob
     })
   ]);
 
-  return 'Sarvashtakavarga chart and table copied successfully as a high-resolution image.';
+  return section === 'av'
+    ? 'Sarvashtakavarga chart and table copied successfully.'
+    : 'Arudha Padas chart and table copied successfully.';
 }
 
 	
@@ -7524,9 +7522,11 @@ const control = optionButton.closest('.copy-export-control');
 if (selectedOption === 'copy') {
 
   try {
-const result = section === 'av'
-  ? await copyAVContent(targetElement)
-  : await copyExportContent(targetElement);    console.log(result);
+const result = (section === 'av' || section === 'arudha')
+  ? await copyChartAndTableContent(targetElement, section)
+  : await copyExportContent(targetElement);
+	  
+	  console.log(result);
     alert(result);
 
   } catch (error) {
