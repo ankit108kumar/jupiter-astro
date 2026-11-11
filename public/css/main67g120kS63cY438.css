@@ -4143,7 +4143,6 @@ padding: 28px 30px;
 width: 220px;
 max-width: min(220px, 85vw);
 box-sizing: border-box;
-  min-width: 190px;
   padding: 8px;
   border: 1px solid var(--line, #ddd);
   border-radius: 10px;
