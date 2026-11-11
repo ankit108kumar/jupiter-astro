@@ -1845,7 +1845,7 @@ details summary { cursor: pointer; font-size: .8rem; color: var(--saffron); font
   .wrap {
     padding-inline: 12px;
   }
-  , .research-chart {
+  .research-chart {
     padding: 14px;
   }
 }
