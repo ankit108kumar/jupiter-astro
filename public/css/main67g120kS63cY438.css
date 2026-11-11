@@ -4127,8 +4127,8 @@ padding: 28px 30px;
 }
 
 .copy-export-trigger:hover {
-  background: var(--surface-2, #f5f1ed);
-  border-color: var(--accent, #c58b45);
+  background: var(--surface-alt);
+  border-color: var(--saffron);
 }
 
 .export-chevron {
@@ -4144,7 +4144,7 @@ padding: 28px 30px;
   padding: 8px;
   border: 1px solid var(--line, #ddd);
   border-radius: 10px;
-  background: var(--surface, #fff);
+  background: var(--surface);
   color: var(--ink, #333);
   box-shadow: 0 6px 22px rgba(0, 0, 0, 0.14);
   z-index: 1000;
@@ -4172,11 +4172,14 @@ padding: 28px 30px;
 }
 
 .copy-export-option:hover {
-  background: var(--surface-2, #f5f1ed);
+  background: var(--surface-alt);
 }
 
 .copy-export-option input {
   margin: 0;
-  accent-color: var(--accent, #c58b45);
+  accent-color: var(--saffron);
   cursor: pointer;
+}
+.copy-export-control[hidden] {
+  display: none !important;
 }
