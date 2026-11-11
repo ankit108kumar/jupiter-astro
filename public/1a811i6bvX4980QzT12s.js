@@ -1,3 +1,8 @@
+
+  /* ------------------------------------------
+Jupiter Astro AI Assistant
+------------------------------------------ */
+
 (function () {
 
   const widget = document.getElementById("jupiter-ai-widget");
