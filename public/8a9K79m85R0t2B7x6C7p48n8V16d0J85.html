@@ -6994,6 +6994,95 @@ document.addEventListener('click', function (e) {
 });
 
 
+async function downloadChartPDF(targetElement) {
+
+  const svg = targetElement.matches('svg')
+    ? targetElement
+    : targetElement.querySelector('svg');
+
+  if (!svg) {
+    throw new Error('No chart found for PDF export.');
+  }
+
+  const clone = svg.cloneNode(true);
+
+  clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+  const rect = svg.getBoundingClientRect();
+
+  const width = Math.max(1, Math.ceil(rect.width));
+  const height = Math.max(1, Math.ceil(rect.height));
+
+  clone.setAttribute('width', width);
+  clone.setAttribute('height', height);
+
+  const svgText = new XMLSerializer().serializeToString(clone);
+
+  const svgBlob = new Blob(
+    [svgText],
+    { type: 'image/svg+xml;charset=utf-8' }
+  );
+
+  const objectUrl = URL.createObjectURL(svgBlob);
+
+  try {
+
+    const img = new Image();
+
+    img.src = objectUrl;
+
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+    });
+
+    const EXPORT_SCALE = 5;
+
+    const canvas = document.createElement('canvas');
+
+    canvas.width = width * EXPORT_SCALE;
+    canvas.height = height * EXPORT_SCALE;
+
+    const ctx = canvas.getContext('2d');
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    const pngData = canvas.toDataURL('image/png');
+
+    const { jsPDF } = window.jspdf;
+
+    // Choose page orientation according to chart proportions
+    const orientation = width >= height ? 'landscape' : 'portrait';
+
+    const pdf = new jsPDF({
+      orientation: orientation,
+      unit: 'px',
+      format: [width, height],
+      compress: true
+    });
+
+    pdf.addImage(
+      pngData,
+      'PNG',
+      0,
+      0,
+      width,
+      height
+    );
+
+    pdf.save('Kundali-Chart.pdf');
+
+    return 'PDF downloaded successfully.';
+
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+	
+
 async function downloadChartPNG(targetElement) {
 
   const svg = targetElement.matches('svg')
