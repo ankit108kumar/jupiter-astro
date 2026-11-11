@@ -3605,16 +3605,18 @@ return `
 
       <div class="copy-export-heading">Choose an action</div>
 
-      ${validOptions.map((option, index) => `
-        <label class="copy-export-option">
-          <input
-            type="radio"
-            name="${groupName}"
-            value="${option}"
-            ${index === 0 ? 'checked' : ''}>
-          <span>${exportOptions[option]}</span>
-        </label>
-      `).join('')}
+      ${validOptions.map(option => `
+  <button
+    type="button"
+    class="copy-export-option"
+    data-export-action="${option}">
+    ${option === 'copy' ? '📋' :
+      option === 'png' ? '🖼️' :
+      option === 'pdf' ? '📄' :
+      option === 'csv' ? '📊' : '📑'}
+    <span>${exportOptions[option]}</span>
+  </button>
+`).join('')}
 
     </div>
   </div>
