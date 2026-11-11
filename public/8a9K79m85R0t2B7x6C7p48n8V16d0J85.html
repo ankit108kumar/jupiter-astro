@@ -7501,8 +7501,9 @@ if (selectedOption === 'copy') {
 } else if (selectedOption === 'pdf') {
 
   try {
-    const result = await downloadChartPDF(targetElement);
-    console.log(result);
+const result = section === 'planets'
+  ? await downloadPlanetaryTablePDF(targetElement)
+  : await downloadChartPDF(targetElement);    console.log(result);
     alert(result);
 
   } catch (error) {
