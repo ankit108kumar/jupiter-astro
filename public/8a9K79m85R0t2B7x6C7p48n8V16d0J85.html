@@ -6883,6 +6883,107 @@ document.addEventListener('click', function (e) {
 
 
 /* ==========================================
+   COMMON COPY FUNCTION
+========================================== */
+
+async function copyExportContent(targetElement) {
+
+  // 1. If the target contains a chart, copy it as PNG
+  const svg = targetElement.matches('svg')
+    ? targetElement
+    : targetElement.querySelector('svg');
+
+  if (svg) {
+
+    const clone = svg.cloneNode(true);
+
+    clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+    const rect = svg.getBoundingClientRect();
+
+    const width = Math.max(1, Math.ceil(rect.width));
+    const height = Math.max(1, Math.ceil(rect.height));
+
+    clone.setAttribute('width', width);
+    clone.setAttribute('height', height);
+
+    const svgText = new XMLSerializer().serializeToString(clone);
+
+    const svgBlob = new Blob(
+      [svgText],
+      { type: 'image/svg+xml;charset=utf-8' }
+    );
+
+    const objectUrl = URL.createObjectURL(svgBlob);
+
+    try {
+
+      const img = new Image();
+
+      img.src = objectUrl;
+
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      const pngBlob = await new Promise(resolve => {
+        canvas.toBlob(resolve, 'image/png');
+      });
+
+      if (!pngBlob) {
+        throw new Error('Unable to create chart image.');
+      }
+
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': pngBlob })
+      ]);
+
+      return 'Chart image copied successfully.';
+
+    } finally {
+      URL.revokeObjectURL(objectUrl);
+    }
+  }
+
+  // 2. If the target contains a table, copy it as TSV
+  const rows = targetElement.querySelectorAll('table tr');
+
+  if (rows.length) {
+
+    const tsv = Array.from(rows).map(row => {
+
+      return Array.from(row.querySelectorAll('th, td'))
+        .map(cell => cell.innerText.trim().replace(/\s+/g, ' '))
+        .join('\t');
+
+    }).join('\n');
+
+    await navigator.clipboard.writeText(tsv);
+
+    return 'Table copied successfully.';
+  }
+
+  // 3. Otherwise, copy the section's text
+  const text = targetElement.innerText.trim();
+
+  if (!text) {
+    throw new Error('No copyable content found.');
+  }
+
+  await navigator.clipboard.writeText(text);
+
+  return 'Text copied successfully.';
+}
+
+/* ==========================================
    COPY / EXPORT — RADIO SELECTION
 ========================================== */
 
