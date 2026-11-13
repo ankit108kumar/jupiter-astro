@@ -250,3 +250,236 @@ html.ja-lib-app-mode #ja-reference-library-window .ja-lib-window-title {
     height: 28px;
   }
 }
+
+
+/* =========================================================
+   LIBRARY THEME SYSTEM
+   Modes:
+   - website: inherit Jupiter Astro's live CSS theme variables
+   - apple: isolated Apple-style light palette for this window only
+   ========================================================= */
+
+#ja-reference-library-window[data-ja-lib-theme="website"] {
+  --ja-lib-bg: var(--paper, #F8FAFC);
+  --ja-lib-panel: var(--surface, #FFFFFF);
+  --ja-lib-panel-alt: var(--surface-alt, #F1F5F9);
+  --ja-lib-ink: var(--ink, #0F172A);
+  --ja-lib-muted: var(--muted, #64748B);
+  --ja-lib-line: var(--line, #E2E8F0);
+  --ja-lib-line-strong: var(--line-strong, #CBD5E1);
+  --ja-lib-accent: var(--saffron, #EA580C);
+  --ja-lib-accent-soft: var(--saffron-soft, rgba(234,88,12,.12));
+  --ja-lib-good: var(--good, #059669);
+  --ja-lib-good-soft: var(--good-soft, rgba(5,150,105,.12));
+  --ja-lib-amber: var(--amber, #D97706);
+  --ja-lib-alert-bg: var(--amber-soft, rgba(217,119,6,.12));
+  --ja-lib-alert-line: color-mix(in srgb, var(--ja-lib-amber) 34%, transparent);
+  --ja-lib-alert-ink: var(--ja-lib-amber);
+  --ja-lib-title-top: var(--surface, #FFFFFF);
+  --ja-lib-title-bottom: var(--surface-alt, #F1F5F9);
+  --ja-lib-hover: color-mix(in srgb, var(--ja-lib-panel-alt) 78%, var(--ja-lib-ink) 5%);
+  --ja-lib-active-bg: var(--ja-lib-accent-soft);
+  --ja-lib-active-ink: var(--ja-lib-accent);
+  --ja-lib-icon-bg: var(--ja-lib-accent-soft);
+  --ja-lib-icon-ink: var(--ja-lib-accent);
+  --ja-lib-shadow: 0 24px 80px rgba(0,0,0,.28), 0 4px 18px rgba(0,0,0,.12);
+  --bg: var(--ja-lib-bg);
+  --line: var(--ja-lib-line);
+  --ink: var(--ja-lib-ink);
+  --muted: var(--ja-lib-muted);
+  color: var(--ja-lib-ink);
+  background: var(--ja-lib-bg);
+  border-color: var(--ja-lib-line);
+  box-shadow: var(--ja-lib-shadow);
+  color-scheme: light dark;
+}
+
+#ja-reference-library-window[data-ja-lib-theme="apple"] {
+  --ja-lib-bg: #F5F5F7;
+  --ja-lib-panel: #FFFFFF;
+  --ja-lib-panel-alt: #EFEFF2;
+  --ja-lib-ink: #1D1D1F;
+  --ja-lib-muted: #6E6E73;
+  --ja-lib-line: rgba(60,60,67,.16);
+  --ja-lib-line-strong: rgba(60,60,67,.24);
+  --ja-lib-accent: #007AFF;
+  --ja-lib-accent-soft: rgba(0,122,255,.10);
+  --ja-lib-good: #248A3D;
+  --ja-lib-good-soft: rgba(36,138,61,.12);
+  --ja-lib-amber: #9A6700;
+  --ja-lib-alert-bg: #FFF7E5;
+  --ja-lib-alert-line: #F0D89A;
+  --ja-lib-alert-ink: #815600;
+  --ja-lib-title-top: #FAFAFC;
+  --ja-lib-title-bottom: #EDEDF0;
+  --ja-lib-hover: #F1F1F4;
+  --ja-lib-active-bg: #E6F1FF;
+  --ja-lib-active-ink: #0066CC;
+  --ja-lib-icon-bg: #EAF3FF;
+  --ja-lib-icon-ink: #007AFF;
+  --ja-lib-shadow: 0 24px 80px rgba(0,0,0,.26), 0 4px 18px rgba(0,0,0,.12);
+  --bg: var(--ja-lib-bg);
+  --line: var(--ja-lib-line);
+  --ink: var(--ja-lib-ink);
+  --muted: var(--ja-lib-muted);
+  color: var(--ja-lib-ink);
+  background: var(--ja-lib-bg);
+  border-color: var(--ja-lib-line);
+  box-shadow: var(--ja-lib-shadow);
+  color-scheme: light;
+}
+
+/* Make all Library surfaces consume the selected mode's tokens. */
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-titlebar {
+  color: var(--ja-lib-ink);
+  background: linear-gradient(var(--ja-lib-title-top), var(--ja-lib-title-bottom));
+  border-bottom-color: var(--ja-lib-line);
+}
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-window-title,
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-heading,
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-empty strong {
+  color: var(--ja-lib-ink);
+}
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-sidebar {
+  background: var(--ja-lib-panel-alt);
+  border-right-color: var(--ja-lib-line);
+}
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-side-heading,
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-status,
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-search-icon {
+  color: var(--ja-lib-muted);
+}
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-provider {
+  color: var(--ja-lib-ink);
+}
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-provider:hover {
+  background: var(--ja-lib-hover);
+}
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-provider.active {
+  color: var(--ja-lib-active-ink);
+  background: var(--ja-lib-active-bg);
+}
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-content {
+  background: var(--ja-lib-panel);
+  border-color: var(--ja-lib-line);
+}
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-empty {
+  color: var(--ja-lib-muted);
+}
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-empty-symbol {
+  color: var(--ja-lib-icon-ink);
+  background: var(--ja-lib-icon-bg);
+}
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-search {
+  color: var(--ja-lib-ink);
+  background: var(--ja-lib-panel);
+  border-color: var(--ja-lib-line-strong);
+}
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-search::placeholder {
+  color: var(--ja-lib-muted);
+  opacity: .78;
+}
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-search:focus {
+  border-color: var(--ja-lib-accent);
+  box-shadow: 0 0 0 3px var(--ja-lib-accent-soft);
+}
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-readonly {
+  color: var(--ja-lib-good);
+  background: var(--ja-lib-good-soft);
+}
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-action {
+  color: var(--ja-lib-muted);
+  background: var(--ja-lib-panel-alt);
+  border-color: var(--ja-lib-line-strong);
+}
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-action.primary {
+  color: #fff;
+  background: var(--ja-lib-accent);
+  border-color: var(--ja-lib-accent);
+}
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-notice {
+  color: var(--ja-lib-alert-ink);
+  background: var(--ja-lib-alert-bg);
+  border-color: var(--ja-lib-alert-line);
+}
+#ja-reference-library-launcher {
+  color: var(--ja-lib-ink, #443a2d);
+  background: var(--ja-lib-panel, #f5f1e9);
+  border-color: var(--ja-lib-line, rgba(70,60,48,.13));
+}
+#ja-reference-library-launcher button {
+  color: inherit;
+}
+#ja-reference-library-launcher button:hover {
+  background: var(--ja-lib-hover, #ebe3d6);
+}
+
+/* Round top-right appearance/theme selector. */
+#ja-reference-library-window .ja-lib-titlebar-tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+  gap: 8px;
+  margin-left: auto;
+  position: relative;
+  z-index: 1;
+}
+#ja-reference-library-window .ja-lib-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--ja-lib-line-strong, #dedad2);
+  border-radius: 50%;
+  color: var(--ja-lib-ink, #45413b);
+  background: var(--ja-lib-panel, rgba(255,255,255,.72));
+  cursor: pointer;
+  box-shadow: 0 2px 7px rgba(0,0,0,.08);
+  transition: transform 160ms ease, background-color 180ms ease,
+              border-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+#ja-reference-library-window .ja-lib-theme-toggle:hover {
+  transform: translateY(-1px);
+  color: var(--ja-lib-accent, #007AFF);
+  border-color: var(--ja-lib-accent, #007AFF);
+  box-shadow: 0 4px 12px rgba(0,0,0,.12);
+}
+#ja-reference-library-window .ja-lib-theme-toggle:active {
+  transform: scale(.94);
+}
+#ja-reference-library-window .ja-lib-theme-toggle svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#ja-reference-library-window .ja-lib-fullscreen {
+  color: var(--ja-lib-ink, #625b50);
+  background: var(--ja-lib-panel, rgba(255,255,255,.45));
+  border-color: var(--ja-lib-line, rgba(70,60,48,.12));
+}
+#ja-reference-library-window .ja-lib-fullscreen:hover {
+  color: var(--ja-lib-accent, #49351d);
+  background: var(--ja-lib-hover, rgba(255,255,255,.9));
+}
+
+@media (max-width: 620px) {
+  #ja-reference-library-window .ja-lib-theme-toggle {
+    flex-basis: 31px;
+    width: 31px;
+    height: 31px;
+  }
+  #ja-reference-library-window .ja-lib-titlebar-tools {
+    gap: 5px;
+  }
+  #ja-reference-library-window .ja-lib-window-title {
+    font-size: 11px;
+  }
+}
