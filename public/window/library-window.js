@@ -126,10 +126,9 @@
 
     var providerButtons = providers.map(function (provider) {
       return '<button class="ja-lib-provider' + (provider.id === "all" ? " active" : "") +
-        '" type="button" data-ja-provider="' + provider.id + '">' +
+        '" type="button" data-ja-provider="' + provider.id + '" title="' + provider.label + '">' +
         '<span class="ja-lib-provider-icon" aria-hidden="true">' + provider.icon + '</span>' +
         '<span>' + provider.label + '</span>' +
-        '<span class="ja-lib-provider-tooltip" aria-hidden="true">' + provider.label + '</span>' +
         (provider.id !== "all" ? '<span class="ja-lib-provider-state" title="Not connected"></span>' : "") +
         '</button>';
     }).join("");
