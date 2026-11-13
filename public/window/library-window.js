@@ -181,6 +181,8 @@
       '</div>';
 
     document.body.appendChild(libraryWindow);
+    var previewButton = libraryWindow.querySelector('[data-ja-action="preview-selected"]');
+    if (previewButton) previewButton.disabled = !selectedFile;
     applyThemeMode(themeMode, false);
     updateSidebarState();
 
