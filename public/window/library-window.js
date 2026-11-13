@@ -16,6 +16,10 @@
   var maximized = false;
   var previousBounds = null;
   var activeProvider = "all";
+  // The dedicated PWA page opts into app mode explicitly. The normal website
+  // keeps the existing floating-window behaviour.
+  var isLibraryApp = document.documentElement.getAttribute("data-ja-library-app") === "true";
+  if (isLibraryApp) document.documentElement.classList.add("ja-lib-app-mode");
 
   var providers = [
     { id: "all", label: "All files", icon: "▦" },
@@ -50,6 +54,7 @@
           '<button class="ja-lib-dot maximize" type="button" data-ja-action="maximize" title="Maximize or restore library" aria-label="Maximize"></button>' +
         '</div>' +
         '<div class="ja-lib-window-title">Jupiter Astrology · Reference Library</div>' +
+        '<button class="ja-lib-fullscreen" type="button" data-ja-action="fullscreen" title="Enter full screen" aria-label="Enter full screen">⛶</button>' +
         '<div class="ja-lib-header-spacer"></div>' +
       '</header>' +
       '<div class="ja-lib-body">' +
@@ -128,7 +133,41 @@
     if (action === "close") closeWindow();
     if (action === "minimize") minimizeWindow();
     if (action === "maximize") toggleMaximize();
+    if (action === "fullscreen") toggleFullscreen();
   }
+
+  function toggleFullscreen() {
+    if (!libraryWindow || !libraryWindow.classList.contains("ja-lib-open")) return;
+
+    if (document.fullscreenElement === libraryWindow) {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(function () {});
+      }
+      return;
+    }
+
+    if (typeof libraryWindow.requestFullscreen === "function") {
+      libraryWindow.requestFullscreen({ navigationUI: "hide" }).catch(function () {
+        var notice = libraryWindow.querySelector(".ja-lib-notice");
+        if (notice) {
+          notice.textContent = "Full-screen mode is unavailable in this browser session.";
+          notice.classList.add("visible");
+        }
+      });
+    }
+  }
+
+  function syncFullscreenButton() {
+    if (!libraryWindow) return;
+    var button = libraryWindow.querySelector('[data-ja-action="fullscreen"]');
+    if (!button) return;
+    var active = document.fullscreenElement === libraryWindow;
+    button.textContent = active ? "⤢" : "⛶";
+    button.title = active ? "Exit full screen" : "Enter full screen";
+    button.setAttribute("aria-label", button.title);
+  }
+
+  document.addEventListener("fullscreenchange", syncFullscreenButton);
 
   function openWindow() {
     createWindow();
@@ -183,6 +222,10 @@
   }
 
   function enableDragging() {
+    // In the installed app, use the operating system's native app-window
+    // controls instead of dragging an HTML dialog inside the page.
+    if (isLibraryApp) return;
+
     var handle = libraryWindow.querySelector("[data-ja-drag-handle]");
     var drag = null;
     handle.addEventListener("pointerdown", function (event) {
@@ -225,7 +268,9 @@
         openWindow();
       }
     }
-    if (event.key === "Escape" && libraryWindow && libraryWindow.classList.contains("ja-lib-open")) {
+    // Let the browser handle Escape first when exiting Fullscreen.
+    if (event.key === "Escape" && !document.fullscreenElement &&
+        libraryWindow && libraryWindow.classList.contains("ja-lib-open")) {
       closeWindow();
     }
   }, true);
@@ -237,8 +282,23 @@
     restore: restoreWindow,
     isOpen: function () { return !!libraryWindow && libraryWindow.classList.contains("ja-lib-open"); },
     getActiveProvider: function () { return activeProvider; },
+    toggleFullscreen: toggleFullscreen,
     shortcut: "Ctrl + Shift + L"
   };
+
+  // When launched as the installed Library PWA, show the library immediately
+  // and register its service worker. This app page runs in its own OS window.
+  if (isLibraryApp) {
+    openWindow();
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("/window/library-app-sw.js", { scope: "/window/" })
+          .catch(function (error) {
+            console.warn("Jupiter Astro Library: service worker registration failed.", error);
+          });
+      });
+    }
+  }
 
   console.info("Jupiter Astro: Reference Library window shell loaded. Shortcut: Ctrl + Shift + L");
 })();
