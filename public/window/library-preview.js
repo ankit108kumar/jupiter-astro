@@ -228,7 +228,7 @@
     var alreadyOpen = !!panel && panel.classList.contains("is-open");
     var returnFocus = alreadyOpen ? previousFocus : document.activeElement;
     if (window.JupiterReferenceLibrary && typeof window.JupiterReferenceLibrary.open === "function") {
-      window.JupiterReferenceLibrary.open();
+      window.JupiterReferenceLibrary.open({ focusSearch: false });
     }
     try { ensurePanel(); } catch (error) { return Promise.reject(error); }
 
