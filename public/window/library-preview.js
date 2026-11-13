@@ -116,7 +116,7 @@
         '<div class="ja-lib-preview-tools" aria-label="Preview controls"></div>' +
       '</header>' +
       '<div class="ja-lib-preview-stage" tabindex="0"><div class="ja-lib-preview-loading"><span class="ja-lib-preview-spinner"></span><span>Preparing preview…</span></div></div>' +
-      '<footer class="ja-lib-preview-footer"><span class="ja-lib-preview-message">Read-only preview · Original cloud file remains unchanged</span><span class="ja-lib-preview-size"></span></footer>';
+      '<footer class="ja-lib-preview-footer"><span class="ja-lib-preview-message">Preview · Original Drive file remains unchanged</span><span class="ja-lib-preview-size"></span></footer>';
     main.appendChild(panel);
     panel.addEventListener("click", handlePanelClick);
     panel.querySelector('[data-preview-action="back"]').addEventListener("click", close);
@@ -266,7 +266,7 @@
       }
       ensureCurrent(id);
       panel.querySelector(".ja-lib-preview-message").textContent =
-        "Read-only preview · Original cloud file remains unchanged";
+        "Preview · Original Drive file remains unchanged";
     })().catch(function (error) {
       if (error && error.name === "AbortError") return;
       if (!current || current.id !== id) return;
