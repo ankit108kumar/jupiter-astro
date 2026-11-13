@@ -1,8 +1,8 @@
 {
   "id": "/window/reference-library",
-  "name": "Jupiter Astrology Reference Library",
-  "short_name": "JA Library",
-  "description": "A standalone window for the Jupiter Astrology Reference Library.",
+  "name": "Jupiter Astrology Library",
+  "short_name": "Library",
+  "description": "A standalone window for the Jupiter Astrology Library.",
   "start_url": "/window/library-app.html",
   "scope": "/window/",
   "display": "standalone",
