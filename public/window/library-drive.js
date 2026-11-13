@@ -17,8 +17,8 @@
 
   function apiKey() {
     var config = window.jaFirebaseConfig;
-    if (!config || !config.apiKey) throw new Error("Firebase configuration is not ready. Refresh the page and retry.");
-    return config.apiKey;
+    if (!config || !(config.driveApiKey || config.apiKey)) throw new Error("Firebase configuration is not ready. Refresh the page and retry.");
+    return config.driveApiKey || config.apiKey;
   }
   function contentEl() { return document.querySelector("#ja-reference-library-window .ja-lib-content"); }
   function searchEl() { return document.querySelector("#ja-reference-library-window .ja-lib-search"); }
