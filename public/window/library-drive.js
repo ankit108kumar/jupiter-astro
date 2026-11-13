@@ -324,48 +324,39 @@
   async function downloadFile(item, signal) {
     var shortcut = item.shortcutDetails || {};
     var fileId = shortcut.targetId || item.id;
-    var mimeType = shortcut.targetMimeType || item.mimeType || "";
     var resourceKey = shortcut.targetResourceKey || item.resourceKey || "";
-    var exportInfo = workspaceExport(mimeType);
-    var isWorkspace = !!exportInfo;
-
-    var url = new URL(API_ROOT + "/files/" + encodeURIComponent(fileId) + (isWorkspace ? "/export" : ""));
-    if (isWorkspace) {
-      url.searchParams.set("mimeType", exportInfo.mimeType);
-    } else {
-      url.searchParams.set("alt", "media");
-    }
-    url.searchParams.set("supportsAllDrives", "true");
-    url.searchParams.set("key", apiKey());
+    var params = new URLSearchParams({
+      action: "download",
+      fileId: fileId
+    });
+    if (resourceKey) params.set("resourceKey", resourceKey);
 
     var response;
     try {
-      response = await fetch(url.toString(), {
+      response = await fetch("/api/drive?" + params.toString(), {
         method: "GET",
-        credentials: "omit",
+        credentials: "same-origin",
         signal: signal,
-        headers: resourceHeader(fileId, resourceKey)
+        headers: { Accept: "*/*" }
       });
     } catch (error) {
       if (error && error.name === "AbortError") throw error;
-      throw new Error("Could not download this file from Google Drive. Check read/download permission and API-key restrictions.");
+      throw new Error("Could not reach the Jupiter Drive preview service. Check your connection and try again.");
     }
+
     if (!response.ok) {
-      var message = "Google Drive could not provide the file content (HTTP " + response.status + ").";
+      var message = "The Drive preview service returned HTTP " + response.status + ".";
       try {
         var body = await response.json();
-        if (body.error && body.error.message) message = body.error.message;
-        if (isWorkspace && /export.*10\s*MB|file.*too large|export.*size/i.test(message)) {
-          message = "Google Drive's export endpoint has a 10 MB response limit for native Docs, Sheets and Slides. Use Open in Google Drive for this file.";
-        }
+        if (body && body.error) message = body.error;
       } catch (error) {}
       throw new Error(message);
     }
+
     var blob = await response.blob();
     if (!blob.size) throw new Error("Google Drive returned an empty file.");
-    if (isWorkspace && exportInfo.mimeType && blob.type !== exportInfo.mimeType) {
-      blob = new Blob([blob], { type: exportInfo.mimeType });
-    }
+    var mimeType = response.headers.get("content-type") || "";
+    if (!blob.type && mimeType) blob = new Blob([blob], { type: mimeType });
     return blob;
   }
 
