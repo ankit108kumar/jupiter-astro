@@ -621,3 +621,6 @@ html[data-palette="wooden"] #ja-reference-library-window[data-ja-lib-theme="webs
   visibility:visible;
   transform:translateY(-50%) translateX(0);
 }
+
+
+/* Document preview module styles are loaded from library-preview.css. */
