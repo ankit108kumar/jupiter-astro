@@ -848,12 +848,7 @@
         row.setAttribute("aria-pressed", "true");
       }
 
-      row.addEventListener("click", function (event) {
-        if (event.target.closest(".ja-drive-file-title")) {
-          // Keep the file name text selectable; selection still occurs on pointer click.
-          selectFile();
-          return;
-        }
+      row.addEventListener("click", function () {
         if (folder) navigateFolder();
         else selectFile();
       });
