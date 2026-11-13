@@ -624,3 +624,14 @@ html[data-palette="wooden"] #ja-reference-library-window[data-ja-lib-theme="webs
 
 
 /* Document preview module styles are loaded from library-preview.css. */
+
+/* Enabled footer actions must behave like active controls. */
+#ja-reference-library-window .ja-lib-action:not(:disabled) {
+  cursor:pointer;
+  opacity:1;
+}
+#ja-reference-library-window .ja-lib-action:not(:disabled):hover {
+  border-color:var(--ja-lib-accent,#a87332);
+  color:var(--ja-lib-ink,#292722);
+  background:var(--ja-lib-hover,#f1eee8);
+}
