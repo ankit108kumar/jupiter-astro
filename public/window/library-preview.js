@@ -435,7 +435,7 @@
     var clipped = range.e.r > lastRow || range.e.c > lastCol;
     var rows = XLSX.utils.sheet_to_json(worksheet, {
       header: 1, raw: false, defval: "", blankrows: true,
-      range: { s: { r: range.s.r, c: range.s.c }, e: { r: lastRow, c: lastCol } }
+      range: XLSX.utils.encode_range({ s: { r: range.s.r, c: range.s.c }, e: { r: lastRow, c: lastCol } })
     });
     var table = document.createElement("table");
     table.className = "ja-lib-sheet-table";
