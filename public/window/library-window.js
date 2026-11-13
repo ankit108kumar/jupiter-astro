@@ -126,10 +126,10 @@
 
     var providerButtons = providers.map(function (provider) {
       return '<button class="ja-lib-provider' + (provider.id === "all" ? " active" : "") +
-        '" type="button" data-ja-provider="' + provider.id + '" title="' + provider.label + '">' +
+        '" type="button" data-ja-provider="' + provider.id + '" data-tooltip="' + provider.label + '" aria-label="' + provider.label + '">' +
         '<span class="ja-lib-provider-icon" aria-hidden="true">' + provider.icon + '</span>' +
         '<span>' + provider.label + '</span>' +
-        (provider.id !== "all" ? '<span class="ja-lib-provider-state" title="Not connected"></span>' : "") +
+        (provider.id !== "all" ? '<span class="ja-lib-provider-state" aria-hidden="true"></span>' : "") +
         '</button>';
     }).join("");
 
