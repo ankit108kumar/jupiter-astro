@@ -267,8 +267,22 @@ module.exports = async function handler(req, res) {
 
   try {
     const action = String(req.query.action || "");
-    if (action !== "download") return sendError(res, 400, "Unsupported Drive action.");
+    if (action !== "download" && action !== "status") {
+      return sendError(res, 400, "Unsupported Drive action.");
+    }
     const token = await getAccessToken();
+
+    if (action === "status") {
+      const root = await getMetadata(ROOT_FOLDER_ID, token);
+      res.setHeader("Cache-Control", "no-store");
+      return res.status(200).json({
+        configured: true,
+        folderId: ROOT_FOLDER_ID,
+        folderName: root.name || "Shared Astrology Library",
+        permission: "Drive read-only"
+      });
+    }
+
     return await downloadFile(req, res, token);
   } catch (error) {
     const status = Number(error && error.statusCode) || 502;
