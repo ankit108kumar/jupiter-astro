@@ -20,6 +20,7 @@
   var MAX_PREVIEW_BYTES = 150 * 1024 * 1024;
   var panel = null;
   var current = null;
+  var requestId = 0;
   var previousFocus = null;
   var spreadsheetEngine = null;
   var modulePromises = Object.create(null);
