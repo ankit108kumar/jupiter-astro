@@ -118,7 +118,7 @@
     libraryWindow = document.createElement("section");
     libraryWindow.id = WINDOW_ID;
     libraryWindow.setAttribute("role", "dialog");
-    libraryWindow.setAttribute("aria-label", "Jupiter Astrology Reference Library");
+    libraryWindow.setAttribute("aria-label", "Jupiter Astrology Library");
     libraryWindow.setAttribute("aria-modal", "false");
 
     var providerButtons = providers.map(function (provider) {
@@ -137,7 +137,7 @@
           '<button class="ja-lib-dot minimize" type="button" data-ja-action="minimize" title="Minimize library" aria-label="Minimize"></button>' +
           '<button class="ja-lib-dot maximize" type="button" data-ja-action="maximize" title="Maximize or restore library" aria-label="Maximize"></button>' +
         '</div>' +
-        '<div class="ja-lib-window-title">Jupiter Astrology · Reference Library</div>' +
+        '<div class="ja-lib-window-title">Jupiter Astrology · Library</div>' +
         '<div class="ja-lib-titlebar-tools">' +
           '<button class="ja-lib-fullscreen" type="button" data-ja-action="fullscreen" title="Enter full screen" aria-label="Enter full screen">⛶</button>' +
           '<button class="ja-lib-theme-toggle" type="button" data-ja-action="theme-toggle" title="Following website theme · Switch to Apple Light" aria-label="Switch to Apple Light mode" aria-pressed="false"></button>' +
@@ -149,7 +149,7 @@
         '</nav></aside>' +
         '<main class="ja-lib-main">' +
           '<div class="ja-lib-main-top">' +
-            '<h2 class="ja-lib-heading">Reference Library</h2>' +
+            '<h2 class="ja-lib-heading">Library</h2>' +
             '<span class="ja-lib-readonly">● Read only</span>' +
             '<label class="ja-lib-search-wrap"><span class="ja-lib-search-icon" aria-hidden="true">⌕</span>' +
               '<input class="ja-lib-search" type="search" placeholder="Search files and folders" aria-label="Search files and folders" autocomplete="off">' +
@@ -174,7 +174,7 @@
     launcher = document.createElement("div");
     launcher.id = LAUNCHER_ID;
     launcher.innerHTML = '<button type="button" aria-label="Restore Jupiter Astrology Library">' +
-      '<span aria-hidden="true">▤</span><span>Reference Library</span><span aria-hidden="true">↗</span></button>';
+      '<span aria-hidden="true">▤</span><span>Library</span><span aria-hidden="true">↗</span></button>';
     launcher.querySelector("button").addEventListener("click", restoreWindow);
     document.body.appendChild(launcher);
 
@@ -389,5 +389,5 @@
     }
   }
 
-  console.info("Jupiter Astro: Reference Library window shell loaded. Shortcut: Ctrl + Shift + L");
+  console.info("Jupiter Astro: Library window shell loaded. Shortcut: Ctrl + Shift + L");
 })();
