@@ -1,0 +1,21 @@
+{
+  "id": "/window/reference-library",
+  "name": "Jupiter Astrology Reference Library",
+  "short_name": "JA Library",
+  "description": "A standalone window for the Jupiter Astrology Reference Library.",
+  "start_url": "/window/library-app.html",
+  "scope": "/window/",
+  "display": "standalone",
+  "display_override": ["standalone", "fullscreen"],
+  "orientation": "any",
+  "background_color": "#fbfaf8",
+  "theme_color": "#f4f2ee",
+  "icons": [
+    {
+      "src": "/window/library-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
