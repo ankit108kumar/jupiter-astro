@@ -1,0 +1,143 @@
+/* =========================================================
+   JUPITER ASTRO — REFERENCE LIBRARY WINDOW
+   ========================================================= */
+#ja-reference-library-window,
+#ja-reference-library-window *,
+#ja-reference-library-launcher,
+#ja-reference-library-launcher * { box-sizing: border-box; }
+
+#ja-reference-library-window {
+  --bg: #fbfaf8;
+  --line: rgba(70,60,48,.13);
+  --ink: #292722;
+  --muted: #77736b;
+  position: fixed; z-index: 2147483000; left: 50%; top: 50%;
+  transform: translate(-50%,-50%);
+  width: min(1060px,calc(100vw - 36px));
+  height: min(720px,calc(100vh - 36px));
+  min-width: min(340px,calc(100vw - 16px)); min-height: 300px;
+  max-width: calc(100vw - 16px); max-height: calc(100vh - 16px);
+  display: none; flex-direction: column; overflow: hidden; resize: both;
+  color: var(--ink); background: var(--bg);
+  border: 1px solid rgba(255,255,255,.85); border-radius: 15px;
+  box-shadow: 0 24px 80px rgba(0,0,0,.30),0 4px 18px rgba(0,0,0,.13);
+  font: 14px/1.45 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  isolation: isolate;
+}
+#ja-reference-library-window.ja-lib-open { display: flex; }
+#ja-reference-library-window.ja-lib-maximized {
+  inset: 10px; left: 10px; top: 10px; width: auto; height: auto;
+  max-width: none; max-height: none; min-width: 0; min-height: 0;
+  transform: none; resize: none; border-radius: 12px;
+}
+#ja-reference-library-window button,
+#ja-reference-library-launcher button { font: inherit; }
+
+#ja-reference-library-window .ja-lib-titlebar {
+  height: 48px; min-height: 48px; display: flex; align-items: center;
+  gap: 12px; padding: 0 14px;
+  background: linear-gradient(#f4f2ee,#eae7e1);
+  border-bottom: 1px solid var(--line); cursor: grab;
+  user-select: none; touch-action: none;
+}
+#ja-reference-library-window .ja-lib-titlebar:active { cursor: grabbing; }
+#ja-reference-library-window .ja-lib-window-controls { display:flex;align-items:center;gap:8px;flex:0 0 auto; }
+#ja-reference-library-window .ja-lib-dot {
+  width:12px;height:12px;border:0;border-radius:50%;padding:0;cursor:pointer;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.10);
+}
+#ja-reference-library-window .close { background:#ff6058; }
+#ja-reference-library-window .minimize { background:#ffbd2e; }
+#ja-reference-library-window .maximize { background:#28c840; }
+#ja-reference-library-window .ja-lib-window-title {
+  flex:1;min-width:0;text-align:center;font-weight:650;font-size:13px;
+  letter-spacing:.15px;color:#45413b;pointer-events:none;
+}
+#ja-reference-library-window .ja-lib-header-spacer { width:44px;flex:0 0 44px; }
+#ja-reference-library-window .ja-lib-body { display:grid;grid-template-columns:205px minmax(0,1fr);min-height:0;flex:1; }
+#ja-reference-library-window .ja-lib-sidebar {
+  min-height:0;overflow:auto;padding:18px 12px;background:#f5f3ef;
+  border-right:1px solid var(--line);
+}
+#ja-reference-library-window .ja-lib-side-heading {
+  margin:0 9px 10px;color:#89847b;font-size:10px;font-weight:750;
+  letter-spacing:1.1px;text-transform:uppercase;
+}
+#ja-reference-library-window .ja-lib-provider {
+  width:100%;display:flex;align-items:center;gap:10px;padding:10px 11px;
+  margin:3px 0;border:0;border-radius:8px;color:#4a463f;
+  background:transparent;text-align:left;cursor:pointer;
+}
+#ja-reference-library-window .ja-lib-provider:hover { background:#eae7e1; }
+#ja-reference-library-window .ja-lib-provider.active { background:#e9dfd0;color:#694516;font-weight:650; }
+#ja-reference-library-window .ja-lib-provider-icon { width:20px;text-align:center;font-size:17px; }
+#ja-reference-library-window .ja-lib-provider-state { margin-left:auto;width:7px;height:7px;border-radius:50%;background:#c7c2b9; }
+#ja-reference-library-window .ja-lib-main {
+  min-width:0;min-height:0;display:flex;flex-direction:column;
+  padding:22px 24px 16px;overflow:hidden;
+}
+#ja-reference-library-window .ja-lib-main-top { display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:17px; }
+#ja-reference-library-window .ja-lib-heading { margin:0;font-size:20px;line-height:1.2;font-weight:700;color:#302c26; }
+#ja-reference-library-window .ja-lib-readonly {
+  display:inline-flex;align-items:center;gap:6px;padding:4px 9px;
+  border-radius:999px;color:#39744d;background:#e7f2e9;font-size:11px;font-weight:650;
+}
+#ja-reference-library-window .ja-lib-search-wrap { position:relative;margin-left:auto;min-width:190px;flex:1 1 240px;max-width:390px; }
+#ja-reference-library-window .ja-lib-search {
+  width:100%;height:37px;padding:0 12px 0 35px;border:1px solid #dedad2;
+  border-radius:8px;outline:none;color:var(--ink);background:#fff;font:inherit;
+}
+#ja-reference-library-window .ja-lib-search:focus { border-color:#c18b48;box-shadow:0 0 0 3px rgba(193,139,72,.13); }
+#ja-reference-library-window .ja-lib-search-icon { position:absolute;left:12px;top:8px;color:#89847b;pointer-events:none; }
+#ja-reference-library-window .ja-lib-content { min-height:0;flex:1;overflow:auto;border:1px solid #e7e3dc;border-radius:10px;background:#fff; }
+#ja-reference-library-window .ja-lib-empty {
+  min-height:250px;height:100%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:9px;padding:25px;
+  text-align:center;color:var(--muted);
+}
+#ja-reference-library-window .ja-lib-empty-symbol {
+  width:54px;height:54px;display:grid;place-items:center;border-radius:15px;
+  background:#f3eee6;color:#a97534;font-size:25px;
+}
+#ja-reference-library-window .ja-lib-empty strong { color:#464139;font-size:15px; }
+#ja-reference-library-window .ja-lib-empty p { max-width:410px;margin:0;font-size:12px; }
+#ja-reference-library-window .ja-lib-status {
+  min-height:30px;display:flex;align-items:center;justify-content:space-between;
+  gap:10px;padding-top:10px;color:#89847b;font-size:11px;
+}
+#ja-reference-library-window .ja-lib-actions { display:flex;align-items:center;gap:8px; }
+#ja-reference-library-window .ja-lib-action {
+  padding:7px 12px;border:1px solid #ded9d0;border-radius:7px;
+  color:#777168;background:#f7f5f1;font-size:11px;cursor:not-allowed;opacity:.72;
+}
+#ja-reference-library-window .ja-lib-action.primary { color:#fff;border-color:#9e6929;background:#a87332; }
+#ja-reference-library-window .ja-lib-notice {
+  display:none;margin-top:10px;padding:9px 11px;border:1px solid #ead8b9;
+  border-radius:7px;color:#795522;background:#fff8eb;font-size:11px;
+}
+#ja-reference-library-window .ja-lib-notice.visible { display:block; }
+
+#ja-reference-library-launcher {
+  position:fixed;z-index:2147483001;right:22px;bottom:22px;display:none;
+  padding:0;border:1px solid rgba(255,255,255,.85);border-radius:12px;
+  background:#f5f1e9;box-shadow:0 8px 28px rgba(0,0,0,.2);
+}
+#ja-reference-library-launcher.visible { display:block; }
+#ja-reference-library-launcher button {
+  display:flex;align-items:center;gap:9px;padding:11px 15px;border:0;
+  border-radius:12px;color:#443a2d;background:transparent;font-weight:650;cursor:pointer;
+}
+#ja-reference-library-launcher button:hover { background:#ebe3d6; }
+
+@media (max-width:620px) {
+  #ja-reference-library-window {
+    width:calc(100vw - 12px);height:calc(100vh - 12px);min-width:0;min-height:260px;
+    max-width:calc(100vw - 12px);max-height:calc(100vh - 12px);border-radius:10px;
+  }
+  #ja-reference-library-window .ja-lib-body { grid-template-columns:132px minmax(0,1fr); }
+  #ja-reference-library-window .ja-lib-sidebar { padding:12px 7px; }
+  #ja-reference-library-window .ja-lib-provider { gap:6px;padding:9px 6px;font-size:11px; }
+  #ja-reference-library-window .ja-lib-main { padding:15px 12px 10px; }
+  #ja-reference-library-window .ja-lib-heading { font-size:17px; }
+  #ja-reference-library-window .ja-lib-header-spacer { width:10px;flex-basis:10px; }
+}
