@@ -211,6 +211,17 @@ html.ja-lib-app-mode #ja-reference-library-launcher {
   display: none !important;
 }
 
+
+/* Use the real operating-system window controls in the installed PWA.
+   The in-page traffic-light controls are only for the embedded website modal. */
+html.ja-lib-app-mode #ja-reference-library-window .ja-lib-window-controls,
+html.ja-lib-app-mode #ja-reference-library-window .ja-lib-header-spacer {
+  display: none !important;
+}
+html.ja-lib-app-mode #ja-reference-library-window .ja-lib-window-title {
+  text-align: left;
+}
+
 /* Fullscreen button in the library title bar. */
 #ja-reference-library-window .ja-lib-fullscreen {
   display: inline-flex;
