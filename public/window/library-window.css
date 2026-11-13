@@ -524,3 +524,64 @@ html[data-palette="wooden"] #ja-reference-library-window[data-ja-lib-theme="webs
 #ja-reference-library-window[data-ja-lib-theme="apple"] .ja-lib-search::placeholder {
   color:#6E6E73 !important;
 }
+
+
+/* Collapsible provider sidebar. The compact state keeps provider icons visible. */
+#ja-reference-library-window .ja-lib-sidebar-head {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:6px; margin:0 2px 12px 0; min-height:26px;
+}
+#ja-reference-library-window .ja-lib-sidebar-head .ja-lib-side-heading {
+  margin:0 0 0 9px; min-width:0;
+}
+#ja-reference-library-window .ja-lib-sidebar-toggle {
+  display:grid; place-items:center; flex:0 0 26px;
+  width:26px; height:26px; padding:0;
+  border:1px solid var(--ja-lib-line-strong, #d8d8dc);
+  border-radius:7px; color:var(--ja-lib-muted, #777);
+  background:transparent; cursor:pointer;
+}
+#ja-reference-library-window .ja-lib-sidebar-toggle:hover {
+  color:var(--ja-lib-accent, #4776d0);
+  background:var(--ja-lib-hover, #f1f1f4);
+}
+#ja-reference-library-window .ja-lib-sidebar-toggle svg {
+  width:15px; height:15px; fill:none; stroke:currentColor;
+  stroke-width:2; stroke-linecap:round; stroke-linejoin:round;
+  transition:transform 160ms ease;
+}
+#ja-reference-library-window .ja-lib-provider-tooltip { display:none; }
+
+#ja-reference-library-window.ja-lib-sidebar-collapsed .ja-lib-body {
+  grid-template-columns:72px minmax(0,1fr);
+}
+#ja-reference-library-window.ja-lib-sidebar-collapsed .ja-lib-sidebar {
+  padding-left:8px; padding-right:8px;
+}
+#ja-reference-library-window.ja-lib-sidebar-collapsed .ja-lib-sidebar-head {
+  justify-content:center;
+}
+#ja-reference-library-window.ja-lib-sidebar-collapsed .ja-lib-side-heading {
+  display:none;
+}
+#ja-reference-library-window.ja-lib-sidebar-collapsed .ja-lib-sidebar-toggle svg {
+  transform:rotate(180deg);
+}
+#ja-reference-library-window.ja-lib-sidebar-collapsed .ja-lib-provider {
+  justify-content:center; gap:0; padding:11px 5px;
+}
+#ja-reference-library-window.ja-lib-sidebar-collapsed .ja-lib-provider > span:not(.ja-lib-provider-icon) {
+  display:none;
+}
+#ja-reference-library-window.ja-lib-sidebar-collapsed .ja-lib-provider-icon {
+  width:auto; font-size:18px;
+}
+
+@media (max-width:620px) {
+  #ja-reference-library-window.ja-lib-sidebar-collapsed .ja-lib-body {
+    grid-template-columns:62px minmax(0,1fr);
+  }
+  #ja-reference-library-window.ja-lib-sidebar-collapsed .ja-lib-sidebar {
+    padding-left:5px; padding-right:5px;
+  }
+}
