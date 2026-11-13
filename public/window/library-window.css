@@ -483,3 +483,37 @@ html.ja-lib-app-mode #ja-reference-library-window .ja-lib-window-title {
     font-size: 11px;
   }
 }
+
+
+/* Targeted fixes for the three palette collisions (Library only). */
+
+/* Wooden Glass + Website theme: warm, readable Library surfaces. */
+html[data-palette="wooden"] #ja-reference-library-window[data-ja-lib-theme="website"] {
+  --ja-lib-bg:#F4E5CC; --ja-lib-panel:#FFF8EC; --ja-lib-panel-alt:#EAD7B9;
+  --ja-lib-ink:#382113; --ja-lib-muted:#765238;
+  --ja-lib-line:rgba(164,104,52,.32); --ja-lib-line-strong:rgba(164,104,52,.52);
+  --ja-lib-accent:#A85E22; --ja-lib-accent-soft:rgba(168,94,34,.14);
+  --ja-lib-title-top:#F7E8CE; --ja-lib-title-bottom:#E8C99B;
+  --ja-lib-hover:#F1DFC4; --ja-lib-active-bg:#E8C99B;
+  --ja-lib-active-ink:#5A3218; --ja-lib-icon-bg:#E8C99B; --ja-lib-icon-ink:#9B551D;
+  color-scheme:light;
+}
+
+/* Wooden Glass + Apple Light: prevent the global Wooden footer rules leaking in. */
+#ja-reference-library-window[data-ja-lib-theme="apple"] .ja-lib-status {
+  background:var(--ja-lib-panel-alt) !important;
+  color:var(--ja-lib-muted) !important;
+  border-top:1px solid var(--ja-lib-line) !important;
+}
+#ja-reference-library-window[data-ja-lib-theme="apple"] .ja-lib-status span {
+  color:var(--ja-lib-muted) !important;
+}
+
+/* Cosmic Glass + Apple Light: defeat the global Cosmic input !important rules. */
+#ja-reference-library-window[data-ja-lib-theme="apple"] .ja-lib-search {
+  background:#FFFFFF !important; color:#1D1D1F !important;
+  border-color:rgba(60,60,67,.24) !important;
+}
+#ja-reference-library-window[data-ja-lib-theme="apple"] .ja-lib-search::placeholder {
+  color:#6E6E73 !important;
+}
