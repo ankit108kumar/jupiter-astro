@@ -904,7 +904,6 @@
     var content = contentEl();
     if (content && !content.dataset.driveBound) {
       content.addEventListener("click", onContentClick);
-      content.addEventListener("change", onContentChange);
       content.dataset.driveBound = "true";
     }
   }
