@@ -637,7 +637,8 @@
       var closeButton = document.querySelector('#ja-reference-library-window [data-ja-action="close"]');
       var target = previousFocus;
       previousFocus = null;
-      if (target && target.isConnected && !target.disabled && (!panel || !panel.contains(target))) {
+      if (target && target.isConnected && target !== document.body && target !== document.documentElement &&
+          !target.disabled && (!panel || !panel.contains(target))) {
         target.focus({ preventScroll: true });
       } else if (button && !button.disabled) {
         button.focus({ preventScroll: true });
