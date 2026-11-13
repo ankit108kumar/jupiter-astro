@@ -139,10 +139,26 @@
   }
 
   function showError(message, detail) {
-    panel.querySelector(".ja-lib-preview-stage").innerHTML =
+    var stage = panel.querySelector(".ja-lib-preview-stage");
+    stage.innerHTML =
       '<div class="ja-lib-preview-message-card"><div class="ja-lib-preview-message-icon" aria-hidden="true">!</div>' +
       "<h3>Preview unavailable</h3><p>" + escapeHtml(message) + "</p>" +
       (detail ? "<small>" + escapeHtml(detail) + "</small>" : "") + "</div>";
+    var linkUrl = current && current.file ? current.file.webViewLink : "";
+    if (linkUrl) {
+      try {
+        var safeUrl = new URL(linkUrl);
+        if (safeUrl.protocol === "https:" && ["drive.google.com", "docs.google.com"].includes(safeUrl.hostname)) {
+          var link = document.createElement("a");
+          link.className = "ja-lib-preview-open-drive";
+          link.href = safeUrl.href;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = "Open in Google Drive";
+          stage.querySelector(".ja-lib-preview-message-card").appendChild(link);
+        }
+      } catch (error) {}
+    }
     setTools("");
   }
 
