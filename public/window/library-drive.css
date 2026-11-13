@@ -492,7 +492,7 @@
   min-height:39px;
   gap:8px;
   padding:4px 12px;
-  cursor:default;
+  cursor:pointer;
   user-select:none;
 }
 #ja-reference-library-window .ja-drive-name-cell {
