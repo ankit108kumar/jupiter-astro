@@ -857,9 +857,6 @@
 
       row.addEventListener("dblclick", function (event) {
         if (folder) return;
-        if (event.target.closest(".ja-drive-file-title")) {
-          event.preventDefault();
-        }
         if (window.JupiterReferenceLibrary) {
           window.JupiterReferenceLibrary.preview(descriptor(item));
         }
