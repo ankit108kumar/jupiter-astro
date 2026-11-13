@@ -246,6 +246,7 @@
 
   async function renderCurrent(id) {
     ensureCurrent(id);
+    panel.querySelector(".ja-lib-preview-stage").classList.remove("is-spreadsheet");
     switch (current.type) {
       case "pdf": return renderPdf(id);
       case "image": return renderImage(id);
@@ -394,6 +395,7 @@
     stage.innerHTML =
       '<div class="ja-lib-sheet-tabs" role="tablist" aria-label="Worksheets"></div>' +
       '<div class="ja-lib-sheet-wrap"></div><div class="ja-lib-sheet-limit" hidden></div>';
+    stage.classList.add("is-spreadsheet");
     var tabs = stage.querySelector(".ja-lib-sheet-tabs");
     workbook.SheetNames.forEach(function (name, index) {
       var button = document.createElement("button");
