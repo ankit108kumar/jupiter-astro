@@ -29,6 +29,12 @@
   var memoryCache = new Map();
   var currentFilter = "all";
   var currentSort = "name-asc";
+  var driveToolbar = null;
+  var driveToolbarMainTop = null;
+  var driveFilterSelect = null;
+  var driveSortSelect = null;
+  var driveCount = null;
+  var drivePath = null;
 
   function apiKey() {
     var config = window.jaFirebaseConfig;
@@ -461,7 +467,7 @@
   function bindSearch() {
     var search = searchEl();
     if (!search || searchBound) return;
-    search.addEventListener("input", renderBrowser);
+    search.addEventListener("input", renderRows);
     searchBound = true;
   }
 
@@ -513,7 +519,7 @@
       await cachePut(folderCacheKey(folderId, pageToken), result);
       applyPage(result, append);
       setStatus("Google Drive · Connected · Read only");
-      setNotice("Folder list refreshed. Opened files are cached on this device for up to 7 days.", false);
+      setNotice("");
       renderBrowser();
     } catch (error) {
       if (error && error.name === "AbortError") return;
@@ -545,7 +551,7 @@
       if (cached && Array.isArray(cached.files)) {
         applyPage(cached, append);
         setStatus("Google Drive · Cached · Read only");
-        setNotice("Showing the saved folder list. Checking for updates…", false);
+        setNotice("");
         renderBrowser();
         loading = false;
         refreshInBackground(folder.id, pageToken, serial, append);
@@ -564,14 +570,14 @@
       await cachePut(cacheKey, result);
       applyPage(result, append);
       setStatus("Google Drive · Connected · Read only");
-      setNotice("Folder list saved locally for up to 7 days. Opened files are cached separately.", false);
+      setNotice("");
       renderBrowser();
     } catch (error) {
       if (error && error.name === "AbortError") return;
       if (serial !== requestSerial) return;
       if (files.length) {
         setStatus("Google Drive · Cached · Read only");
-        setNotice("Google Drive is unavailable. Showing the saved copy: " + (error.message || "Network error"), false);
+        setNotice("");
         renderBrowser();
       } else {
         setStatus("Google Drive · Connection needs attention");
@@ -616,46 +622,24 @@
     return result;
   }
 
-  function renderBrowser() {
-    var content = contentEl();
-    if (!content) return;
-    content.innerHTML = "";
+  function ensureDriveToolbar() {
+    var mainTop = document.querySelector("#ja-reference-library-window .ja-lib-main-top");
+    if (!mainTop) return;
 
-    var browser = document.createElement("div");
-    browser.className = "ja-drive-browser";
+    var libraryWindow = document.getElementById("ja-reference-library-window");
+    if (libraryWindow) libraryWindow.classList.add("ja-lib-drive-active");
 
-    var top = document.createElement("div");
-    top.className = "ja-drive-toolbar";
-    var crumbs = document.createElement("div");
-    crumbs.className = "ja-drive-breadcrumb";
-    stack.forEach(function (folder, index) {
-      if (index) {
-        var sep = document.createElement("span");
-        sep.className = "ja-drive-crumb-separator";
-        sep.textContent = "›";
-        crumbs.appendChild(sep);
-      }
-      var crumb = button(folder.name, "ja-drive-crumb", "crumb");
-      crumb.dataset.index = String(index);
-      crumb.disabled = index === stack.length - 1;
-      crumbs.appendChild(crumb);
-    });
-    var rightTools = document.createElement("div");
-    rightTools.className = "ja-drive-toolbar-actions";
-    var cacheLabel = document.createElement("span");
-    cacheLabel.className = "ja-drive-cache-label";
-    cacheLabel.textContent = "Local cache · 7 days";
-    var refresh = button("↻", "ja-drive-icon-button", "refresh");
-    refresh.title = "Refresh from Google Drive";
-    refresh.setAttribute("aria-label", "Refresh from Google Drive");
-    var clear = button("Clear cache", "ja-drive-text-button", "clear-cache");
-    rightTools.append(cacheLabel, refresh, clear);
-    top.append(crumbs, rightTools);
-    browser.appendChild(top);
+    var readonly = mainTop.querySelector(".ja-lib-readonly");
+    if (readonly) readonly.hidden = true;
 
-    var controls = document.createElement("div");
-    controls.className = "ja-drive-controls";
-    var filter = selectControl("ja-drive-select", "Filter files", [
+    if (driveToolbar && driveToolbar.isConnected) return;
+
+    driveToolbarMainTop = mainTop;
+    driveToolbar = document.createElement("div");
+    driveToolbar.className = "ja-drive-inline-controls";
+    driveToolbar.setAttribute("aria-label", "Google Drive folder controls");
+
+    driveFilterSelect = selectControl("ja-drive-select", "Filter files", [
       { value: "all", label: "All files" },
       { value: "folder", label: "Folders" },
       { value: "pdf", label: "PDF files" },
@@ -666,35 +650,137 @@
       { value: "media", label: "Audio & video" },
       { value: "other", label: "Other files" }
     ], currentFilter);
-    filter.dataset.driveControl = "filter";
-    var sort = selectControl("ja-drive-select", "Sort files", [
-      { value: "name-asc", label: "Name · A to Z" },
-      { value: "name-desc", label: "Name · Z to A" },
+    driveFilterSelect.addEventListener("change", function () {
+      currentFilter = driveFilterSelect.value;
+      renderRows();
+    });
+
+    driveSortSelect = selectControl("ja-drive-select", "Sort files", [
+      { value: "name-asc", label: "Name · A–Z" },
+      { value: "name-desc", label: "Name · Z–A" },
       { value: "modified-newest", label: "Recently modified" },
       { value: "modified-oldest", label: "Oldest modified" },
       { value: "size-largest", label: "Largest first" },
       { value: "size-smallest", label: "Smallest first" }
     ], currentSort);
-    sort.dataset.driveControl = "sort";
-    controls.append(filter, sort);
-    browser.appendChild(controls);
+    driveSortSelect.addEventListener("change", function () {
+      currentSort = driveSortSelect.value;
+      renderRows();
+    });
+
+    driveCount = document.createElement("span");
+    driveCount.className = "ja-drive-inline-count";
+    driveCount.textContent = files.length + " items";
+
+    drivePath = document.createElement("div");
+    drivePath.className = "ja-drive-inline-path";
+    drivePath.setAttribute("aria-label", "Current folder");
+
+    var refresh = button("↻", "ja-drive-icon-button", "refresh");
+    refresh.title = "Refresh from Google Drive";
+    refresh.setAttribute("aria-label", "Refresh from Google Drive");
+    refresh.addEventListener("click", function () {
+      loadCurrent(false, true);
+    });
+
+    var clear = button("Clear cache", "ja-drive-text-button", "clear-cache");
+    clear.addEventListener("click", function () {
+      if (!window.confirm("Clear saved Google Drive folder lists and opened-file copies from this device?")) return;
+      clearLocalCache().then(function () {
+        setNotice("");
+        loadCurrent(false, true);
+      });
+    });
+
+    driveToolbar.append(
+      driveFilterSelect,
+      driveSortSelect,
+      driveCount,
+      drivePath,
+      refresh,
+      clear
+    );
+    mainTop.appendChild(driveToolbar);
+    updateDrivePath();
+  }
+
+  function updateDrivePath() {
+    if (!drivePath || !drivePath.isConnected) return;
+    drivePath.innerHTML = "";
+    stack.forEach(function (folder, index) {
+      if (index) {
+        var sep = document.createElement("span");
+        sep.className = "ja-drive-crumb-separator";
+        sep.textContent = "›";
+        drivePath.appendChild(sep);
+      }
+      var crumb = button(folder.name, "ja-drive-crumb", "crumb");
+      crumb.dataset.index = String(index);
+      crumb.disabled = index === stack.length - 1;
+      crumb.title = folder.name;
+      crumb.addEventListener("click", function () {
+        var targetIndex = Number(crumb.dataset.index);
+        if (!Number.isInteger(targetIndex) || targetIndex < 0 || targetIndex >= stack.length - 1) return;
+        if (activeController) activeController.abort();
+        if (refreshController) refreshController.abort();
+        stack = stack.slice(0, targetIndex + 1);
+        clearSelection();
+        loadCurrent(false, false);
+      });
+      drivePath.appendChild(crumb);
+    });
+  }
+
+  function restoreMainHeader() {
+    var libraryWindow = document.getElementById("ja-reference-library-window");
+    if (libraryWindow) libraryWindow.classList.remove("ja-lib-drive-active");
+    var mainTop = driveToolbarMainTop || document.querySelector("#ja-reference-library-window .ja-lib-main-top");
+    if (driveToolbar && driveToolbar.parentNode) driveToolbar.parentNode.removeChild(driveToolbar);
+    driveToolbar = null;
+    driveToolbarMainTop = null;
+    driveFilterSelect = null;
+    driveSortSelect = null;
+    driveCount = null;
+    drivePath = null;
+    if (mainTop) {
+      var readonly = mainTop.querySelector(".ja-lib-readonly");
+      if (readonly) readonly.hidden = false;
+    }
+  }
+
+  function renderBrowser() {
+    var content = contentEl();
+    if (!content) return;
+    ensureDriveToolbar();
+    renderRows();
+  }
+
+  function matchesFilter(item) {
+    if (currentFilter === "all") return true;
+    return categoryOf(item) === currentFilter;
+  }
+
+  function renderRows() {
+    var content = contentEl();
+    if (!content) return;
+    if (!driveToolbar || !driveToolbar.isConnected) ensureDriveToolbar();
 
     var query = (searchEl() && searchEl().value || "").trim().toLocaleLowerCase();
     var visible = sortItems(files.filter(function (item) {
       return (!query || String(item.name || "").toLocaleLowerCase().includes(query)) && matchesFilter(item);
     }));
 
-    var summary = document.createElement("div");
-    summary.className = "ja-drive-list-summary";
-    var count = document.createElement("strong");
-    count.textContent = visible.length + (visible.length === 1 ? " item" : " items");
-    var pathLabel = document.createElement("span");
-    pathLabel.textContent = stack.map(function (folder) { return folder.name; }).join(" / ");
-    summary.append(count, pathLabel);
-    browser.appendChild(summary);
+    if (driveCount) {
+      driveCount.textContent = visible.length + (visible.length === 1 ? " item" : " items");
+    }
+    updateDrivePath();
 
+    content.innerHTML = "";
+    var browser = document.createElement("div");
+    browser.className = "ja-drive-browser";
     var table = document.createElement("div");
     table.className = "ja-drive-table";
+
     var header = document.createElement("div");
     header.className = "ja-drive-columns";
     header.innerHTML = '<span>Name</span><span>Modified</span><span>Size</span>';
@@ -711,10 +797,11 @@
 
     visible.forEach(function (item) {
       var folder = isFolder(item);
-      var row = document.createElement("button");
-      row.type = "button";
+      var row = document.createElement("div");
       row.className = "ja-drive-row" + (item.id === selectedId ? " selected" : "");
       row.dataset.fileId = item.id;
+      row.setAttribute("role", "button");
+      row.setAttribute("tabindex", "0");
       row.setAttribute("aria-pressed", item.id === selectedId ? "true" : "false");
 
       var first = document.createElement("span");
@@ -722,14 +809,12 @@
       var icon = document.createElement("span");
       icon.className = "ja-drive-file-icon type-" + categoryOf(item);
       icon.textContent = iconFor(item);
-      var nameWrap = document.createElement("span");
-      nameWrap.className = "ja-drive-file-name";
+
       var name = document.createElement("strong");
+      name.className = "ja-drive-file-title";
       name.textContent = item.name || "Untitled";
-      var meta = document.createElement("small");
-      meta.textContent = categoryLabel(item) + (folder ? "" : " · Double-click to preview");
-      nameWrap.append(name, meta);
-      first.append(icon, nameWrap);
+      name.title = item.name || "Untitled";
+      first.append(icon, name);
 
       var modified = document.createElement("span");
       modified.className = "ja-drive-modified";
@@ -739,15 +824,15 @@
       size.textContent = folder ? "—" : formatBytes(item.size);
       row.append(first, modified, size);
 
-      row.addEventListener("click", function () {
-        if (folder) {
-          if (activeController) activeController.abort();
-          if (refreshController) refreshController.abort();
-          stack.push({ id: item.id, name: item.name || "Folder" });
-          clearSelection();
-          loadCurrent(false, false);
-          return;
-        }
+      function navigateFolder() {
+        if (activeController) activeController.abort();
+        if (refreshController) refreshController.abort();
+        stack.push({ id: item.id, name: item.name || "Folder" });
+        clearSelection();
+        loadCurrent(false, false);
+      }
+
+      function selectFile() {
         selectedId = item.id;
         if (window.JupiterReferenceLibrary) {
           window.JupiterReferenceLibrary.setSelectedFile(descriptor(item));
@@ -758,11 +843,39 @@
         });
         row.classList.add("selected");
         row.setAttribute("aria-pressed", "true");
+      }
+
+      row.addEventListener("click", function (event) {
+        if (event.target.closest(".ja-drive-file-title")) {
+          // Keep the file name text selectable; selection still occurs on pointer click.
+          selectFile();
+          return;
+        }
+        if (folder) navigateFolder();
+        else selectFile();
       });
 
-      row.addEventListener("dblclick", function () {
-        if (!folder && window.JupiterReferenceLibrary) {
+      row.addEventListener("dblclick", function (event) {
+        if (folder) return;
+        if (event.target.closest(".ja-drive-file-title")) {
+          event.preventDefault();
+        }
+        if (window.JupiterReferenceLibrary) {
           window.JupiterReferenceLibrary.preview(descriptor(item));
+        }
+      });
+
+      row.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          if (folder) navigateFolder();
+          else if (window.JupiterReferenceLibrary) {
+            window.JupiterReferenceLibrary.preview(descriptor(item));
+          }
+        } else if (event.key === " ") {
+          event.preventDefault();
+          if (folder) navigateFolder();
+          else selectFile();
         }
       });
 
@@ -770,14 +883,14 @@
     });
 
     browser.appendChild(table);
-
     if (nextPageToken) {
       var moreWrap = document.createElement("div");
       moreWrap.className = "ja-drive-more-wrap";
-      moreWrap.appendChild(button("Load more files", "ja-drive-load-more", "more"));
+      var more = button("Load more files", "ja-drive-load-more", "more");
+      more.addEventListener("click", function () { loadCurrent(true, false); });
+      moreWrap.appendChild(more);
       browser.appendChild(moreWrap);
     }
-
     content.appendChild(browser);
   }
 
@@ -785,35 +898,11 @@
     var target = event.target.closest("[data-drive-action]");
     if (!target || target.disabled) return;
     var action = target.dataset.driveAction;
-    if (action === "refresh" || action === "retry") {
+    if (action === "retry") {
       loadCurrent(false, true);
     } else if (action === "more") {
       loadCurrent(true, false);
-    } else if (action === "clear-cache") {
-      if (window.confirm("Clear saved Google Drive folder lists and opened-file copies from this device?")) {
-        clearLocalCache().then(function () {
-          setNotice("Local cache cleared. Refreshing the folder from Google Drive…", false);
-          loadCurrent(false, true);
-        });
-      }
-    } else if (action === "crumb") {
-      var index = Number(target.dataset.index);
-      if (Number.isInteger(index) && index >= 0 && index < stack.length - 1) {
-        if (activeController) activeController.abort();
-        if (refreshController) refreshController.abort();
-        stack = stack.slice(0, index + 1);
-        clearSelection();
-        loadCurrent(false, false);
-      }
     }
-  }
-
-  function onContentChange(event) {
-    var target = event.target;
-    if (!target || !target.dataset.driveControl) return;
-    if (target.dataset.driveControl === "filter") currentFilter = target.value;
-    if (target.dataset.driveControl === "sort") currentSort = target.value;
-    renderBrowser();
   }
 
   function init() {
@@ -826,6 +915,7 @@
   }
 
   function clear() {
+    restoreMainHeader();
     if (activeController) activeController.abort();
     if (refreshController) refreshController.abort();
     requestSerial++;
