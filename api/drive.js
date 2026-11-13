@@ -1,1 +1,284 @@
-module.exports = async function handler(req, res) { return res.status(501).json({ error: 'Drive API setup pending' }); };
+"use strict";
+
+const { createSign } = require("node:crypto");
+const { Readable } = require("node:stream");
+
+const DRIVE_API = "https://www.googleapis.com/drive/v3";
+const TOKEN_URL = "https://oauth2.googleapis.com/token";
+const ROOT_FOLDER_ID = "10ZkA2yVR0xHS9qpWpBRLjOKOCWIrzsNj";
+const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.readonly";
+const MAX_FOLDER_DEPTH = 30;
+
+const EXPORTS = {
+  "application/vnd.google-apps.document": {
+    mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    extension: ".docx"
+  },
+  "application/vnd.google-apps.spreadsheet": {
+    mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    extension: ".xlsx"
+  },
+  "application/vnd.google-apps.presentation": {
+    mimeType: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    extension: ".pptx"
+  },
+  "application/vnd.google-apps.drawing": {
+    mimeType: "application/pdf",
+    extension: ".pdf"
+  }
+};
+
+let cachedAccessToken = null;
+let tokenExpiresAt = 0;
+let tokenPromise = null;
+
+function sendError(res, status, message) {
+  res.setHeader("Cache-Control", "no-store");
+  return res.status(status).json({ error: message });
+}
+
+function getCredentials() {
+  const email = String(process.env.GOOGLE_DRIVE_SERVICE_ACCOUNT_EMAIL || "").trim();
+  const privateKey = String(process.env.GOOGLE_DRIVE_SERVICE_ACCOUNT_PRIVATE_KEY || "")
+    .replace(/\\n/g, "\n")
+    .trim();
+
+  if (!email || !privateKey || !privateKey.includes("BEGIN PRIVATE KEY")) {
+    const error = new Error(
+      "Google Drive preview needs server credentials. Add GOOGLE_DRIVE_SERVICE_ACCOUNT_EMAIL and GOOGLE_DRIVE_SERVICE_ACCOUNT_PRIVATE_KEY to Vercel, then redeploy."
+    );
+    error.statusCode = 503;
+    throw error;
+  }
+  return { email, privateKey };
+}
+
+function base64Url(value) {
+  return Buffer.from(value).toString("base64url");
+}
+
+async function getAccessToken() {
+  if (cachedAccessToken && tokenExpiresAt > Date.now() + 60000) {
+    return cachedAccessToken;
+  }
+  if (tokenPromise) return tokenPromise;
+
+  tokenPromise = (async function () {
+    const credentials = getCredentials();
+    const now = Math.floor(Date.now() / 1000);
+    const unsigned =
+      base64Url(JSON.stringify({ alg: "RS256", typ: "JWT" })) + "." +
+      base64Url(JSON.stringify({
+        iss: credentials.email,
+        scope: DRIVE_SCOPE,
+        aud: TOKEN_URL,
+        iat: now,
+        exp: now + 3600
+      }));
+
+    const signer = createSign("RSA-SHA256");
+    signer.update(unsigned);
+    signer.end();
+    const assertion = unsigned + "." + signer.sign(credentials.privateKey, "base64url");
+
+    const response = await fetch(TOKEN_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+        assertion
+      })
+    });
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok || !data.access_token) {
+      console.error("Drive service-account authentication failed:", response.status, data.error || "");
+      const error = new Error(
+        "Google could not authenticate the Library service account. Check the service-account email and private key in Vercel."
+      );
+      error.statusCode = 502;
+      throw error;
+    }
+
+    cachedAccessToken = data.access_token;
+    tokenExpiresAt = Date.now() + Math.max(60, Number(data.expires_in) || 3600) * 1000;
+    return cachedAccessToken;
+  })();
+
+  try {
+    return await tokenPromise;
+  } finally {
+    tokenPromise = null;
+  }
+}
+
+function buildUrl(path, params) {
+  const url = new URL(DRIVE_API + path);
+  Object.keys(params || {}).forEach((key) => {
+    if (params[key] !== undefined && params[key] !== null && params[key] !== "") {
+      url.searchParams.set(key, String(params[key]));
+    }
+  });
+  return url;
+}
+
+function resourceKeyHeader(fileId, resourceKey) {
+  return resourceKey
+    ? { "X-Goog-Drive-Resource-Keys": fileId + "/" + resourceKey }
+    : {};
+}
+
+async function getMetadata(fileId, token, resourceKey) {
+  const url = buildUrl("/files/" + encodeURIComponent(fileId), {
+    supportsAllDrives: "true",
+    fields: "id,name,mimeType,parents,resourceKey,shortcutDetails(targetId,targetMimeType,targetResourceKey),capabilities(canDownload),size,modifiedTime,webViewLink"
+  });
+  const response = await fetch(url.toString(), {
+    headers: Object.assign(
+      { Authorization: "Bearer " + token, Accept: "application/json" },
+      resourceKeyHeader(fileId, resourceKey)
+    )
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error(body.error && body.error.message || "Google Drive metadata request failed.");
+    error.statusCode = response.status;
+    throw error;
+  }
+  return body;
+}
+
+async function assertInsideLibrary(fileId, token, resourceKey) {
+  let currentId = fileId;
+  let currentKey = resourceKey || "";
+  const visited = new Set();
+
+  for (let depth = 0; depth < MAX_FOLDER_DEPTH; depth++) {
+    if (currentId === ROOT_FOLDER_ID) return true;
+    if (visited.has(currentId)) return false;
+    visited.add(currentId);
+
+    const metadata = await getMetadata(currentId, token, currentKey);
+    const parents = Array.isArray(metadata.parents) ? metadata.parents : [];
+    if (parents.includes(ROOT_FOLDER_ID)) return true;
+    if (!parents.length) return false;
+
+    currentId = parents[0];
+    currentKey = "";
+  }
+  return false;
+}
+
+function safeFilename(value) {
+  return String(value || "drive-file")
+    .replace(/[\r\n"\\/]/g, "_")
+    .slice(0, 180) || "drive-file";
+}
+
+async function downloadFile(req, res, token) {
+  const fileId = String(req.query.fileId || "").trim();
+  const resourceKey = String(req.query.resourceKey || "").trim();
+
+  if (!/^[A-Za-z0-9_-]{10,200}$/.test(fileId)) {
+    return sendError(res, 400, "Invalid Google Drive file identifier.");
+  }
+
+  if (!(await assertInsideLibrary(fileId, token, resourceKey))) {
+    return sendError(res, 403, "This file is not inside the configured Jupiter Astrology Library folder.");
+  }
+
+  let metadata = await getMetadata(fileId, token, resourceKey);
+  if (metadata.mimeType === "application/vnd.google-apps.shortcut" &&
+      metadata.shortcutDetails && metadata.shortcutDetails.targetId) {
+    const shortcut = metadata.shortcutDetails;
+    const targetId = shortcut.targetId;
+    const targetKey = shortcut.targetResourceKey || "";
+    if (!(await assertInsideLibrary(targetId, token, targetKey))) {
+      return sendError(res, 403, "This shortcut points to a file outside the configured Library folder.");
+    }
+    metadata = await getMetadata(targetId, token, targetKey);
+  }
+
+  if (metadata.capabilities && metadata.capabilities.canDownload === false) {
+    return sendError(res, 403, "The file owner has disabled downloading. Open this item in Google Drive instead.");
+  }
+
+  const exportInfo = EXPORTS[metadata.mimeType] || null;
+  const url = exportInfo
+    ? buildUrl("/files/" + encodeURIComponent(metadata.id) + "/export", { mimeType: exportInfo.mimeType })
+    : buildUrl("/files/" + encodeURIComponent(metadata.id), { alt: "media", supportsAllDrives: "true" });
+
+  const headers = { Authorization: "Bearer " + token };
+  if (metadata.resourceKey) {
+    headers["X-Goog-Drive-Resource-Keys"] = metadata.id + "/" + metadata.resourceKey;
+  }
+
+  const upstream = await fetch(url.toString(), { method: "GET", headers });
+  if (!upstream.ok) {
+    const body = await upstream.json().catch(() => ({}));
+    const message = body.error && body.error.message || "Google Drive could not return this file.";
+    if (exportInfo && /10.?MB|export.*size|file.*too large/i.test(message)) {
+      return sendError(res, 413, "Google Drive limits native Docs, Sheets and Slides exports to 10 MB. Open this file in Google Drive instead.");
+    }
+    console.error("Drive file content request failed:", upstream.status, message);
+    return sendError(
+      res,
+      upstream.status === 403 ? 403 : upstream.status === 404 ? 404 : 502,
+      upstream.status === 403
+        ? "The Library service account does not have Viewer/download access to this file. Share the Library folder with its service-account email as Viewer."
+        : message
+    );
+  }
+
+  if (!upstream.body) {
+    return sendError(res, 502, "Google Drive returned an empty file stream.");
+  }
+
+  const filename = exportInfo
+    ? safeFilename(String(metadata.name || "document").replace(/\.[^.]+$/, "") + exportInfo.extension)
+    : safeFilename(metadata.name || "drive-file");
+
+  res.statusCode = 200;
+  res.setHeader("Content-Type", exportInfo ? exportInfo.mimeType : upstream.headers.get("content-type") || "application/octet-stream");
+  res.setHeader("Content-Disposition", "inline; filename*=UTF-8''" + encodeURIComponent(filename));
+  res.setHeader("Cache-Control", "private, no-store");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+
+  const length = upstream.headers.get("content-length");
+  if (length) res.setHeader("Content-Length", length);
+
+  // Stream binary content to avoid buffering large files in the function.
+  Readable.fromWeb(upstream.body).on("error", (error) => {
+    console.error("Drive response stream failed:", error.message);
+    if (!res.headersSent) {
+      res.statusCode = 502;
+      res.end("Google Drive stream failed.");
+    } else {
+      res.destroy(error);
+    }
+  }).pipe(res);
+}
+
+module.exports = async function handler(req, res) {
+  if (req.method !== "GET") {
+    res.setHeader("Allow", "GET");
+    return sendError(res, 405, "Method not allowed.");
+  }
+
+  try {
+    const action = String(req.query.action || "");
+    if (action !== "download") return sendError(res, 400, "Unsupported Drive action.");
+    const token = await getAccessToken();
+    return await downloadFile(req, res, token);
+  } catch (error) {
+    const status = Number(error && error.statusCode) || 502;
+    console.error("Jupiter Drive preview endpoint:", status, error && error.message);
+
+    if (status === 503) return sendError(res, 503, error.message);
+    if (status === 403) {
+      return sendError(res, 403, "The service account cannot access this file. Share the configured Library folder with the service-account email as Viewer.");
+    }
+    if (status === 404) return sendError(res, 404, "Google Drive could not find this file. It may have been moved or deleted.");
+    return sendError(res, status >= 400 && status < 500 ? status : 502, error.message || "Google Drive preview request failed.");
+  }
+};
