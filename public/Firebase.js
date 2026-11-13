@@ -42,7 +42,7 @@
     apiKey: firebaseConfig.apiKey,
     // Defaults to the Firebase key. You may replace this with a dedicated
     // Google Drive API key restricted to your website's HTTP referrers.
-    driveApiKey: firebaseConfig.apiKey,
+    driveApiKey: "AIzaSyB5sipi-7bK2k-VWblZ9g4Lf1_uPSx1NXY",
     projectId: firebaseConfig.projectId
   };
 
