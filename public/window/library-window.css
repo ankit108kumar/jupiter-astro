@@ -499,6 +499,12 @@ html[data-palette="wooden"] #ja-reference-library-window[data-ja-lib-theme="webs
   color-scheme:light;
 }
 
+/* Wooden Glass + Website theme: keep the status footer readable on its light surface. */
+html[data-palette="wooden"] #ja-reference-library-window[data-ja-lib-theme="website"] .ja-lib-status,
+html[data-palette="wooden"] #ja-reference-library-window[data-ja-lib-theme="website"] .ja-lib-status span {
+  color:var(--ja-lib-muted) !important;
+}
+
 /* Wooden Glass + Apple Light: prevent the global Wooden footer rules leaking in. */
 #ja-reference-library-window[data-ja-lib-theme="apple"] .ja-lib-status {
   background:var(--ja-lib-panel-alt) !important;
