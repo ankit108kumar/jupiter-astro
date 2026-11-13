@@ -505,13 +505,14 @@ html[data-palette="wooden"] #ja-reference-library-window[data-ja-lib-theme="webs
   color:var(--ja-lib-muted) !important;
 }
 
-/* Wooden Glass + Apple Light: prevent the global Wooden footer rules leaking in. */
-#ja-reference-library-window[data-ja-lib-theme="apple"] .ja-lib-status {
-  background:var(--ja-lib-panel-alt) !important;
+/* Keep the status row neutral: let it share the Library's own background. */
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-status {
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
   color:var(--ja-lib-muted) !important;
-  border-top:1px solid var(--ja-lib-line) !important;
 }
-#ja-reference-library-window[data-ja-lib-theme="apple"] .ja-lib-status span {
+#ja-reference-library-window[data-ja-lib-theme] .ja-lib-status span {
   color:var(--ja-lib-muted) !important;
 }
 
