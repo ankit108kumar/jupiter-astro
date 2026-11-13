@@ -1,0 +1,152 @@
+/* =========================================================
+   JUPITER ASTRO — DOCUMENT PREVIEW SURFACE
+   Theme tokens inherit from the Library window.
+   ========================================================= */
+#ja-reference-library-window .ja-lib-main { position:relative; }
+#ja-reference-library-window .ja-lib-preview,
+#ja-reference-library-window .ja-lib-preview * { box-sizing:border-box; }
+#ja-reference-library-window .ja-lib-preview {
+  position:absolute; inset:0; z-index:20; display:none; flex-direction:column;
+  min-width:0; min-height:0; overflow:hidden;
+  color:var(--ja-lib-ink,var(--ink,#292722));
+  background:var(--ja-lib-bg,var(--bg,#fbfaf8));
+}
+#ja-reference-library-window .ja-lib-preview.is-open { display:flex; }
+#ja-reference-library-window .ja-lib-preview-toolbar {
+  min-height:58px; display:flex; align-items:center; gap:12px; padding:8px 14px;
+  border-bottom:1px solid var(--ja-lib-line,var(--line,#ddd));
+  background:var(--ja-lib-panel,var(--surface,#fff));
+}
+#ja-reference-library-window .ja-lib-preview-back {
+  display:inline-flex; align-items:center; gap:7px; flex:0 0 auto;
+  padding:7px 10px; border:1px solid var(--ja-lib-line-strong,#ddd); border-radius:8px;
+  color:var(--ja-lib-ink,#222); background:var(--ja-lib-panel-alt,#f5f5f5); cursor:pointer; font:inherit;
+}
+#ja-reference-library-window .ja-lib-preview-back:hover,
+#ja-reference-library-window .ja-lib-preview-tool:hover:not(:disabled) { background:var(--ja-lib-hover,#eee); }
+#ja-reference-library-window .ja-lib-preview-back span:first-child { font-size:22px; line-height:14px; }
+#ja-reference-library-window .ja-lib-preview-file { display:flex; align-items:center; gap:9px; min-width:0; flex:1; }
+#ja-reference-library-window .ja-lib-preview-file-icon {
+  display:grid; place-items:center; flex:0 0 34px; width:34px; height:34px; border-radius:9px;
+  color:var(--ja-lib-icon-ink,var(--ja-lib-accent,#8a663d));
+  background:var(--ja-lib-icon-bg,var(--ja-lib-accent-soft,#f2eadf)); font-size:12px; font-weight:750;
+}
+#ja-reference-library-window .ja-lib-preview-file-meta { display:flex; flex-direction:column; min-width:0; gap:2px; }
+#ja-reference-library-window .ja-lib-preview-name {
+  overflow:hidden; color:var(--ja-lib-ink,#222); font-size:12px; font-weight:700;
+  text-overflow:ellipsis; white-space:nowrap;
+}
+#ja-reference-library-window .ja-lib-preview-subtitle { color:var(--ja-lib-muted,#777); font-size:10px; }
+#ja-reference-library-window .ja-lib-preview-tools { display:flex; align-items:center; justify-content:flex-end; gap:5px; flex:0 0 auto; }
+#ja-reference-library-window .ja-lib-preview-tool {
+  min-width:29px; height:29px; padding:0 7px; border:1px solid var(--ja-lib-line-strong,#ddd);
+  border-radius:7px; color:var(--ja-lib-ink,#222); background:var(--ja-lib-panel,var(--surface,#fff));
+  cursor:pointer; font:inherit; font-size:13px;
+}
+#ja-reference-library-window .ja-lib-preview-tool:disabled { opacity:.35; cursor:not-allowed; }
+#ja-reference-library-window .ja-lib-preview-counter {
+  min-width:46px; color:var(--ja-lib-muted,#777); font-size:11px; text-align:center; font-variant-numeric:tabular-nums;
+}
+#ja-reference-library-window .ja-lib-preview-note { color:var(--ja-lib-muted,#777); font-size:10px; white-space:nowrap; }
+#ja-reference-library-window .ja-lib-preview-stage {
+  display:flex; flex:1; min-height:0; min-width:0; overflow:auto;
+  align-items:flex-start; justify-content:center; padding:18px;
+  background:var(--ja-lib-bg,var(--bg,#fbfaf8));
+}
+#ja-reference-library-window .ja-lib-preview-footer {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  min-height:29px; padding:5px 13px; border-top:1px solid var(--ja-lib-line,var(--line,#ddd));
+  color:var(--ja-lib-muted,#777); background:var(--ja-lib-panel,var(--surface,#fff)); font-size:10px;
+}
+#ja-reference-library-window .ja-lib-preview-loading {
+  display:flex; align-items:center; justify-content:center; gap:11px;
+  min-height:180px; margin:auto; color:var(--ja-lib-muted,#777); font-size:12px;
+}
+#ja-reference-library-window .ja-lib-preview-spinner {
+  width:19px; height:19px; border:2px solid var(--ja-lib-line-strong,#ddd);
+  border-top-color:var(--ja-lib-accent,#a87332); border-radius:50%;
+  animation:ja-lib-preview-spin .8s linear infinite;
+}
+@keyframes ja-lib-preview-spin { to { transform:rotate(360deg); } }
+#ja-reference-library-window .ja-lib-preview-message-card {
+  align-self:center; max-width:440px; margin:auto; padding:30px 24px;
+  border:1px solid var(--ja-lib-line,var(--line,#ddd)); border-radius:14px;
+  color:var(--ja-lib-ink,#222); background:var(--ja-lib-panel,var(--surface,#fff));
+  text-align:center; box-shadow:0 8px 30px rgba(0,0,0,.06);
+}
+#ja-reference-library-window .ja-lib-preview-message-card h3 { margin:10px 0 6px; font-size:15px; }
+#ja-reference-library-window .ja-lib-preview-message-card p { margin:0; color:var(--ja-lib-muted,#777); font-size:12px; }
+#ja-reference-library-window .ja-lib-preview-message-card small { display:block; margin-top:10px; color:var(--ja-lib-muted,#777); font-size:10px; }
+#ja-reference-library-window .ja-lib-preview-message-icon {
+  display:grid; place-items:center; width:38px; height:38px; margin:auto; border-radius:50%;
+  color:var(--ja-lib-alert-ink,#805a1e); background:var(--ja-lib-alert-bg,#fff2d8); font-weight:800;
+}
+#ja-reference-library-window .ja-lib-preview-page-frame { width:max-content; max-width:100%; padding:8px; background:#fff; box-shadow:0 4px 22px rgba(0,0,0,.13); }
+#ja-reference-library-window .ja-lib-preview-page-frame canvas { display:block; max-width:100%; height:auto; }
+#ja-reference-library-window .ja-lib-preview-image-wrap { display:flex; align-items:center; justify-content:center; width:100%; min-height:100%; overflow:auto; }
+#ja-reference-library-window .ja-lib-preview-image {
+  display:block; max-width:100%; max-height:none; object-fit:contain;
+  transform-origin:center center; box-shadow:0 4px 22px rgba(0,0,0,.10);
+}
+#ja-reference-library-window .ja-lib-docx-page {
+  width:min(850px,100%); min-height:100%; padding:48px 56px;
+  color:#222; background:#fff; box-shadow:0 4px 22px rgba(0,0,0,.12);
+  font:14px/1.65 Georgia,"Times New Roman",serif; overflow-wrap:anywhere;
+}
+#ja-reference-library-window .ja-lib-docx-page h1,
+#ja-reference-library-window .ja-lib-docx-page h2,
+#ja-reference-library-window .ja-lib-docx-page h3 { color:#222; margin:1.2em 0 .5em; }
+#ja-reference-library-window .ja-lib-docx-page p { margin:.6em 0; }
+#ja-reference-library-window .ja-lib-docx-page table { width:100%; border-collapse:collapse; margin:1em 0; font:12px/1.45 Arial,sans-serif; }
+#ja-reference-library-window .ja-lib-docx-page td,
+#ja-reference-library-window .ja-lib-docx-page th { border:1px solid #c9c9c9; padding:5px 7px; vertical-align:top; }
+#ja-reference-library-window .ja-lib-docx-page img { max-width:100%; height:auto; }
+#ja-reference-library-window .ja-lib-docx-page a { color:#1769aa; }
+#ja-reference-library-window .ja-lib-text-preview {
+  width:min(1100px,100%); min-height:100%; margin:0; padding:22px;
+  border:1px solid var(--ja-lib-line,var(--line,#ddd)); border-radius:10px;
+  color:var(--ja-lib-ink,#222); background:var(--ja-lib-panel,var(--surface,#fff));
+  font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace; white-space:pre-wrap; overflow-wrap:anywhere; tab-size:2;
+}
+#ja-reference-library-window .ja-lib-sheet-tabs {
+  display:flex; align-self:stretch; gap:3px; width:100%; min-height:34px; overflow-x:auto;
+  margin:-18px -18px 12px; padding:6px 14px 0;
+  border-bottom:1px solid var(--ja-lib-line,var(--line,#ddd)); background:var(--ja-lib-panel,var(--surface,#fff));
+}
+#ja-reference-library-window .ja-lib-sheet-tab {
+  padding:6px 12px; border:1px solid transparent; border-bottom:0; border-radius:7px 7px 0 0;
+  color:var(--ja-lib-muted,#777); background:transparent; cursor:pointer; font:inherit; font-size:11px; white-space:nowrap;
+}
+#ja-reference-library-window .ja-lib-sheet-tab.active {
+  color:var(--ja-lib-ink,#222); background:var(--ja-lib-bg,#fff);
+  border-color:var(--ja-lib-line,var(--line,#ddd)); font-weight:700;
+}
+#ja-reference-library-window .ja-lib-sheet-wrap {
+  width:max-content; min-width:100%; align-self:flex-start;
+  border:1px solid var(--ja-lib-line,var(--line,#ddd)); background:var(--ja-lib-panel,var(--surface,#fff));
+}
+#ja-reference-library-window .ja-lib-sheet-table { border-collapse:collapse; font:11px/1.4 Arial,sans-serif; color:#252525; }
+#ja-reference-library-window .ja-lib-sheet-table th,
+#ja-reference-library-window .ja-lib-sheet-table td {
+  min-width:88px; max-width:280px; padding:5px 9px; border:1px solid #d9dde3;
+  text-align:left; white-space:pre-wrap; overflow-wrap:anywhere;
+}
+#ja-reference-library-window .ja-lib-sheet-table thead th { position:sticky; top:0; z-index:1; background:#edf1f5; font-weight:700; }
+#ja-reference-library-window .ja-lib-sheet-table .row-number {
+  position:sticky; left:0; min-width:42px; max-width:42px; color:#616975; background:#f2f4f7; text-align:right;
+}
+#ja-reference-library-window .ja-lib-sheet-limit,
+#ja-reference-library-window .ja-lib-preview-empty-sheet { padding:12px; color:var(--ja-lib-muted,#777); font-size:11px; }
+#ja-reference-library-window .ja-lib-media-wrap { display:flex; align-items:center; justify-content:center; width:100%; min-height:100%; }
+#ja-reference-library-window .ja-lib-video { display:block; width:min(100%,1100px); max-height:100%; background:#111; }
+#ja-reference-library-window .ja-lib-audio { width:min(600px,100%); }
+@media (max-width:700px) {
+  #ja-reference-library-window .ja-lib-preview-toolbar { gap:7px; padding:7px 8px; }
+  #ja-reference-library-window .ja-lib-preview-back { padding:7px; }
+  #ja-reference-library-window .ja-lib-preview-back span:last-child { display:none; }
+  #ja-reference-library-window .ja-lib-preview-file-icon { display:none; }
+  #ja-reference-library-window .ja-lib-preview-name { font-size:11px; }
+  #ja-reference-library-window .ja-lib-preview-note { display:none; }
+  #ja-reference-library-window .ja-lib-preview-stage { padding:10px; }
+  #ja-reference-library-window .ja-lib-docx-page { padding:24px 20px; }
+}
