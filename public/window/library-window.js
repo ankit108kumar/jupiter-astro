@@ -16,6 +16,9 @@
   var maximized = false;
   var previousBounds = null;
   var activeProvider = "all";
+  var SIDEBAR_COLLAPSED_KEY = "ja-library-sidebar-collapsed";
+  var sidebarCollapsed = false;
+  try { sidebarCollapsed = localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "true"; } catch (error) {}
   var THEME_MODE_KEY = "ja-library-theme-mode";
   var themeMode = "website";
 
@@ -126,6 +129,7 @@
         '" type="button" data-ja-provider="' + provider.id + '">' +
         '<span class="ja-lib-provider-icon" aria-hidden="true">' + provider.icon + '</span>' +
         '<span>' + provider.label + '</span>' +
+        '<span class="ja-lib-provider-tooltip" aria-hidden="true">' + provider.label + '</span>' +
         (provider.id !== "all" ? '<span class="ja-lib-provider-state" title="Not connected"></span>' : "") +
         '</button>';
     }).join("");
@@ -144,9 +148,17 @@
         '</div>' +
       '</header>' +
       '<div class="ja-lib-body">' +
-        '<aside class="ja-lib-sidebar"><div class="ja-lib-side-heading">Library sources</div><nav aria-label="Cloud storage providers">' +
-          providerButtons +
-        '</nav></aside>' +
+        '<aside class="ja-lib-sidebar">' +
+          '<div class="ja-lib-sidebar-head">' +
+            '<div class="ja-lib-side-heading">Library sources</div>' +
+            '<button class="ja-lib-sidebar-toggle" type="button" data-ja-action="toggle-sidebar" aria-label="Collapse sidebar" aria-expanded="true" aria-controls="ja-lib-provider-nav" title="Collapse sidebar">' +
+              '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 5-7 7 7 7"></path></svg>' +
+            '</button>' +
+          '</div>' +
+          '<nav id="ja-lib-provider-nav" aria-label="Cloud storage providers">' +
+            providerButtons +
+          '</nav>' +
+        '</aside>' +
         '<main class="ja-lib-main">' +
           '<div class="ja-lib-main-top">' +
             '<h2 class="ja-lib-heading">Library</h2>' +
@@ -170,6 +182,7 @@
 
     document.body.appendChild(libraryWindow);
     applyThemeMode(themeMode, false);
+    updateSidebarState();
 
     launcher = document.createElement("div");
     launcher.id = LAUNCHER_ID;
@@ -186,6 +199,24 @@
     });
 
     enableDragging();
+  }
+
+  function updateSidebarState() {
+    if (!libraryWindow) return;
+    libraryWindow.classList.toggle("ja-lib-sidebar-collapsed", sidebarCollapsed);
+
+    var button = libraryWindow.querySelector('[data-ja-action="toggle-sidebar"]');
+    if (!button) return;
+    var label = sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar";
+    button.setAttribute("aria-label", label);
+    button.setAttribute("title", label);
+    button.setAttribute("aria-expanded", sidebarCollapsed ? "false" : "true");
+  }
+
+  function toggleSidebar() {
+    sidebarCollapsed = !sidebarCollapsed;
+    updateSidebarState();
+    try { localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(sidebarCollapsed)); } catch (error) {}
   }
 
   function selectProvider(providerId) {
@@ -222,6 +253,7 @@
     if (action === "maximize") toggleMaximize();
     if (action === "fullscreen") toggleFullscreen();
     if (action === "theme-toggle") toggleThemeMode();
+    if (action === "toggle-sidebar") toggleSidebar();
   }
 
   function toggleFullscreen() {
