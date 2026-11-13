@@ -621,3 +621,35 @@ html[data-palette="wooden"] #ja-reference-library-window[data-ja-lib-theme="webs
   visibility:visible;
   transform:translateY(-50%) translateX(0);
 }
+
+
+/* macOS-style traffic-light glyphs: hidden at rest, revealed on hover/focus. */
+#ja-reference-library-window .ja-lib-dot {
+  display:grid;
+  place-items:center;
+  position:relative;
+}
+#ja-reference-library-window .ja-lib-dot::before {
+  display:block;
+  color:rgba(45,35,25,.82);
+  font:700 10px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  opacity:0;
+  transition:opacity 100ms ease;
+  pointer-events:none;
+}
+#ja-reference-library-window .ja-lib-dot.close::before { content:"×"; font-size:11px; }
+#ja-reference-library-window .ja-lib-dot.minimize::before { content:"−"; }
+#ja-reference-library-window .ja-lib-dot.maximize::before { content:"+"; font-size:10px; }
+#ja-reference-library-window .ja-lib-window-controls:hover .ja-lib-dot::before,
+#ja-reference-library-window .ja-lib-window-controls:focus-within .ja-lib-dot::before,
+#ja-reference-library-window .ja-lib-dot:focus-visible::before {
+  opacity:1;
+}
+#ja-reference-library-window .ja-lib-dot:hover {
+  filter:brightness(.94);
+  transform:scale(1.08);
+}
+#ja-reference-library-window .ja-lib-dot:focus-visible {
+  outline:2px solid var(--ja-lib-accent, #007AFF);
+  outline-offset:2px;
+}
