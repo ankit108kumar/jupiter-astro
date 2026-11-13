@@ -40,6 +40,9 @@
   // Restrict this API key by HTTP referrer and enabled APIs in Google Cloud.
   window.jaFirebaseConfig = {
     apiKey: firebaseConfig.apiKey,
+    // Defaults to the Firebase key. You may replace this with a dedicated
+    // Google Drive API key restricted to your website's HTTP referrers.
+    driveApiKey: firebaseConfig.apiKey,
     projectId: firebaseConfig.projectId
   };
 
