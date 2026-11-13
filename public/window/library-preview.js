@@ -11,8 +11,8 @@
   if (window.__JA_LIBRARY_PREVIEW_LOADED) return;
   window.__JA_LIBRARY_PREVIEW_LOADED = true;
 
-  var PDFJS_URL = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs";
-  var PDFJS_WORKER_URL = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";
+  var PDFJS_URL = "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.5.438/build/pdf.mjs";
+  var PDFJS_WORKER_URL = "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.5.438/build/pdf.worker.mjs";
   var MAMMOTH_URL = "https://cdn.jsdelivr.net/npm/mammoth@1.13.0/mammoth.browser.min.js";
   var SHEETJS_URL = "https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js";
   var PAGUS_CORE_URL = "https://esm.sh/@pagus-kit/core@0.1.1?bundle";
