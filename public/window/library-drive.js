@@ -246,6 +246,30 @@
     return /^application\/vnd\.google-apps\.(document|spreadsheet|presentation|drawing)$/.test(mime || "");
   }
 
+  function workspaceExport(mime) {
+    switch (mime) {
+      case "application/vnd.google-apps.document":
+        return {
+          mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          extension: ".docx"
+        };
+      case "application/vnd.google-apps.spreadsheet":
+        return {
+          mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          extension: ".xlsx"
+        };
+      case "application/vnd.google-apps.presentation":
+        return {
+          mimeType: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+          extension: ".pptx"
+        };
+      case "application/vnd.google-apps.drawing":
+        return { mimeType: "application/pdf", extension: ".pdf" };
+      default:
+        return null;
+    }
+  }
+
   function resourceHeader(fileId, resourceKey) {
     return resourceKey ? { "X-Goog-Drive-Resource-Keys": fileId + "/" + resourceKey } : {};
   }
@@ -296,11 +320,12 @@
     var fileId = shortcut.targetId || item.id;
     var mimeType = shortcut.targetMimeType || item.mimeType || "";
     var resourceKey = shortcut.targetResourceKey || item.resourceKey || "";
-    var isWorkspace = isGoogleWorkspace(mimeType);
+    var exportInfo = workspaceExport(mimeType);
+    var isWorkspace = !!exportInfo;
 
     var url = new URL(API_ROOT + "/files/" + encodeURIComponent(fileId) + (isWorkspace ? "/export" : ""));
     if (isWorkspace) {
-      url.searchParams.set("mimeType", "application/pdf");
+      url.searchParams.set("mimeType", exportInfo.mimeType);
     } else {
       url.searchParams.set("alt", "media");
     }
@@ -332,14 +357,19 @@
     }
     var blob = await response.blob();
     if (!blob.size) throw new Error("Google Drive returned an empty file.");
+    if (isWorkspace && exportInfo.mimeType && blob.type !== exportInfo.mimeType) {
+      blob = new Blob([blob], { type: exportInfo.mimeType });
+    }
     return blob;
   }
 
   function fileCacheKey(item) {
     var shortcut = item.shortcutDetails || {};
     var id = shortcut.targetId || item.id;
+    var mime = shortcut.targetMimeType || item.mimeType || "";
+    var exportInfo = workspaceExport(mime);
     var modified = item.modifiedTime || "unversioned";
-    return "file:" + id + ":" + modified;
+    return "file:" + id + ":" + modified + ":" + (exportInfo ? exportInfo.extension : "original");
   }
 
   async function getCachedFile(item, signal) {
@@ -367,13 +397,14 @@
     var shortcut = item.shortcutDetails || {};
     var id = shortcut.targetId || item.id;
     var mime = shortcut.targetMimeType || item.mimeType;
-    var resourceKey = shortcut.targetResourceKey || item.resourceKey || "";
-    var googleDoc = isGoogleWorkspace(mime);
-    var name = googleDoc ? String(item.name).replace(/\.[^.]+$/, "") + ".pdf" : item.name;
+    var exportInfo = workspaceExport(mime);
+    var name = exportInfo
+      ? String(item.name).replace(/\.[^.]+$/, "") + exportInfo.extension
+      : item.name;
     return {
       id: id,
       name: name,
-      mimeType: googleDoc ? "application/pdf" : mime,
+      mimeType: exportInfo ? exportInfo.mimeType : mime,
       size: Number(item.size) || undefined,
       provider: "Google Drive",
       modifiedTime: item.modifiedTime || "",
