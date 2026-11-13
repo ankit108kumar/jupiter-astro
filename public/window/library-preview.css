@@ -98,6 +98,15 @@
   color:var(--ja-lib-alert-ink,#805a1e); background:var(--ja-lib-alert-bg,#fff2d8); font-weight:800;
 }
 #ja-reference-library-window .ja-lib-preview-page-frame { width:max-content; max-width:100%; padding:8px; background:#fff; box-shadow:0 4px 22px rgba(0,0,0,.13); }
+#ja-reference-library-window .ja-lib-drive-frame {
+  display:flex; width:100%; min-height:560px; height:100%; align-self:stretch;
+  overflow:hidden; border:1px solid var(--ja-lib-line,var(--line,#ddd));
+  border-radius:9px; background:var(--ja-lib-panel,var(--surface,#fff));
+}
+#ja-reference-library-window .ja-lib-drive-frame iframe {
+  display:block; width:100%; min-height:560px; height:100%; flex:1;
+  border:0; background:#fff;
+}
 #ja-reference-library-window .ja-lib-preview-page-frame canvas { display:block; max-width:100%; height:auto; }
 #ja-reference-library-window .ja-lib-preview-image-wrap { display:flex; align-items:center; justify-content:center; width:100%; min-height:100%; overflow:auto; }
 #ja-reference-library-window .ja-lib-preview-image {
