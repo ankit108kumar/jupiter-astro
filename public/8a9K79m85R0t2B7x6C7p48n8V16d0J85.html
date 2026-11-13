@@ -545,14 +545,19 @@
 const activeChartsRegistry = new Map();
 
 const Theme = {
+  // Jupiter Astro's default theme is Light. Do not derive it from the
+  // operating system's appearance preference. Earlier builds could save
+  // an accidental "dark" value after auto-detecting the OS; normalize it.
   get() {
     try {
-      return localStorage.getItem('ja-theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-    } catch (e) {
-      return 'dark';
-    }
+      localStorage.setItem('ja-theme', 'light');
+    } catch (e) {}
+    return 'light';
   },
  apply(mode) {
+    // The default theme is intentionally Light; dark chart colors are not
+    // used unless a specifically selected custom palette defines them.
+    mode = 'light';
     document.documentElement.setAttribute('data-theme', mode);
     const icon = document.getElementById('themeIcon');
     const text = document.getElementById('themeText');
