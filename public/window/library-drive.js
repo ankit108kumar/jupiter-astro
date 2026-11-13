@@ -292,8 +292,8 @@
       url.searchParams.set("mimeType", "application/pdf");
     } else {
       url.searchParams.set("alt", "media");
-      url.searchParams.set("supportsAllDrives", "true");
     }
+    url.searchParams.set("supportsAllDrives", "true");
     url.searchParams.set("key", apiKey());
 
     var response;
@@ -356,14 +356,6 @@
     var resourceKey = shortcut.targetResourceKey || item.resourceKey || "";
     var googleDoc = isGoogleWorkspace(mime);
     var name = googleDoc ? String(item.name).replace(/\.[^.]+$/, "") + ".pdf" : item.name;
-    var embedHost = "https://drive.google.com/file/d/";
-    if (mime === "application/vnd.google-apps.document") embedHost = "https://docs.google.com/document/d/";
-    else if (mime === "application/vnd.google-apps.spreadsheet") embedHost = "https://docs.google.com/spreadsheets/d/";
-    else if (mime === "application/vnd.google-apps.presentation") embedHost = "https://docs.google.com/presentation/d/";
-    else if (mime === "application/vnd.google-apps.drawing") embedHost = "https://docs.google.com/drawings/d/";
-    var embedUrl = embedHost + encodeURIComponent(id) + "/preview";
-    if (resourceKey) embedUrl += "?resourcekey=" + encodeURIComponent(resourceKey);
-
     return {
       id: id,
       name: name,
@@ -371,7 +363,6 @@
       size: Number(item.size) || undefined,
       provider: "Google Drive",
       modifiedTime: item.modifiedTime || "",
-      embedUrl: embedUrl,
       webViewLink: item.webViewLink || "",
       getBlob: function (options) {
         return getCachedFile(item, options && options.signal);
