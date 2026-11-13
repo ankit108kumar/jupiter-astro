@@ -16,6 +16,7 @@
   var maximized = false;
   var previousBounds = null;
   var activeProvider = "all";
+  var selectedFile = null;
   var SIDEBAR_COLLAPSED_KEY = "ja-library-sidebar-collapsed";
   var sidebarCollapsed = false;
   try { sidebarCollapsed = localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "true"; } catch (error) {}
@@ -173,7 +174,7 @@
           '</div></div>' +
           '<div class="ja-lib-notice" role="status" aria-live="polite"></div>' +
           '<footer class="ja-lib-status"><span class="ja-lib-source-label">All storage providers · Not connected</span>' +
-            '<div class="ja-lib-actions"><button class="ja-lib-action" type="button" disabled>Preview</button>' +
+            '<div class="ja-lib-actions"><button class="ja-lib-action" type="button" data-ja-action="preview-selected" disabled>Preview</button>' +
             '<button class="ja-lib-action primary" type="button" disabled>Use in module</button></div>' +
           '</footer>' +
         '</main>' +
@@ -218,6 +219,23 @@
     try { localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(sidebarCollapsed)); } catch (error) {}
   }
 
+  function setSelectedFile(file) {
+    selectedFile = file || null;
+    if (libraryWindow) {
+      var button = libraryWindow.querySelector('[data-ja-action="preview-selected"]');
+      if (button) button.disabled = !selectedFile;
+    }
+  }
+
+  function previewSelectedFile() {
+    if (!selectedFile) return Promise.resolve(false);
+    if (!window.JupiterLibraryPreview || typeof window.JupiterLibraryPreview.open !== "function") {
+      console.warn("Jupiter Astrology: Document preview module has not loaded.");
+      return Promise.resolve(false);
+    }
+    return window.JupiterLibraryPreview.open(selectedFile);
+  }
+
   function selectProvider(providerId) {
     activeProvider = providerId;
     libraryWindow.querySelectorAll("[data-ja-provider]").forEach(function (button) {
@@ -253,6 +271,7 @@
     if (action === "fullscreen") toggleFullscreen();
     if (action === "theme-toggle") toggleThemeMode();
     if (action === "toggle-sidebar") toggleSidebar();
+    if (action === "preview-selected") previewSelectedFile();
   }
 
   function toggleFullscreen() {
@@ -301,6 +320,7 @@
 
   function closeWindow() {
     if (!libraryWindow) return;
+    if (window.JupiterLibraryPreview && window.JupiterLibraryPreview.isOpen()) window.JupiterLibraryPreview.close({ silent:true });
     libraryWindow.classList.remove("ja-lib-open", "ja-lib-maximized");
     libraryWindow.setAttribute("aria-hidden", "true");
     launcher.classList.remove("visible");
@@ -390,6 +410,7 @@
     // Let the browser handle Escape first when exiting Fullscreen.
     if (event.key === "Escape" && !document.fullscreenElement &&
         libraryWindow && libraryWindow.classList.contains("ja-lib-open")) {
+      if (window.JupiterLibraryPreview && window.JupiterLibraryPreview.isOpen()) return;
       closeWindow();
     }
   }, true);
@@ -397,6 +418,9 @@
   window.JupiterReferenceLibrary = {
     open: openWindow,
     close: closeWindow,
+    setSelectedFile: setSelectedFile,
+    previewSelected: previewSelectedFile,
+    preview: function (file) { if (file) setSelectedFile(file); return previewSelectedFile(); },
     minimize: minimizeWindow,
     restore: restoreWindow,
     isOpen: function () { return !!libraryWindow && libraryWindow.classList.contains("ja-lib-open"); },
