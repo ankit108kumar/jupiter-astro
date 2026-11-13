@@ -141,3 +141,101 @@
   #ja-reference-library-window .ja-lib-heading { font-size:17px; }
   #ja-reference-library-window .ja-lib-header-spacer { width:10px;flex-basis:10px; }
 }
+
+
+/* =========================================================
+   FULLSCREEN + INSTALLED LIBRARY APP MODE
+   ========================================================= */
+
+/* Fullscreen the library surface itself, hiding the browser's tab/toolbar UI. */
+#ja-reference-library-window:fullscreen {
+  position: fixed !important;
+  inset: 0 !important;
+  left: 0 !important;
+  top: 0 !important;
+  transform: none !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  max-height: none !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  resize: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+#ja-reference-library-window:fullscreen::backdrop {
+  background: #fbfaf8;
+}
+
+/* Full viewport layout when opened as the separately installed PWA. */
+html.ja-lib-app-mode,
+html.ja-lib-app-mode body {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #fbfaf8;
+}
+html.ja-lib-app-mode #ja-reference-library-window {
+  position: fixed;
+  inset: 0;
+  left: 0;
+  top: 0;
+  transform: none;
+  width: 100vw;
+  width: 100dvw;
+  height: 100vh;
+  height: 100dvh;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  max-height: none;
+  display: none;
+  resize: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+html.ja-lib-app-mode #ja-reference-library-window.ja-lib-open {
+  display: flex;
+}
+html.ja-lib-app-mode #ja-reference-library-window .ja-lib-titlebar {
+  cursor: default;
+  touch-action: auto;
+}
+html.ja-lib-app-mode #ja-reference-library-launcher {
+  display: none !important;
+}
+
+/* Fullscreen button in the library title bar. */
+#ja-reference-library-window .ja-lib-fullscreen {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid rgba(70,60,48,.12);
+  border-radius: 7px;
+  color: #625b50;
+  background: rgba(255,255,255,.45);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+}
+#ja-reference-library-window .ja-lib-fullscreen:hover {
+  color: #49351d;
+  background: rgba(255,255,255,.9);
+}
+@media (max-width: 620px) {
+  #ja-reference-library-window .ja-lib-fullscreen {
+    flex-basis: 28px;
+    width: 28px;
+    height: 28px;
+  }
+}
