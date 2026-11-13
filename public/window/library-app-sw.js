@@ -7,7 +7,8 @@ var APP_SHELL = [
   "/window/library-app.webmanifest",
   "/window/library-window.css",
   "/window/library-window.js",
-  "/window/library-icon.svg"
+  "/window/library-icon-192.svg",
+  "/window/library-icon-512.svg"
 ];
 
 self.addEventListener("install", function (event) {
