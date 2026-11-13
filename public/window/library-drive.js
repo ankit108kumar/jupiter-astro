@@ -136,6 +136,17 @@
     } catch (error) {}
   }
 
+  function requestPersistentStorage() {
+    if (!navigator.storage || typeof navigator.storage.persist !== "function") return;
+    navigator.storage.persist().then(function (granted) {
+      if (granted) {
+        console.info("Jupiter Astro Library: browser granted persistent storage.");
+      } else {
+        console.info("Jupiter Astro Library: local cache is best-effort browser storage.");
+      }
+    }).catch(function () {});
+  }
+
   async function clearLocalCache() {
     memoryCache.clear();
     var db = await openCacheDb();
@@ -313,6 +324,9 @@
       try {
         var body = await response.json();
         if (body.error && body.error.message) message = body.error.message;
+        if (isWorkspace && /export.*10\s*MB|file.*too large|export.*size/i.test(message)) {
+          message = "Google Drive's export endpoint has a 10 MB response limit for native Docs, Sheets and Slides. Use Open in Google Drive for this file.";
+        }
       } catch (error) {}
       throw new Error(message);
     }
@@ -421,6 +435,7 @@
   }
 
   function openRoot() {
+    requestPersistentStorage();
     if (activeController) activeController.abort();
     if (refreshController) refreshController.abort();
     requestSerial++;
@@ -669,7 +684,6 @@
       row.type = "button";
       row.className = "ja-drive-row" + (item.id === selectedId ? " selected" : "");
       row.dataset.fileId = item.id;
-      row.setAttribute("role", "listitem");
       row.setAttribute("aria-pressed", item.id === selectedId ? "true" : "false");
 
       var first = document.createElement("span");
