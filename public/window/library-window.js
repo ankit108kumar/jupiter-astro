@@ -317,15 +317,27 @@
 
   document.addEventListener("fullscreenchange", syncFullscreenButton);
 
-  function openWindow() {
+  var searchFocusTimer = null;
+
+  function openWindow(options) {
+    options = options || {};
+    if (searchFocusTimer) {
+      window.clearTimeout(searchFocusTimer);
+      searchFocusTimer = null;
+    }
     createWindow();
     libraryWindow.classList.add("ja-lib-open");
     libraryWindow.setAttribute("aria-hidden", "false");
     launcher.classList.remove("visible");
-    window.setTimeout(function () {
-      var search = libraryWindow.querySelector(".ja-lib-search");
-      if (search) search.focus({ preventScroll: true });
-    }, 0);
+
+    if (options.focusSearch !== false) {
+      searchFocusTimer = window.setTimeout(function () {
+        searchFocusTimer = null;
+        if (window.JupiterLibraryPreview && window.JupiterLibraryPreview.isOpen()) return;
+        var search = libraryWindow.querySelector(".ja-lib-search");
+        if (search) search.focus({ preventScroll: true });
+      }, 0);
+    }
   }
 
   function closeWindow() {
