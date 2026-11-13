@@ -36,6 +36,13 @@
     appId: "1:867320173550:web:fead03b3b96c8fd01034ff"
   };
 
+  // Public client configuration for browser-side integrations.
+  // Restrict this API key by HTTP referrer and enabled APIs in Google Cloud.
+  window.jaFirebaseConfig = {
+    apiKey: firebaseConfig.apiKey,
+    projectId: firebaseConfig.projectId
+  };
+
 
   // ================= INITIALIZE FIREBASE =================
 
