@@ -482,6 +482,9 @@
     nextPageToken = null;
     currentFilter = "all";
     currentSort = "name-asc";
+    ensureDriveToolbar();
+    if (driveFilterSelect) driveFilterSelect.value = currentFilter;
+    if (driveSortSelect) driveSortSelect.value = currentSort;
     clearSelection();
     bindSearch();
     var search = searchEl();
@@ -518,15 +521,15 @@
       if (serial !== requestSerial || !stack.length || stack[stack.length - 1].id !== folderId) return;
       await cachePut(folderCacheKey(folderId, pageToken), result);
       applyPage(result, append);
-      setStatus("Google Drive · Connected · Read only");
-      setNotice("");
-      renderBrowser();
+      setStatus("Google Drive · Connected");
+      // Keep the current DOM intact during a background refresh so it cannot
+      // interrupt row selection, text selection or a double-click gesture.
     } catch (error) {
       if (error && error.name === "AbortError") return;
       if (serial !== requestSerial) return;
       if (files.length) {
-        setStatus("Google Drive · Cached · Read only");
-        setNotice("Showing the saved folder list. Google Drive could not refresh it: " + (error.message || "Network error"), false);
+        setStatus("Google Drive · Cached");
+        setNotice("");
       } else {
         setStatus("Google Drive · Connection needs attention");
         showMessage("Google Drive could not be connected", error.message || "Check folder sharing and API settings.", true);
@@ -550,7 +553,7 @@
       if (serial !== requestSerial) return;
       if (cached && Array.isArray(cached.files)) {
         applyPage(cached, append);
-        setStatus("Google Drive · Cached · Read only");
+        setStatus("Google Drive · Cached");
         setNotice("");
         renderBrowser();
         loading = false;
@@ -569,14 +572,14 @@
       if (serial !== requestSerial) return;
       await cachePut(cacheKey, result);
       applyPage(result, append);
-      setStatus("Google Drive · Connected · Read only");
+      setStatus("Google Drive · Connected");
       setNotice("");
       renderBrowser();
     } catch (error) {
       if (error && error.name === "AbortError") return;
       if (serial !== requestSerial) return;
       if (files.length) {
-        setStatus("Google Drive · Cached · Read only");
+        setStatus("Google Drive · Cached");
         setNotice("");
         renderBrowser();
       } else {
