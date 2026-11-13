@@ -157,7 +157,7 @@
           '</div>' +
           '<div class="ja-lib-content"><div class="ja-lib-empty">' +
             '<div class="ja-lib-empty-symbol" aria-hidden="true">▤</div>' +
-            '<strong class="ja-lib-empty-title">Your reference library is ready</strong>' +
+            '<strong class="ja-lib-empty-title">Your library is ready</strong>' +
             '<p class="ja-lib-empty-description">Connect Google Drive, Dropbox or OneDrive to browse your astrology reference files here. Your original cloud files will remain read-only.</p>' +
           '</div></div>' +
           '<div class="ja-lib-notice" role="status" aria-live="polite"></div>' +
@@ -202,7 +202,7 @@
     var title = libraryWindow.querySelector(".ja-lib-empty-title");
     var description = libraryWindow.querySelector(".ja-lib-empty-description");
     if (providerId === "all") {
-      title.textContent = "Your reference library is ready";
+      title.textContent = "Your library is ready";
       description.textContent =
         "Connect Google Drive, Dropbox or OneDrive to browse your astrology reference files here. Your original cloud files will remain read-only.";
     } else {
