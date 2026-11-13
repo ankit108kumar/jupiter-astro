@@ -82,6 +82,7 @@
   function detectType(file) {
     var ext = extensionOf(file.name);
     var mime = String(file.mimeType || file.mime_type || file.type || "").toLowerCase().split(";")[0].trim();
+    if (file.embedUrl) return "remote";
     if (mime === "application/pdf" || ext === "pdf") return "pdf";
     if (/^image\//.test(mime) || /^(png|jpe?g|gif|webp|bmp|svg|avif|tif?f)$/.test(ext)) return "image";
     if (/wordprocessingml\.document/.test(mime) || ext === "docx") return "docx";
@@ -148,9 +149,10 @@
   function setMetadata(file, type) {
     var labels = {
       pdf: "PDF document", image: "Image", docx: "Word document", spreadsheet: "Spreadsheet",
-      pptx: "PowerPoint presentation", text: "Text document", audio: "Audio", video: "Video", unsupported: "File"
+      pptx: "PowerPoint presentation", text: "Text document", audio: "Audio", video: "Video",
+      remote: "Google Drive preview", unsupported: "File"
     };
-    var icons = { pdf: "PDF", image: "▧", docx: "W", spreadsheet: "▦", pptx: "▤", text: "≡", audio: "♫", video: "▶", unsupported: "?" };
+    var icons = { pdf: "PDF", image: "▧", docx: "W", spreadsheet: "▦", pptx: "▤", text: "≡", audio: "♫", video: "▶", remote: "G", unsupported: "?" };
     panel.querySelector(".ja-lib-preview-name").textContent = file.name || "Untitled file";
     panel.querySelector(".ja-lib-preview-subtitle").textContent =
       (labels[type] || "File") + " · " + String(file.provider || "Cloud file");
@@ -232,18 +234,24 @@
     setTools("");
     setLoading("Retrieving " + (file.name || "file") + "…");
 
-    return getBlob(file, controller.signal).then(async function (blob) {
+    return (async function () {
       ensureCurrent(id);
-      current.blob = blob;
-      if (blob.size > MAX_PREVIEW_BYTES) {
-        throw new Error("This file is " + formatBytes(blob.size) + ". The in-browser preview limit is " + formatBytes(MAX_PREVIEW_BYTES) + ".");
+      if (current.type === "remote") {
+        await renderCurrent(id);
+      } else {
+        var blob = await getBlob(file, controller.signal);
+        ensureCurrent(id);
+        current.blob = blob;
+        if (blob.size > MAX_PREVIEW_BYTES) {
+          throw new Error("This file is " + formatBytes(blob.size) + ". The in-browser preview limit is " + formatBytes(MAX_PREVIEW_BYTES) + ".");
+        }
+        panel.querySelector(".ja-lib-preview-size").textContent = formatBytes(blob.size);
+        await renderCurrent(id);
       }
-      panel.querySelector(".ja-lib-preview-size").textContent = formatBytes(blob.size);
-      await renderCurrent(id);
       ensureCurrent(id);
       panel.querySelector(".ja-lib-preview-message").textContent =
         "Read-only preview · Original cloud file remains unchanged";
-    }).catch(function (error) {
+    })().catch(function (error) {
       if (error && error.name === "AbortError") return;
       if (!current || current.id !== id) return;
       showError(error && error.message ? error.message : "The file could not be previewed.");
@@ -262,6 +270,7 @@
       case "text": return renderText(id);
       case "audio": return renderMedia(id, "audio");
       case "video": return renderMedia(id, "video");
+      case "remote": return renderRemote(id);
       default:
         return showError("This file format is not supported by the current preview engine.",
           "Supported: PDF, common images, DOCX, XLSX, XLS, XLSM, CSV, PPTX, TXT, Markdown, JSON, XML, audio and video. Legacy .PPT files are not supported.");
@@ -314,6 +323,36 @@
     var next = panel.querySelector('[data-preview-action="page-next"]');
     if (prev) prev.disabled = current.page <= 1;
     if (next) next.disabled = current.page >= current.pageCount;
+  }
+
+  function renderRemote(id) {
+    ensureCurrent(id);
+    var rawUrl = current.file.embedUrl;
+    var embed;
+    try {
+      embed = new URL(rawUrl);
+    } catch (error) {
+      throw new Error("Google Drive did not supply a valid preview link.");
+    }
+    if (embed.protocol !== "https:" ||
+        !["drive.google.com", "docs.google.com"].includes(embed.hostname)) {
+      throw new Error("The preview link is not an approved Google Drive viewer URL.");
+    }
+
+    var stage = panel.querySelector(".ja-lib-preview-stage");
+    stage.innerHTML = "";
+    var frame = document.createElement("div");
+    frame.className = "ja-lib-drive-frame";
+    var iframe = document.createElement("iframe");
+    iframe.title = "Read-only Google Drive preview: " + (current.file.name || "file");
+    iframe.src = embed.href;
+    iframe.loading = "eager";
+    iframe.referrerPolicy = "strict-origin-when-cross-origin";
+    iframe.allowFullscreen = true;
+    iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox");
+    frame.appendChild(iframe);
+    stage.appendChild(frame);
+    setTools('<span class="ja-lib-preview-note">Google Drive viewer · Read-only</span>');
   }
 
   function renderImage(id) {
@@ -663,7 +702,7 @@
     close: close,
     isOpen: function () { return !!panel && panel.classList.contains("is-open"); },
     getSupportedTypes: function () {
-      return ["pdf", "image", "docx", "spreadsheet", "pptx", "text", "audio", "video"];
+      return ["pdf", "image", "docx", "spreadsheet", "pptx", "text", "audio", "video", "remote"];
     },
     maxPreviewBytes: MAX_PREVIEW_BYTES
   };
