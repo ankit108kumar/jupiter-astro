@@ -53,6 +53,22 @@
   align-items:flex-start; justify-content:center; padding:18px;
   background:var(--ja-lib-bg,var(--bg,#fbfaf8));
 }
+#ja-reference-library-window .ja-lib-preview-stage.is-spreadsheet {
+  flex-direction:column; align-items:stretch; justify-content:flex-start;
+}
+#ja-reference-library-window .ja-lib-preview-stage.is-spreadsheet .ja-lib-sheet-tabs {
+  flex:0 0 auto;
+}
+#ja-reference-library-window .ja-lib-preview-stage.is-spreadsheet .ja-lib-sheet-wrap {
+  flex:0 0 auto;
+}
+#ja-reference-library-window .ja-lib-slide-frame {
+  width:min(100%,1280px); margin:auto; background:#fff;
+  box-shadow:0 4px 22px rgba(0,0,0,.13);
+}
+#ja-reference-library-window .ja-lib-slide-frame > svg {
+  display:block; width:100%; height:auto; max-width:100%;
+}
 #ja-reference-library-window .ja-lib-preview-footer {
   display:flex; align-items:center; justify-content:space-between; gap:12px;
   min-height:29px; padding:5px 13px; border-top:1px solid var(--ja-lib-line,var(--line,#ddd));
