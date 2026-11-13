@@ -16,6 +16,90 @@
   var maximized = false;
   var previousBounds = null;
   var activeProvider = "all";
+  var THEME_MODE_KEY = "ja-library-theme-mode";
+  var themeMode = "website";
+
+  try {
+    themeMode = localStorage.getItem(THEME_MODE_KEY) === "apple" ? "apple" : "website";
+  } catch (error) {}
+
+  function syncStandaloneWebsiteTheme() {
+    if (!isLibraryApp) return;
+
+    var root = document.documentElement;
+    try {
+      var savedTheme = localStorage.getItem("ja-theme");
+      if (!savedTheme) {
+        savedTheme = window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      }
+      root.setAttribute("data-theme", savedTheme);
+
+      var savedPalette = localStorage.getItem("ja-palette");
+      if (savedPalette) root.setAttribute("data-palette", savedPalette);
+      else root.removeAttribute("data-palette");
+    } catch (error) {
+      root.setAttribute("data-theme", "light");
+      root.removeAttribute("data-palette");
+    }
+  }
+
+  function themeIconMarkup(mode) {
+    if (mode === "apple") {
+      return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.6"></circle><path d="M12 2v2.1M12 19.9V22M4.93 4.93l1.48 1.48m11.18 11.18 1.48 1.48M2 12h2.1m15.8 0H22M4.93 19.07l1.48-1.48M17.59 6.41l1.48-1.48"></path></svg>';
+    }
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"></rect><path d="M3 8h18M7 6h.01M10 6h.01M7 12h10M7 15.5h7"></path></svg>';
+  }
+
+  function updateThemeToggle() {
+    if (!libraryWindow) return;
+    var button = libraryWindow.querySelector('[data-ja-action="theme-toggle"]');
+    if (!button) return;
+
+    var appleActive = themeMode === "apple";
+    button.innerHTML = themeIconMarkup(themeMode);
+    button.title = appleActive
+      ? "Apple Light is active · Switch to website theme"
+      : "Following website theme · Switch to Apple Light";
+    button.setAttribute("aria-label", appleActive
+      ? "Switch to website theme"
+      : "Switch to Apple Light mode");
+    button.setAttribute("aria-pressed", appleActive ? "true" : "false");
+  }
+
+  function applyThemeMode(mode, persist) {
+    themeMode = mode === "apple" ? "apple" : "website";
+
+    if (libraryWindow) {
+      libraryWindow.setAttribute("data-ja-lib-theme", themeMode);
+    }
+
+    if (isLibraryApp && themeMode === "website") {
+      syncStandaloneWebsiteTheme();
+    }
+
+    updateThemeToggle();
+
+    if (persist !== false) {
+      try { localStorage.setItem(THEME_MODE_KEY, themeMode); } catch (error) {}
+    }
+  }
+
+  function toggleThemeMode() {
+    applyThemeMode(themeMode === "website" ? "apple" : "website", true);
+  }
+
+  window.addEventListener("storage", function (event) {
+    if (event.key === THEME_MODE_KEY) {
+      applyThemeMode(event.newValue === "apple" ? "apple" : "website", false);
+      return;
+    }
+
+    if (isLibraryApp && themeMode === "website" &&
+        (event.key === "ja-theme" || event.key === "ja-palette")) {
+      syncStandaloneWebsiteTheme();
+    }
+  });
   // The dedicated PWA page opts into app mode explicitly. The normal website
   // keeps the existing floating-window behaviour.
   var isLibraryApp = document.documentElement.getAttribute("data-ja-library-app") === "true";
@@ -54,8 +138,10 @@
           '<button class="ja-lib-dot maximize" type="button" data-ja-action="maximize" title="Maximize or restore library" aria-label="Maximize"></button>' +
         '</div>' +
         '<div class="ja-lib-window-title">Jupiter Astrology · Reference Library</div>' +
-        '<button class="ja-lib-fullscreen" type="button" data-ja-action="fullscreen" title="Enter full screen" aria-label="Enter full screen">⛶</button>' +
-        '<div class="ja-lib-header-spacer"></div>' +
+        '<div class="ja-lib-titlebar-tools">' +
+          '<button class="ja-lib-fullscreen" type="button" data-ja-action="fullscreen" title="Enter full screen" aria-label="Enter full screen">⛶</button>' +
+          '<button class="ja-lib-theme-toggle" type="button" data-ja-action="theme-toggle" title="Following website theme · Switch to Apple Light" aria-label="Switch to Apple Light mode" aria-pressed="false"></button>' +
+        '</div>' +
       '</header>' +
       '<div class="ja-lib-body">' +
         '<aside class="ja-lib-sidebar"><div class="ja-lib-side-heading">Library sources</div><nav aria-label="Cloud storage providers">' +
@@ -83,6 +169,7 @@
       '</div>';
 
     document.body.appendChild(libraryWindow);
+    applyThemeMode(themeMode, false);
 
     launcher = document.createElement("div");
     launcher.id = LAUNCHER_ID;
@@ -134,6 +221,7 @@
     if (action === "minimize") minimizeWindow();
     if (action === "maximize") toggleMaximize();
     if (action === "fullscreen") toggleFullscreen();
+    if (action === "theme-toggle") toggleThemeMode();
   }
 
   function toggleFullscreen() {
@@ -289,6 +377,7 @@
   // When launched as the installed Library PWA, show the library immediately
   // and register its service worker. This app page runs in its own OS window.
   if (isLibraryApp) {
+    syncStandaloneWebsiteTheme();
     openWindow();
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", function () {
