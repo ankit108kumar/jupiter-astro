@@ -9,6 +9,18 @@
   <meta name="application-name" content="Jupiter Astrology Library">
   <link rel="manifest" href="/window/library-app.webmanifest">
   <link rel="icon" href="/window/library-icon.svg" type="image/svg+xml">
+  <script>
+    (function () {
+      try {
+        document.documentElement.setAttribute("data-theme", localStorage.getItem("ja-theme") || "light");
+        var palette = localStorage.getItem("ja-palette");
+        if (palette) document.documentElement.setAttribute("data-palette", palette);
+      } catch (error) {
+        document.documentElement.setAttribute("data-theme", "light");
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="/css/main67g120kS63cY438.css">
   <link rel="stylesheet" href="/window/library-window.css">
   <title>Jupiter Astrology · Reference Library</title>
 </head>
