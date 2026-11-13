@@ -93,6 +93,13 @@
 #ja-reference-library-window .ja-lib-preview-message-card h3 { margin:10px 0 6px; font-size:15px; }
 #ja-reference-library-window .ja-lib-preview-message-card p { margin:0; color:var(--ja-lib-muted,#777); font-size:12px; }
 #ja-reference-library-window .ja-lib-preview-message-card small { display:block; margin-top:10px; color:var(--ja-lib-muted,#777); font-size:10px; }
+#ja-reference-library-window .ja-lib-preview-open-drive {
+  display:inline-flex; align-items:center; justify-content:center;
+  margin-top:15px; padding:8px 13px; border:1px solid var(--ja-lib-accent,#a87332);
+  border-radius:8px; color:#fff; background:var(--ja-lib-accent,#a87332);
+  font-size:11px; font-weight:650; text-decoration:none;
+}
+#ja-reference-library-window .ja-lib-preview-open-drive:hover { filter:brightness(.96); }
 #ja-reference-library-window .ja-lib-preview-message-icon {
   display:grid; place-items:center; width:38px; height:38px; margin:auto; border-radius:50%;
   color:var(--ja-lib-alert-ink,#805a1e); background:var(--ja-lib-alert-bg,#fff2d8); font-weight:800;
