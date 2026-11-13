@@ -249,6 +249,14 @@
     libraryWindow.querySelector(".ja-lib-source-label").textContent =
       label + (providerId === "all" ? " · Not connected" : " · Connector not configured");
 
+    if (window.JupiterLibraryDrive) {
+      if (providerId === "google-drive") {
+        window.JupiterLibraryDrive.openRoot();
+        return;
+      }
+      window.JupiterLibraryDrive.clear();
+    }
+
     var title = libraryWindow.querySelector(".ja-lib-empty-title");
     var description = libraryWindow.querySelector(".ja-lib-empty-description");
     if (providerId === "all") {
