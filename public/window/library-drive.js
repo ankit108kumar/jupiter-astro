@@ -74,14 +74,21 @@
   }
 
   function descriptor(item) {
-    var id = item.shortcutDetails && item.shortcutDetails.targetId || item.id;
-    var mime = item.shortcutDetails && item.shortcutDetails.targetMimeType || item.mimeType;
-    var googleDoc = isGoogleWorkspace(mime);
-    var name = googleDoc ? String(item.name).replace(/\.[^.]+$/,"") + ".pdf" : item.name;
+    var shortcut = item.shortcutDetails || {};
+    var id = shortcut.targetId || item.id;
+    var mime = shortcut.targetMimeType || item.mimeType;
+    var resourceKey = shortcut.targetResourceKey || item.resourceKey || "";
+    var embedHost = "https://drive.google.com/file/d/";
+    if (mime === "application/vnd.google-apps.document") embedHost = "https://docs.google.com/document/d/";
+    else if (mime === "application/vnd.google-apps.spreadsheet") embedHost = "https://docs.google.com/spreadsheets/d/";
+    else if (mime === "application/vnd.google-apps.presentation") embedHost = "https://docs.google.com/presentation/d/";
+    else if (mime === "application/vnd.google-apps.drawing") embedHost = "https://docs.google.com/drawings/d/";
+    var embedUrl = embedHost + encodeURIComponent(id) + "/preview";
+    if (resourceKey) embedUrl += "?resourcekey=" + encodeURIComponent(resourceKey);
     return {
-      id:id, name:name, mimeType:googleDoc ? "application/pdf" : mime,
+      id:id, name:item.name, mimeType:mime,
       size:Number(item.size) || undefined, provider:"Google Drive",
-      getBlob:function (options) { return downloadFile(id,mime,options && options.signal); }
+      embedUrl:embedUrl, webViewLink:item.webViewLink || ""
     };
   }
 
@@ -117,33 +124,12 @@
     url.searchParams.set("q","'" + folderId + "' in parents and trashed = false");
     url.searchParams.set("pageSize",String(PAGE_SIZE));
     url.searchParams.set("orderBy","folder,name");
-    url.searchParams.set("fields","nextPageToken,files(id,name,mimeType,size,modifiedTime,webViewLink,thumbnailLink,shortcutDetails(targetId,targetMimeType))");
+    url.searchParams.set("supportsAllDrives","true");
+    url.searchParams.set("includeItemsFromAllDrives","true");
+    url.searchParams.set("fields","nextPageToken,files(id,name,mimeType,size,modifiedTime,webViewLink,thumbnailLink,resourceKey,shortcutDetails(targetId,targetMimeType,targetResourceKey))");
     url.searchParams.set("key",apiKey());
     if (pageToken) url.searchParams.set("pageToken",pageToken);
     return apiJson(url.toString(),signal);
-  }
-
-  async function downloadFile(fileId,mimeType,signal) {
-    var url = new URL(API_ROOT + "/files/" + encodeURIComponent(fileId));
-    if (isGoogleWorkspace(mimeType)) {
-      url.pathname += "/export";
-      url.searchParams.set("mimeType","application/pdf");
-    } else {
-      url.searchParams.set("alt","media");
-    }
-    url.searchParams.set("key",apiKey());
-    var response;
-    try { response = await fetch(url.toString(),{method:"GET",credentials:"omit",signal:signal}); }
-    catch (error) {
-      if (error && error.name === "AbortError") throw error;
-      throw new Error("Could not download this item from Google Drive. Check sharing permission and API access.");
-    }
-    if (!response.ok) {
-      var message = "Drive could not provide the file content (HTTP " + response.status + ").";
-      try { var body = await response.json(); if (body.error && body.error.message) message = body.error.message; } catch (error) {}
-      throw new Error(message);
-    }
-    return response.blob();
   }
 
   function button(label,className,action) {
