@@ -1,0 +1,27 @@
+/* JUPITER ASTRO — GOOGLE DRIVE FILE LIST */
+#ja-reference-library-window .ja-drive-browser{display:flex;flex-direction:column;min-height:100%;color:var(--ja-lib-ink,#292722)}
+#ja-reference-library-window .ja-drive-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:46px;padding:8px 13px;border-bottom:1px solid var(--ja-lib-line,#e5e1d9);background:var(--ja-lib-panel,#fff)}
+#ja-reference-library-window .ja-drive-breadcrumb{display:flex;align-items:center;gap:7px;min-width:0;overflow:auto;color:var(--ja-lib-muted,#777);font-size:11px;white-space:nowrap}
+#ja-reference-library-window .ja-drive-crumb{padding:3px 2px;border:0;color:var(--ja-lib-accent,#94652e);background:transparent;cursor:pointer;font:inherit}
+#ja-reference-library-window .ja-drive-crumb:disabled{color:var(--ja-lib-ink,#292722);font-weight:700;cursor:default}
+#ja-reference-library-window .ja-drive-crumb-separator{color:var(--ja-lib-muted,#999)}
+#ja-reference-library-window .ja-drive-refresh{flex:0 0 30px;width:30px;height:30px;border:1px solid var(--ja-lib-line,#ddd);border-radius:8px;color:var(--ja-lib-ink,#333);background:var(--ja-lib-panel,#fff);cursor:pointer;font-size:17px}
+#ja-reference-library-window .ja-drive-list{display:flex;flex-direction:column;padding:4px 0}
+#ja-reference-library-window .ja-drive-row{display:flex;align-items:center;gap:12px;width:100%;min-height:59px;padding:8px 15px;border:0;border-bottom:1px solid var(--ja-lib-line,#eee);color:var(--ja-lib-ink,#292722);background:transparent;text-align:left;cursor:pointer}
+#ja-reference-library-window .ja-drive-row:hover{background:var(--ja-lib-hover,#f5f3ef)}
+#ja-reference-library-window .ja-drive-row.selected{background:var(--ja-lib-active-bg,rgba(168,115,50,.12));box-shadow:inset 3px 0 var(--ja-lib-accent,#a87332)}
+#ja-reference-library-window .ja-drive-file-icon{display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;border-radius:9px;color:var(--ja-lib-icon-ink,var(--ja-lib-accent,#8a663d));background:var(--ja-lib-icon-bg,#f2eadf);font-size:11px;font-weight:750}
+#ja-reference-library-window .ja-drive-file-name{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+#ja-reference-library-window .ja-drive-file-name strong{overflow:hidden;color:var(--ja-lib-ink,#292722);font-size:12px;font-weight:650;text-overflow:ellipsis;white-space:nowrap}
+#ja-reference-library-window .ja-drive-file-name small{color:var(--ja-lib-muted,#888);font-size:10px}
+#ja-reference-library-window .ja-drive-file-size{flex:0 0 auto;color:var(--ja-lib-muted,#888);font-size:10px}
+#ja-reference-library-window .ja-drive-row-chevron{color:var(--ja-lib-muted,#888);font-size:18px}
+#ja-reference-library-window .ja-drive-no-files{display:grid;place-items:center;min-height:150px;padding:25px;color:var(--ja-lib-muted,#888);font-size:12px;text-align:center}
+#ja-reference-library-window .ja-drive-more-wrap{display:flex;justify-content:center;padding:14px}
+#ja-reference-library-window .ja-drive-button{padding:8px 13px;border:1px solid var(--ja-lib-line-strong,#d8d3ca);border-radius:8px;color:var(--ja-lib-ink,#333);background:var(--ja-lib-panel,#fff);font:inherit;font-size:11px;cursor:pointer}
+#ja-reference-library-window .ja-drive-button.primary{border-color:var(--ja-lib-accent,#a87332);color:#fff;background:var(--ja-lib-accent,#a87332)}
+#ja-reference-library-window .ja-drive-empty{min-height:100%}
+#ja-reference-library-window .ja-drive-empty .ja-drive-button{margin-top:8px}
+#ja-reference-library-window .ja-lib-provider.is-connected .ja-lib-provider-state{background:#2da765;box-shadow:0 0 0 3px rgba(45,167,101,.13)}
+#ja-reference-library-window .ja-lib-notice.error{color:#8b3a32;border-color:#e7c3be;background:#fff2ef}
+@media(max-width:620px){#ja-reference-library-window .ja-drive-row{gap:8px;padding:8px 9px}#ja-reference-library-window .ja-drive-file-icon{flex-basis:30px;width:30px;height:30px}#ja-reference-library-window .ja-drive-file-size{display:none}#ja-reference-library-window .ja-drive-toolbar{padding:7px 9px}}
