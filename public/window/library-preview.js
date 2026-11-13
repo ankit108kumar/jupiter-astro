@@ -20,6 +20,7 @@
   var MAX_PREVIEW_BYTES = 150 * 1024 * 1024;
   var panel = null;
   var current = null;
+  var previousFocus = null;
   var spreadsheetEngine = null;
   var modulePromises = Object.create(null);
   var scriptPromises = Object.create(null);
@@ -206,6 +207,8 @@
 
   function open(file) {
     if (!file || typeof file !== "object") return Promise.reject(new TypeError("Preview expects a file metadata object."));
+    var alreadyOpen = !!panel && panel.classList.contains("is-open");
+    var returnFocus = alreadyOpen ? previousFocus : document.activeElement;
     if (window.JupiterReferenceLibrary && typeof window.JupiterReferenceLibrary.open === "function") {
       window.JupiterReferenceLibrary.open();
     }
@@ -221,7 +224,10 @@
 
     panel.classList.add("is-open");
     panel.setAttribute("aria-hidden", "false");
+    previousFocus = returnFocus;
     panel.querySelector(".ja-lib-preview-stage").scrollTop = 0;
+    var backButton = panel.querySelector('[data-preview-action="back"]');
+    if (backButton) backButton.focus({ preventScroll: true });
     setMetadata(file, current.type);
     setTools("");
     setLoading("Retrieving " + (file.name || "file") + "…");
@@ -628,7 +634,18 @@
     }
     if (!options.silent) {
       var button = document.querySelector('#ja-reference-library-window [data-ja-action="preview-selected"]');
-      if (button) button.focus({ preventScroll: true });
+      var closeButton = document.querySelector('#ja-reference-library-window [data-ja-action="close"]');
+      var target = previousFocus;
+      previousFocus = null;
+      if (target && target.isConnected && !target.disabled && (!panel || !panel.contains(target))) {
+        target.focus({ preventScroll: true });
+      } else if (button && !button.disabled) {
+        button.focus({ preventScroll: true });
+      } else if (closeButton) {
+        closeButton.focus({ preventScroll: true });
+      }
+    } else {
+      previousFocus = null;
     }
   }
 
