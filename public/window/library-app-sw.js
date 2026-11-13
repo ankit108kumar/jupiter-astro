@@ -1,13 +1,15 @@
 /* Jupiter Astrology Reference Library — app-shell service worker */
 "use strict";
 
-var CACHE_NAME = "ja-reference-library-shell-v6";
+var CACHE_NAME = "ja-reference-library-shell-v8";
 var APP_SHELL = [
   "/window/library-app.html",
   "/window/library-app.webmanifest",
   "/css/main67g120kS63cY438.css",
   "/window/library-window.css",
+  "/window/library-preview.css",
   "/window/library-window.js",
+  "/window/library-preview.js",
   "/window/library-icon-192.svg",
   "/window/library-icon-512.svg"
 ];
