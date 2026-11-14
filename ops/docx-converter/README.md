@@ -30,7 +30,7 @@ The added collection includes:
 
 This is broad fallback coverage, not a guarantee that every Word font is identical. The image deliberately does not redistribute proprietary Microsoft/Adobe/commercial fonts. Where an original DOCX uses a licensed font that is not included, put its licensed `.ttf`, `.otf` or `.ttc` file into the private `fonts/` directory on the converter build machine. The Dockerfile installs those files and refreshes Fontconfig.
 
-**This font pack affects DOCX → PDF conversion through LibreOffice.** The browser-only DOCX → HTML option uses fonts available to the visitor's browser; installing a font in this Docker image does not install it in every visitor's browser.
+**This font pack affects DOCX → PDF conversion through LibreOffice.** DOCX → HTML is a separate browser-rendering path. On desktop Chrome/Edge, its **Use Windows fonts** control can request permission to read the document's matching installed font faces, load their font bytes into temporary browser-only Blob URLs, and verify that the faces actually load. Font bytes are not uploaded to Vercel or the converter. The feature requires a secure context, browser support and the user's explicit local-font permission; other browsers continue with their normal font fallback. This improves font fidelity when the exact family is installed, but does not make HTML rendering identical to Microsoft Word.
 
 For the PDF route to use the new fonts, rebuild and redeploy the converter image after updating the repository:
 
