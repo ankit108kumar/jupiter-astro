@@ -380,6 +380,7 @@
     var stage = panel.querySelector(".ja-lib-preview-stage");
     var mode = current.pdfScrollMode || "vertical";
     var hadLayout = !!current.pdfHasLayout;
+    var previousMode = current.previousPdfScrollMode || mode;
     var previousScrollTop = stage.scrollTop;
     var previousScrollLeft = stage.scrollLeft;
     var previousScrollHeight = stage.scrollHeight;
@@ -462,9 +463,13 @@
     var targetState = states[targetPage - 1];
     if (targetState) {
       if (mode === "vertical") {
-        if (hadLayout && previousScrollHeight > stage.clientHeight) {
+        if (hadLayout && previousMode === "vertical" && previousScrollHeight > stage.clientHeight) {
           var verticalProgress = previousScrollTop / Math.max(1, previousScrollHeight - stage.clientHeight);
           stage.scrollTop = verticalProgress * Math.max(0, stage.scrollHeight - stage.clientHeight);
+        } else if (hadLayout && previousMode === "horizontal") {
+          var verticalRect = targetState.frame.getBoundingClientRect();
+          var verticalStageRect = stage.getBoundingClientRect();
+          stage.scrollTop = Math.max(0, stage.scrollTop + verticalRect.top - verticalStageRect.top - 12);
         } else {
           stage.scrollTop = 0;
         }
