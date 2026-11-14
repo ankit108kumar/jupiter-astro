@@ -196,6 +196,7 @@
   function cleanupCurrent() {
     if (!current) return;
     restoreWindowsFontAliases();
+    restoreDocxFallbackFont();
     cancelPdfPageStates();
     if (current.controller) current.controller.abort();
     if (current.objectUrl) URL.revokeObjectURL(current.objectUrl);
@@ -261,7 +262,8 @@
       windowsFontsEnabled: false, windowsLocalFonts: null,
       windowsFontOverrides: [], windowsFontStyle: null, windowsFontObjectUrls: [],
       windowsFontAliasMap: Object.create(null), windowsFontMatchCount: 0,
-      windowsFontDiagnostics: null
+      windowsFontDiagnostics: null,
+      docxFallbackOverrides: [], docxFallbackAppliedCount: 0
     };
 
     panel.classList.add("is-open");
@@ -805,6 +807,113 @@
     current.windowsFontDiagnostics = null;
   }
 
+  var DOCX_FALLBACK_FONT_FAMILY = "Bookman Antiqua";
+
+  function splitCssFontFamilyList(value) {
+    var parts = [];
+    var currentPart = "";
+    var quote = "";
+    var escaped = false;
+    String(value || "").split("").forEach(function (character) {
+      if (escaped) {
+        currentPart += character;
+        escaped = false;
+        return;
+      }
+      if (character === "\\") {
+        currentPart += character;
+        escaped = true;
+        return;
+      }
+      if (quote) {
+        currentPart += character;
+        if (character === quote) quote = "";
+        return;
+      }
+      if (character === "\"" || character === "'") {
+        quote = character;
+        currentPart += character;
+        return;
+      }
+      if (character === ",") {
+        if (currentPart.trim()) parts.push(currentPart.trim());
+        currentPart = "";
+        return;
+      }
+      currentPart += character;
+    });
+    if (currentPart.trim()) parts.push(currentPart.trim());
+    return parts;
+  }
+
+  function unquoteCssFontFamily(value) {
+    return String(value || "").trim().replace(/^["']|["']$/g, "");
+  }
+
+  function addBookmanFallback(fontFamilyValue) {
+    var parts = splitCssFontFamilyList(fontFamilyValue);
+    var specific = [];
+    var generic = [];
+    var hasBookman = false;
+
+    parts.forEach(function (part) {
+      var name = unquoteCssFontFamily(part);
+      if (normalizeFontName(name) === normalizeFontName(DOCX_FALLBACK_FONT_FAMILY)) {
+        hasBookman = true;
+        specific.push(cssQuotedString(DOCX_FALLBACK_FONT_FAMILY));
+      } else if (isGenericOrSystemFont(name) || /^(math|fangsong)$/i.test(name)) {
+        generic.push(part);
+      } else {
+        specific.push(part);
+      }
+    });
+
+    if (!hasBookman) specific.push(cssQuotedString(DOCX_FALLBACK_FONT_FAMILY));
+    if (!generic.length) generic.push("serif");
+
+    return specific.concat(generic).join(", ");
+  }
+
+  function restoreDocxFallbackFont() {
+    if (!current) return;
+    (current.docxFallbackOverrides || []).forEach(function (entry) {
+      if (!entry.element || !entry.element.isConnected) return;
+      if (entry.value) {
+        entry.element.style.setProperty("font-family", entry.value, entry.priority || "");
+      } else {
+        entry.element.style.removeProperty("font-family");
+      }
+    });
+    current.docxFallbackOverrides = [];
+    current.docxFallbackAppliedCount = 0;
+  }
+
+  function applyDocxFallbackFont(root) {
+    if (!current || !root) return 0;
+    restoreDocxFallbackFont();
+
+    var nodes = [root].concat(Array.from(root.querySelectorAll("*")));
+    var applied = 0;
+    nodes.forEach(function (node) {
+      var computedFamily = window.getComputedStyle(node).fontFamily || "";
+      var fallbackFamily = addBookmanFallback(computedFamily);
+      if (!fallbackFamily) fallbackFamily = cssQuotedString(DOCX_FALLBACK_FONT_FAMILY) + ", serif";
+
+      var previous = node.style.getPropertyValue("font-family");
+      var previousPriority = node.style.getPropertyPriority("font-family");
+      current.docxFallbackOverrides.push({
+        element: node,
+        value: previous,
+        priority: previousPriority
+      });
+      node.style.setProperty("font-family", fallbackFamily, "important");
+      applied++;
+    });
+
+    current.docxFallbackAppliedCount = applied;
+    return applied;
+  }
+
   function isGenericOrSystemFont(value) {
     return /^(serif|sans-serif|monospace|cursive|fantasy|system-ui|ui-serif|ui-sans-serif|ui-monospace|ui-rounded|-apple-system|blinkmacsystemfont)$/i
       .test(normalizeFontName(value));
@@ -1043,7 +1152,11 @@
           value: node.style.getPropertyValue("font-family"),
           priority: node.style.getPropertyPriority("font-family")
         });
-        node.style.setProperty("font-family", cssQuotedString(alias), "important");
+        node.style.setProperty(
+          "font-family",
+          cssQuotedString(alias) + ", " + cssQuotedString(DOCX_FALLBACK_FONT_FAMILY) + ", serif",
+          "important"
+        );
         appliedElements++;
       });
     });
@@ -1121,6 +1234,8 @@
       failedFaceCount: result.failedFaceCount,
       appliedElements: appliedElements,
       totalBytes: result.totalBytes,
+      fallbackFamily: DOCX_FALLBACK_FONT_FAMILY,
+      fallbackElements: current.docxFallbackAppliedCount || 0,
       warning: docxMetadata.warning || ""
     };
     current.windowsFontDiagnostics = diagnostics;
@@ -1135,6 +1250,8 @@
       "Windows font families loaded: " + diagnostics.loadedFamilies.length + ".",
       "Selected font faces loaded: " + diagnostics.loadedFaces + ".",
       "Document elements updated: " + diagnostics.appliedElements + ".",
+      (diagnostics.fallbackFamily || DOCX_FALLBACK_FONT_FAMILY) +
+        " is the final fallback on " + (diagnostics.fallbackElements || 0) + " elements when installed.",
       "Local font data: " + (diagnostics.totalBytes / 1048576).toFixed(1) + " MB."
     ];
     if (diagnostics.loadedFamilies.length) {
@@ -1296,6 +1413,7 @@
     var stage = panel.querySelector(".ja-lib-preview-stage");
     stage.classList.remove("is-pdf","is-pdf-vertical","is-pdf-horizontal","is-docx","is-spreadsheet","is-pptx");
     restoreWindowsFontAliases();
+    restoreDocxFallbackFont();
     stage.classList.add("is-docxjs");
     stage.innerHTML =
       '<div class="ja-lib-docxjs-styles"></div>' +
@@ -1323,6 +1441,7 @@
       debug: false
     });
     ensureCurrent(id);
+    var fallbackElements = applyDocxFallbackFont(body);
     var fontDiagnostics = null;
     if (current.windowsFontsEnabled && current.windowsLocalFonts && current.windowsLocalFonts.length) {
       fontDiagnostics = await applyWindowsFontAliases(id);
@@ -1334,10 +1453,18 @@
     setPreviewStatus(
       current.windowsFontsEnabled
         ? "DOCX → HTML · " + fontDiagnostics.loadedFamilies.length + " Windows font families loaded"
-        : "DOCX → HTML · Browser rendering",
+        : "DOCX → HTML · " + DOCX_FALLBACK_FONT_FAMILY + " fallback enabled",
       current.blob.size
     );
-    if (fontDiagnostics) showDocxRendererNotice(formatWindowsFontDiagnostics(fontDiagnostics));
+    if (fontDiagnostics) {
+      showDocxRendererNotice(formatWindowsFontDiagnostics(fontDiagnostics));
+    } else {
+      showDocxRendererNotice(
+        DOCX_FALLBACK_FONT_FAMILY +
+        " is configured as the final fallback when a document font or glyph is unavailable. " +
+        "This font must be installed on this Windows computer."
+      );
+    }
   }
 
   async function convertDocxToPdf(id) {
@@ -1408,6 +1535,7 @@
 
   async function renderDocxPdf(id) {
     restoreWindowsFontAliases();
+    restoreDocxFallbackFont();
     destroyPdfView();
     var pdfBlob = await convertDocxToPdf(id);
     ensureCurrent(id);
