@@ -207,8 +207,8 @@
     try {
       CSS.highlights.delete("ja-lib-search-results");
       CSS.highlights.delete("ja-lib-search-active");
-      if (ranges && ranges.length) CSS.highlights.set("ja-lib-search-results", new Highlight(...ranges));
-      if (activeRange) CSS.highlights.set("ja-lib-search-active", new Highlight(activeRange));
+      if (ranges && ranges.length) CSS.highlights.set("ja-lib-search-results", new window.Highlight(...ranges));
+      if (activeRange) CSS.highlights.set("ja-lib-search-active", new window.Highlight(activeRange));
     } catch (error) {
       console.warn("Jupiter Library: could not highlight search results.", error);
     }
