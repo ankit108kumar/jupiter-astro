@@ -592,3 +592,188 @@
   outline:2px solid var(--ja-lib-accent,#6b9a70);
   outline-offset:2px;
 }
+
+
+/* =========================================================
+   UNIFIED IN-DOCUMENT SEARCH
+   Shared search field for PDF, Word, Excel, PowerPoint and text.
+   ========================================================= */
+#ja-reference-library-window .ja-lib-preview-search {
+  display:flex;
+  align-items:center;
+  flex:0 1 350px;
+  min-width:195px;
+  height:36px;
+  gap:5px;
+  padding:3px 4px 3px 10px;
+  border:1px solid var(--ja-lib-line-strong,#d5d9e0);
+  border-radius:10px;
+  color:var(--ja-lib-ink,#253044);
+  background:var(--ja-lib-panel-alt,#f8fafc);
+  box-shadow:inset 0 1px 2px rgba(15,23,42,.035);
+  transition:border-color .16s ease, box-shadow .16s ease, background .16s ease;
+}
+#ja-reference-library-window .ja-lib-preview-search[hidden] {
+  display:none !important;
+}
+#ja-reference-library-window .ja-lib-preview-search:focus-within {
+  border-color:var(--ja-lib-accent,#a87332);
+  background:var(--ja-lib-panel,#fff);
+  box-shadow:0 0 0 3px var(--ja-lib-accent-soft,rgba(168,115,50,.13));
+}
+#ja-reference-library-window .ja-lib-preview-search-icon {
+  display:inline-flex;
+  flex:0 0 17px;
+  width:17px;
+  height:17px;
+  align-items:center;
+  justify-content:center;
+  color:var(--ja-lib-muted,#7b8493);
+}
+#ja-reference-library-window .ja-lib-preview-search-icon svg {
+  display:block;
+  width:17px;
+  height:17px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.8;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+#ja-reference-library-window .ja-lib-preview-search-input {
+  flex:1 1 auto;
+  min-width:45px;
+  width:100%;
+  height:27px;
+  padding:3px 4px;
+  border:0;
+  outline:0;
+  color:var(--ja-lib-ink,#253044);
+  background:transparent;
+  font:inherit;
+  font-size:12px;
+  font-weight:500;
+  line-height:1.3;
+  box-shadow:none;
+}
+#ja-reference-library-window .ja-lib-preview-search-input::placeholder {
+  color:var(--ja-lib-muted,#8991a0);
+  opacity:1;
+}
+#ja-reference-library-window .ja-lib-preview-search-input:disabled {
+  opacity:.55;
+  cursor:wait;
+}
+#ja-reference-library-window .ja-lib-preview-search-count {
+  flex:0 0 auto;
+  min-width:34px;
+  padding:0 3px;
+  color:var(--ja-lib-muted,#7b8493);
+  font-size:10px;
+  font-variant-numeric:tabular-nums;
+  text-align:center;
+  white-space:nowrap;
+}
+#ja-reference-library-window .ja-lib-preview-search-nav {
+  display:grid;
+  flex:0 0 27px;
+  place-items:center;
+  width:27px;
+  height:27px;
+  padding:0;
+  border:1px solid var(--ja-lib-line,#e1e5eb);
+  border-radius:7px;
+  color:var(--ja-lib-ink,#3a4556);
+  background:var(--ja-lib-panel,#fff);
+  cursor:pointer;
+  transition:color .14s ease, border-color .14s ease, background .14s ease, transform .14s ease;
+}
+#ja-reference-library-window .ja-lib-preview-search-nav svg {
+  display:block;
+  width:14px;
+  height:14px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+#ja-reference-library-window .ja-lib-preview-search-nav:hover:not(:disabled) {
+  color:var(--ja-lib-accent,#a87332);
+  border-color:var(--ja-lib-accent,#a87332);
+  background:var(--ja-lib-accent-soft,rgba(168,115,50,.1));
+}
+#ja-reference-library-window .ja-lib-preview-search-nav:active:not(:disabled) {
+  transform:translateY(1px);
+}
+#ja-reference-library-window .ja-lib-preview-search-nav:disabled {
+  opacity:.35;
+  cursor:not-allowed;
+}
+#ja-reference-library-window .ja-lib-preview-search-nav:focus-visible {
+  outline:2px solid var(--ja-lib-accent,#a87332);
+  outline-offset:2px;
+}
+#ja-reference-library-window .ja-lib-preview-search-count {
+  user-select:none;
+}
+
+/* Search result colours are deliberately distinct from ordinary text selection. */
+::highlight(ja-lib-search-results) {
+  color:inherit;
+  background:rgba(255,205,65,.48);
+  text-decoration:underline;
+  text-decoration-color:rgba(194,132,20,.65);
+  text-decoration-thickness:1px;
+}
+::highlight(ja-lib-search-active) {
+  color:#231800;
+  background:rgba(255,155,35,.78);
+  text-decoration:underline;
+  text-decoration-color:#99520c;
+  text-decoration-thickness:2px;
+}
+
+@media(max-width:980px) {
+  #ja-reference-library-window .ja-lib-preview-search {
+    flex-basis:290px;
+    min-width:180px;
+  }
+}
+@media(max-width:700px) {
+  #ja-reference-library-window .ja-lib-preview-toolbar {
+    flex-wrap:wrap;
+    row-gap:6px;
+  }
+  #ja-reference-library-window .ja-lib-preview-file {
+    flex:1 1 calc(100% - 68px);
+  }
+  #ja-reference-library-window .ja-lib-preview-search {
+    order:3;
+    flex:1 1 190px;
+    min-width:145px;
+  }
+  #ja-reference-library-window .ja-lib-preview-tools {
+    order:4;
+    flex:0 1 auto;
+    max-width:100%;
+    overflow-x:auto;
+    justify-content:flex-start;
+  }
+}
+@media(max-width:420px) {
+  #ja-reference-library-window .ja-lib-preview-search {
+    min-width:130px;
+    gap:3px;
+    padding-left:7px;
+  }
+  #ja-reference-library-window .ja-lib-preview-search-count {
+    min-width:28px;
+    font-size:9px;
+  }
+  #ja-reference-library-window .ja-lib-preview-search-nav {
+    flex-basis:25px;
+    width:25px;
+    height:25px;
+  }
+}
