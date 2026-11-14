@@ -305,17 +305,23 @@ async function convertDocxToPdf(req, res, token) {
   }
 
   const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-  if (metadata.mimeType !== DOCX_MIME && !/\.docx$/i.test(metadata.name || "")) {
-    return sendError(res, 415, "PDF conversion is currently available for DOCX files only.");
+  const GOOGLE_DOC_MIME = "application/vnd.google-apps.document";
+  const isGoogleDoc = metadata.mimeType === GOOGLE_DOC_MIME;
+  if (!isGoogleDoc && metadata.mimeType !== DOCX_MIME && !/\.docx$/i.test(metadata.name || "")) {
+    return sendError(res, 415, "PDF conversion is currently available for Word DOCX files only.");
   }
   if (metadata.capabilities && metadata.capabilities.canDownload === false) {
     return sendError(res, 403, "The file owner has disabled downloading. This DOCX cannot be converted.");
   }
 
-  const driveFileUrl = buildUrl("/files/" + encodeURIComponent(metadata.id), {
-    alt: "media",
-    supportsAllDrives: "true"
-  });
+  const driveFileUrl = isGoogleDoc
+    ? buildUrl("/files/" + encodeURIComponent(metadata.id) + "/export", {
+        mimeType: DOCX_MIME
+      })
+    : buildUrl("/files/" + encodeURIComponent(metadata.id), {
+        alt: "media",
+        supportsAllDrives: "true"
+      });
   const driveHeaders = { Authorization: "Bearer " + token };
   if (metadata.resourceKey) {
     driveHeaders["X-Goog-Drive-Resource-Keys"] = metadata.id + "/" + metadata.resourceKey;
