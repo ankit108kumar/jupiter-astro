@@ -418,13 +418,33 @@
     handle.addEventListener("pointercancel", stopDragging);
   }
 
+  function isApplePlatform() {
+    var platform = "";
+    if (navigator.userAgentData && navigator.userAgentData.platform) {
+      platform = navigator.userAgentData.platform;
+    } else {
+      platform = navigator.platform || "";
+    }
+    return /mac|iphone|ipad|ipod/i.test(platform);
+  }
+
+  function getLibraryShortcutLabel() {
+    return isApplePlatform() ? "⌘ + Shift + L" : "Ctrl + Shift + L";
+  }
+
   document.addEventListener("keydown", function (event) {
     var isLibraryShortcut = event.key && event.key.toLowerCase() === "l";
-    if ((event.ctrlKey || event.metaKey) && event.shiftKey && isLibraryShortcut) {
+    var isMac = isApplePlatform();
+    var primaryModifier = isMac
+      ? event.metaKey && !event.ctrlKey
+      : event.ctrlKey && !event.metaKey;
+
+    if (primaryModifier && event.shiftKey && !event.altKey && isLibraryShortcut) {
       event.preventDefault();
       event.stopPropagation();
       if (libraryWindow && libraryWindow.classList.contains("ja-lib-open")) {
-        libraryWindow.querySelector(".ja-lib-search").focus({ preventScroll: true });
+        var searchInput = libraryWindow.querySelector(".ja-lib-search");
+        if (searchInput) searchInput.focus({ preventScroll: true });
       } else {
         openWindow();
       }
@@ -448,7 +468,7 @@
     isOpen: function () { return !!libraryWindow && libraryWindow.classList.contains("ja-lib-open"); },
     getActiveProvider: function () { return activeProvider; },
     toggleFullscreen: toggleFullscreen,
-    shortcut: "Ctrl + Shift + L"
+    shortcut: getLibraryShortcutLabel()
   };
 
   // When launched as the installed Library PWA, show the library immediately
@@ -466,5 +486,5 @@
     }
   }
 
-  console.info("Jupiter Astro: Library window shell loaded. Shortcut: Ctrl + Shift + L");
+  console.info("Jupiter Astro: Library window shell loaded. Shortcut: " + getLibraryShortcutLabel());
 })();
