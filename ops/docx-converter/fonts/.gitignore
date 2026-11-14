@@ -1,0 +1,6 @@
+# Font binaries are private build inputs. Do not commit them.
+*.ttf
+*.otf
+*.ttc
+*.woff
+*.woff2
