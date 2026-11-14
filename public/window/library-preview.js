@@ -195,6 +195,7 @@
 
   function cleanupCurrent() {
     if (!current) return;
+    restoreWindowsFontAliases();
     cancelPdfPageStates();
     if (current.controller) current.controller.abort();
     if (current.objectUrl) URL.revokeObjectURL(current.objectUrl);
@@ -256,7 +257,10 @@
     current = {
       id: id, controller: controller, file: file, type: detectType(file),
       blob: null, objectUrl: null, pdfDocument: null, page: 1, zoom: 1,
-      docxRenderer: "html", docxPdfBlob: null
+      docxRenderer: "html", docxPdfBlob: null,
+      windowsFontsEnabled: false, windowsLocalFonts: null,
+      windowsFontOverrides: [], windowsFontStyle: null,
+      windowsFontAliasMap: Object.create(null), windowsFontMatchCount: 0
     };
 
     panel.classList.add("is-open");
@@ -624,6 +628,234 @@
     });
   }
 
+  function normalizeFontName(value) {
+    return String(value || "").replace(/^["']|["']$/g, "").trim().toLocaleLowerCase();
+  }
+
+  function firstFontFamily(value) {
+    var first = String(value || "").split(",")[0] || "";
+    return first.replace(/^["']|["']$/g, "").trim();
+  }
+
+  function cssQuotedString(value) {
+    return '"' + String(value == null ? "" : value)
+      .replace(/\\/g, "\\\\")
+      .replace(/"/g, '\\"')
+      .replace(/[\r\n\f]/g, " ") + '"';
+  }
+
+  function localFontWeight(styleName) {
+    var style = String(styleName || "").toLowerCase();
+    if (/hairline|ultra.?thin/.test(style)) return 100;
+    if (/\bthin\b/.test(style)) return 200;
+    if (/extra.?light|ultra.?light/.test(style)) return 200;
+    if (/\blight\b/.test(style)) return 300;
+    if (/\bmedium\b/.test(style)) return 500;
+    if (/semi.?bold|demi/.test(style)) return 600;
+    if (/extra.?bold|ultra.?bold/.test(style)) return 800;
+    if (/\bblack\b|\bheavy\b/.test(style)) return 900;
+    if (/\bbold\b/.test(style)) return 700;
+    return 400;
+  }
+
+  function localFontStyle(styleName) {
+    return /italic|oblique/i.test(String(styleName || "")) ? "italic" : "normal";
+  }
+
+  function restoreWindowsFontAliases() {
+    if (!current) return;
+    (current.windowsFontOverrides || []).forEach(function (entry) {
+      if (!entry.element || !entry.element.isConnected) return;
+      if (entry.value) {
+        entry.element.style.setProperty("font-family", entry.value, entry.priority || "");
+      } else {
+        entry.element.style.removeProperty("font-family");
+      }
+    });
+    current.windowsFontOverrides = [];
+
+    if (current.windowsFontStyle && current.windowsFontStyle.parentNode) {
+      current.windowsFontStyle.parentNode.removeChild(current.windowsFontStyle);
+    }
+    current.windowsFontStyle = null;
+    current.windowsFontAliasMap = Object.create(null);
+    current.windowsFontMatchCount = 0;
+  }
+
+  function collectRenderedFontFamilies(root) {
+    var found = new Map();
+    if (!root) return [];
+    var nodes = [root].concat(Array.from(root.querySelectorAll("*")));
+    nodes.forEach(function (node) {
+      var family = firstFontFamily(window.getComputedStyle(node).fontFamily);
+      var key = normalizeFontName(family);
+      if (!key || /^(serif|sans-serif|monospace|cursive|fantasy|system-ui|ui-serif|ui-sans-serif|ui-monospace)$/i.test(key)) return;
+      if (!found.has(key)) found.set(key, family);
+    });
+    return Array.from(found.values());
+  }
+
+  function buildWindowsFontAliases(fontFamilies, localFonts) {
+    var aliases = Object.create(null);
+    var cssRules = [];
+    var matched = [];
+    var missing = [];
+    var aliasIndex = 0;
+
+    fontFamilies.forEach(function (documentFamily) {
+      var key = normalizeFontName(documentFamily);
+      var faces = localFonts.filter(function (font) {
+        return normalizeFontName(font.family) === key ||
+          normalizeFontName(font.fullName) === key ||
+          normalizeFontName(font.postscriptName) === key;
+      });
+      if (!faces.length) {
+        missing.push(documentFamily);
+        return;
+      }
+
+      var alias = "JupiterDOCXLocal_" + current.id + "_" + (++aliasIndex);
+      aliases[key] = alias;
+      matched.push(documentFamily);
+
+      faces.forEach(function (face) {
+        var localNames = [];
+        if (face.postscriptName) localNames.push(face.postscriptName);
+        if (face.fullName && localNames.indexOf(face.fullName) === -1) localNames.push(face.fullName);
+        if (!localNames.length) return;
+        var sources = localNames.map(function (name) {
+          return "local(" + cssQuotedString(name) + ")";
+        }).join(", ");
+        cssRules.push(
+          "@font-face{" +
+            "font-family:" + cssQuotedString(alias) + ";" +
+            "src:" + sources + ";" +
+            "font-weight:" + localFontWeight(face.style) + ";" +
+            "font-style:" + localFontStyle(face.style) + ";" +
+            "font-display:swap;" +
+          "}"
+        );
+      });
+    });
+
+    return { aliases: aliases, rules: cssRules, matched: matched, missing: missing };
+  }
+
+  async function applyWindowsFontAliases(id) {
+    ensureCurrent(id);
+    restoreWindowsFontAliases();
+
+    var stage = panel.querySelector(".ja-lib-preview-stage");
+    var root = stage && stage.querySelector(".ja-lib-docxjs-body");
+    if (!root || !current.windowsLocalFonts || !current.windowsLocalFonts.length) return 0;
+
+    var families = collectRenderedFontFamilies(root);
+    var result = buildWindowsFontAliases(families, current.windowsLocalFonts);
+    current.windowsFontAliasMap = result.aliases;
+    current.windowsFontMatchCount = result.matched.length;
+
+    if (!result.rules.length) return 0;
+
+    var style = document.createElement("style");
+    style.id = "ja-docx-local-fonts-" + current.id;
+    style.type = "text/css";
+    style.textContent = result.rules.join("\n");
+    document.head.appendChild(style);
+    current.windowsFontStyle = style;
+
+    var nodes = [root].concat(Array.from(root.querySelectorAll("*")));
+    current.windowsFontOverrides = [];
+    nodes.forEach(function (node) {
+      var family = firstFontFamily(window.getComputedStyle(node).fontFamily);
+      var alias = current.windowsFontAliasMap[normalizeFontName(family)];
+      if (!alias) return;
+
+      current.windowsFontOverrides.push({
+        element: node,
+        value: node.style.getPropertyValue("font-family"),
+        priority: node.style.getPropertyPriority("font-family")
+      });
+      node.style.setProperty("font-family", cssQuotedString(alias), "important");
+    });
+
+    ensureCurrent(id);
+    var aliases = Array.from(new Set(Object.keys(result.aliases).map(function (key) {
+      return result.aliases[key];
+    })));
+    await Promise.all(aliases.map(function (alias) {
+      return document.fonts.load("12px " + cssQuotedString(alias)).catch(function () { return []; });
+    }));
+    ensureCurrent(id);
+    return result.matched.length;
+  }
+
+  async function toggleWindowsFonts() {
+    if (!current || current.type !== "docx" || current.docxRenderer !== "html") return;
+    var id = current.id;
+
+    if (current.windowsFontsEnabled) {
+      restoreWindowsFontAliases();
+      current.windowsFontsEnabled = false;
+      current.windowsLocalFonts = null;
+      setTools(docxRendererTools());
+      setPreviewStatus("DOCX → HTML · Browser font matching", current.blob.size);
+      showDocxRendererNotice("Windows font matching is off. The browser's normal font selection is active.");
+      return;
+    }
+
+    if (typeof window.queryLocalFonts !== "function") {
+      showDocxRendererNotice("This browser does not support Local Font Access. Normal browser matching of installed Windows fonts will still be used.");
+      return;
+    }
+
+    // Invoke queryLocalFonts immediately during this button click so Chrome
+    // can show its explicit local-font permission prompt.
+    var request;
+    try {
+      request = window.queryLocalFonts();
+    } catch (error) {
+      showDocxRendererNotice("Chrome could not request local font access: " + (error.message || "Permission unavailable."));
+      return;
+    }
+
+    setPreviewStatus("Requesting Windows font permission…", current.blob.size);
+    try {
+      var localFonts = await request;
+      ensureCurrent(id);
+      if (!Array.isArray(localFonts) || !localFonts.length) {
+        showDocxRendererNotice("No local fonts were returned. Check Chrome's local-font permission for this site.");
+        setPreviewStatus("DOCX → HTML · Browser font matching", current.blob.size);
+        return;
+      }
+
+      current.windowsLocalFonts = localFonts;
+      current.windowsFontsEnabled = true;
+      var matched = await applyWindowsFontAliases(id);
+      ensureCurrent(id);
+      setTools(docxRendererTools());
+
+      if (matched) {
+        setPreviewStatus("Windows fonts · " + matched + " document families matched", current.blob.size);
+        showDocxRendererNotice(
+          matched + " font family/families from this document matched fonts installed on this Windows computer. Font files remain on this computer."
+        );
+      } else {
+        setPreviewStatus("Windows fonts · No exact family matches", current.blob.size);
+        showDocxRendererNotice(
+          "No exact local font-family match was found for the rendered document. The browser's normal font fallback remains active; no font files were uploaded."
+        );
+      }
+    } catch (error) {
+      if (!current || current.id !== id) return;
+      setPreviewStatus("DOCX → HTML · Browser font matching", current.blob.size);
+      showDocxRendererNotice(
+        error && error.name === "NotAllowedError"
+          ? "Local font access was not granted. You can allow it from Chrome's site permissions and try again."
+          : "Could not access local Windows fonts: " + (error && error.message ? error.message : "Permission unavailable.")
+      );
+    }
+  }
+
   function docxRendererTools() {
     var mode = current && current.docxRenderer || "html";
     return (
@@ -634,6 +866,14 @@
         '<button type="button" class="ja-lib-docx-toggle' + (mode === "pdf" ? " active" : "") +
           '" data-preview-action="docx-mode-pdf" aria-pressed="' + (mode === "pdf" ? "true" : "false") +
           '" title="Convert DOCX to PDF using LibreOffice, then view with PDF.js">DOCX → PDF</button>' +
+        (mode === "html" ?
+          '<button type="button" class="ja-lib-docx-toggle ja-lib-docx-local-fonts' +
+            (current && current.windowsFontsEnabled ? ' active' : '') +
+            '" data-preview-action="windows-fonts" aria-pressed="' +
+            (current && current.windowsFontsEnabled ? "true" : "false") +
+            '" title="Ask Chrome to match this document to fonts installed on your Windows computer. Font files stay local.">' +
+            (current && current.windowsFontsEnabled ? "Windows fonts ✓" : "Use Windows fonts") +
+          '</button>' : '') +
       '</div>'
     );
   }
@@ -682,6 +922,7 @@
 
     var stage = panel.querySelector(".ja-lib-preview-stage");
     stage.classList.remove("is-pdf","is-pdf-vertical","is-pdf-horizontal","is-docx","is-spreadsheet","is-pptx");
+    restoreWindowsFontAliases();
     stage.classList.add("is-docxjs");
     stage.innerHTML =
       '<div class="ja-lib-docxjs-styles"></div>' +
@@ -709,8 +950,18 @@
       debug: false
     });
     ensureCurrent(id);
+    var matchedWindowsFamilies = 0;
+    if (current.windowsFontsEnabled && current.windowsLocalFonts && current.windowsLocalFonts.length) {
+      matchedWindowsFamilies = await applyWindowsFontAliases(id);
+      ensureCurrent(id);
+    }
     setTools(docxRendererTools());
-    setPreviewStatus("DOCX → HTML · Browser rendering", current.blob.size);
+    setPreviewStatus(
+      current.windowsFontsEnabled
+        ? "DOCX → HTML · Windows fonts · " + matchedWindowsFamilies + " matched"
+        : "DOCX → HTML · Browser rendering",
+      current.blob.size
+    );
   }
 
   async function convertDocxToPdf(id) {
@@ -997,6 +1248,8 @@
       selectDocxRenderer("html");
     } else if (action === "docx-mode-pdf" && current.type === "docx") {
       selectDocxRenderer("pdf");
+    } else if (action === "windows-fonts" && current.type === "docx" && current.docxRenderer === "html") {
+      toggleWindowsFonts();
     } else if (action === "zoom-in") changeZoom(1.2);
     else if (action === "zoom-out") changeZoom(1 / 1.2);
     else if (action === "zoom-reset") resetZoom();
