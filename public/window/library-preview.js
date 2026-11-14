@@ -669,6 +669,7 @@
   }
 
   async function renderDocxHtml(id) {
+    destroyPdfView();
     setLoading("Loading DOCX browser renderer…");
     await loadScript(JSZIP_URL, "docx-jszip", "JSZip");
     ensureCurrent(id);
@@ -792,7 +793,6 @@
     if (current.docxRenderer === "pdf") {
       return renderDocxPdf(id);
     }
-    destroyPdfView();
     return renderDocxHtml(id);
   }
 
