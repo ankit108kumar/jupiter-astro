@@ -924,7 +924,7 @@
       return cacheGet("converted-docx-pdf:v1:" + String(key || ""));
     },
     setConvertedPreview: async function (key, blob, fileName) {
-      if (!(blob instanceof Blob) || !blob.size) return false;
+      if (!(blob instanceof Blob) || !blob.size || blob.size > MAX_CACHED_FILE_BYTES) return false;
       return cachePut("converted-docx-pdf:v1:" + String(key || ""), {
         blob: blob,
         name: fileName || "",
