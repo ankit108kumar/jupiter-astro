@@ -289,13 +289,14 @@
       if (error && error.name === "AbortError") return;
       if (!current || current.id !== id) return;
       showError(error && error.message ? error.message : "The file could not be previewed.");
+      if (current.type === "docx") setTools(docxRendererTools());
     });
   }
 
   async function renderCurrent(id) {
     ensureCurrent(id);
     var previewStage = panel.querySelector(".ja-lib-preview-stage");
-    previewStage.classList.remove("is-spreadsheet","is-pdf","is-pdf-vertical","is-pdf-horizontal","is-docx","is-pptx");
+    previewStage.classList.remove("is-spreadsheet","is-pdf","is-pdf-vertical","is-pdf-horizontal","is-docx","is-docxjs","is-pptx");
     previewStage.style.zoom = "";
     switch (current.type) {
       case "pdf": return renderPdf(id);
@@ -1086,7 +1087,9 @@
 
   function handleRenderError(error) {
     if (error && error.name === "AbortError") return;
-    if (current) showError(error && error.message ? error.message : "The preview could not be rendered.");
+    if (!current) return;
+    showError(error && error.message ? error.message : "The preview could not be rendered.");
+    if (current.type === "docx") setTools(docxRendererTools());
   }
 
   function close(options) {
