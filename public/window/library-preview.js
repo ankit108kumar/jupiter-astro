@@ -133,6 +133,22 @@
     if (!current || !current.search) return;
     current.search.ready = !!value;
     updateSearchToolbar();
+    if (current.search.ready && current.search.query && !current.search.building) {
+      runPreviewSearch(current.search.query);
+    }
+  }
+
+  function prepareSearchForRerender() {
+    if (!current || !current.search) return;
+    if (current.search.timer) window.clearTimeout(current.search.timer);
+    current.search.timer = null;
+    current.search.token++;
+    current.search.matches = [];
+    current.search.index = -1;
+    current.search.building = false;
+    current.search.ready = false;
+    clearSearchHighlights();
+    updateSearchToolbar();
   }
 
   function clearSearchHighlights() {
@@ -243,7 +259,7 @@
       var page = current.pdfPageObjects[pageNo - 1] || await current.pdfDocument.getPage(pageNo);
       var content = await page.getTextContent();
       ensureCurrent(id);
-      var text = (content.items || []).map(function (item) { return String(item.str || ""); }).join(" ");
+      var text = (content.items || []).map(function (item) { return String(item.str || ""); }).join("");
       findOccurrences(text, query).forEach(function (_, localIndex) {
         if (matches.length < SEARCH_MAX_MATCHES) matches.push({ kind: "pdf", pageNumber: pageNo, localIndex: localIndex });
       });
@@ -399,6 +415,12 @@
     if (event.key === "Enter") {
       event.preventDefault();
       event.stopPropagation();
+      if (current && current.search && event.target.value.trim() !== current.search.query) {
+        if (current.search.timer) window.clearTimeout(current.search.timer);
+        current.search.timer = null;
+        runPreviewSearch(event.target.value);
+        return;
+      }
       navigatePreviewSearch(event.shiftKey ? -1 : 1);
     } else if (event.key === "Escape" && event.target.value) {
       event.preventDefault();
@@ -2054,6 +2076,7 @@
       button.addEventListener("click", function () {
         if (!current) return;
         current.sheetIndex = index;
+        current.searchTargetCell = null;
         renderSheet(id);
       });
       tabs.appendChild(button);
@@ -2274,6 +2297,7 @@
     if (!current || current.type !== "docx" || current.docxRenderer === mode) return;
     var id = current.id;
     var previousMode = current.docxRenderer || "html";
+    prepareSearchForRerender();
     current.docxRenderer = mode;
 
     try {
