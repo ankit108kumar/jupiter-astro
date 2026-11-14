@@ -848,7 +848,9 @@
     for (var family of uniqueFamilies.values()) {
       var key = normalizeFontName(family);
       var faces = localFonts.filter(function (font) {
-        return normalizeFontName(font.family) === key;
+        return normalizeFontName(font.family) === key ||
+          normalizeFontName(font.fullName) === key ||
+          normalizeFontName(font.postscriptName) === key;
       });
 
       if (!faces.length) {
@@ -868,6 +870,7 @@
         try {
           if (typeof face.blob !== "function") throw new Error("This browser did not provide font bytes.");
           var fontBlob = await face.blob();
+          ensureCurrent(id);
           if (!(fontBlob instanceof Blob) || !fontBlob.size) throw new Error("The returned font file was empty.");
           if (totalBytes + fontBlob.size > maxTotalBytes) {
             throw new Error("The 64 MB safety limit for local font data was reached.");
@@ -875,6 +878,9 @@
 
           var objectUrl = URL.createObjectURL(fontBlob);
           objectUrls.push(objectUrl);
+          // Track each URL immediately so closing/switching the preview can revoke it,
+          // even while this async font-loading pass is still in progress.
+          if (current && current.id === id) current.windowsFontObjectUrls.push(objectUrl);
           totalBytes += fontBlob.size;
           cssRules.push(
             "@font-face{" +
@@ -888,6 +894,7 @@
           familyLoaded++;
           loadedFaceCount++;
         } catch (error) {
+          if (error && error.name === "AbortError") throw error;
           failedFaceCount++;
           failed.push(family + " (" + String(face.style || "unknown style") + "): " +
             (error && error.message ? error.message : "Font data could not be read."));
@@ -941,7 +948,6 @@
     ensureCurrent(id);
     current.windowsFontAliasMap = result.aliases;
     current.windowsFontMatchCount = result.matched.length;
-    current.windowsFontObjectUrls = result.objectUrls;
 
     if (result.rules.length) {
       var style = document.createElement("style");
