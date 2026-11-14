@@ -475,6 +475,24 @@ signInForm.addEventListener('submit', async function (e) {
 });
 
 
+  // Open the existing Account dialogue when returning from the standalone Library prompt.
+  if (window.location.hash === '#account') {
+    const openFromLibraryPrompt = function () {
+      openAccount();
+      window.history.replaceState(
+        null,
+        '',
+        window.location.pathname + window.location.search
+      );
+    };
+
+    if (window.jaAuthReady && typeof window.jaAuthReady.then === 'function') {
+      window.jaAuthReady.then(openFromLibraryPrompt, openFromLibraryPrompt);
+    } else {
+      openFromLibraryPrompt();
+    }
+  }
+
   // FORGOT PASSWORD PLACEHOLDER
   document.getElementById('forgotPasswordBtn')
     .addEventListener('click', function (e) {
