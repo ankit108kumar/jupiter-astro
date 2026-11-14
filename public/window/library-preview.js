@@ -116,10 +116,10 @@
           '<div class="ja-lib-preview-file-meta"><strong class="ja-lib-preview-name"></strong><span class="ja-lib-preview-subtitle"></span></div></div>' +
         '<div class="ja-lib-preview-tools" aria-label="Preview controls"></div>' +
       '</header>' +
-      '<div class="ja-lib-preview-stage" tabindex="0"><div class="ja-lib-preview-loading"><span class="ja-lib-preview-spinner"></span><span>Preparing preview…</span></div></div>' +
-      '<footer class="ja-lib-preview-footer"><span class="ja-lib-preview-message">Preview · Original Drive file remains unchanged</span><span class="ja-lib-preview-size"></span></footer>';
+      '<div class="ja-lib-preview-stage" tabindex="0"><div class="ja-lib-preview-loading"><span class="ja-lib-preview-spinner"></span><span>Preparing preview…</span></div></div>';
     main.appendChild(panel);
     panel.addEventListener("click", handlePanelClick);
+    panel.addEventListener("wheel", handlePreviewWheel, { passive: false });
     panel.querySelector('[data-preview-action="back"]').addEventListener("click", close);
     return panel;
   }
@@ -165,20 +165,36 @@
 
   function setMetadata(file, type) {
     var labels = {
-      pdf: "PDF document", image: "Image", docx: "Word document", spreadsheet: "Spreadsheet",
-      pptx: "PowerPoint presentation", text: "Text document", audio: "Audio", video: "Video",
-      remote: "Google Drive preview", unsupported: "File"
+      pdf: "PDF", image: "Image", docx: "Word", spreadsheet: "Excel",
+      pptx: "PowerPoint", text: "Text", audio: "Audio", video: "Video",
+      remote: "Google Drive", unsupported: "File"
     };
-    var icons = { pdf: "PDF", image: "▧", docx: "W", spreadsheet: "▦", pptx: "▤", text: "≡", audio: "♫", video: "▶", remote: "G", unsupported: "?" };
+    var icons = { pdf:"PDF", image:"▧", docx:"W", spreadsheet:"▦", pptx:"▤", text:"≡", audio:"♫", video:"▶", remote:"G", unsupported:"?" };
     panel.querySelector(".ja-lib-preview-name").textContent = file.name || "Untitled file";
-    panel.querySelector(".ja-lib-preview-subtitle").textContent =
-      (labels[type] || "File") + " · " + String(file.provider || "Cloud file");
-    panel.querySelector(".ja-lib-preview-size").textContent = formatBytes(file.size);
     panel.querySelector(".ja-lib-preview-file-icon").textContent = icons[type] || "▤";
+    setPreviewStatus("Preview", file.size);
+  }
+
+  function setPreviewStatus(status, size) {
+    if (!panel || !current) return;
+    var labels = {
+      pdf:"PDF", image:"Image", docx:"Word", spreadsheet:"Excel",
+      pptx:"PowerPoint", text:"Text", audio:"Audio", video:"Video",
+      remote:"Google Drive", unsupported:"File"
+    };
+    var parts = [
+      labels[current.type] || "File",
+      String(current.file.provider || "Cloud file"),
+      status || "Preview",
+      formatBytes(size || current.blob && current.blob.size || current.file.size)
+    ].filter(Boolean);
+    var subtitle = panel.querySelector(".ja-lib-preview-subtitle");
+    if (subtitle) subtitle.textContent = parts.join(" · ");
   }
 
   function cleanupCurrent() {
     if (!current) return;
+    cancelPdfPageStates();
     if (current.controller) current.controller.abort();
     if (current.objectUrl) URL.revokeObjectURL(current.objectUrl);
     if (current.pdfDocument && typeof current.pdfDocument.destroy === "function") {
@@ -262,12 +278,11 @@
         if (blob.size > MAX_PREVIEW_BYTES) {
           throw new Error("This file is " + formatBytes(blob.size) + ". The in-browser preview limit is " + formatBytes(MAX_PREVIEW_BYTES) + ".");
         }
-        panel.querySelector(".ja-lib-preview-size").textContent = formatBytes(blob.size);
+        setPreviewStatus("Preview", blob.size);
         await renderCurrent(id);
       }
       ensureCurrent(id);
-      panel.querySelector(".ja-lib-preview-message").textContent =
-        "Preview · Original Drive file remains unchanged";
+      setPreviewStatus("Preview", current.blob && current.blob.size || file.size);
     })().catch(function (error) {
       if (error && error.name === "AbortError") return;
       if (!current || current.id !== id) return;
@@ -277,7 +292,9 @@
 
   async function renderCurrent(id) {
     ensureCurrent(id);
-    panel.querySelector(".ja-lib-preview-stage").classList.remove("is-spreadsheet");
+    var previewStage = panel.querySelector(".ja-lib-preview-stage");
+    previewStage.classList.remove("is-spreadsheet","is-pdf","is-pdf-vertical","is-pdf-horizontal","is-docx","is-pptx");
+    previewStage.style.zoom = "";
     switch (current.type) {
       case "pdf": return renderPdf(id);
       case "image": return renderImage(id);
@@ -298,48 +315,232 @@
     setLoading("Loading PDF viewer…");
     var pdfjs = await loadModule("pdfjs", PDFJS_URL);
     ensureCurrent(id);
+    if (!pdfjs.TextLayer) {
+      throw new Error("The loaded PDF.js build does not expose its selectable text layer.");
+    }
     pdfjs.GlobalWorkerOptions.workerSrc = PDFJS_WORKER_URL;
     var pdf = await pdfjs.getDocument({ data: await current.blob.arrayBuffer() }).promise;
     ensureCurrent(id);
+
     current.pdfDocument = pdf;
+    current.pdfjs = pdfjs;
     current.pageCount = pdf.numPages;
     current.page = 1;
-    current.zoom = 1.15;
-    setTools(toolButton("zoom-out", "Zoom out", "−") +
-      '<span class="ja-lib-preview-counter" data-preview-counter></span>' +
-      toolButton("zoom-in", "Zoom in", "+") +
-      toolButton("page-prev", "Previous page", "‹") +
-      toolButton("page-next", "Next page", "›"));
-    await renderPdfPage(id);
+    current.zoom = 1;
+    current.pdfScrollMode = "vertical";
+    current.pdfPageObjects = await Promise.all(
+      Array.from({ length: pdf.numPages }, function (_, index) {
+        return pdf.getPage(index + 1);
+      })
+    );
+    ensureCurrent(id);
+    await rebuildPdfPageLayout(id, 1);
   }
 
-  async function renderPdfPage(id) {
+  function cancelPdfPageStates() {
+    if (!current) return;
+    if (current.pdfRenderObserver) {
+      current.pdfRenderObserver.disconnect();
+      current.pdfRenderObserver = null;
+    }
+    (current.pdfPageStates || []).forEach(function (state) {
+      if (state.renderTask && typeof state.renderTask.cancel === "function") {
+        try { state.renderTask.cancel(); } catch (error) {}
+      }
+      if (state.textLayer && typeof state.textLayer.cancel === "function") {
+        try { state.textLayer.cancel(); } catch (error) {}
+      }
+    });
+    current.pdfPageStates = [];
+  }
+
+  function updatePdfTools() {
+    if (!current || current.type !== "pdf") return;
+    var mode = current.pdfScrollMode || "vertical";
+    setTools(
+      toolButton("zoom-out", "Zoom out", "−") +
+      toolButton("zoom-reset", "Reset zoom", "100%") +
+      toolButton("zoom-in", "Zoom in", "+") +
+      '<span class="ja-lib-preview-counter" data-preview-counter>' +
+        "Page " + (current.page || 1) + " of " + current.pageCount +
+      "</span>" +
+      toolButton(
+        "scroll-mode",
+        mode === "vertical" ? "Switch to horizontal scrolling" : "Switch to vertical scrolling",
+        mode === "vertical" ? "↔" : "↕"
+      )
+    );
+  }
+
+  async function rebuildPdfPageLayout(id, keepPage) {
     ensureCurrent(id);
-    var page = await current.pdfDocument.getPage(current.page);
-    ensureCurrent(id);
-    var viewport = page.getViewport({ scale: current.zoom });
-    var ratio = Math.min(window.devicePixelRatio || 1, 2);
-    var canvas = document.createElement("canvas");
-    var context = canvas.getContext("2d", { alpha: false });
-    canvas.width = Math.floor(viewport.width * ratio);
-    canvas.height = Math.floor(viewport.height * ratio);
-    canvas.style.width = Math.floor(viewport.width) + "px";
-    canvas.style.height = Math.floor(viewport.height) + "px";
-    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    cancelPdfPageStates();
+    current.pdfGeneration = (current.pdfGeneration || 0) + 1;
+    var generation = current.pdfGeneration;
     var stage = panel.querySelector(".ja-lib-preview-stage");
+    var mode = current.pdfScrollMode || "vertical";
+    stage.classList.remove("is-spreadsheet","is-pdf","is-pdf-vertical","is-pdf-horizontal","is-docx","is-pptx");
+    stage.classList.add("is-pdf", "is-pdf-" + mode);
     stage.innerHTML = "";
-    var frame = document.createElement("div");
-    frame.className = "ja-lib-preview-page-frame";
-    frame.appendChild(canvas);
-    stage.appendChild(frame);
-    await page.render({ canvasContext: context, viewport: viewport }).promise;
-    ensureCurrent(id);
+
+    var documentView = document.createElement("div");
+    documentView.className = "ja-lib-pdf-document " + (mode === "horizontal" ? "is-horizontal" : "is-vertical");
+    stage.appendChild(documentView);
+
+    var states = [];
+    current.pdfPageObjects.forEach(function (page, index) {
+      var viewport = page.getViewport({ scale: current.zoom });
+      var frame = document.createElement("div");
+      frame.className = "ja-lib-pdf-page-frame";
+      frame.dataset.pageNumber = String(index + 1);
+      frame.style.width = Math.ceil(viewport.width) + "px";
+      frame.style.height = Math.ceil(viewport.height) + "px";
+      frame.style.setProperty("--total-scale-factor", String(current.zoom));
+
+      var canvas = document.createElement("canvas");
+      canvas.className = "ja-lib-pdf-page-canvas";
+      canvas.setAttribute("aria-hidden", "true");
+      frame.appendChild(canvas);
+      documentView.appendChild(frame);
+
+      states.push({
+        pageNumber: index + 1,
+        page: page,
+        viewport: viewport,
+        frame: frame,
+        canvas: canvas,
+        rendered: false,
+        rendering: false,
+        renderTask: null,
+        textLayer: null,
+        ratio: 0,
+        generation: generation
+      });
+    });
+    current.pdfPageStates = states;
+
     var counter = panel.querySelector("[data-preview-counter]");
-    if (counter) counter.textContent = current.page + " / " + current.pageCount;
-    var prev = panel.querySelector('[data-preview-action="page-prev"]');
-    var next = panel.querySelector('[data-preview-action="page-next"]');
-    if (prev) prev.disabled = current.page <= 1;
-    if (next) next.disabled = current.page >= current.pageCount;
+    if (counter) counter.textContent = "Page " + (keepPage || 1) + " of " + current.pageCount;
+
+    if ("IntersectionObserver" in window) {
+      current.pdfRenderObserver = new IntersectionObserver(function (entries) {
+        if (!current || current.id !== id || current.pdfGeneration !== generation) return;
+        entries.forEach(function (entry) {
+          var pageNumber = Number(entry.target.dataset.pageNumber);
+          var state = current.pdfPageStates[pageNumber - 1];
+          if (!state) return;
+          state.ratio = entry.isIntersecting ? entry.intersectionRatio : 0;
+          if (entry.isIntersecting && !state.rendered && !state.rendering) {
+            renderPdfPageFrame(id, state, generation).catch(handleRenderError);
+          }
+        });
+        var visibleStates = current.pdfPageStates
+          .filter(function (state) { return state.ratio > 0; })
+          .sort(function (a, b) { return b.ratio - a.ratio; });
+        if (visibleStates.length) {
+          current.page = visibleStates[0].pageNumber;
+          updatePdfCounter();
+        }
+      }, {
+        root: stage,
+        rootMargin: mode === "vertical" ? "1000px 0px" : "0px 1100px",
+        threshold: [0, 0.15, 0.35, 0.6, 0.85, 1]
+      });
+      states.forEach(function (state) {
+        current.pdfRenderObserver.observe(state.frame);
+      });
+    }
+
+    updatePdfTools();
+
+    var targetPage = Math.min(Math.max(1, Number(keepPage) || 1), current.pageCount);
+    var targetState = states[targetPage - 1];
+    if (targetState) {
+      if (mode === "vertical") {
+        stage.scrollTop = 0;
+        stage.scrollLeft = 0;
+      } else {
+        stage.scrollTop = 0;
+        stage.scrollLeft = Math.max(0, targetState.frame.offsetLeft - stage.clientWidth * 0.12);
+      }
+      await renderPdfPageFrame(id, targetState, generation);
+    }
+
+    // Also prime the adjacent page so a quick scroll feels immediate.
+    var adjacent = states[targetPage];
+    if (adjacent) renderPdfPageFrame(id, adjacent, generation).catch(handleRenderError);
+  }
+
+  function updatePdfCounter() {
+    if (!current || current.type !== "pdf") return;
+    var counter = panel.querySelector("[data-preview-counter]");
+    if (counter) counter.textContent = "Page " + current.page + " of " + current.pageCount;
+  }
+
+  async function renderPdfPageFrame(id, state, generation) {
+    ensureCurrent(id);
+    if (state.rendered || state.rendering) return;
+    state.rendering = true;
+
+    try {
+      var page = state.page;
+      var viewport = page.getViewport({ scale: current.zoom });
+      state.viewport = viewport;
+      state.frame.style.width = Math.ceil(viewport.width) + "px";
+      state.frame.style.height = Math.ceil(viewport.height) + "px";
+      state.frame.style.setProperty("--total-scale-factor", String(current.zoom));
+
+      var ratio = Math.min(window.devicePixelRatio || 1, 2);
+      var canvas = state.canvas;
+      var context = canvas.getContext("2d", { alpha: false });
+      canvas.width = Math.floor(viewport.width * ratio);
+      canvas.height = Math.floor(viewport.height * ratio);
+      canvas.style.width = Math.ceil(viewport.width) + "px";
+      canvas.style.height = Math.ceil(viewport.height) + "px";
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+      var task = page.render({ canvasContext: context, viewport: viewport });
+      state.renderTask = task;
+      await task.promise;
+      ensureCurrent(id);
+      if (current.pdfGeneration !== generation) return;
+
+      var textContent = await page.getTextContent();
+      ensureCurrent(id);
+      if (current.pdfGeneration !== generation) return;
+
+      var textContainer = document.createElement("div");
+      textContainer.className = "textLayer";
+      textContainer.setAttribute("aria-label", "Selectable PDF text, page " + state.pageNumber);
+      textContainer.style.width = Math.ceil(viewport.width) + "px";
+      textContainer.style.height = Math.ceil(viewport.height) + "px";
+      textContainer.style.setProperty("--total-scale-factor", String(current.zoom));
+      state.frame.appendChild(textContainer);
+
+      var textLayer = new current.pdfjs.TextLayer({
+        textContentSource: textContent,
+        container: textContainer,
+        viewport: viewport
+      });
+      state.textLayer = textLayer;
+      await textLayer.render();
+      ensureCurrent(id);
+      if (current.pdfGeneration !== generation) return;
+      state.rendered = true;
+    } catch (error) {
+      if (error && (error.name === "RenderingCancelledException" || error.name === "AbortException")) return;
+      throw error;
+    } finally {
+      state.rendering = false;
+      state.renderTask = null;
+    }
+  }
+
+  function setPdfScrollMode(mode) {
+    if (!current || current.type !== "pdf" || current.pdfScrollMode === mode) return;
+    var page = current.page || 1;
+    current.pdfScrollMode = mode;
+    rebuildPdfPageLayout(current.id, page).catch(handleRenderError);
   }
 
   function renderRemote(id) {
@@ -433,12 +634,15 @@
     ensureCurrent(id);
     var safeBody = sanitizeDocxHtml(result.value);
     var stage = panel.querySelector(".ja-lib-preview-stage");
+    stage.classList.add("is-docx");
     stage.innerHTML = '<article class="ja-lib-docx-page"></article>';
     stage.querySelector("article").appendChild(document.importNode(safeBody, true));
-    setTools('<span class="ja-lib-preview-note">Reflowed preview · Word page layout may differ</span>');
+    stage.querySelectorAll("a").forEach(function (link) {
+      link.setAttribute("rel", "noopener noreferrer");
+    });
+    setTools('<span class="ja-lib-preview-note">A4-width Word preview · Reflowed text</span>');
     if (result.messages && result.messages.length) {
-      panel.querySelector(".ja-lib-preview-message").textContent =
-        result.messages.length + " conversion note(s) · Some Word features may not be represented.";
+      setPreviewStatus(result.messages.length + " conversion notes", current.blob.size);
     }
   }
 
@@ -622,6 +826,7 @@
     var options = current.fontSubstitutes ? { fontSubstitutes: current.fontSubstitutes } : {};
     var rendered = current.renderer.renderSlide(presentation.slides[current.slideIndex], presentation.slideSize, options);
     var stage = panel.querySelector(".ja-lib-preview-stage");
+    stage.classList.add("is-pptx");
     stage.innerHTML = '<div class="ja-lib-slide-frame"></div>';
     stage.querySelector(".ja-lib-slide-frame").appendChild(sanitizeRenderedSvg(rendered.svg));
     var counter = panel.querySelector("[data-preview-counter]");
@@ -640,12 +845,8 @@
     else if (action === "zoom-in") changeZoom(1.2);
     else if (action === "zoom-out") changeZoom(1 / 1.2);
     else if (action === "zoom-reset") resetZoom();
-    else if (action === "page-prev" && current.page > 1) {
-      current.page--;
-      renderPdfPage(current.id).catch(handleRenderError);
-    } else if (action === "page-next" && current.page < current.pageCount) {
-      current.page++;
-      renderPdfPage(current.id).catch(handleRenderError);
+    else if (action === "scroll-mode") {
+      setPdfScrollMode(current.pdfScrollMode === "vertical" ? "horizontal" : "vertical");
     } else if (action === "slide-prev" && current.slideIndex > 0) {
       current.slideIndex--;
       renderSlide(current.id).catch(handleRenderError);
@@ -657,22 +858,51 @@
 
   function changeZoom(factor) {
     if (!current) return;
-    current.zoom = Math.min(3, Math.max(.35, current.zoom * factor));
-    if (current.type === "pdf") renderPdfPage(current.id).catch(handleRenderError);
-    else if (current.type === "image") {
+    var next = Math.min(3, Math.max(.35, current.zoom * factor));
+    if (Math.abs(next - current.zoom) < .001) return;
+    current.zoom = next;
+
+    if (current.type === "pdf") {
+      rebuildPdfPageLayout(current.id, current.page || 1).catch(handleRenderError);
+    } else if (current.type === "image") {
       var image = panel.querySelector(".ja-lib-preview-image");
       if (image) image.style.transform = "scale(" + current.zoom + ")";
+    } else if (current.type === "docx") {
+      var docxPage = panel.querySelector(".ja-lib-docx-page");
+      if (docxPage) docxPage.style.zoom = String(current.zoom);
+    } else if (current.type === "spreadsheet") {
+      var sheet = panel.querySelector(".ja-lib-sheet-wrap");
+      if (sheet) sheet.style.zoom = String(current.zoom);
+    } else if (current.type === "pptx") {
+      var slide = panel.querySelector(".ja-lib-slide-frame");
+      if (slide) slide.style.zoom = String(current.zoom);
     }
   }
 
   function resetZoom() {
     if (!current) return;
-    current.zoom = current.type === "pdf" ? 1.15 : 1;
-    if (current.type === "pdf") renderPdfPage(current.id).catch(handleRenderError);
-    else if (current.type === "image") {
+    current.zoom = 1;
+    if (current.type === "pdf") {
+      rebuildPdfPageLayout(current.id, current.page || 1).catch(handleRenderError);
+    } else if (current.type === "image") {
       var image = panel.querySelector(".ja-lib-preview-image");
       if (image) image.style.transform = "scale(1)";
+    } else {
+      var stage = panel.querySelector(".ja-lib-preview-stage");
+      if (stage) stage.style.zoom = "1";
+      var scaled = stage && stage.querySelector(".ja-lib-docx-page, .ja-lib-sheet-wrap, .ja-lib-slide-frame");
+      if (scaled) scaled.style.zoom = "1";
     }
+  }
+
+  function handlePreviewWheel(event) {
+    if (!current || (!event.ctrlKey && !event.metaKey)) return;
+    // Chromium reports touchpad pinch as a Ctrl+wheel gesture. Keep the zoom
+    // inside the document viewer rather than zooming the whole web page.
+    event.preventDefault();
+    event.stopPropagation();
+    var delta = Math.max(-120, Math.min(120, event.deltaY));
+    changeZoom(Math.exp(-delta * .003));
   }
 
   function handleRenderError(error) {
