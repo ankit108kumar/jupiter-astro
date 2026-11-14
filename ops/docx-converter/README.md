@@ -15,6 +15,30 @@ Set these environment variables on the conversion host:
 
 The Compose file enables Gotenberg Basic Authentication. Do not disable it when the service is reachable over the public internet.
 
+## Included font coverage
+
+The custom image installs a broad set of redistributable families on top of Gotenberg's built-in fonts (Carlito, Caladea, Liberation, DejaVu, Noto Core/CJK/Emoji and URW Base35).
+
+The added collection includes:
+
+- **Office-style and general sans:** Croscore, Open Sans, Roboto, Lato, Inter, Cantarell and Montserrat.
+- **Serif and publishing:** EB Garamond, Linux Libertine, Gentium, Charis, Junicode and TeX Gyre.
+- **Monospace:** Inconsolata, Fira Code and Noto Mono.
+- **Unicode and symbols:** Noto Extra, Noto UI Core/Extra and DejaVu Extra.
+- **Indian scripts:** Devanagari, Bengali/Assamese, Gujarati, Punjabi, Kannada, Malayalam, Odia, Tamil and Telugu families.
+- **Other writing systems:** Arabic, Thai, Sinhala, Khmer and Myanmar, with Japanese/CJK coverage from Gotenberg's included Noto CJK fonts and IPA additions.
+
+This is broad fallback coverage, not a guarantee that every Word font is identical. The image deliberately does not redistribute proprietary Microsoft/Adobe/commercial fonts. Where an original DOCX uses a licensed font that is not included, put its licensed `.ttf`, `.otf` or `.ttc` file into the private `fonts/` directory on the converter build machine. The Dockerfile installs those files and refreshes Fontconfig.
+
+**This font pack affects DOCX → PDF conversion through LibreOffice.** The browser-only DOCX → HTML option uses fonts available to the visitor's browser; installing a font in this Docker image does not install it in every visitor's browser.
+
+For the PDF route to use the new fonts, rebuild and redeploy the converter image after updating the repository:
+
+    docker compose build --no-cache gotenberg
+    docker compose up -d
+
+The image writes its detected font-family list to `/usr/share/gotenberg/font-families.txt` for diagnostics.
+
 Copy the sample environment file, replace both placeholders with strong unique values, and keep the real `.env` file on the converter host only:
 
     cp .env.example .env
