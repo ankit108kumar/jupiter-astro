@@ -540,5 +540,6 @@
     }
   };
 
+  window.dispatchEvent(new CustomEvent("ja-dropbox-connector-ready"));
   console.info("Jupiter Astro: Dropbox read-only Library connector loaded.");
 })();
