@@ -395,7 +395,7 @@
     var previousScrollLeft = stage.scrollLeft;
     var previousScrollHeight = stage.scrollHeight;
     var previousScrollWidth = stage.scrollWidth;
-    stage.classList.remove("is-spreadsheet","is-pdf","is-pdf-vertical","is-pdf-horizontal","is-docx","is-pptx");
+    stage.classList.remove("is-spreadsheet","is-pdf","is-pdf-vertical","is-pdf-horizontal","is-docx","is-docxjs","is-pptx");
     stage.classList.add("is-pdf", "is-pdf-" + mode);
     stage.innerHTML = "";
 
@@ -821,7 +821,6 @@
     current.docxPdfBlob = pdfBlob;
     await renderPdfBlob(id, pdfBlob, true);
     ensureCurrent(id);
-    setTools(docxRendererTools() + panel.querySelector(".ja-lib-preview-tools").innerHTML);
     setPreviewStatus("DOCX → PDF · LibreOffice conversion", pdfBlob.size);
   }
 
