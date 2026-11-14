@@ -852,26 +852,52 @@
 
   function addBookmanFallback(fontFamilyValue) {
     var parts = splitCssFontFamilyList(fontFamilyValue);
-    var specific = [];
-    var generic = [];
-    var hasBookman = false;
+    var ordered = [];
+    var seen = new Set();
 
+    function addFamily(value) {
+      var family = String(value || "").trim();
+      var key = normalizeFontName(unquoteCssFontFamily(family));
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      ordered.push(family);
+    }
+
+    // Keep real document font families first. Remove generic/system keywords
+    // such as "monospace": retaining one after an unavailable Bookman causes
+    // the browser to fall back to the very monospaced face we are replacing.
     parts.forEach(function (part) {
       var name = unquoteCssFontFamily(part);
-      if (normalizeFontName(name) === normalizeFontName(DOCX_FALLBACK_FONT_FAMILY)) {
-        hasBookman = true;
-        specific.push(cssQuotedString(DOCX_FALLBACK_FONT_FAMILY));
-      } else if (isGenericOrSystemFont(name) || /^(math|fangsong)$/i.test(name)) {
-        generic.push(part);
-      } else {
-        specific.push(part);
+      if (!isGenericOrSystemFont(name) && !/^(math|fangsong)$/i.test(name)) {
+        addFamily(part);
       }
     });
 
-    if (!hasBookman) specific.push(cssQuotedString(DOCX_FALLBACK_FONT_FAMILY));
-    if (!generic.length) generic.push("serif");
+    // This is a last-resort hierarchy, not a replacement for an installed
+    // font specified by the DOCX.
+    addFamily(cssQuotedString(DOCX_FALLBACK_FONT_FAMILY));
+    addFamily("Georgia");
+    addFamily(cssQuotedString("Times New Roman"));
+    addFamily("serif");
 
-    return specific.concat(generic).join(", ");
+    // Preserve specialist browser fallback keywords only after the requested
+    // Bookman/serif chain, never before it.
+    parts.forEach(function (part) {
+      var name = unquoteCssFontFamily(part);
+      if (/^(math|fangsong)$/i.test(name)) addFamily(part);
+    });
+
+    return ordered.join(", ");
+  }
+
+  function isWindowsLocalFontFamilyAvailable(familyName) {
+    if (!current || !Array.isArray(current.windowsLocalFonts)) return null;
+    var key = normalizeFontName(familyName);
+    return current.windowsLocalFonts.some(function (font) {
+      return normalizeFontName(font.family) === key ||
+        normalizeFontName(font.fullName) === key ||
+        normalizeFontName(font.postscriptName) === key;
+    });
   }
 
   function restoreDocxFallbackFont() {
@@ -1235,6 +1261,7 @@
       appliedElements: appliedElements,
       totalBytes: result.totalBytes,
       fallbackFamily: DOCX_FALLBACK_FONT_FAMILY,
+      bookmanDetectedOnWindows: isWindowsLocalFontFamilyAvailable(DOCX_FALLBACK_FONT_FAMILY),
       fallbackElements: current.docxFallbackAppliedCount || 0,
       warning: docxMetadata.warning || ""
     };
@@ -1254,6 +1281,11 @@
         " is the final fallback on " + (diagnostics.fallbackElements || 0) + " elements when installed.",
       "Local font data: " + (diagnostics.totalBytes / 1048576).toFixed(1) + " MB."
     ];
+    if (diagnostics.bookmanDetectedOnWindows === true) {
+      parts.push("Bookman Antiqua was found in Chrome's Windows font list.");
+    } else if (diagnostics.bookmanDetectedOnWindows === false) {
+      parts.push("Bookman Antiqua was NOT found in Chrome's Windows font list; missing document fonts will fall back to Georgia, Times New Roman or another serif face instead of monospace.");
+    }
     if (diagnostics.loadedFamilies.length) {
       parts.push("Loaded: " + diagnostics.loadedFamilies.join(", ") + ".");
     }
@@ -1461,8 +1493,8 @@
     } else {
       showDocxRendererNotice(
         DOCX_FALLBACK_FONT_FAMILY +
-        " is configured as the final fallback when a document font or glyph is unavailable. " +
-        "This font must be installed on this Windows computer."
+        " is the preferred final fallback after the document's own fonts. If it is not installed, " +
+        "the viewer uses Georgia, Times New Roman or a generic serif font; it will not fall back to monospace."
       );
     }
   }
