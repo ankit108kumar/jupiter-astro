@@ -110,11 +110,39 @@
   if (isLibraryApp) document.documentElement.classList.add("ja-lib-app-mode");
 
   var providers = [
-    { id: "all", label: "All files", icon: "▦" },
-    { id: "google-drive", label: "Google Drive", icon: "▣" },
-    { id: "dropbox", label: "Dropbox", icon: "◈" },
-    { id: "onedrive", label: "OneDrive", icon: "☁" }
+    { id: "all", label: "All files" },
+    { id: "google-drive", label: "Google Drive" },
+    { id: "dropbox", label: "Dropbox" },
+    { id: "onedrive", label: "OneDrive" }
   ];
+
+  function providerIconMarkup(providerId) {
+    var icons = {
+      all:
+        '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+          '<rect x="3" y="3" width="6" height="6" rx="1"></rect>' +
+          '<rect x="15" y="3" width="6" height="6" rx="1"></rect>' +
+          '<rect x="3" y="15" width="6" height="6" rx="1"></rect>' +
+          '<rect x="15" y="15" width="6" height="6" rx="1"></rect>' +
+        '</svg>',
+      "google-drive":
+        '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+          '<path fill="#00832D" d="M8.1 2.5h5.1l8.2 14.2h-5.1L8.1 2.5z"></path>' +
+          '<path fill="#0066DA" d="M8.1 2.5 1 14.8l2.8 4.7 7.2-12.4-2.9-4.6z"></path>' +
+          '<path fill="#FFBA00" d="M3.8 19.5h13.7l3.8-6.5H7.6l-3.8 6.5z"></path>' +
+        '</svg>',
+      dropbox:
+        '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+          '<path fill="#0061FF" d="M6.5 1 0.5 5l6 4 6-4-6-4zm11 0-6 4 6 4 6-4-6-4zM0.5 13l6 4 6-4-6-4-6 4zm17-4-6 4 6 4 6-4-6-4zM12 14l-6 4 6 4 6-4-6-4z"></path>' +
+        '</svg>',
+      onedrive:
+        '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+          '<path fill="#0078D4" d="M9.1 18.8h10.2a4.2 4.2 0 0 0 .4-8.4 6.4 6.4 0 0 0-12-1.1 4.9 4.9 0 0 0 1.4 9.5z"></path>' +
+          '<path fill="#1490DF" d="M5.4 18.8h8.1l4.1-5.3a5.3 5.3 0 0 0-8.7-.5 4.8 4.8 0 0 0-3.5 5.8z"></path>' +
+        '</svg>'
+    };
+    return icons[providerId] || icons.all;
+  }
 
   function createWindow() {
     if (libraryWindow) return;
@@ -128,7 +156,7 @@
     var providerButtons = providers.map(function (provider) {
       return '<button class="ja-lib-provider' + (provider.id === "all" ? " active" : "") +
         '" type="button" data-ja-provider="' + provider.id + '" data-tooltip="' + provider.label + '" aria-label="' + provider.label + '">' +
-        '<span class="ja-lib-provider-icon" aria-hidden="true">' + provider.icon + '</span>' +
+        '<span class="ja-lib-provider-icon provider-icon-' + provider.id + '" aria-hidden="true">' + providerIconMarkup(provider.id) + '</span>' +
         '<span>' + provider.label + '</span>' +
         (provider.id !== "all" ? '<span class="ja-lib-provider-state" aria-hidden="true"></span>' : "") +
         '</button>';
