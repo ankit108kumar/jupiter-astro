@@ -99,7 +99,7 @@
     text.textContent = description;
     wrap.append(symbol, heading, text);
     if (actionLabel && action) {
-      var button = createButton(actionLabel, "ja-drive-primary-button", action);
+      var button = createButton(actionLabel, "ja-drive-text-button", action);
       button.addEventListener("click", action);
       wrap.appendChild(button);
     }
