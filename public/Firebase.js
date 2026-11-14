@@ -76,14 +76,36 @@
 	// ================= ACCOUNT SESSION SYNCHRONIZATION =================
 
 window.jaAuthUser = null;
+window.jaAuthStateReady = false;
+
+let resolveJaAuthReady = null;
+window.jaAuthReady = new Promise(function (resolve) {
+  resolveJaAuthReady = resolve;
+});
+
+function publishJaAuthState(user) {
+  window.jaAuthUser = user || null;
+
+  if (!window.jaAuthStateReady) {
+    window.jaAuthStateReady = true;
+    if (resolveJaAuthReady) {
+      resolveJaAuthReady(window.jaAuthUser);
+      resolveJaAuthReady = null;
+    }
+  }
+
+  window.dispatchEvent(new CustomEvent('ja-auth-state-changed', {
+    detail: { user: window.jaAuthUser }
+  }));
+}
 
 const accountButton =
   document.getElementById('accountOpenBtn');
 
 onAuthStateChanged(auth, function(user) {
 
-  // Maintain current login state globally
-  window.jaAuthUser = user || null;
+  // Publish the current login state and notify gated features.
+  publishJaAuthState(user);
 
   // Update Account button appearance
   if (accountButton) {
@@ -110,6 +132,9 @@ onAuthStateChanged(auth, function(user) {
 
   }
 
+}, function (error) {
+  console.error("Jupiter Astro: Firebase auth-state listener failed.", error);
+  publishJaAuthState(null);
 });
 
   console.log("Jupiter Astro: Firebase initialized successfully.");

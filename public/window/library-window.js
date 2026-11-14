@@ -318,8 +318,109 @@
   document.addEventListener("fullscreenchange", syncFullscreenButton);
 
   var searchFocusTimer = null;
+  var libraryAuthPromptTimer = null;
+  var LIBRARY_LOGIN_URL = "/8a9K79m85R0t2B7x6C7p48n8V16d0J85.html#account";
 
-  function openWindow(options) {
+  function dismissLibraryAuthPrompt() {
+    if (libraryAuthPromptTimer) {
+      window.clearTimeout(libraryAuthPromptTimer);
+      libraryAuthPromptTimer = null;
+    }
+    var prompt = document.getElementById("ja-library-auth-prompt");
+    if (prompt && prompt.parentNode) prompt.parentNode.removeChild(prompt);
+  }
+
+  function openLibraryLogin() {
+    dismissLibraryAuthPrompt();
+    var accountButton = document.getElementById("accountOpenBtn");
+    if (accountButton) {
+      accountButton.click();
+      return;
+    }
+    window.location.assign(LIBRARY_LOGIN_URL);
+  }
+
+  function showLibraryAuthPrompt() {
+    dismissLibraryAuthPrompt();
+    var prompt = document.createElement("div");
+    prompt.id = "ja-library-auth-prompt";
+    prompt.setAttribute("role", "status");
+    prompt.setAttribute("aria-live", "polite");
+
+    var message = document.createElement("span");
+    message.textContent = "Please log in or sign up to open the Library.";
+
+    var action = document.createElement("button");
+    action.type = "button";
+    action.className = "ja-library-auth-prompt-action";
+    action.textContent = "Log in / Sign up";
+    action.addEventListener("click", openLibraryLogin);
+
+    prompt.appendChild(message);
+    prompt.appendChild(action);
+    document.body.appendChild(prompt);
+
+    libraryAuthPromptTimer = window.setTimeout(function () {
+      dismissLibraryAuthPrompt();
+    }, 7000);
+  }
+
+  function waitForAuthReady() {
+    if (window.jaAuthStateReady === true) {
+      return Promise.resolve(window.jaAuthUser || null);
+    }
+
+    if (window.jaAuthReady && typeof window.jaAuthReady.then === "function") {
+      return window.jaAuthReady.then(function () {
+        return window.jaAuthUser || null;
+      }, function () {
+        return null;
+      });
+    }
+
+    return new Promise(function (resolve) {
+      var finished = false;
+      var timeout = window.setTimeout(function () {
+        finish(null);
+      }, 10000);
+
+      function finish(user) {
+        if (finished) return;
+        finished = true;
+        window.clearTimeout(timeout);
+        window.removeEventListener("ja-auth-state-changed", onAuthState);
+        resolve(window.jaAuthUser || user || null);
+      }
+
+      function onAuthState(event) {
+        finish(event && event.detail ? event.detail.user : window.jaAuthUser);
+      }
+
+      window.addEventListener("ja-auth-state-changed", onAuthState, { once: true });
+
+      if (window.jaAuthReady && typeof window.jaAuthReady.then === "function") {
+        window.jaAuthReady.then(function () {
+          finish(window.jaAuthUser);
+        }, function () {
+          finish(null);
+        });
+      }
+    });
+  }
+
+  async function requireLibraryLogin() {
+    var user = await waitForAuthReady();
+    if (window.jaAuthUser || user) {
+      dismissLibraryAuthPrompt();
+      return true;
+    }
+    showLibraryAuthPrompt();
+    return false;
+  }
+
+  async function openWindow(options) {
+    if (!(await requireLibraryLogin())) return false;
+
     options = options || {};
     if (searchFocusTimer) {
       window.clearTimeout(searchFocusTimer);
@@ -338,6 +439,7 @@
         if (search) search.focus({ preventScroll: true });
       }, 0);
     }
+    return true;
   }
 
   function closeWindow() {
@@ -355,11 +457,13 @@
     launcher.classList.add("visible");
   }
 
-  function restoreWindow() {
-    if (!libraryWindow) return;
+  async function restoreWindow() {
+    if (!libraryWindow) return false;
+    if (!(await requireLibraryLogin())) return false;
     libraryWindow.classList.add("ja-lib-open");
     libraryWindow.setAttribute("aria-hidden", "false");
     launcher.classList.remove("visible");
+    return true;
   }
 
   function toggleMaximize() {
@@ -457,6 +561,17 @@
     }
   }, true);
 
+  window.addEventListener("ja-auth-state-changed", function (event) {
+    var user = event && event.detail &&
+      Object.prototype.hasOwnProperty.call(event.detail, "user")
+      ? event.detail.user
+      : window.jaAuthUser;
+
+    if (!user && libraryWindow && libraryWindow.classList.contains("ja-lib-open")) {
+      closeWindow();
+    }
+  });
+
   window.JupiterReferenceLibrary = {
     open: openWindow,
     close: closeWindow,
@@ -475,7 +590,13 @@
   // and register its service worker. This app page runs in its own OS window.
   if (isLibraryApp) {
     syncStandaloneWebsiteTheme();
-    openWindow();
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", function () {
+        openWindow();
+      }, { once: true });
+    } else {
+      openWindow();
+    }
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", function () {
         navigator.serviceWorker.register("/window/library-app-sw.js", { scope: "/window/" })

@@ -635,3 +635,47 @@ html[data-palette="wooden"] #ja-reference-library-window[data-ja-lib-theme="webs
   color:var(--ja-lib-ink,#292722);
   background:var(--ja-lib-hover,#f1eee8);
 }
+
+
+/* One-line sign-in prompt shown when a signed-out user requests the Library. */
+#ja-library-auth-prompt {
+  position:fixed;
+  z-index:2147483647;
+  left:50%;
+  bottom:max(20px, env(safe-area-inset-bottom));
+  transform:translateX(-50%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  max-width:calc(100vw - 28px);
+  padding:10px 13px;
+  border:1px solid var(--ja-lib-line-strong, #d8d3ca);
+  border-radius:10px;
+  color:var(--ja-lib-ink, #292722);
+  background:var(--ja-lib-panel, #fff);
+  box-shadow:0 8px 28px rgba(0,0,0,.18);
+  font:500 12px/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  white-space:nowrap;
+}
+#ja-library-auth-prompt .ja-library-auth-prompt-action {
+  flex:0 0 auto;
+  padding:5px 9px;
+  border:1px solid var(--ja-lib-accent, #a87332);
+  border-radius:7px;
+  color:#fff;
+  background:var(--ja-lib-accent, #a87332);
+  font:600 11px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  cursor:pointer;
+}
+#ja-library-auth-prompt .ja-library-auth-prompt-action:hover {
+  filter:brightness(.96);
+}
+@media (max-width:520px) {
+  #ja-library-auth-prompt {
+    white-space:normal;
+    width:max-content;
+    max-width:calc(100vw - 24px);
+    gap:8px;
+  }
+}
