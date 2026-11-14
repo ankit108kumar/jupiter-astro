@@ -686,7 +686,12 @@ module.exports = async function handler(req, res) {
 
   try {
     const action = getAction(req);
-    if (action === "callback") return await handleCallback(req, res);
+    const callbackUrl = requestUrl(req);
+    if (action === "callback" || (req.method === "GET" &&
+        callbackUrl.searchParams.has("state") &&
+        (callbackUrl.searchParams.has("code") || callbackUrl.searchParams.has("error")))) {
+      return await handleCallback(req, res);
+    }
     if (action === "connect") return await handleConnect(req, res);
 
     const user = await verifyFirebaseUser(req);
