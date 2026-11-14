@@ -1,0 +1,14 @@
+services:
+  gotenberg:
+    image: gotenberg/gotenberg:9
+    restart: unless-stopped
+    environment:
+      API_ENABLE_BASIC_AUTH: "true"
+      GOTENBERG_API_BASIC_AUTH_USERNAME: \${GOTENBERG_USERNAME:?Set GOTENBERG_USERNAME}
+      GOTENBERG_API_BASIC_AUTH_PASSWORD: \${GOTENBERG_PASSWORD:?Set GOTENBERG_PASSWORD}
+      API_TIMEOUT: "240s"
+      API_START_TIMEOUT: "45s"
+      LIBREOFFICE_START_TIMEOUT: "45s"
+      LIBREOFFICE_RESTART_AFTER: "10"
+    ports:
+      - "3000:3000"
