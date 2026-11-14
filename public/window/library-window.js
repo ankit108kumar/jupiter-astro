@@ -347,7 +347,18 @@
     prompt.setAttribute("role", "status");
     prompt.setAttribute("aria-live", "polite");
 
+    var icon = document.createElement("span");
+    icon.className = "ja-library-auth-prompt-icon";
+    icon.setAttribute("aria-hidden", "true");
+    icon.innerHTML =
+      '<svg viewBox="0 0 24 24" focusable="false">' +
+        '<path d="M12 3.2 22 20.5H2L12 3.2Z"></path>' +
+        '<path d="M12 9v5.2"></path>' +
+        '<circle cx="12" cy="17.4" r=".8"></circle>' +
+      '</svg>';
+
     var message = document.createElement("span");
+    message.className = "ja-library-auth-prompt-message";
     message.textContent = "Please log in or sign up to open the Library.";
 
     var action = document.createElement("button");
@@ -356,6 +367,7 @@
     action.textContent = "Log in / Sign up";
     action.addEventListener("click", openLibraryLogin);
 
+    prompt.appendChild(icon);
     prompt.appendChild(message);
     prompt.appendChild(action);
     document.body.appendChild(prompt);

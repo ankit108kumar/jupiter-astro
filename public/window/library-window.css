@@ -647,29 +647,57 @@ html[data-palette="wooden"] #ja-reference-library-window[data-ja-lib-theme="webs
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:12px;
+  gap:10px;
   max-width:calc(100vw - 28px);
   padding:10px 13px;
-  border:1px solid var(--ja-lib-line-strong, #d8d3ca);
+  border:1.5px solid var(--bad, #DC2626);
   border-radius:10px;
-  color:var(--ja-lib-ink, #292722);
-  background:var(--ja-lib-panel, #fff);
+  color:var(--ink, #292722);
+  background:var(--surface, #fff);
   box-shadow:0 8px 28px rgba(0,0,0,.18);
   font:500 12px/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   white-space:nowrap;
 }
+#ja-library-auth-prompt .ja-library-auth-prompt-icon {
+  display:inline-flex;
+  flex:0 0 19px;
+  width:19px;
+  height:19px;
+  align-items:center;
+  justify-content:center;
+  color:var(--bad, #DC2626);
+}
+#ja-library-auth-prompt .ja-library-auth-prompt-icon svg {
+  display:block;
+  width:19px;
+  height:19px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.8;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+#ja-library-auth-prompt .ja-library-auth-prompt-message {
+  min-width:0;
+}
 #ja-library-auth-prompt .ja-library-auth-prompt-action {
   flex:0 0 auto;
-  padding:5px 9px;
-  border:1px solid var(--ja-lib-accent, #a87332);
-  border-radius:7px;
+  padding:7px 12px;
+  border:1px solid var(--saffron, #EA580C);
+  border-radius:8px;
   color:#fff;
-  background:var(--ja-lib-accent, #a87332);
-  font:600 11px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:var(--saffron, #EA580C);
+  font:600 12px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   cursor:pointer;
+  transition:background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
 }
 #ja-library-auth-prompt .ja-library-auth-prompt-action:hover {
-  filter:brightness(.96);
+  background:color-mix(in srgb, var(--saffron, #EA580C) 88%, #000);
+  border-color:color-mix(in srgb, var(--saffron, #EA580C) 88%, #000);
+}
+#ja-library-auth-prompt .ja-library-auth-prompt-action:focus-visible {
+  outline:2px solid var(--saffron, #EA580C);
+  outline-offset:3px;
 }
 @media (max-width:520px) {
   #ja-library-auth-prompt {
