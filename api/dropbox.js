@@ -21,6 +21,7 @@ const MAX_DOWNLOAD_BYTES = 150 * 1024 * 1024;
 let googleAccessToken = null;
 let googleAccessTokenExpiresAt = 0;
 let googleTokenPromise = null;
+const dropboxAccessTokenCache = new Map();
 
 function sendJson(res, status, body) {
   res.setHeader("Cache-Control", "no-store, private");
@@ -332,8 +333,18 @@ async function deleteStoredConnection(uid) {
   return !response.notFound;
 }
 
-function createSignedState(uid) {
+function getStateSecret() {
   const secret = requiredEnv("DROPBOX_STATE_SECRET");
+  if (Buffer.byteLength(secret, "utf8") < 32) {
+    const error = new Error("DROPBOX_STATE_SECRET must contain at least 32 bytes of random data.");
+    error.statusCode = 503;
+    throw error;
+  }
+  return secret;
+}
+
+function createSignedState(uid) {
+  const secret = getStateSecret();
   const data = {
     state: randomBytes(24).toString("hex"),
     uid: uid,
@@ -345,7 +356,7 @@ function createSignedState(uid) {
 }
 
 function verifySignedState(cookieValue, state) {
-  const secret = requiredEnv("DROPBOX_STATE_SECRET");
+  const secret = getStateSecret();
   const parts = String(cookieValue || "").split(".");
   if (parts.length !== 2) return null;
   const expected = createHmac("sha256", secret).update(parts[0]).digest("base64url");
@@ -413,19 +424,35 @@ async function refreshDropboxAccessToken(refreshToken, config) {
     error.statusCode = 502;
     throw error;
   }
-  return data.access_token;
+  return {
+    accessToken: data.access_token,
+    expiresIn: Math.max(60, Number(data.expires_in) || 14400)
+  };
 }
 
 async function getDropboxAccessToken(uid) {
   const config = getDropboxConfig();
+  const cached = dropboxAccessTokenCache.get(uid);
+  if (cached && cached.expiresAt > Date.now() + 60000) {
+    return { accessToken: cached.accessToken };
+  }
+
   const stored = await getStoredConnection(uid);
   if (!stored) {
     const error = new Error("Dropbox is not connected. Choose Connect Dropbox to authorize this account.");
     error.statusCode = 409;
     throw error;
   }
-  const accessToken = await refreshDropboxAccessToken(stored.refreshToken, config);
-  return { accessToken: accessToken, accountId: stored.accountId, connectedAt: stored.connectedAt };
+  const refreshed = await refreshDropboxAccessToken(stored.refreshToken, config);
+  dropboxAccessTokenCache.set(uid, {
+    accessToken: refreshed.accessToken,
+    expiresAt: Date.now() + refreshed.expiresIn * 1000
+  });
+  return {
+    accessToken: refreshed.accessToken,
+    accountId: stored.accountId,
+    connectedAt: stored.connectedAt
+  };
 }
 
 function safeFilename(value) {
@@ -766,6 +793,7 @@ async function handleDisconnect(req, res, user) {
     }
   }
   await deleteStoredConnection(user.uid);
+  dropboxAccessTokenCache.delete(user.uid);
   return sendJson(res, 200, { disconnected: true });
 }
 
