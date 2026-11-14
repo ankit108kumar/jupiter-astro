@@ -24,6 +24,24 @@ RUN set -eux; \
       fonts-inconsolata \
       fonts-firacode \
       fonts-noto-mono \
+      fonts-noto-extra \
+      fonts-noto-ui-core \
+      fonts-noto-ui-extra \
+      fonts-dejavu-extra \
+      fonts-sil-gentium \
+      fonts-sil-charis \
+      fonts-junicode \
+      fonts-texgyre \
+      fonts-ipaexfont \
+      fonts-ipafont \
+      fonts-beng \
+      fonts-gujr \
+      fonts-guru \
+      fonts-knda \
+      fonts-mlym \
+      fonts-orya \
+      fonts-taml \
+      fonts-telu \
       fonts-deva \
       fonts-lohit-beng-assamese \
       fonts-lohit-beng-bengali \
