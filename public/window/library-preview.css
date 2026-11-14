@@ -650,7 +650,10 @@
   outline:0;
   color:var(--ja-lib-ink,#253044);
   background:transparent;
-  font:500 12px/1.3 inherit;
+  font:inherit;
+  font-size:12px;
+  font-weight:500;
+  line-height:1.3;
   box-shadow:none;
 }
 #ja-reference-library-window .ja-lib-preview-search-input::placeholder {
