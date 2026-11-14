@@ -363,13 +363,13 @@ async function exchangeDropboxCode(code, config) {
   const body = new URLSearchParams({
     code: code,
     grant_type: "authorization_code",
-    redirect_uri: config.redirectUri
+    redirect_uri: config.redirectUri,
+    client_id: config.appKey,
+    client_secret: config.appSecret
   });
-  const basic = Buffer.from(config.appKey + ":" + config.appSecret).toString("base64");
   const response = await fetch(DROPBOX_TOKEN_URL, {
     method: "POST",
     headers: {
-      Authorization: "Basic " + basic,
       "Content-Type": "application/x-www-form-urlencoded",
       Accept: "application/json"
     },
@@ -387,17 +387,17 @@ async function exchangeDropboxCode(code, config) {
 }
 
 async function refreshDropboxAccessToken(refreshToken, config) {
-  const basic = Buffer.from(config.appKey + ":" + config.appSecret).toString("base64");
   const response = await fetch(DROPBOX_TOKEN_URL, {
     method: "POST",
     headers: {
-      Authorization: "Basic " + basic,
       "Content-Type": "application/x-www-form-urlencoded",
       Accept: "application/json"
     },
     body: new URLSearchParams({
       grant_type: "refresh_token",
-      refresh_token: refreshToken
+      refresh_token: refreshToken,
+      client_id: config.appKey,
+      client_secret: config.appSecret
     }),
     signal: AbortSignal.timeout(20000)
   });
@@ -617,7 +617,9 @@ async function handleDownload(req, res, user) {
   const filename = safeFilename(metadata.name || path.split("/").pop() || "dropbox-file");
   const mime = response.headers.get("Content-Type") || "application/octet-stream";
   const length = Number(response.headers.get("Content-Length") || 0);
-  if (length > MAX_DOWNLOAD_BYTES) return sendError(res, 413, "This file exceeds the current 150 MB preview limit.");
+  if (length > MAX_DOWNLOAD_BYTES || Number(metadata.size || 0) > MAX_DOWNLOAD_BYTES) {
+    return sendError(res, 413, "This file exceeds the current 150 MB preview limit.");
+  }
   res.statusCode = 200;
   res.setHeader("Content-Type", mime);
   res.setHeader("Content-Disposition", "inline; filename*=UTF-8''" + encodeURIComponent(filename));
@@ -689,7 +691,9 @@ async function handleConvertDocx(req, res, user) {
 
   const contentLength = Number(source.headers.get("Content-Length") || 0);
   const maxDocxBytes = 50 * 1024 * 1024;
-  if (contentLength > maxDocxBytes) return sendError(res, 413, "This DOCX exceeds the 50 MB conversion limit.");
+  if (contentLength > maxDocxBytes || Number(metadata.size || 0) > maxDocxBytes) {
+    return sendError(res, 413, "This DOCX exceeds the 50 MB conversion limit.");
+  }
 
   const fileBytes = Buffer.from(await source.arrayBuffer());
   if (!fileBytes.length) return sendError(res, 502, "Dropbox returned an empty Word file.");
