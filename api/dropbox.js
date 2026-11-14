@@ -278,29 +278,6 @@ async function getStoredConnection(uid) {
   };
 }
 
-async function saveStoredConnection(uid, refreshToken, accountId) {
-  const documentUrl = firestoreDocumentUrl(uid);
-  const body = {
-    fields: {
-      encryptedRefreshToken: { stringValue: encryptRefreshToken(refreshToken) },
-      accountId: { stringValue: String(accountId || "") },
-      connectedAt: { stringValue: new Date().toISOString() },
-      provider: { stringValue: "dropbox" }
-    }
-  };
-
-  const created = await firestoreRequest(
-    "https://firestore.googleapis.com/v1/projects/" +
-      encodeURIComponent(String(process.env.GOOGLE_CLOUD_PROJECT || process.env.FIREBASE_PROJECT_ID || "jupiter-astro")) +
-      "/databases/(default)/documents/" + FIRESTORE_COLLECTION + "?documentId=" + encodeURIComponent(uid),
-    { method: "POST", body: JSON.stringify(body) }
-  );
-  if (!created.notFound) return;
-
-  // The helper returns notFound only for 404. A create request normally
-  // returns 409 if this user has already connected Dropbox.
-}
-
 async function upsertStoredConnection(uid, refreshToken, accountId) {
   const projectId = String(process.env.GOOGLE_CLOUD_PROJECT || process.env.FIREBASE_PROJECT_ID || "jupiter-astro").trim();
   const collectionUrl = "https://firestore.googleapis.com/v1/projects/" + encodeURIComponent(projectId) +
@@ -658,6 +635,114 @@ async function handleDownload(req, res, user) {
   }).pipe(res);
 }
 
+
+async function handleConvertDocx(req, res, user) {
+  if (req.method !== "GET") {
+    res.setHeader("Allow", "GET");
+    return sendError(res, 405, "Method not allowed.");
+  }
+  const path = getQuery(req, "path");
+  if (!path || !path.startsWith("/") || path.includes("\\") || path.split("/").includes("..")) {
+    return sendError(res, 400, "Invalid Dropbox file path.");
+  }
+
+  const converterBase = String(process.env.DOCX_PDF_CONVERTER_URL || "").trim().replace(/\/+$/, "");
+  const converterUser = String(process.env.DOCX_PDF_CONVERTER_USERNAME || "").trim();
+  const converterPassword = String(process.env.DOCX_PDF_CONVERTER_PASSWORD || "");
+  if (!converterBase || !converterUser || !converterPassword) {
+    return sendError(res, 503,
+      "The DOCX-to-PDF option is not configured. Check DOCX_PDF_CONVERTER_URL, DOCX_PDF_CONVERTER_USERNAME and DOCX_PDF_CONVERTER_PASSWORD in Vercel.");
+  }
+
+  let converterUrl;
+  try {
+    converterUrl = new URL(converterBase);
+    if (converterUrl.protocol !== "https:") throw new Error("HTTPS required.");
+  } catch (error) {
+    return sendError(res, 503, "DOCX PDF converter URL must be a valid HTTPS URL.");
+  }
+
+  const tokenData = await getDropboxAccessToken(user.uid);
+  const source = await fetch(DROPBOX_CONTENT_URL + "/files/download", {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + tokenData.accessToken,
+      "Dropbox-API-Arg": JSON.stringify({ path: path }),
+      Accept: "*/*"
+    },
+    signal: AbortSignal.timeout(60000)
+  });
+  if (!source.ok) {
+    const text = await source.text();
+    console.error("Dropbox DOCX download for conversion failed:", source.status, text.slice(0, 500));
+    return sendError(res, source.status === 409 ? 404 : 502,
+      source.status === 409 ? "Dropbox could not find this Word file." : "Dropbox could not retrieve the original Word file.");
+  }
+
+  const resultHeader = source.headers.get("Dropbox-API-Result");
+  let metadata = {};
+  try { metadata = resultHeader ? JSON.parse(resultHeader) : {}; } catch (error) {}
+  const sourceName = safeFilename(metadata.name || path.split("/").pop() || "document.docx");
+  if (!/\.docx$/i.test(sourceName)) {
+    return sendError(res, 415, "PDF conversion is currently available for DOCX files only.");
+  }
+
+  const contentLength = Number(source.headers.get("Content-Length") || 0);
+  const maxDocxBytes = 50 * 1024 * 1024;
+  if (contentLength > maxDocxBytes) return sendError(res, 413, "This DOCX exceeds the 50 MB conversion limit.");
+
+  const fileBytes = Buffer.from(await source.arrayBuffer());
+  if (!fileBytes.length) return sendError(res, 502, "Dropbox returned an empty Word file.");
+  if (fileBytes.length > maxDocxBytes) return sendError(res, 413, "This DOCX exceeds the 50 MB conversion limit.");
+
+  const form = new FormData();
+  form.append("files", new Blob([fileBytes], {
+    type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  }), sourceName);
+
+  const basicAuth = Buffer.from(converterUser + ":" + converterPassword).toString("base64");
+  let converted;
+  try {
+    converted = await fetch(converterBase + "/forms/libreoffice/convert", {
+      method: "POST",
+      headers: { Authorization: "Basic " + basicAuth, Accept: "application/pdf" },
+      body: form,
+      signal: AbortSignal.timeout(240000)
+    });
+  } catch (error) {
+    console.error("Dropbox DOCX PDF conversion service request failed:", error && error.message);
+    return sendError(res, 502, "The LibreOffice conversion service could not be reached or timed out.");
+  }
+
+  if (!converted.ok) {
+    const responseText = await converted.text();
+    console.error("Gotenberg Dropbox conversion failed:", converted.status, responseText.slice(0, 1000));
+    return sendError(res, 502, "LibreOffice could not convert this Dropbox DOCX to PDF. Check the document and converter logs.");
+  }
+  const contentType = converted.headers.get("content-type") || "";
+  if (!contentType.toLowerCase().includes("application/pdf") || !converted.body) {
+    return sendError(res, 502, "The conversion service did not return a valid PDF.");
+  }
+
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition",
+    "inline; filename*=UTF-8''" + encodeURIComponent(sourceName.replace(/\.docx$/i, ".pdf")));
+  res.setHeader("Cache-Control", "private, no-store");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  const resultLength = converted.headers.get("content-length");
+  if (resultLength) res.setHeader("Content-Length", resultLength);
+  Readable.fromWeb(converted.body).on("error", function (error) {
+    console.error("Dropbox-converted PDF stream failed:", error.message);
+    if (!res.headersSent) {
+      res.statusCode = 502;
+      res.end("Converted PDF stream failed.");
+    } else {
+      res.destroy(error);
+    }
+  }).pipe(res);
+}
+
 async function handleDisconnect(req, res, user) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -698,6 +783,7 @@ module.exports = async function handler(req, res) {
     if (action === "status") return await handleStatus(req, res, user);
     if (action === "list") return await handleList(req, res, user);
     if (action === "download") return await handleDownload(req, res, user);
+    if (action === "convert-docx") return await handleConvertDocx(req, res, user);
     if (action === "disconnect") return await handleDisconnect(req, res, user);
     return sendError(res, 400, "Unsupported Dropbox action.");
   } catch (error) {
