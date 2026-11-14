@@ -576,3 +576,19 @@
     padding:12px 8px;
   }
 }
+
+
+/* User-controlled Windows local-font option in DOCX → HTML mode. */
+#ja-reference-library-window .ja-lib-docx-local-fonts {
+  border-color:var(--ja-lib-accent-soft,rgba(70,130,80,.28));
+  color:var(--ja-lib-accent,var(--ja-lib-ink,#3d6f43));
+}
+#ja-reference-library-window .ja-lib-docx-local-fonts.active {
+  border-color:var(--ja-lib-accent,#6b9a70);
+  color:var(--ja-lib-accent,#3d7747);
+  background:var(--ja-lib-accent-soft,rgba(70,130,80,.12));
+}
+#ja-reference-library-window .ja-lib-docx-local-fonts:focus-visible {
+  outline:2px solid var(--ja-lib-accent,#6b9a70);
+  outline-offset:2px;
+}
