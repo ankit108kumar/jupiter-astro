@@ -151,7 +151,11 @@ async function verifyFirebaseUser(req) {
 
   const response = await fetch(FIREBASE_LOOKUP_URL + "?key=" + encodeURIComponent(process.env.FIREBASE_WEB_API_KEY || FIREBASE_API_KEY), {
     method: "POST",
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Referer: "https://jupiterastrology108.com/"
+    },
     body: JSON.stringify({ idToken: match[1] }),
     signal: AbortSignal.timeout(15000)
   });
