@@ -469,15 +469,23 @@
     } catch (error) {
       if (serial !== requestSerial) return;
       setProviderStatus("Dropbox · Connection needs attention");
-      showMessage("Dropbox could not load this folder", error.message || "Check your Dropbox connection.", true, "Retry", function () { loadFolder(false); });
+      var needsReconnect = /reconnect dropbox|authorization.*expired|revoked/i.test(error && error.message || "");
+      showMessage(
+        needsReconnect ? "Reconnect Dropbox" : "Dropbox could not load this folder",
+        error.message || "Check your Dropbox connection.",
+        true,
+        needsReconnect ? "Reconnect" : "Retry",
+        needsReconnect ? connect : function () { loadFolder(false); }
+      );
     } finally {
       if (serial === requestSerial) loading = false;
     }
   }
 
   async function openRoot() {
-    requestSerial++;
+    var serial = ++requestSerial;
     loading = false;
+    connected = false;
     files = [];
     cursor = "";
     stack = [{ path: "", name: "Dropbox" }];
@@ -487,6 +495,7 @@
     try {
       var response = await api("status", {}, "GET");
       var status = await response.json();
+      if (serial !== requestSerial || !provider || !provider.classList.contains("active")) return;
       if (!status.connected) {
         renderConnectPrompt();
         return;
@@ -494,6 +503,7 @@
       connected = true;
       await loadFolder(false);
     } catch (error) {
+      if (serial !== requestSerial || (provider && !provider.classList.contains("active"))) return;
       connected = false;
       setProviderStatus("Dropbox · Setup required");
       showMessage("Dropbox is not ready", error.message || "Check Vercel and Firestore setup.", true, "Retry", openRoot);
