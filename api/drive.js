@@ -259,6 +259,160 @@ async function downloadFile(req, res, token) {
   }).pipe(res);
 }
 
+
+async function convertDocxToPdf(req, res, token) {
+  const fileId = String(req.query.fileId || "").trim();
+  const resourceKey = String(req.query.resourceKey || "").trim();
+
+  if (!/^[A-Za-z0-9_-]{10,200}$/.test(fileId)) {
+    return sendError(res, 400, "Invalid Google Drive file identifier.");
+  }
+
+  const converterBase = String(process.env.DOCX_PDF_CONVERTER_URL || "").trim().replace(/\/+$/, "");
+  const converterUser = String(process.env.DOCX_PDF_CONVERTER_USERNAME || "").trim();
+  const converterPassword = String(process.env.DOCX_PDF_CONVERTER_PASSWORD || "");
+
+  if (!converterBase || !converterUser || !converterPassword) {
+    return sendError(
+      res,
+      503,
+      "The DOCX-to-PDF option is not configured yet. Deploy the private LibreOffice converter and set DOCX_PDF_CONVERTER_URL, DOCX_PDF_CONVERTER_USERNAME and DOCX_PDF_CONVERTER_PASSWORD in Vercel."
+    );
+  }
+
+  let converterUrl;
+  try {
+    converterUrl = new URL(converterBase);
+    if (converterUrl.protocol !== "https:") throw new Error("HTTPS required.");
+  } catch (error) {
+    return sendError(res, 503, "DOCX PDF converter URL must be a valid HTTPS URL.");
+  }
+
+  if (!(await assertInsideLibrary(fileId, token, resourceKey))) {
+    return sendError(res, 403, "This file is not inside the configured Jupiter Astrology Library folder.");
+  }
+
+  let metadata = await getMetadata(fileId, token, resourceKey);
+  if (metadata.mimeType === "application/vnd.google-apps.shortcut" &&
+      metadata.shortcutDetails && metadata.shortcutDetails.targetId) {
+    const shortcut = metadata.shortcutDetails;
+    const targetId = shortcut.targetId;
+    const targetKey = shortcut.targetResourceKey || "";
+    if (!(await assertInsideLibrary(targetId, token, targetKey))) {
+      return sendError(res, 403, "This shortcut points to a file outside the configured Library folder.");
+    }
+    metadata = await getMetadata(targetId, token, targetKey);
+  }
+
+  const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+  if (metadata.mimeType !== DOCX_MIME && !/\.docx$/i.test(metadata.name || "")) {
+    return sendError(res, 415, "PDF conversion is currently available for DOCX files only.");
+  }
+  if (metadata.capabilities && metadata.capabilities.canDownload === false) {
+    return sendError(res, 403, "The file owner has disabled downloading. This DOCX cannot be converted.");
+  }
+
+  const driveFileUrl = buildUrl("/files/" + encodeURIComponent(metadata.id), {
+    alt: "media",
+    supportsAllDrives: "true"
+  });
+  const driveHeaders = { Authorization: "Bearer " + token };
+  if (metadata.resourceKey) {
+    driveHeaders["X-Goog-Drive-Resource-Keys"] = metadata.id + "/" + metadata.resourceKey;
+  }
+
+  const source = await fetch(driveFileUrl.toString(), {
+    method: "GET",
+    headers: driveHeaders
+  });
+  if (!source.ok) {
+    const body = await source.json().catch(() => ({}));
+    return sendError(
+      res,
+      source.status === 403 ? 403 : source.status === 404 ? 404 : 502,
+      body.error && body.error.message || "Google Drive could not retrieve the original DOCX."
+    );
+  }
+
+  const contentLength = Number(source.headers.get("content-length") || 0);
+  const maxDocxBytes = 50 * 1024 * 1024;
+  if (contentLength > maxDocxBytes) {
+    return sendError(res, 413, "This DOCX exceeds the 50 MB conversion limit.");
+  }
+
+  const fileBytes = Buffer.from(await source.arrayBuffer());
+  if (!fileBytes.length) return sendError(res, 502, "Google Drive returned an empty DOCX.");
+  if (fileBytes.length > maxDocxBytes) {
+    return sendError(res, 413, "This DOCX exceeds the 50 MB conversion limit.");
+  }
+
+  const filename = safeFilename(metadata.name || "document.docx");
+  const form = new FormData();
+  form.append("files", new Blob([fileBytes], { type: DOCX_MIME }), filename);
+
+  const basicAuth = Buffer.from(converterUser + ":" + converterPassword).toString("base64");
+  const conversionEndpoint = converterBase + "/forms/libreoffice/convert";
+
+  let converted;
+  try {
+    converted = await fetch(conversionEndpoint, {
+      method: "POST",
+      headers: {
+        Authorization: "Basic " + basicAuth,
+        Accept: "application/pdf"
+      },
+      body: form,
+      signal: AbortSignal.timeout(240000)
+    });
+  } catch (error) {
+    console.error("DOCX PDF conversion service request failed:", error && error.message);
+    return sendError(res, 502, "The LibreOffice conversion service could not be reached or timed out.");
+  }
+
+  if (!converted.ok) {
+    const responseText = await converted.text();
+    console.error("Gotenberg conversion failed:", converted.status, responseText.slice(0, 1200));
+    return sendError(
+      res,
+      converted.status === 401 ? 502 : 502,
+      converted.status === 401
+        ? "The LibreOffice conversion service rejected its server credentials. Check the converter username and password in Vercel."
+        : "LibreOffice could not convert this DOCX to PDF. Check the document and converter service logs."
+    );
+  }
+
+  const contentType = converted.headers.get("content-type") || "";
+  if (!contentType.toLowerCase().includes("application/pdf")) {
+    const responseText = await converted.text();
+    console.error("Unexpected Gotenberg response:", contentType, responseText.slice(0, 500));
+    return sendError(res, 502, "The conversion service did not return a PDF file.");
+  }
+
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader(
+    "Content-Disposition",
+    "inline; filename*=UTF-8''" + encodeURIComponent(String(metadata.name || "document").replace(/\.docx$/i, ".pdf"))
+  );
+  res.setHeader("Cache-Control", "private, no-store");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  const resultLength = converted.headers.get("content-length");
+  if (resultLength) res.setHeader("Content-Length", resultLength);
+
+  if (!converted.body) {
+    return sendError(res, 502, "The conversion service returned an empty PDF stream.");
+  }
+  Readable.fromWeb(converted.body).on("error", (error) => {
+    console.error("Converted PDF response stream failed:", error.message);
+    if (!res.headersSent) {
+      res.statusCode = 502;
+      res.end("Converted PDF stream failed.");
+    } else {
+      res.destroy(error);
+    }
+  }).pipe(res);
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== "GET") {
     res.setHeader("Allow", "GET");
@@ -267,10 +421,14 @@ module.exports = async function handler(req, res) {
 
   try {
     const action = String(req.query.action || "");
-    if (action !== "download" && action !== "status") {
+    if (action !== "download" && action !== "status" && action !== "convert-docx") {
       return sendError(res, 400, "Unsupported Drive action.");
     }
     const token = await getAccessToken();
+
+    if (action === "convert-docx") {
+      return await convertDocxToPdf(req, res, token);
+    }
 
     if (action === "status") {
       const root = await getMetadata(ROOT_FOLDER_ID, token);
