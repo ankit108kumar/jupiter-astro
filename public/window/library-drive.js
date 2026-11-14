@@ -405,6 +405,7 @@
       size: Number(item.size) || undefined,
       provider: "Google Drive",
       modifiedTime: item.modifiedTime || "",
+      resourceKey: shortcut.targetResourceKey || item.resourceKey || "",
       webViewLink: item.webViewLink || "",
       getBlob: function (options) {
         return getCachedFile(item, options && options.signal);
@@ -919,6 +920,18 @@
     clear: clear,
     refresh: function () { return stack.length ? loadCurrent(false, true) : openRoot(); },
     clearCache: clearLocalCache,
+    getConvertedPreview: async function (key) {
+      return cacheGet("converted-docx-pdf:v1:" + String(key || ""));
+    },
+    setConvertedPreview: async function (key, blob, fileName) {
+      if (!(blob instanceof Blob) || !blob.size) return false;
+      return cachePut("converted-docx-pdf:v1:" + String(key || ""), {
+        blob: blob,
+        name: fileName || "",
+        mimeType: "application/pdf",
+        savedAt: Date.now()
+      });
+    },
     getFolderId: function () { return ROOT.id; },
     getStatus: function () {
       return {
