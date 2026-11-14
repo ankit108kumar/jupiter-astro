@@ -182,3 +182,262 @@
   #ja-reference-library-window .ja-lib-preview-stage { padding:10px; }
   #ja-reference-library-window .ja-lib-docx-page { padding:24px 20px; }
 }
+
+/* =========================================================
+   DOCUMENT READING IMPROVEMENTS
+   - selectable PDF text layer (layout based on PDF.js v6.5.438
+     web/text_layer_builder.css; Mozilla, Apache-2.0)
+   - continuous PDF scrolling in vertical/horizontal modes
+   - fixed A4-width Word document sheet
+   ========================================================= */
+
+/* The title subtitle now carries file type, source, preview state and size. */
+#ja-reference-library-window .ja-lib-preview-subtitle {
+  max-width:min(62vw,760px);
+  overflow:hidden;
+  color:var(--ja-lib-muted,#858078);
+  font-size:10px;
+  line-height:1.35;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+#ja-reference-library-window .ja-lib-preview-footer {
+  display:none !important;
+}
+
+/* Continuous PDF viewport */
+#ja-reference-library-window .ja-lib-preview-stage.is-pdf {
+  display:block;
+  overflow:auto;
+  padding:18px;
+  background:#e9ebee;
+  user-select:text;
+  -webkit-user-select:text;
+  overscroll-behavior:contain;
+}
+#ja-reference-library-window .ja-lib-pdf-document {
+  display:flex;
+  width:max-content;
+  min-width:100%;
+  margin:0 auto;
+  gap:18px;
+  align-items:flex-start;
+}
+#ja-reference-library-window .ja-lib-pdf-document.is-vertical {
+  flex-direction:column;
+  align-items:center;
+}
+#ja-reference-library-window .ja-lib-pdf-document.is-horizontal {
+  flex-direction:row;
+  min-width:max-content;
+  min-height:100%;
+  align-items:center;
+  margin:0;
+  padding-bottom:4px;
+}
+#ja-reference-library-window .ja-lib-pdf-page-frame {
+  position:relative;
+  flex:0 0 auto;
+  display:block;
+  overflow:hidden;
+  margin:0 auto;
+  border:0;
+  background:#fff;
+  box-shadow:0 3px 18px rgba(0,0,0,.14);
+  direction:ltr;
+}
+#ja-reference-library-window .ja-lib-pdf-page-canvas {
+  position:absolute;
+  inset:0;
+  z-index:0;
+  display:block;
+  margin:0;
+  max-width:none;
+  pointer-events:none;
+  background:#fff;
+}
+#ja-reference-library-window .ja-lib-preview-stage.is-pdf .textLayer {
+  position:absolute;
+  inset:0;
+  z-index:2;
+  display:block;
+  overflow:hidden;
+  margin:0;
+  padding:0;
+  color:transparent;
+  opacity:1;
+  line-height:1;
+  letter-spacing:normal;
+  word-spacing:normal;
+  text-size-adjust:none;
+  forced-color-adjust:none;
+  transform-origin:0 0;
+  pointer-events:auto;
+  user-select:text;
+  -webkit-user-select:text;
+  cursor:text;
+}
+#ja-reference-library-window .ja-lib-preview-stage.is-pdf .textLayer span,
+#ja-reference-library-window .ja-lib-preview-stage.is-pdf .textLayer br {
+  position:absolute;
+  color:transparent;
+  white-space:pre;
+  cursor:text;
+  transform-origin:0 0;
+  user-select:text;
+  -webkit-user-select:text;
+}
+#ja-reference-library-window .ja-lib-preview-stage.is-pdf .textLayer .markedContent {
+  display:contents;
+}
+#ja-reference-library-window .ja-lib-preview-stage.is-pdf .textLayer ::selection {
+  color:transparent;
+  background:rgba(45,105,220,.28);
+}
+#ja-reference-library-window .ja-lib-preview-stage.is-pdf .textLayer .endOfContent {
+  display:block;
+  position:absolute;
+  inset:100% 0 0;
+  z-index:0;
+  user-select:none;
+  -webkit-user-select:none;
+}
+#ja-reference-library-window .ja-lib-preview-stage.is-pdf .textLayer .highlight {
+  margin:-1px;
+  padding:1px;
+  border-radius:3px;
+  background:rgba(180,0,170,.2);
+}
+
+/* Word preview: fixed A4 sheet, independent of website palette. */
+#ja-reference-library-window .ja-lib-preview-stage.is-docx {
+  display:block;
+  overflow:auto;
+  padding:22px;
+  background:#e9ebee;
+  color:#222;
+  user-select:text;
+  -webkit-user-select:text;
+}
+#ja-reference-library-window .ja-lib-docx-page {
+  display:block;
+  box-sizing:border-box;
+  width:210mm;
+  max-width:calc(100vw - 150px);
+  min-height:297mm;
+  height:auto;
+  margin:0 auto 20px;
+  padding:18mm 17mm;
+  overflow:visible;
+  color:#222 !important;
+  background:#fff !important;
+  box-shadow:0 3px 18px rgba(0,0,0,.14);
+  font:11pt/1.5 Arial,Helvetica,sans-serif;
+  text-align:left;
+  overflow-wrap:anywhere;
+  word-break:normal;
+  white-space:normal;
+  user-select:text;
+  -webkit-user-select:text;
+}
+#ja-reference-library-window .ja-lib-docx-page *,
+#ja-reference-library-window .ja-lib-docx-page p,
+#ja-reference-library-window .ja-lib-docx-page span,
+#ja-reference-library-window .ja-lib-docx-page li {
+  max-width:100%;
+  color:inherit;
+  overflow-wrap:anywhere;
+  word-break:normal;
+}
+#ja-reference-library-window .ja-lib-docx-page table {
+  display:table;
+  box-sizing:border-box;
+  width:100% !important;
+  max-width:100% !important;
+  table-layout:fixed;
+  border-collapse:collapse;
+  border-spacing:0;
+  margin:8pt 0;
+  color:#222 !important;
+  background:#fff !important;
+  font:9.5pt/1.35 Arial,Helvetica,sans-serif;
+}
+#ja-reference-library-window .ja-lib-docx-page thead,
+#ja-reference-library-window .ja-lib-docx-page tbody,
+#ja-reference-library-window .ja-lib-docx-page tr {
+  max-width:100%;
+  background:#fff !important;
+}
+#ja-reference-library-window .ja-lib-docx-page td,
+#ja-reference-library-window .ja-lib-docx-page th {
+  box-sizing:border-box;
+  max-width:0;
+  min-width:0;
+  padding:5px 6px;
+  border:1px solid #c9c9c9;
+  color:#222 !important;
+  background:#fff !important;
+  vertical-align:top;
+  white-space:normal !important;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+#ja-reference-library-window .ja-lib-docx-page p {
+  margin:.45em 0;
+  line-height:1.5;
+}
+#ja-reference-library-window .ja-lib-docx-page img {
+  display:inline-block;
+  max-width:100% !important;
+  height:auto !important;
+  object-fit:contain;
+}
+#ja-reference-library-window .ja-lib-docx-page pre {
+  max-width:100%;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+#ja-reference-library-window .ja-lib-docx-page ul,
+#ja-reference-library-window .ja-lib-docx-page ol {
+  padding-inline-start:1.5em;
+}
+#ja-reference-library-window .ja-lib-preview-stage.is-spreadsheet,
+#ja-reference-library-window .ja-lib-preview-stage.is-pptx {
+  user-select:text;
+  -webkit-user-select:text;
+}
+#ja-reference-library-window .ja-lib-preview-stage.is-spreadsheet .ja-lib-sheet-table td,
+#ja-reference-library-window .ja-lib-preview-stage.is-spreadsheet .ja-lib-sheet-table th {
+  user-select:text;
+  -webkit-user-select:text;
+}
+
+/* Compact muted status in the title bar; no separate bottom status strip. */
+#ja-reference-library-window .ja-lib-preview-toolbar {
+  min-height:56px;
+}
+#ja-reference-library-window .ja-lib-preview-file {
+  min-width:0;
+}
+#ja-reference-library-window .ja-lib-preview-file-meta {
+  min-width:0;
+}
+#ja-reference-library-window .ja-lib-preview-subtitle {
+  letter-spacing:.05px;
+}
+@media(max-width:700px) {
+  #ja-reference-library-window .ja-lib-docx-page {
+    width:100%;
+    max-width:100%;
+    min-height:0;
+    padding:24px 20px;
+  }
+  #ja-reference-library-window .ja-lib-preview-stage.is-pdf,
+  #ja-reference-library-window .ja-lib-preview-stage.is-docx {
+    padding:10px;
+  }
+  #ja-reference-library-window .ja-lib-preview-subtitle {
+    max-width:48vw;
+    font-size:9px;
+  }
+}
