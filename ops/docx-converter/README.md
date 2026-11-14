@@ -15,6 +15,10 @@ Set these environment variables on the conversion host:
 
 The Compose file enables Gotenberg Basic Authentication. Do not disable it when the service is reachable over the public internet.
 
+Copy the sample environment file, replace both placeholders with strong unique values, and keep the real `.env` file on the converter host only:
+
+    cp .env.example .env
+
 Start the service with:
 
     docker compose up -d
