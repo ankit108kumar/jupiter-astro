@@ -560,6 +560,7 @@ async function handleCallback(req, res) {
     const config = getDropboxConfig();
     const tokens = await exchangeDropboxCode(code, config);
     await upsertStoredConnection(signed.uid, tokens.refresh_token, tokens.account_id || "");
+    dropboxAccessTokenCache.delete(signed.uid);
     return redirectAfterDropbox(res, "connected");
   } catch (error) {
     console.error("Dropbox OAuth callback failed:", error && error.message);
