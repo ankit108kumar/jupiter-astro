@@ -379,6 +379,11 @@
     var generation = current.pdfGeneration;
     var stage = panel.querySelector(".ja-lib-preview-stage");
     var mode = current.pdfScrollMode || "vertical";
+    var hadLayout = !!current.pdfHasLayout;
+    var previousScrollTop = stage.scrollTop;
+    var previousScrollLeft = stage.scrollLeft;
+    var previousScrollHeight = stage.scrollHeight;
+    var previousScrollWidth = stage.scrollWidth;
     stage.classList.remove("is-spreadsheet","is-pdf","is-pdf-vertical","is-pdf-horizontal","is-docx","is-pptx");
     stage.classList.add("is-pdf", "is-pdf-" + mode);
     stage.innerHTML = "";
@@ -457,12 +462,26 @@
     var targetState = states[targetPage - 1];
     if (targetState) {
       if (mode === "vertical") {
-        stage.scrollTop = 0;
+        if (hadLayout && previousScrollHeight > stage.clientHeight) {
+          var verticalProgress = previousScrollTop / Math.max(1, previousScrollHeight - stage.clientHeight);
+          stage.scrollTop = verticalProgress * Math.max(0, stage.scrollHeight - stage.clientHeight);
+        } else {
+          stage.scrollTop = 0;
+        }
         stage.scrollLeft = 0;
       } else {
         stage.scrollTop = 0;
-        stage.scrollLeft = Math.max(0, targetState.frame.offsetLeft - stage.clientWidth * 0.12);
+        if (hadLayout && current.previousPdfScrollMode === "horizontal" && previousScrollWidth > stage.clientWidth) {
+          var horizontalProgress = previousScrollLeft / Math.max(1, previousScrollWidth - stage.clientWidth);
+          stage.scrollLeft = horizontalProgress * Math.max(0, stage.scrollWidth - stage.clientWidth);
+        } else {
+          var frameRect = targetState.frame.getBoundingClientRect();
+          var stageRect = stage.getBoundingClientRect();
+          stage.scrollLeft = Math.max(0, stage.scrollLeft + frameRect.left - stageRect.left - stage.clientWidth * 0.12);
+        }
       }
+      current.pdfHasLayout = true;
+      current.previousPdfScrollMode = mode;
       await renderPdfPageFrame(id, targetState, generation);
     }
 
