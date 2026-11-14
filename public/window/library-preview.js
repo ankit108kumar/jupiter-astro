@@ -97,6 +97,416 @@
     return "unsupported";
   }
 
+  var SEARCHABLE_PREVIEW_TYPES = new Set(["pdf", "docx", "spreadsheet", "pptx", "text"]);
+  var SEARCH_MAX_MATCHES = 20000;
+
+  function isSearchAvailable() {
+    return !!current && SEARCHABLE_PREVIEW_TYPES.has(current.type);
+  }
+
+  function setSearchToolbarVisibility() {
+    if (!panel) return;
+    var wrap = panel.querySelector("[data-preview-search-wrap]");
+    if (wrap) wrap.hidden = !isSearchAvailable();
+  }
+
+  function updateSearchToolbar() {
+    if (!panel || !current || !current.search) return;
+    var wrap = panel.querySelector("[data-preview-search-wrap]");
+    var input = panel.querySelector("[data-preview-search-input]");
+    var count = panel.querySelector("[data-preview-search-count]");
+    var previous = panel.querySelector('[data-preview-action="search-prev"]');
+    var next = panel.querySelector('[data-preview-action="search-next"]');
+    if (!wrap || !input || !count) return;
+    wrap.hidden = !isSearchAvailable();
+    if (input.value !== current.search.query) input.value = current.search.query;
+    input.disabled = !current.search.ready;
+    count.textContent = current.search.building ? "…" :
+      (current.search.matches.length && current.search.index >= 0
+        ? (current.search.index + 1) + "/" + current.search.matches.length : "0/0");
+    var enabled = current.search.ready && current.search.matches.length > 0;
+    if (previous) previous.disabled = !enabled;
+    if (next) next.disabled = !enabled;
+  }
+
+  function setSearchReady(value) {
+    if (!current || !current.search) return;
+    current.search.ready = !!value;
+    updateSearchToolbar();
+  }
+
+  function clearSearchHighlights() {
+    if (!window.CSS || !CSS.highlights) return;
+    CSS.highlights.delete("ja-lib-search-results");
+    CSS.highlights.delete("ja-lib-search-active");
+  }
+
+  function getTextRanges(root, query) {
+    if (!root || !query) return [];
+    var needle = String(query).toLocaleLowerCase();
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    var segments = [];
+    var combined = "";
+    var node;
+    while ((node = walker.nextNode())) {
+      if (!node.nodeValue || !node.parentElement ||
+          node.parentElement.closest("script,style,noscript,template,[aria-hidden='true']")) continue;
+      var value = node.nodeValue;
+      if (!value) continue;
+      segments.push({ node: node, start: combined.length, end: combined.length + value.length });
+      combined += value;
+    }
+    if (!combined) return [];
+    var lower = combined.toLocaleLowerCase();
+    function locate(offset, endOffset) {
+      for (var i = 0; i < segments.length; i++) {
+        var segment = segments[i];
+        if (offset >= segment.start && (offset < segment.end || (endOffset && offset === segment.end))) return segment;
+      }
+      return null;
+    }
+    var ranges = [];
+    var cursor = 0;
+    while (cursor <= lower.length - needle.length && ranges.length < SEARCH_MAX_MATCHES) {
+      var start = lower.indexOf(needle, cursor);
+      if (start < 0) break;
+      var end = start + needle.length;
+      var first = locate(start, false);
+      var last = locate(end, true);
+      if (first && last) {
+        try {
+          var range = document.createRange();
+          range.setStart(first.node, start - first.start);
+          range.setEnd(last.node, end - last.start);
+          ranges.push(range);
+        } catch (error) {}
+      }
+      cursor = start + Math.max(1, needle.length);
+    }
+    return ranges;
+  }
+
+  function applySearchHighlights(ranges, activeRange) {
+    if (!window.CSS || !CSS.highlights || typeof window.Highlight !== "function") return;
+    try {
+      CSS.highlights.delete("ja-lib-search-results");
+      CSS.highlights.delete("ja-lib-search-active");
+      if (ranges && ranges.length) CSS.highlights.set("ja-lib-search-results", new Highlight(...ranges));
+      if (activeRange) CSS.highlights.set("ja-lib-search-active", new Highlight(activeRange));
+    } catch (error) {
+      console.warn("Jupiter Library: could not highlight search results.", error);
+    }
+  }
+
+  function scrollSearchRange(range) {
+    if (!range) return;
+    var element = range.startContainer.nodeType === Node.ELEMENT_NODE
+      ? range.startContainer : range.startContainer.parentElement;
+    if (element && element.scrollIntoView) {
+      element.scrollIntoView({ block: "center", inline: "nearest", behavior: "smooth" });
+    }
+  }
+
+  function findOccurrences(value, query) {
+    var haystack = String(value == null ? "" : value).toLocaleLowerCase();
+    var needle = String(query || "").toLocaleLowerCase();
+    var result = [];
+    var cursor = 0;
+    while (needle && cursor <= haystack.length - needle.length && result.length < SEARCH_MAX_MATCHES) {
+      var found = haystack.indexOf(needle, cursor);
+      if (found < 0) break;
+      result.push(found);
+      cursor = found + Math.max(1, needle.length);
+    }
+    return result;
+  }
+
+  function getDomSearchRoot() {
+    if (!current) return null;
+    var stage = panel.querySelector(".ja-lib-preview-stage");
+    if (current.type === "docx" && current.docxRenderer !== "pdf") return stage.querySelector(".ja-lib-docxjs-body");
+    if (current.type === "text") return stage.querySelector(".ja-lib-text-preview");
+    return null;
+  }
+
+  function buildDomSearchMatches(query) {
+    return getTextRanges(getDomSearchRoot(), query).map(function (_, index) {
+      return { kind: "dom", rangeIndex: index };
+    });
+  }
+
+  async function buildPdfSearchMatches(id, query) {
+    if (!current.pdfDocument) return [];
+    var matches = [];
+    for (var pageNo = 1; pageNo <= current.pdfDocument.numPages; pageNo++) {
+      ensureCurrent(id);
+      var page = current.pdfPageObjects[pageNo - 1] || await current.pdfDocument.getPage(pageNo);
+      var content = await page.getTextContent();
+      ensureCurrent(id);
+      var text = (content.items || []).map(function (item) { return String(item.str || ""); }).join(" ");
+      findOccurrences(text, query).forEach(function (_, localIndex) {
+        if (matches.length < SEARCH_MAX_MATCHES) matches.push({ kind: "pdf", pageNumber: pageNo, localIndex: localIndex });
+      });
+      if (matches.length >= SEARCH_MAX_MATCHES) break;
+    }
+    return matches;
+  }
+
+  function getSpreadsheetCellText(cell) {
+    if (!cell) return "";
+    if (cell.w != null && String(cell.w) !== "") return String(cell.w);
+    if (cell.v == null) return "";
+    if (cell.v instanceof Date) return cell.v.toLocaleString();
+    return String(cell.v);
+  }
+
+  function buildSpreadsheetSearchMatches(query) {
+    var XLSX = spreadsheetEngine;
+    var workbook = current.workbook;
+    if (!XLSX || !workbook) return [];
+    var matches = [];
+    for (var sheetIndex = 0; sheetIndex < workbook.SheetNames.length; sheetIndex++) {
+      var worksheet = workbook.Sheets[workbook.SheetNames[sheetIndex]];
+      if (!worksheet) continue;
+      var addresses = Object.keys(worksheet).filter(function (address) {
+        return /^[A-Z]{1,3}[1-9]\d*$/i.test(address);
+      });
+      addresses.sort(function (a, b) {
+        var aa = XLSX.utils.decode_cell(a);
+        var bb = XLSX.utils.decode_cell(b);
+        return aa.r - bb.r || aa.c - bb.c;
+      });
+      for (var a = 0; a < addresses.length; a++) {
+        var address = addresses[a];
+        findOccurrences(getSpreadsheetCellText(worksheet[address]), query).forEach(function (_, cellMatchIndex) {
+          if (matches.length < SEARCH_MAX_MATCHES) matches.push({
+            kind: "spreadsheet", sheetIndex: sheetIndex, address: address, cellMatchIndex: cellMatchIndex
+          });
+        });
+        if (matches.length >= SEARCH_MAX_MATCHES) break;
+      }
+      if (matches.length >= SEARCH_MAX_MATCHES) break;
+    }
+    return matches;
+  }
+
+  function resolveZipPath(target) {
+    try {
+      var path = new URL(String(target || ""), "https://zip.invalid/ppt/presentation.xml").pathname;
+      return path.charAt(0) === "/" ? path.slice(1) : path;
+    } catch (error) { return ""; }
+  }
+
+  async function buildPptxSlideTexts(id) {
+    if (current.pptxSlideTexts) return current.pptxSlideTexts;
+    await loadScript(JSZIP_URL, "docx-jszip", "JSZip");
+    ensureCurrent(id);
+    var zip = await window.JSZip.loadAsync(current.blob);
+    var presentationFile = zip.file("ppt/presentation.xml");
+    var relsFile = zip.file("ppt/_rels/presentation.xml.rels");
+    if (!presentationFile || !relsFile) throw new Error("The PowerPoint slide list could not be read.");
+    var parser = new DOMParser();
+    var presentation = parser.parseFromString(await presentationFile.async("string"), "application/xml");
+    var rels = parser.parseFromString(await relsFile.async("string"), "application/xml");
+    if (presentation.querySelector("parsererror") || rels.querySelector("parsererror")) {
+      throw new Error("PowerPoint slide metadata is invalid.");
+    }
+    var relationshipMap = Object.create(null);
+    Array.from(rels.getElementsByTagNameNS("http://schemas.openxmlformats.org/package/2006/relationships", "Relationship"))
+      .forEach(function (item) { relationshipMap[item.getAttribute("Id")] = item.getAttribute("Target"); });
+    var slideIds = Array.from(presentation.getElementsByTagNameNS("http://schemas.openxmlformats.org/presentationml/2006/main", "sldId"));
+    var texts = [];
+    for (var i = 0; i < slideIds.length; i++) {
+      ensureCurrent(id);
+      var relId = slideIds[i].getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships", "id");
+      var target = relationshipMap[relId];
+      if (!target) { texts.push(""); continue; }
+      var slide = zip.file(resolveZipPath(target));
+      if (!slide) { texts.push(""); continue; }
+      var xml = parser.parseFromString(await slide.async("string"), "application/xml");
+      texts.push(Array.from(xml.getElementsByTagNameNS("http://schemas.openxmlformats.org/drawingml/2006/main", "t"))
+        .map(function (item) { return item.textContent || ""; }).join(" "));
+    }
+    current.pptxSlideTexts = texts;
+    return texts;
+  }
+
+  async function buildPptxSearchMatches(id, query) {
+    var texts = await buildPptxSlideTexts(id);
+    var matches = [];
+    texts.forEach(function (text, slideIndex) {
+      findOccurrences(text, query).forEach(function (_, localIndex) {
+        if (matches.length < SEARCH_MAX_MATCHES) matches.push({ kind: "pptx", slideIndex: slideIndex, localIndex: localIndex });
+      });
+    });
+    return matches;
+  }
+
+  async function buildSearchMatches(id, query) {
+    if (current.type === "pdf" || (current.type === "docx" && isPdfView())) return buildPdfSearchMatches(id, query);
+    if (current.type === "docx" || current.type === "text") return buildDomSearchMatches(query);
+    if (current.type === "spreadsheet") return buildSpreadsheetSearchMatches(query);
+    if (current.type === "pptx") return buildPptxSearchMatches(id, query);
+    return [];
+  }
+
+  async function runPreviewSearch(query) {
+    if (!current || !current.search || !current.search.ready) return;
+    var id = current.id;
+    var state = current.search;
+    state.token++;
+    var token = state.token;
+    state.query = String(query || "").trim();
+    state.matches = [];
+    state.index = -1;
+    state.building = false;
+    clearSearchHighlights();
+    if (!state.query) { updateSearchToolbar(); return; }
+    state.building = true;
+    updateSearchToolbar();
+    try {
+      var matches = await buildSearchMatches(id, state.query);
+      ensureCurrent(id);
+      if (current.search.token !== token) return;
+      state.matches = matches;
+      state.building = false;
+      updateSearchToolbar();
+      if (matches.length) await navigatePreviewSearch(0);
+    } catch (error) {
+      if (!current || current.id !== id || (error && error.name === "AbortError")) return;
+      state.building = false;
+      state.matches = [];
+      state.index = -1;
+      updateSearchToolbar();
+      console.warn("Jupiter Library: in-document search failed.", error);
+    }
+  }
+
+  function handlePreviewSearchInput(event) {
+    if (!event.target.matches("[data-preview-search-input]") || !current || !current.search) return;
+    if (current.search.timer) window.clearTimeout(current.search.timer);
+    var id = current.id;
+    var query = event.target.value;
+    current.search.timer = window.setTimeout(function () {
+      if (!current || current.id !== id) return;
+      current.search.timer = null;
+      runPreviewSearch(query);
+    }, 140);
+  }
+
+  function handlePreviewSearchKeydown(event) {
+    if (!event.target.matches("[data-preview-search-input]")) return;
+    if (event.key === "Enter") {
+      event.preventDefault();
+      event.stopPropagation();
+      navigatePreviewSearch(event.shiftKey ? -1 : 1);
+    } else if (event.key === "Escape" && event.target.value) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.target.value = "";
+      runPreviewSearch("");
+    }
+  }
+
+  async function navigatePreviewSearch(direction) {
+    if (!current || !current.search || !current.search.matches.length) return;
+    var search = current.search;
+    var index = search.index + direction;
+    if (direction !== 1 && direction !== -1) index = Math.max(0, Number(direction) || 0);
+    if (index < 0) index = search.matches.length - 1;
+    if (index >= search.matches.length) index = 0;
+    search.index = index;
+    updateSearchToolbar();
+    var id = current.id;
+    var entry = search.matches[index];
+    var stage = panel.querySelector(".ja-lib-preview-stage");
+
+    if (entry.kind === "dom") {
+      var ranges = getTextRanges(getDomSearchRoot(), search.query);
+      applySearchHighlights(ranges, ranges[entry.rangeIndex] || null);
+      scrollSearchRange(ranges[entry.rangeIndex]);
+    } else if (entry.kind === "pdf") {
+      var state = current.pdfPageStates[entry.pageNumber - 1];
+      if (!state) return;
+      state.frame.scrollIntoView({ block: "start", inline: "nearest", behavior: "smooth" });
+      await renderPdfPageFrame(id, state, current.pdfGeneration);
+      ensureCurrent(id);
+      var pdfRanges = getTextRanges(state.textContainer || state.frame.querySelector(".textLayer"), search.query);
+      var activePdf = pdfRanges[entry.localIndex] || pdfRanges[0] || null;
+      applySearchHighlights(pdfRanges, activePdf);
+      scrollSearchRange(activePdf);
+    } else if (entry.kind === "spreadsheet") {
+      var XLSX = spreadsheetEngine;
+      var decoded = XLSX.utils.decode_cell(entry.address);
+      var info = current.renderedSheetWindow;
+      var needsRender = current.sheetIndex !== entry.sheetIndex || !info ||
+        decoded.r < info.startRow || decoded.r > info.endRow ||
+        decoded.c < info.startCol || decoded.c > info.endCol;
+      current.searchTargetCell = { sheetIndex: entry.sheetIndex, row: decoded.r, col: decoded.c, address: entry.address };
+      if (needsRender) {
+        current.sheetIndex = entry.sheetIndex;
+        renderSheet(id);
+      }
+      ensureCurrent(id);
+      var wrap = stage.querySelector(".ja-lib-sheet-wrap");
+      var cell = wrap && wrap.querySelector('[data-cell-address="' + entry.address + '"]');
+      if (!cell) return;
+      var cellRanges = getTextRanges(cell, search.query);
+      var activeCell = cellRanges[entry.cellMatchIndex] || cellRanges[0] || null;
+      applySearchHighlights(getTextRanges(wrap, search.query), activeCell);
+      cell.scrollIntoView({ block: "center", inline: "center", behavior: "smooth" });
+      scrollSearchRange(activeCell);
+    } else if (entry.kind === "pptx") {
+      if (current.slideIndex !== entry.slideIndex) {
+        current.slideIndex = entry.slideIndex;
+        await renderSlide(id);
+        ensureCurrent(id);
+      }
+      var slideRoot = stage.querySelector(".ja-lib-slide-frame");
+      var slideRanges = getTextRanges(slideRoot, search.query);
+      var activeSlide = slideRanges[entry.localIndex] || slideRanges[0] || null;
+      applySearchHighlights(slideRanges, activeSlide);
+      scrollSearchRange(activeSlide);
+    }
+  }
+
+  function refreshVisibleSearchHighlights() {
+    if (!current || !current.search || !current.search.query) return;
+    var state = current.search;
+    if ((current.type === "docx" && !isPdfView()) || current.type === "text") {
+      var domRanges = getTextRanges(getDomSearchRoot(), state.query);
+      var domEntry = state.matches[state.index];
+      applySearchHighlights(domRanges, domEntry && domRanges[domEntry.rangeIndex] || null);
+    } else if (current.type === "spreadsheet") {
+      var wrap = panel.querySelector(".ja-lib-sheet-wrap");
+      var allRanges = getTextRanges(wrap, state.query);
+      var entry = state.matches[state.index];
+      var active = null;
+      if (entry && entry.sheetIndex === current.sheetIndex) {
+        var cell = wrap && wrap.querySelector('[data-cell-address="' + entry.address + '"]');
+        var cellRanges = getTextRanges(cell, state.query);
+        active = cellRanges[entry.cellMatchIndex] || cellRanges[0] || null;
+      }
+      applySearchHighlights(allRanges, active);
+    } else if (current.type === "pptx") {
+      var slide = panel.querySelector(".ja-lib-slide-frame");
+      var pptRanges = getTextRanges(slide, state.query);
+      var pptEntry = state.matches[state.index];
+      var pptActive = pptEntry && pptEntry.slideIndex === current.slideIndex
+        ? pptRanges[pptEntry.localIndex] || pptRanges[0] || null : null;
+      applySearchHighlights(pptRanges, pptActive);
+    } else if (isPdfView()) {
+      var pageState = current.pdfPageStates[current.page - 1];
+      if (pageState && pageState.textContainer) {
+        var pageRanges = getTextRanges(pageState.textContainer, state.query);
+        var pdfEntry = state.matches[state.index];
+        var pdfActive = pdfEntry && pdfEntry.pageNumber === current.page
+          ? pageRanges[pdfEntry.localIndex] || pageRanges[0] || null : null;
+        applySearchHighlights(pageRanges, pdfActive);
+      }
+    }
+  }
+
   function ensurePanel() {
     if (panel && panel.isConnected) return panel;
     var main = document.querySelector("#ja-reference-library-window .ja-lib-main");
@@ -115,12 +525,21 @@
         '<button class="ja-lib-preview-back" type="button" data-preview-action="back" aria-label="Back to Library" title="Back to Library"><span aria-hidden="true">‹</span><span>Library</span></button>' +
         '<div class="ja-lib-preview-file"><span class="ja-lib-preview-file-icon" aria-hidden="true">▤</span>' +
           '<div class="ja-lib-preview-file-meta"><strong class="ja-lib-preview-name"></strong><span class="ja-lib-preview-subtitle"></span></div></div>' +
+        '<div class="ja-lib-preview-search" data-preview-search-wrap hidden>' +
+          '<span class="ja-lib-preview-search-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.7"></circle><path d="m16 16 5 5"></path></svg></span>' +
+          '<input class="ja-lib-preview-search-input" data-preview-search-input type="search" placeholder="Search in file" aria-label="Search in opened file" autocomplete="off" disabled>' +
+          '<span class="ja-lib-preview-search-count" data-preview-search-count aria-live="polite">0/0</span>' +
+          '<button class="ja-lib-preview-search-nav" type="button" data-preview-action="search-prev" title="Previous match (Shift+Enter)" aria-label="Previous match" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6"></path></svg></button>' +
+          '<button class="ja-lib-preview-search-nav" type="button" data-preview-action="search-next" title="Next match (Enter)" aria-label="Next match" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 10 6 6 6-6"></path></svg></button>' +
+        '</div>' +
         '<div class="ja-lib-preview-tools" aria-label="Preview controls"></div>' +
       '</header>' +
       '<div class="ja-lib-preview-stage" tabindex="0"><div class="ja-lib-preview-loading"><span class="ja-lib-preview-spinner"></span><span>Preparing preview…</span></div></div>';
     main.appendChild(panel);
     panel.addEventListener("click", handlePanelClick);
     panel.addEventListener("wheel", handlePreviewWheel, { passive: false });
+    panel.addEventListener("input", handlePreviewSearchInput);
+    panel.addEventListener("keydown", handlePreviewSearchKeydown);
     panel.querySelector('[data-preview-action="back"]').addEventListener("click", close);
     return panel;
   }
@@ -162,6 +581,7 @@
       } catch (error) {}
     }
     setTools("");
+    setSearchReady(false);
   }
 
   function setMetadata(file, type) {
@@ -198,6 +618,8 @@
     restoreDocxFallbackFont();
     restoreWindowsFontAliases();
     cancelPdfPageStates();
+    if (current.search && current.search.timer) window.clearTimeout(current.search.timer);
+    clearSearchHighlights();
     if (current.controller) current.controller.abort();
     if (current.objectUrl) URL.revokeObjectURL(current.objectUrl);
     if (current.pdfDocument && typeof current.pdfDocument.destroy === "function") {
@@ -263,7 +685,9 @@
       windowsFontOverrides: [], windowsFontStyle: null, windowsFontObjectUrls: [],
       windowsFontAliasMap: Object.create(null), windowsFontMatchCount: 0,
       windowsFontDiagnostics: null,
-      docxFallbackOverrides: [], docxFallbackAppliedCount: 0
+      docxFallbackOverrides: [], docxFallbackAppliedCount: 0,
+      search: { query: "", matches: [], index: -1, ready: false, token: 0, timer: null, pptxSlideTexts: null },
+      renderedSheetWindow: null, searchTargetCell: null
     };
 
     panel.classList.add("is-open");
@@ -273,6 +697,8 @@
     var backButton = panel.querySelector('[data-preview-action="back"]');
     if (backButton) backButton.focus({ preventScroll: true });
     setMetadata(file, current.type);
+    setSearchToolbarVisibility();
+    setSearchReady(false);
     setTools("");
     setLoading("Retrieving " + (file.name || "file") + "…");
 
@@ -350,6 +776,7 @@
     );
     ensureCurrent(id);
     await rebuildPdfPageLayout(id, 1);
+    setSearchReady(true);
   }
 
   function cancelPdfPageStates() {
@@ -554,6 +981,7 @@
       var textContainer = document.createElement("div");
       textContainer.className = "textLayer";
       textContainer.setAttribute("aria-label", "Selectable PDF text, page " + state.pageNumber);
+      state.textContainer = textContainer;
       textContainer.style.width = Math.ceil(viewport.width) + "px";
       textContainer.style.height = Math.ceil(viewport.height) + "px";
       textContainer.style.setProperty("--total-scale-factor", String(current.zoom));
@@ -569,6 +997,7 @@
       ensureCurrent(id);
       if (current.pdfGeneration !== generation) return;
       state.rendered = true;
+      if (current.search && current.search.query) refreshVisibleSearchHighlights();
     } catch (error) {
       if (error && (error.name === "RenderingCancelledException" || error.name === "AbortException")) return;
       throw error;
@@ -1509,6 +1938,8 @@
         "the viewer uses Georgia, Times New Roman or a generic serif font; it will not fall back to monospace."
       );
     }
+    setSearchReady(true);
+    refreshVisibleSearchHighlights();
   }
 
   async function convertDocxToPdf(id) {
@@ -1629,6 +2060,7 @@
     });
     setTools('<span class="ja-lib-preview-note">Read-only cell values · No formula recalculation</span>');
     renderSheet(id);
+    setSearchReady(true);
   }
 
   function renderSheet(id) {
@@ -1649,13 +2081,27 @@
       return;
     }
     var range = XLSX.utils.decode_range(worksheet["!ref"]);
-    var lastRow = Math.min(range.e.r, range.s.r + 249);
-    var lastCol = Math.min(range.e.c, range.s.c + 39);
-    var clipped = range.e.r > lastRow || range.e.c > lastCol;
+    var viewStartRow = range.s.r;
+    var viewStartCol = range.s.c;
+    var targetCell = current.searchTargetCell;
+    if (targetCell && targetCell.sheetIndex === current.sheetIndex) {
+      var maxRowStart = Math.max(range.s.r, range.e.r - 249);
+      var maxColStart = Math.max(range.s.c, range.e.c - 39);
+      viewStartRow = Math.max(range.s.r, Math.min(targetCell.row - 125, maxRowStart));
+      viewStartCol = Math.max(range.s.c, Math.min(targetCell.col - 20, maxColStart));
+    }
+    var lastRow = Math.min(range.e.r, viewStartRow + 249);
+    var lastCol = Math.min(range.e.c, viewStartCol + 39);
+    var clipped = viewStartRow > range.s.r || viewStartCol > range.s.c ||
+      range.e.r > lastRow || range.e.c > lastCol;
     var rows = XLSX.utils.sheet_to_json(worksheet, {
       header: 1, raw: false, defval: "", blankrows: true,
-      range: XLSX.utils.encode_range({ s: { r: range.s.r, c: range.s.c }, e: { r: lastRow, c: lastCol } })
+      range: XLSX.utils.encode_range({ s: { r: viewStartRow, c: viewStartCol }, e: { r: lastRow, c: lastCol } })
     });
+    current.renderedSheetWindow = {
+      sheetIndex: current.sheetIndex, startRow: viewStartRow, endRow: lastRow,
+      startCol: viewStartCol, endCol: lastCol
+    };
     var table = document.createElement("table");
     table.className = "ja-lib-sheet-table";
     var thead = document.createElement("thead");
@@ -1664,7 +2110,7 @@
     corner.className = "row-number";
     corner.textContent = "#";
     headRow.appendChild(corner);
-    for (var col = range.s.c; col <= lastCol; col++) {
+    for (var col = viewStartCol; col <= lastCol; col++) {
       var th = document.createElement("th");
       th.textContent = XLSX.utils.encode_col(col);
       headRow.appendChild(th);
@@ -1676,11 +2122,14 @@
       var tr = document.createElement("tr");
       var number = document.createElement("th");
       number.className = "row-number";
-      number.textContent = String(range.s.r + rowIndex + 1);
+      number.textContent = String(viewStartRow + rowIndex + 1);
       tr.appendChild(number);
-      for (var c = range.s.c; c <= lastCol; c++) {
+      for (var c = viewStartCol; c <= lastCol; c++) {
         var td = document.createElement("td");
-        td.textContent = row[c - range.s.c] == null ? "" : String(row[c - range.s.c]);
+        td.textContent = row[c - viewStartCol] == null ? "" : String(row[c - viewStartCol]);
+        td.setAttribute("data-cell-address", XLSX.utils.encode_cell({
+          r: viewStartRow + rowIndex, c: c
+        }));
         tr.appendChild(td);
       }
       tbody.appendChild(tr);
@@ -1690,9 +2139,11 @@
     var limit = stage.querySelector(".ja-lib-sheet-limit");
     limit.hidden = !clipped;
     limit.textContent = clipped
-      ? "Preview limited to the first " + (lastRow - range.s.r + 1) + " rows and " +
-        (lastCol - range.s.c + 1) + " columns of this worksheet for performance."
+      ? "Preview window: rows " + (viewStartRow + 1) + "–" + (lastRow + 1) +
+        ", columns " + XLSX.utils.encode_col(viewStartCol) + "–" + XLSX.utils.encode_col(lastCol) +
+        ". Search checks all populated cells in this worksheet."
       : "";
+    if (current.search && current.search.query) refreshVisibleSearchHighlights();
   }
 
   function renderText(id) {
@@ -1706,6 +2157,8 @@
       stage.innerHTML = "";
       stage.appendChild(pre);
       setTools('<span class="ja-lib-preview-note">Plain-text view · Content is not executed</span>');
+      setSearchReady(true);
+      refreshVisibleSearchHighlights();
     });
   }
 
@@ -1769,6 +2222,7 @@
       '<span class="ja-lib-preview-counter" data-preview-counter></span>' +
       toolButton("slide-next", "Next slide", "›"));
     await renderSlide(id);
+    setSearchReady(true);
   }
 
   async function renderSlide(id) {
@@ -1786,13 +2240,16 @@
     var next = panel.querySelector('[data-preview-action="slide-next"]');
     if (prev) prev.disabled = current.slideIndex <= 0;
     if (next) next.disabled = current.slideIndex >= presentation.slides.length - 1;
+    if (current.search && current.search.query) refreshVisibleSearchHighlights();
   }
 
   function handlePanelClick(event) {
     var button = event.target.closest("[data-preview-action]");
     if (!button || button.disabled || !current) return;
     var action = button.getAttribute("data-preview-action");
-    if (action === "back") close();
+    if (action === "search-prev") navigatePreviewSearch(-1);
+    else if (action === "search-next") navigatePreviewSearch(1);
+    else if (action === "back") close();
     else if (action === "docx-mode-html" && current.type === "docx") {
       selectDocxRenderer("html");
     } else if (action === "docx-mode-pdf" && current.type === "docx") {
