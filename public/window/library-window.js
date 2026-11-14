@@ -274,28 +274,47 @@
 
     var provider = providers.find(function (item) { return item.id === providerId; });
     var label = provider ? provider.label : "All files";
-    libraryWindow.querySelector(".ja-lib-source-label").textContent =
-      label + (providerId === "all" ? " · Not connected" : " · Connector not configured");
+    var sourceLabel = libraryWindow.querySelector(".ja-lib-source-label");
 
-    if (window.JupiterLibraryDrive) {
-      if (providerId === "google-drive") {
+    if (providerId === "google-drive") {
+      if (window.JupiterLibraryDropbox) window.JupiterLibraryDropbox.clear();
+      if (window.JupiterLibraryDrive) {
+        if (sourceLabel) sourceLabel.textContent = "Google Drive · Connecting…";
         window.JupiterLibraryDrive.openRoot();
         return;
       }
-      window.JupiterLibraryDrive.clear();
     }
 
-    var title = libraryWindow.querySelector(".ja-lib-empty-title");
-    var description = libraryWindow.querySelector(".ja-lib-empty-description");
+    if (providerId === "dropbox") {
+      if (window.JupiterLibraryDrive) window.JupiterLibraryDrive.clear();
+      if (window.JupiterLibraryDropbox) {
+        if (sourceLabel) sourceLabel.textContent = "Dropbox · Checking connection…";
+        window.JupiterLibraryDropbox.openRoot();
+        return;
+      }
+    }
+
+    if (window.JupiterLibraryDrive) window.JupiterLibraryDrive.clear();
+    if (window.JupiterLibraryDropbox) window.JupiterLibraryDropbox.clear();
+    if (sourceLabel) {
+      sourceLabel.textContent = label + (providerId === "all" ? " · Choose a source" : " · Not connected");
+    }
+
+    var content = libraryWindow.querySelector(".ja-lib-content");
     if (providerId === "all") {
-      title.textContent = "Your library is ready";
-      description.textContent =
-        "Connect Google Drive, Dropbox or OneDrive to browse your astrology reference files here. Your original cloud files will remain read-only.";
+      if (content) content.innerHTML =
+        '<div class="ja-lib-empty">' +
+          '<div class="ja-lib-empty-symbol">▤</div>' +
+          '<strong class="ja-lib-empty-title">Your library is ready</strong>' +
+          '<p class="ja-lib-empty-description">Choose Google Drive or Dropbox to browse your astrology reference files. Original cloud files remain read-only.</p>' +
+        '</div>';
     } else {
-      title.textContent = label + " is not connected yet";
-      description.textContent =
-        "The library window is ready. Secure " + label +
-        " authentication and its read-only file connector will be configured in the next integration phase.";
+      if (content) content.innerHTML =
+        '<div class="ja-lib-empty">' +
+          '<div class="ja-lib-empty-symbol">!</div>' +
+          '<strong class="ja-lib-empty-title">' + label + ' is not available yet</strong>' +
+          '<p class="ja-lib-empty-description">This storage provider has not been connected.</p>' +
+        '</div>';
     }
   }
 
@@ -646,6 +665,36 @@
       });
     }
   }
+
+  function handleDropboxOAuthReturn() {
+    var url = new URL(window.location.href);
+    var outcome = url.searchParams.get("dropbox");
+    if (!outcome) return;
+
+    url.searchParams.delete("dropbox");
+    window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+
+    var start = function () {
+      waitForAuthReady().then(function (user) {
+        if (!user) return;
+        openWindow().then(function () {
+          if (outcome === "connected" && window.JupiterLibraryDropbox) {
+            selectProvider("dropbox");
+          } else if (outcome !== "connected") {
+            selectProvider("dropbox");
+          }
+        });
+      });
+    };
+
+    if (window.JupiterLibraryDropbox) {
+      start();
+    } else {
+      window.addEventListener("ja-dropbox-connector-ready", start, { once: true });
+    }
+  }
+
+  handleDropboxOAuthReturn();
 
   console.info("Jupiter Astro: Library window shell loaded. Shortcut: " + getLibraryShortcutLabel());
 })();
