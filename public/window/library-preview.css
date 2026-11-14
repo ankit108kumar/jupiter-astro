@@ -215,6 +215,10 @@
   -webkit-user-select:text;
   overscroll-behavior:contain;
 }
+#ja-reference-library-window .ja-lib-preview-stage.is-pdf {
+  scroll-behavior:smooth;
+  touch-action:pan-x pan-y pinch-zoom;
+}
 #ja-reference-library-window .ja-lib-pdf-document {
   display:flex;
   width:max-content;
@@ -257,11 +261,12 @@
   background:#fff;
 }
 #ja-reference-library-window .ja-lib-preview-stage.is-pdf .textLayer {
+  color-scheme:only light;
   position:absolute;
   inset:0;
   z-index:2;
   display:block;
-  overflow:hidden;
+  overflow:clip;
   margin:0;
   padding:0;
   color:transparent;
@@ -276,6 +281,18 @@
   user-select:text;
   -webkit-user-select:text;
   cursor:text;
+  --min-font-size:1;
+  --min-font-size-inv:1;
+  --text-scale-factor:calc(var(--total-scale-factor) * var(--min-font-size));
+}
+#ja-reference-library-window .ja-lib-preview-stage.is-pdf .textLayer > :not(.markedContent),
+#ja-reference-library-window .ja-lib-preview-stage.is-pdf .textLayer .markedContent span:not(.markedContent) {
+  z-index:1;
+  --font-height:0;
+  font-size:calc(var(--text-scale-factor) * var(--font-height));
+  --scale-x:1;
+  --rotate:0deg;
+  transform:rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv));
 }
 #ja-reference-library-window .ja-lib-preview-stage.is-pdf .textLayer span,
 #ja-reference-library-window .ja-lib-preview-stage.is-pdf .textLayer br {
@@ -290,17 +307,14 @@
 #ja-reference-library-window .ja-lib-preview-stage.is-pdf .textLayer .markedContent {
   display:contents;
 }
+#ja-reference-library-window .ja-lib-preview-stage.is-pdf .textLayer span[role="img"] {
+  user-select:none;
+  -webkit-user-select:none;
+  cursor:default;
+}
 #ja-reference-library-window .ja-lib-preview-stage.is-pdf .textLayer ::selection {
   color:transparent;
   background:rgba(45,105,220,.28);
-}
-#ja-reference-library-window .ja-lib-preview-stage.is-pdf .textLayer .endOfContent {
-  display:block;
-  position:absolute;
-  inset:100% 0 0;
-  z-index:0;
-  user-select:none;
-  -webkit-user-select:none;
 }
 #ja-reference-library-window .ja-lib-preview-stage.is-pdf .textLayer .highlight {
   margin:-1px;
