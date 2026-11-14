@@ -392,6 +392,7 @@
     current.pdfGeneration = (current.pdfGeneration || 0) + 1;
     var generation = current.pdfGeneration;
     var stage = panel.querySelector(".ja-lib-preview-stage");
+    stage.classList.remove("is-docxjs","is-docx");
     var mode = current.pdfScrollMode || "vertical";
     var hadLayout = !!current.pdfHasLayout;
     var previousMode = current.previousPdfScrollMode || mode;
@@ -1031,6 +1032,7 @@
   }
 
   async function renderDocxPdf(id) {
+    restoreWindowsFontAliases();
     destroyPdfView();
     var pdfBlob = await convertDocxToPdf(id);
     ensureCurrent(id);
