@@ -259,8 +259,9 @@
       blob: null, objectUrl: null, pdfDocument: null, page: 1, zoom: 1,
       docxRenderer: "html", docxPdfBlob: null,
       windowsFontsEnabled: false, windowsLocalFonts: null,
-      windowsFontOverrides: [], windowsFontStyle: null,
-      windowsFontAliasMap: Object.create(null), windowsFontMatchCount: 0
+      windowsFontOverrides: [], windowsFontStyle: null, windowsFontObjectUrls: [],
+      windowsFontAliasMap: Object.create(null), windowsFontMatchCount: 0,
+      windowsFontDiagnostics: null
     };
 
     panel.classList.add("is-open");
@@ -629,31 +630,39 @@
     });
   }
 
+  var DOCX_WORD_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+  var DOCX_DRAWING_NS = "http://schemas.openxmlformats.org/drawingml/2006/main";
+
   function normalizeFontName(value) {
-    return String(value || "").replace(/^["']|["']$/g, "").trim().toLocaleLowerCase();
+    return String(value || "")
+      .normalize("NFKC")
+      .replace(/^[\"']|[\"']$/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLocaleLowerCase();
   }
 
   function firstFontFamily(value) {
     var first = String(value || "").split(",")[0] || "";
-    return first.replace(/^["']|["']$/g, "").trim();
+    return first.replace(/^[\"']|[\"']$/g, "").trim();
   }
 
   function cssQuotedString(value) {
-    return '"' + String(value == null ? "" : value)
+    return "\"" + String(value == null ? "" : value)
       .replace(/\\/g, "\\\\")
-      .replace(/"/g, '\\"')
-      .replace(/[\r\n\f]/g, " ") + '"';
+      .replace(/\"/g, "\\\"")
+      .replace(/[\r\n\f]/g, " ") + "\"";
   }
 
   function localFontWeight(styleName) {
-    var style = String(styleName || "").toLowerCase();
-    if (/hairline|ultra.?thin/.test(style)) return 100;
+    var style = String(styleName || "").toLowerCase().replace(/[-_]/g, " ");
+    if (/hairline|ultra\s*thin/.test(style)) return 100;
     if (/\bthin\b/.test(style)) return 200;
-    if (/extra.?light|ultra.?light/.test(style)) return 200;
+    if (/extra\s*light|ultra\s*light/.test(style)) return 200;
     if (/\blight\b/.test(style)) return 300;
     if (/\bmedium\b/.test(style)) return 500;
-    if (/semi.?bold|demi/.test(style)) return 600;
-    if (/extra.?bold|ultra.?bold/.test(style)) return 800;
+    if (/semi\s*bold|demi/.test(style)) return 600;
+    if (/extra\s*bold|ultra\s*bold/.test(style)) return 800;
     if (/\bblack\b|\bheavy\b/.test(style)) return 900;
     if (/\bbold\b/.test(style)) return 700;
     return 400;
@@ -661,6 +670,113 @@
 
   function localFontStyle(styleName) {
     return /italic|oblique/i.test(String(styleName || "")) ? "italic" : "normal";
+  }
+
+  function addDocxFontName(target, value) {
+    var name = String(value || "").replace(/^[\"']|[\"']$/g, "").trim();
+    if (!name || name.charAt(0) === "+" ||
+        /^(serif|sans-serif|monospace|cursive|fantasy|system-ui)$/i.test(name)) return;
+    var key = normalizeFontName(name);
+    if (key && !target.has(key)) target.set(key, name);
+  }
+
+  function xmlElementsByNs(xmlDocument, namespace, localName) {
+    return Array.from(xmlDocument.getElementsByTagNameNS(namespace, localName));
+  }
+
+  function readThemeFontNames(themeXml, target, themeMap) {
+    if (!themeXml) return;
+    var parser = new DOMParser();
+    var xml = parser.parseFromString(themeXml, "application/xml");
+    if (xml.querySelector("parsererror")) return;
+
+    var schemes = xmlElementsByNs(xml, DOCX_DRAWING_NS, "fontScheme");
+    if (!schemes.length) return;
+    var scheme = schemes[0];
+
+    function findFontGroup(groupName, prefix) {
+      var group = xmlElementsByNs(scheme, DOCX_DRAWING_NS, groupName)[0];
+      if (!group) return;
+
+      var latin = xmlElementsByNs(group, DOCX_DRAWING_NS, "latin")[0];
+      var eastAsia = xmlElementsByNs(group, DOCX_DRAWING_NS, "ea")[0];
+      var complexScript = xmlElementsByNs(group, DOCX_DRAWING_NS, "cs")[0];
+      var latinName = latin && latin.getAttribute("typeface");
+      var eastAsiaName = eastAsia && eastAsia.getAttribute("typeface");
+      var complexName = complexScript && complexScript.getAttribute("typeface");
+
+      addDocxFontName(target, latinName);
+      addDocxFontName(target, eastAsiaName);
+      addDocxFontName(target, complexName);
+
+      themeMap[prefix + "ascii"] = latinName || "";
+      themeMap[prefix + "hansi"] = latinName || "";
+      themeMap[prefix + "eastasia"] = eastAsiaName || latinName || "";
+      themeMap[prefix + "bidi"] = complexName || latinName || "";
+
+      xmlElementsByNs(group, DOCX_DRAWING_NS, "font").forEach(function (font) {
+        addDocxFontName(target, font.getAttribute("typeface"));
+      });
+    }
+
+    findFontGroup("majorFont", "major");
+    findFontGroup("minorFont", "minor");
+  }
+
+  async function extractDocxFontFamilies(blob) {
+    var result = { families: [], warning: "" };
+    if (!window.JSZip || typeof window.JSZip.loadAsync !== "function") {
+      result.warning = "DOCX font metadata could not be inspected because JSZip is unavailable.";
+      return result;
+    }
+
+    try {
+      var zip = await window.JSZip.loadAsync(blob);
+      var fonts = new Map();
+      var themeMap = Object.create(null);
+      var themeFile = zip.file("word/theme/theme1.xml");
+      if (themeFile) {
+        readThemeFontNames(await themeFile.async("string"), fonts, themeMap);
+      }
+
+      var xmlPaths = Object.keys(zip.files).filter(function (path) {
+        return /^word\/.*\.xml$/i.test(path) && !zip.files[path].dir;
+      });
+
+      for (var i = 0; i < xmlPaths.length; i++) {
+        var path = xmlPaths[i];
+        var xmlText = await zip.files[path].async("string");
+        var xml = new DOMParser().parseFromString(xmlText, "application/xml");
+        if (xml.querySelector("parsererror")) continue;
+
+        xmlElementsByNs(xml, DOCX_WORD_NS, "rFonts").forEach(function (node) {
+          Array.from(node.attributes).forEach(function (attribute) {
+            var attributeName = String(attribute.localName || attribute.name.split(":").pop()).toLowerCase();
+            var value = String(attribute.value || "").trim();
+            if (attributeName === "ascii" || attributeName === "hansi" ||
+                attributeName === "eastasia" || attributeName === "cs") {
+              addDocxFontName(fonts, value);
+            } else if (/theme$/.test(attributeName)) {
+              var themeName = normalizeFontName(value).replace(/[^a-z]/g, "");
+              addDocxFontName(fonts, themeMap[themeName]);
+            }
+          });
+        });
+
+        if (/^word\/fontTable\.xml$/i.test(path)) {
+          xmlElementsByNs(xml, DOCX_WORD_NS, "font").forEach(function (node) {
+            addDocxFontName(fonts, node.getAttributeNS(DOCX_WORD_NS, "name") || node.getAttribute("w:name") || node.getAttribute("name"));
+          });
+        }
+      }
+
+      result.families = Array.from(fonts.values());
+    } catch (error) {
+      result.warning = "DOCX font metadata inspection failed: " +
+        (error && error.message ? error.message : "Unknown ZIP/XML error.");
+    }
+
+    return result;
   }
 
   function restoreWindowsFontAliases() {
@@ -679,67 +795,131 @@
       current.windowsFontStyle.parentNode.removeChild(current.windowsFontStyle);
     }
     current.windowsFontStyle = null;
+
+    (current.windowsFontObjectUrls || []).forEach(function (url) {
+      try { URL.revokeObjectURL(url); } catch (error) {}
+    });
+    current.windowsFontObjectUrls = [];
     current.windowsFontAliasMap = Object.create(null);
     current.windowsFontMatchCount = 0;
+    current.windowsFontDiagnostics = null;
   }
 
-  function collectRenderedFontFamilies(root) {
-    var found = new Map();
-    if (!root) return [];
+  function collectRenderedFontUsage(root) {
+    var usage = Object.create(null);
+    if (!root) return usage;
+
     var nodes = [root].concat(Array.from(root.querySelectorAll("*")));
     nodes.forEach(function (node) {
-      var family = firstFontFamily(window.getComputedStyle(node).fontFamily);
+      var computed = window.getComputedStyle(node);
+      var family = firstFontFamily(computed.fontFamily);
       var key = normalizeFontName(family);
       if (!key || /^(serif|sans-serif|monospace|cursive|fantasy|system-ui|ui-serif|ui-sans-serif|ui-monospace)$/i.test(key)) return;
-      if (!found.has(key)) found.set(key, family);
+
+      if (!usage[key]) usage[key] = { family: family, variants: Object.create(null), elements: [] };
+      var weightValue = String(computed.fontWeight || "400").toLowerCase();
+      var weight = weightValue === "bold" ? 700 : weightValue === "normal" ? 400 : Number.parseInt(weightValue, 10);
+      if (!Number.isFinite(weight)) weight = 400;
+      var style = /italic|oblique/i.test(computed.fontStyle || "") ? "italic" : "normal";
+      usage[key].variants[weight + "|" + style] = { weight: weight, style: style };
+      usage[key].elements.push(node);
     });
-    return Array.from(found.values());
+    return usage;
   }
 
-  function buildWindowsFontAliases(fontFamilies, localFonts) {
+  async function buildWindowsFontAliases(fontFamilies, localFonts, id) {
     var aliases = Object.create(null);
     var cssRules = [];
     var matched = [];
     var missing = [];
+    var failed = [];
+    var objectUrls = [];
+    var loadedFaceCount = 0;
+    var failedFaceCount = 0;
+    var totalBytes = 0;
+    var maxTotalBytes = 64 * 1024 * 1024;
     var aliasIndex = 0;
+    var uniqueFamilies = new Map();
 
     fontFamilies.forEach(function (documentFamily) {
-      var key = normalizeFontName(documentFamily);
+      addDocxFontName(uniqueFamilies, documentFamily);
+    });
+
+    for (var family of uniqueFamilies.values()) {
+      var key = normalizeFontName(family);
       var faces = localFonts.filter(function (font) {
         return normalizeFontName(font.family) === key ||
           normalizeFontName(font.fullName) === key ||
           normalizeFontName(font.postscriptName) === key;
       });
+
       if (!faces.length) {
-        missing.push(documentFamily);
-        return;
+        missing.push(family);
+        continue;
       }
 
-      var alias = "JupiterDOCXLocal_" + current.id + "_" + (++aliasIndex);
-      aliases[key] = alias;
-      matched.push(documentFamily);
+      var alias = "JupiterDOCXLocal_" + id + "_" + (++aliasIndex);
+      var familyLoaded = 0;
+      var seenFaces = new Set();
 
-      faces.forEach(function (face) {
-        var localNames = [];
-        if (face.postscriptName) localNames.push(face.postscriptName);
-        if (face.fullName && localNames.indexOf(face.fullName) === -1) localNames.push(face.fullName);
-        if (!localNames.length) return;
-        var sources = localNames.map(function (name) {
-          return "local(" + cssQuotedString(name) + ")";
-        }).join(", ");
-        cssRules.push(
-          "@font-face{" +
-            "font-family:" + cssQuotedString(alias) + ";" +
-            "src:" + sources + ";" +
-            "font-weight:" + localFontWeight(face.style) + ";" +
-            "font-style:" + localFontStyle(face.style) + ";" +
-            "font-display:swap;" +
-          "}"
-        );
-      });
-    });
+      for (var face of faces) {
+        var faceKey = normalizeFontName(face.postscriptName || face.fullName || (face.family + " " + face.style));
+        if (seenFaces.has(faceKey)) continue;
+        seenFaces.add(faceKey);
 
-    return { aliases: aliases, rules: cssRules, matched: matched, missing: missing };
+        try {
+          if (typeof face.blob !== "function") throw new Error("This browser did not provide font bytes.");
+          var fontBlob = await face.blob();
+          ensureCurrent(id);
+          if (!(fontBlob instanceof Blob) || !fontBlob.size) throw new Error("The returned font file was empty.");
+          if (totalBytes + fontBlob.size > maxTotalBytes) {
+            throw new Error("The 64 MB safety limit for local font data was reached.");
+          }
+
+          var objectUrl = URL.createObjectURL(fontBlob);
+          objectUrls.push(objectUrl);
+          // Track each URL immediately so closing/switching the preview can revoke it,
+          // even while this async font-loading pass is still in progress.
+          if (current && current.id === id) current.windowsFontObjectUrls.push(objectUrl);
+          totalBytes += fontBlob.size;
+          cssRules.push(
+            "@font-face{" +
+              "font-family:" + cssQuotedString(alias) + ";" +
+              "src:url(" + cssQuotedString(objectUrl) + ");" +
+              "font-weight:" + localFontWeight(face.style) + ";" +
+              "font-style:" + localFontStyle(face.style) + ";" +
+              "font-display:block;" +
+            "}"
+          );
+          familyLoaded++;
+          loadedFaceCount++;
+        } catch (error) {
+          if (error && error.name === "AbortError") throw error;
+          failedFaceCount++;
+          failed.push(family + " (" + String(face.style || "unknown style") + "): " +
+            (error && error.message ? error.message : "Font data could not be read."));
+        }
+      }
+
+      if (familyLoaded) {
+        aliases[key] = alias;
+        matched.push(family);
+      } else {
+        missing.push(family);
+      }
+    }
+
+    return {
+      aliases: aliases,
+      rules: cssRules,
+      matched: matched,
+      missing: missing,
+      failed: failed,
+      objectUrls: objectUrls,
+      loadedFaceCount: loadedFaceCount,
+      failedFaceCount: failedFaceCount,
+      totalBytes: totalBytes
+    };
   }
 
   async function applyWindowsFontAliases(id) {
@@ -748,46 +928,130 @@
 
     var stage = panel.querySelector(".ja-lib-preview-stage");
     var root = stage && stage.querySelector(".ja-lib-docxjs-body");
-    if (!root || !current.windowsLocalFonts || !current.windowsLocalFonts.length) return 0;
+    if (!root || !current.windowsLocalFonts || !current.windowsLocalFonts.length) {
+      return {
+        loadedFamilies: [], missingFamilies: [], failedFaces: [],
+        loadedFaces: 0, failedFaceCount: 0, appliedElements: 0, warning: ""
+      };
+    }
 
-    var families = collectRenderedFontFamilies(root);
-    var result = buildWindowsFontAliases(families, current.windowsLocalFonts);
+    var renderedUsage = collectRenderedFontUsage(root);
+    var docxMetadata = await extractDocxFontFamilies(current.blob);
+    ensureCurrent(id);
+
+    var candidateFamilies = docxMetadata.families.slice();
+    Object.keys(renderedUsage).forEach(function (key) {
+      candidateFamilies.push(renderedUsage[key].family);
+    });
+
+    var result = await buildWindowsFontAliases(candidateFamilies, current.windowsLocalFonts, id);
+    ensureCurrent(id);
     current.windowsFontAliasMap = result.aliases;
     current.windowsFontMatchCount = result.matched.length;
 
-    if (!result.rules.length) return 0;
+    if (result.rules.length) {
+      var style = document.createElement("style");
+      style.id = "ja-docx-local-fonts-" + id;
+      style.type = "text/css";
+      style.textContent = result.rules.join("\n");
+      document.head.appendChild(style);
+      current.windowsFontStyle = style;
+    }
 
-    var style = document.createElement("style");
-    style.id = "ja-docx-local-fonts-" + current.id;
-    style.type = "text/css";
-    style.textContent = result.rules.join("\n");
-    document.head.appendChild(style);
-    current.windowsFontStyle = style;
-
-    var nodes = [root].concat(Array.from(root.querySelectorAll("*")));
-    current.windowsFontOverrides = [];
-    nodes.forEach(function (node) {
-      var family = firstFontFamily(window.getComputedStyle(node).fontFamily);
-      var alias = current.windowsFontAliasMap[normalizeFontName(family)];
+    var appliedElements = 0;
+    Object.keys(renderedUsage).forEach(function (key) {
+      var alias = current.windowsFontAliasMap[key];
       if (!alias) return;
-
-      current.windowsFontOverrides.push({
-        element: node,
-        value: node.style.getPropertyValue("font-family"),
-        priority: node.style.getPropertyPriority("font-family")
+      renderedUsage[key].elements.forEach(function (node) {
+        current.windowsFontOverrides.push({
+          element: node,
+          value: node.style.getPropertyValue("font-family"),
+          priority: node.style.getPropertyPriority("font-family")
+        });
+        node.style.setProperty("font-family", cssQuotedString(alias), "important");
+        appliedElements++;
       });
-      node.style.setProperty("font-family", cssQuotedString(alias), "important");
     });
 
+    var loadedFamilies = [];
+    var failedFamilies = [];
+    var loadChecks = [];
+    Object.keys(current.windowsFontAliasMap).forEach(function (key) {
+      var alias = current.windowsFontAliasMap[key];
+      var usage = renderedUsage[key];
+      var variants = usage ? Object.keys(usage.variants).map(function (variantKey) {
+        return usage.variants[variantKey];
+      }) : [{ weight: 400, style: "normal" }];
+
+      if (!variants.length) variants = [{ weight: 400, style: "normal" }];
+      variants.forEach(function (variant) {
+        var descriptor = variant.weight + " " + variant.style + " 12px " + cssQuotedString(alias);
+        loadChecks.push(
+          document.fonts.load(descriptor).then(function (faces) {
+            return { key: key, ok: Array.isArray(faces) && faces.length > 0 };
+          }).catch(function (error) {
+            return { key: key, ok: false, error: error && error.message ? error.message : "FontFace loading failed." };
+          })
+        );
+      });
+    });
+
+    var checked = await Promise.all(loadChecks);
     ensureCurrent(id);
-    var aliases = Array.from(new Set(Object.keys(result.aliases).map(function (key) {
-      return result.aliases[key];
-    })));
-    await Promise.all(aliases.map(function (alias) {
-      return document.fonts.load("12px " + cssQuotedString(alias)).catch(function () { return []; });
-    }));
-    ensureCurrent(id);
-    return result.matched.length;
+    var loadState = Object.create(null);
+    checked.forEach(function (item) {
+      if (!loadState[item.key]) loadState[item.key] = { loaded: false, errors: [] };
+      if (item.ok) loadState[item.key].loaded = true;
+      else if (item.error) loadState[item.key].errors.push(item.error);
+    });
+
+    Object.keys(current.windowsFontAliasMap).forEach(function (key) {
+      if (loadState[key] && loadState[key].loaded) {
+        loadedFamilies.push(renderedUsage[key] ? renderedUsage[key].family : key);
+      } else {
+        failedFamilies.push(renderedUsage[key] ? renderedUsage[key].family : key);
+      }
+    });
+
+    var diagnostics = {
+      docxFamilies: docxMetadata.families,
+      matchedFamilies: result.matched,
+      loadedFamilies: loadedFamilies,
+      missingFamilies: result.missing,
+      failedFamilies: failedFamilies,
+      failedFaces: result.failed,
+      loadedFaces: result.loadedFaceCount,
+      failedFaceCount: result.failedFaceCount,
+      appliedElements: appliedElements,
+      totalBytes: result.totalBytes,
+      warning: docxMetadata.warning || ""
+    };
+    current.windowsFontDiagnostics = diagnostics;
+    return diagnostics;
+  }
+
+  function formatWindowsFontDiagnostics(diagnostics) {
+    if (!diagnostics) return "No Windows font diagnostics are available.";
+    var parts = [
+      "DOCX families detected: " + diagnostics.docxFamilies.length + ".",
+      "Local font families successfully loaded: " + diagnostics.loadedFamilies.length + ".",
+      "Font faces loaded: " + diagnostics.loadedFaces + ".",
+      "Document elements updated: " + diagnostics.appliedElements + "."
+    ];
+    if (diagnostics.loadedFamilies.length) {
+      parts.push("Loaded: " + diagnostics.loadedFamilies.join(", ") + ".");
+    }
+    if (diagnostics.missingFamilies.length) {
+      parts.push("Not installed or not an exact family match: " + diagnostics.missingFamilies.join(", ") + ".");
+    }
+    if (diagnostics.failedFamilies.length) {
+      parts.push("Could not be verified as loaded: " + diagnostics.failedFamilies.join(", ") + ".");
+    }
+    if (diagnostics.failedFaces.length) {
+      parts.push("Some font faces could not be read: " + diagnostics.failedFaces.slice(0, 5).join("; ") + ".");
+    }
+    if (diagnostics.warning) parts.push(diagnostics.warning);
+    return parts.join(" ");
   }
 
   async function toggleWindowsFonts() {
@@ -800,17 +1064,15 @@
       current.windowsLocalFonts = null;
       setTools(docxRendererTools());
       setPreviewStatus("DOCX → HTML · Browser font matching", current.blob.size);
-      showDocxRendererNotice("Windows font matching is off. The browser's normal font selection is active.");
+      showDocxRendererNotice("Windows font loading is off. The browser's normal font selection is active.");
       return;
     }
 
     if (typeof window.queryLocalFonts !== "function") {
-      showDocxRendererNotice("This browser does not support Local Font Access. Normal browser matching of installed Windows fonts will still be used.");
+      showDocxRendererNotice("This browser does not support Local Font Access. Use desktop Chrome or Edge on a secure site, or switch to DOCX → PDF.");
       return;
     }
 
-    // Invoke queryLocalFonts immediately during this button click so Chrome
-    // can show its explicit local-font permission prompt.
     var request;
     try {
       request = window.queryLocalFonts();
@@ -830,34 +1092,39 @@
       }
 
       current.windowsLocalFonts = localFonts;
-      current.windowsFontsEnabled = true;
-      var matched = await applyWindowsFontAliases(id);
+      var diagnostics = await applyWindowsFontAliases(id);
       ensureCurrent(id);
+      current.windowsFontDiagnostics = diagnostics;
+      current.windowsFontsEnabled = diagnostics.loadedFamilies.length > 0;
       setTools(docxRendererTools());
 
-      if (matched) {
-        setPreviewStatus("Windows fonts · " + matched + " document families matched", current.blob.size);
-        showDocxRendererNotice(
-          matched + " font family/families from this document matched fonts installed on this Windows computer. Font files remain on this computer."
+      if (current.windowsFontsEnabled) {
+        setPreviewStatus(
+          "Windows fonts · " + diagnostics.loadedFamilies.length + " loaded",
+          current.blob.size
         );
       } else {
-        setPreviewStatus("Windows fonts · No exact family matches", current.blob.size);
-        showDocxRendererNotice(
-          "No exact local font-family match was found for the rendered document. The browser's normal font fallback remains active; no font files were uploaded."
-        );
+        current.windowsLocalFonts = null;
+        restoreWindowsFontAliases();
+        setPreviewStatus("DOCX → HTML · No local font faces loaded", current.blob.size);
       }
+      showDocxRendererNotice(formatWindowsFontDiagnostics(diagnostics));
     } catch (error) {
       if (!current || current.id !== id) return;
+      restoreWindowsFontAliases();
+      current.windowsFontsEnabled = false;
+      current.windowsLocalFonts = null;
+      setTools(docxRendererTools());
       setPreviewStatus("DOCX → HTML · Browser font matching", current.blob.size);
       showDocxRendererNotice(
         error && error.name === "NotAllowedError"
-          ? "Local font access was not granted. You can allow it from Chrome's site permissions and try again."
-          : "Could not access local Windows fonts: " + (error && error.message ? error.message : "Permission unavailable.")
+          ? "Local font access was not granted. Allow local-font access in Chrome's site permissions and try again."
+          : "Could not load local Windows fonts: " + (error && error.message ? error.message : "Permission unavailable.")
       );
     }
   }
 
-  function docxRendererTools() {
+    function docxRendererTools() {
     var mode = current && current.docxRenderer || "html";
     return (
       '<div class="ja-lib-docx-renderer-toggle" role="group" aria-label="Word preview method">' +
@@ -951,18 +1218,21 @@
       debug: false
     });
     ensureCurrent(id);
-    var matchedWindowsFamilies = 0;
+    var fontDiagnostics = null;
     if (current.windowsFontsEnabled && current.windowsLocalFonts && current.windowsLocalFonts.length) {
-      matchedWindowsFamilies = await applyWindowsFontAliases(id);
+      fontDiagnostics = await applyWindowsFontAliases(id);
       ensureCurrent(id);
+      current.windowsFontDiagnostics = fontDiagnostics;
+      current.windowsFontsEnabled = fontDiagnostics.loadedFamilies.length > 0;
     }
     setTools(docxRendererTools());
     setPreviewStatus(
       current.windowsFontsEnabled
-        ? "DOCX → HTML · Windows fonts · " + matchedWindowsFamilies + " matched"
+        ? "DOCX → HTML · " + fontDiagnostics.loadedFamilies.length + " Windows font families loaded"
         : "DOCX → HTML · Browser rendering",
       current.blob.size
     );
+    if (fontDiagnostics) showDocxRendererNotice(formatWindowsFontDiagnostics(fontDiagnostics));
   }
 
   async function convertDocxToPdf(id) {
