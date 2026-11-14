@@ -14,6 +14,8 @@
   var PDFJS_URL = "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.5.438/build/pdf.mjs";
   var PDFJS_WORKER_URL = "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.5.438/build/pdf.worker.mjs";
   var MAMMOTH_URL = "https://cdn.jsdelivr.net/npm/mammoth@1.13.0/mammoth.browser.min.js";
+  var JSZIP_URL = "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js";
+  var DOCX_PREVIEW_URL = "https://cdn.jsdelivr.net/npm/docx-preview@0.4.1/dist/docx-preview.min.js";
   var SHEETJS_URL = "https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js";
   var PAGUS_CORE_URL = "https://esm.sh/@pagus-kit/core@0.1.1?bundle";
   var PAGUS_RENDERER_URL = "https://esm.sh/@pagus-kit/renderer@0.1.1?bundle";
@@ -254,7 +256,8 @@
     var controller = new AbortController();
     current = {
       id: id, controller: controller, file: file, type: detectType(file),
-      blob: null, objectUrl: null, pdfDocument: null, page: 1, zoom: 1
+      blob: null, objectUrl: null, pdfDocument: null, page: 1, zoom: 1,
+      docxRenderer: "html", docxPdfBlob: null
     };
 
     panel.classList.add("is-open");
@@ -312,6 +315,10 @@
   }
 
   async function renderPdf(id) {
+    return renderPdfBlob(id, current.blob, false);
+  }
+
+  async function renderPdfBlob(id, blob, keepZoom) {
     setLoading("Loading PDF viewer…");
     var pdfjs = await loadModule("pdfjs", PDFJS_URL);
     ensureCurrent(id);
@@ -319,14 +326,15 @@
       throw new Error("The loaded PDF.js build does not expose its selectable text layer.");
     }
     pdfjs.GlobalWorkerOptions.workerSrc = PDFJS_WORKER_URL;
-    var pdf = await pdfjs.getDocument({ data: await current.blob.arrayBuffer() }).promise;
+    var pdf = await pdfjs.getDocument({ data: await blob.arrayBuffer() }).promise;
     ensureCurrent(id);
 
     current.pdfDocument = pdf;
     current.pdfjs = pdfjs;
+    current.pdfPageObjects = [];
     current.pageCount = pdf.numPages;
     current.page = 1;
-    current.zoom = 1;
+    if (!keepZoom) current.zoom = 1;
     current.pdfScrollMode = "vertical";
     current.pdfPageObjects = await Promise.all(
       Array.from({ length: pdf.numPages }, function (_, index) {
@@ -355,9 +363,11 @@
   }
 
   function updatePdfTools() {
-    if (!current || current.type !== "pdf") return;
+    if (!isPdfView()) return;
     var mode = current.pdfScrollMode || "vertical";
+    var docxToggle = current.type === "docx" ? docxRendererTools() : "";
     setTools(
+      docxToggle +
       toolButton("zoom-out", "Zoom out", "−") +
       toolButton("zoom-reset", "Reset zoom", "100%") +
       toolButton("zoom-in", "Zoom in", "+") +
@@ -561,7 +571,7 @@
   }
 
   function setPdfScrollMode(mode) {
-    if (!current || current.type !== "pdf" || current.pdfScrollMode === mode) return;
+    if (!isPdfView() || current.pdfScrollMode === mode) return;
     var page = current.page || 1;
     current.pdfScrollMode = mode;
     rebuildPdfPageLayout(current.id, page).catch(handleRenderError);
@@ -650,24 +660,178 @@
     return parsed.body;
   }
 
-  async function renderDocx(id) {
-    setLoading("Loading Word document viewer…");
-    var mammoth = await loadScript(MAMMOTH_URL, "mammoth", "mammoth");
-    ensureCurrent(id);
-    var result = await mammoth.convertToHtml({ arrayBuffer: await current.blob.arrayBuffer() });
-    ensureCurrent(id);
-    var safeBody = sanitizeDocxHtml(result.value);
-    var stage = panel.querySelector(".ja-lib-preview-stage");
-    stage.classList.add("is-docx");
-    stage.innerHTML = '<article class="ja-lib-docx-page"></article>';
-    stage.querySelector("article").appendChild(document.importNode(safeBody, true));
-    stage.querySelectorAll("a").forEach(function (link) {
-      link.setAttribute("rel", "noopener noreferrer");
-    });
-    setTools('<span class="ja-lib-preview-note">A4-width Word preview · Reflowed text</span>');
-    if (result.messages && result.messages.length) {
-      setPreviewStatus(result.messages.length + " conversion notes", current.blob.size);
+  function docxRendererTools() {
+    var mode = current && current.docxRenderer || "html";
+    return (
+      '<div class="ja-lib-docx-renderer-toggle" role="group" aria-label="Word preview method">' +
+        '<button type="button" class="ja-lib-docx-toggle' + (mode === "html" ? " active" : "") +
+          '" data-preview-action="docx-mode-html" aria-pressed="' + (mode === "html" ? "true" : "false") +
+          '" title="Render DOCX directly as HTML in this browser">DOCX → HTML</button>' +
+        '<button type="button" class="ja-lib-docx-toggle' + (mode === "pdf" ? " active" : "") +
+          '" data-preview-action="docx-mode-pdf" aria-pressed="' + (mode === "pdf" ? "true" : "false") +
+          '" title="Convert DOCX to PDF using LibreOffice, then view with PDF.js">DOCX → PDF</button>' +
+      '</div>'
+    );
+  }
+
+  function isPdfView() {
+    return !!current && (
+      current.type === "pdf" ||
+      (current.type === "docx" && current.docxRenderer === "pdf")
+    );
+  }
+
+  function destroyPdfView() {
+    if (!current) return;
+    cancelPdfPageStates();
+    if (current.pdfDocument && typeof current.pdfDocument.destroy === "function") {
+      try { current.pdfDocument.destroy(); } catch (error) {}
     }
+    current.pdfDocument = null;
+    current.pdfjs = null;
+    current.pdfPageObjects = [];
+    current.pdfPageStates = [];
+    current.pdfHasLayout = false;
+    current.pageCount = 0;
+    current.page = 1;
+  }
+
+  function showDocxRendererNotice(message) {
+    if (!current || current.type !== "docx") return;
+    var stage = panel.querySelector(".ja-lib-preview-stage");
+    var notice = document.createElement("div");
+    notice.className = "ja-lib-docx-renderer-notice";
+    notice.textContent = message;
+    stage.insertBefore(notice, stage.firstChild);
+  }
+
+  async function renderDocxHtml(id) {
+    setLoading("Loading DOCX browser renderer…");
+    await loadScript(JSZIP_URL, "docx-jszip", "JSZip");
+    ensureCurrent(id);
+    var docxLibrary = await loadScript(DOCX_PREVIEW_URL, "docx-preview", "docx");
+    ensureCurrent(id);
+    if (!docxLibrary || typeof docxLibrary.renderAsync !== "function") {
+      throw new Error("The docx-preview library did not expose renderAsync().");
+    }
+
+    var stage = panel.querySelector(".ja-lib-preview-stage");
+    stage.classList.remove("is-pdf","is-pdf-vertical","is-pdf-horizontal","is-docx","is-spreadsheet","is-pptx");
+    stage.classList.add("is-docxjs");
+    stage.innerHTML =
+      '<div class="ja-lib-docxjs-styles"></div>' +
+      '<div class="ja-lib-docxjs-body"></div>';
+
+    var styles = stage.querySelector(".ja-lib-docxjs-styles");
+    var body = stage.querySelector(".ja-lib-docxjs-body");
+    await docxLibrary.renderAsync(current.blob, body, styles, {
+      className: "jaDocxLayout",
+      inWrapper: true,
+      hideWrapperOnPrint: false,
+      ignoreWidth: false,
+      ignoreHeight: false,
+      ignoreFonts: false,
+      breakPages: true,
+      ignoreLastRenderedPageBreak: false,
+      renderHeaders: true,
+      renderFooters: true,
+      renderFootnotes: true,
+      renderEndnotes: true,
+      renderComments: false,
+      renderAltChunks: true,
+      useBase64URL: false,
+      experimental: false,
+      debug: false
+    });
+    ensureCurrent(id);
+    setTools(docxRendererTools());
+    setPreviewStatus("DOCX → HTML · Browser rendering", current.blob.size);
+  }
+
+  async function convertDocxToPdf(id) {
+    ensureCurrent(id);
+    var file = current.file || {};
+    if (!file.id) {
+      throw new Error("This file has no Google Drive file ID for server-side PDF conversion.");
+    }
+
+    var cacheKey = [
+      file.id,
+      file.modifiedTime || "unversioned",
+      "libreoffice-v1"
+    ].join(":");
+
+    var driveCache = window.JupiterLibraryDrive;
+    if (driveCache && typeof driveCache.getConvertedPreview === "function") {
+      var cached = await driveCache.getConvertedPreview(cacheKey);
+      ensureCurrent(id);
+      if (cached && cached.blob instanceof Blob && cached.blob.size) {
+        setPreviewStatus("DOCX → PDF · Cached conversion", cached.blob.size);
+        return cached.blob;
+      }
+    }
+
+    setLoading("Converting Word document to PDF…");
+    var params = new URLSearchParams({
+      action: "convert-docx",
+      fileId: String(file.id)
+    });
+    if (file.resourceKey) params.set("resourceKey", String(file.resourceKey));
+
+    var response;
+    try {
+      response = await fetch("/api/drive?" + params.toString(), {
+        method: "GET",
+        credentials: "same-origin",
+        signal: current.controller.signal,
+        headers: { Accept: "application/pdf, application/json" }
+      });
+    } catch (error) {
+      if (error && error.name === "AbortError") throw error;
+      throw new Error("Could not reach the DOCX-to-PDF conversion service.");
+    }
+
+    if (!response.ok) {
+      var message = "DOCX-to-PDF conversion returned HTTP " + response.status + ".";
+      try {
+        var body = await response.json();
+        if (body && body.error) message = body.error;
+      } catch (error) {}
+      throw new Error(message);
+    }
+
+    var pdfBlob = await response.blob();
+    ensureCurrent(id);
+    if (!pdfBlob.size || (pdfBlob.type && !pdfBlob.type.toLowerCase().includes("pdf"))) {
+      throw new Error("The conversion service did not return a valid PDF.");
+    }
+    if (!pdfBlob.type) pdfBlob = new Blob([pdfBlob], { type: "application/pdf" });
+
+    if (driveCache && typeof driveCache.setConvertedPreview === "function") {
+      await driveCache.setConvertedPreview(cacheKey, pdfBlob, file.name || "");
+    }
+    ensureCurrent(id);
+    return pdfBlob;
+  }
+
+  async function renderDocxPdf(id) {
+    destroyPdfView();
+    var pdfBlob = await convertDocxToPdf(id);
+    ensureCurrent(id);
+    current.docxPdfBlob = pdfBlob;
+    await renderPdfBlob(id, pdfBlob, true);
+    ensureCurrent(id);
+    setTools(docxRendererTools() + panel.querySelector(".ja-lib-preview-tools").innerHTML);
+    setPreviewStatus("DOCX → PDF · LibreOffice conversion", pdfBlob.size);
+  }
+
+  async function renderDocx(id) {
+    if (!current.docxRenderer) current.docxRenderer = "html";
+    if (current.docxRenderer === "pdf") {
+      return renderDocxPdf(id);
+    }
+    destroyPdfView();
+    return renderDocxHtml(id);
   }
 
   async function renderSpreadsheet(id) {
@@ -866,7 +1030,11 @@
     if (!button || button.disabled || !current) return;
     var action = button.getAttribute("data-preview-action");
     if (action === "back") close();
-    else if (action === "zoom-in") changeZoom(1.2);
+    else if (action === "docx-mode-html" && current.type === "docx") {
+      selectDocxRenderer("html");
+    } else if (action === "docx-mode-pdf" && current.type === "docx") {
+      selectDocxRenderer("pdf");
+    } else if (action === "zoom-in") changeZoom(1.2);
     else if (action === "zoom-out") changeZoom(1 / 1.2);
     else if (action === "zoom-reset") resetZoom();
     else if (action === "scroll-mode") {
@@ -880,19 +1048,44 @@
     }
   }
 
+  async function selectDocxRenderer(mode) {
+    if (!current || current.type !== "docx" || current.docxRenderer === mode) return;
+    var id = current.id;
+    var previousMode = current.docxRenderer || "html";
+    current.docxRenderer = mode;
+
+    try {
+      if (mode === "pdf") await renderDocxPdf(id);
+      else await renderDocxHtml(id);
+    } catch (error) {
+      if (!current || current.id !== id) return;
+      if (mode === "pdf") {
+        current.docxRenderer = previousMode;
+        try {
+          await renderDocxHtml(id);
+          showDocxRendererNotice(error && error.message ? error.message : "PDF conversion is unavailable.");
+        } catch (renderError) {
+          handleRenderError(renderError);
+        }
+      } else {
+        handleRenderError(error);
+      }
+    }
+  }
+
   function changeZoom(factor) {
     if (!current) return;
     var next = Math.min(3, Math.max(.35, current.zoom * factor));
     if (Math.abs(next - current.zoom) < .001) return;
     current.zoom = next;
 
-    if (current.type === "pdf") {
+    if (isPdfView()) {
       rebuildPdfPageLayout(current.id, current.page || 1).catch(handleRenderError);
     } else if (current.type === "image") {
       var image = panel.querySelector(".ja-lib-preview-image");
       if (image) image.style.transform = "scale(" + current.zoom + ")";
     } else if (current.type === "docx") {
-      var docxPage = panel.querySelector(".ja-lib-docx-page");
+      var docxPage = panel.querySelector(".jaDocxLayout-wrapper, .ja-lib-docx-page");
       if (docxPage) docxPage.style.zoom = String(current.zoom);
     } else if (current.type === "spreadsheet") {
       var sheet = panel.querySelector(".ja-lib-sheet-wrap");
@@ -906,7 +1099,7 @@
   function resetZoom() {
     if (!current) return;
     current.zoom = 1;
-    if (current.type === "pdf") {
+    if (isPdfView()) {
       rebuildPdfPageLayout(current.id, current.page || 1).catch(handleRenderError);
     } else if (current.type === "image") {
       var image = panel.querySelector(".ja-lib-preview-image");
@@ -914,7 +1107,7 @@
     } else {
       var stage = panel.querySelector(".ja-lib-preview-stage");
       if (stage) stage.style.zoom = "1";
-      var scaled = stage && stage.querySelector(".ja-lib-docx-page, .ja-lib-sheet-wrap, .ja-lib-slide-frame");
+      var scaled = stage && stage.querySelector(".jaDocxLayout-wrapper, .ja-lib-docx-page, .ja-lib-sheet-wrap, .ja-lib-slide-frame");
       if (scaled) scaled.style.zoom = "1";
     }
   }
