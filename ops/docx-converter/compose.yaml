@@ -1,6 +1,9 @@
 services:
   gotenberg:
-    image: gotenberg/gotenberg:9
+    image: jupiter-astro/gotenberg-fontpack:9
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: unless-stopped
     environment:
       API_ENABLE_BASIC_AUTH: "true"
