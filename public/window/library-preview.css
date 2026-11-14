@@ -529,8 +529,6 @@
 #ja-reference-library-window .ja-lib-docxjs-body section.jaDocxLayout {
   flex:0 0 auto;
   margin:0 auto !important;
-  color:initial;
-  background:#fff !important;
   box-shadow:0 3px 18px rgba(0,0,0,.14) !important;
   user-select:text;
   -webkit-user-select:text;
