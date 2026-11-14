@@ -455,3 +455,126 @@
     font-size:9px;
   }
 }
+
+
+/* =========================================================
+   DOCX RENDERER COMPARISON
+   Two real paths: browser HTML (docx-preview) and converted PDF.
+   ========================================================= */
+#ja-reference-library-window .ja-lib-docx-renderer-toggle {
+  display:inline-flex;
+  align-items:center;
+  gap:2px;
+  flex:0 0 auto;
+  padding:3px;
+  border:1px solid var(--ja-lib-line-strong,#d8d3ca);
+  border-radius:9px;
+  background:var(--ja-lib-panel-alt,#f4f2ee);
+}
+#ja-reference-library-window .ja-lib-docx-toggle {
+  min-height:27px;
+  padding:4px 9px;
+  border:1px solid transparent;
+  border-radius:6px;
+  color:var(--ja-lib-muted,#777);
+  background:transparent;
+  cursor:pointer;
+  font:inherit;
+  font-size:10px;
+  font-weight:650;
+  white-space:nowrap;
+}
+#ja-reference-library-window .ja-lib-docx-toggle:hover {
+  color:var(--ja-lib-ink,#292722);
+  background:var(--ja-lib-hover,#eeece7);
+}
+#ja-reference-library-window .ja-lib-docx-toggle.active {
+  border-color:var(--ja-lib-line,#e5e1d9);
+  color:var(--ja-lib-ink,#292722);
+  background:var(--ja-lib-panel,#fff);
+  box-shadow:0 1px 2px rgba(0,0,0,.08);
+}
+
+/* docx-preview injects document-specific styles into this local container. */
+#ja-reference-library-window .ja-lib-preview-stage.is-docxjs {
+  display:block;
+  overflow:auto;
+  padding:0;
+  background:#e9ebee;
+  color:#222;
+  user-select:text;
+  -webkit-user-select:text;
+}
+#ja-reference-library-window .ja-lib-docxjs-styles {
+  display:none !important;
+}
+#ja-reference-library-window .ja-lib-docxjs-body {
+  display:block;
+  min-width:0;
+  min-height:100%;
+  user-select:text;
+  -webkit-user-select:text;
+}
+#ja-reference-library-window .ja-lib-docxjs-body .jaDocxLayout-wrapper {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:22px;
+  min-height:100%;
+  padding:22px 20px;
+  background:#e9ebee !important;
+  user-select:text;
+  -webkit-user-select:text;
+}
+#ja-reference-library-window .ja-lib-docxjs-body section.jaDocxLayout {
+  flex:0 0 auto;
+  margin:0 auto !important;
+  color:initial;
+  background:#fff !important;
+  box-shadow:0 3px 18px rgba(0,0,0,.14) !important;
+  user-select:text;
+  -webkit-user-select:text;
+}
+#ja-reference-library-window .ja-lib-docxjs-body section.jaDocxLayout * {
+  user-select:text;
+  -webkit-user-select:text;
+}
+#ja-reference-library-window .ja-lib-docxjs-body .jaDocxLayout table {
+  border-collapse:collapse;
+}
+#ja-reference-library-window .ja-lib-docxjs-body .jaDocxLayout td,
+#ja-reference-library-window .ja-lib-docxjs-body .jaDocxLayout th {
+  vertical-align:top;
+}
+#ja-reference-library-window .ja-lib-docxjs-body .jaDocxLayout img {
+  max-width:100%;
+  height:auto;
+}
+#ja-reference-library-window .ja-lib-docxjs-body .jaDocxLayout a {
+  cursor:pointer;
+}
+#ja-reference-library-window .ja-lib-docxjs-body .jaDocxLayout-wrapper section.jaDocxLayout {
+  overflow:hidden;
+}
+#ja-reference-library-window .ja-lib-docx-renderer-notice {
+  position:sticky;
+  top:0;
+  z-index:5;
+  margin:10px 12px 0;
+  padding:8px 11px;
+  border:1px solid #e7d8ad;
+  border-radius:8px;
+  color:#70571d;
+  background:#fff8e7;
+  font-size:11px;
+  line-height:1.4;
+}
+@media(max-width:700px) {
+  #ja-reference-library-window .ja-lib-docx-toggle {
+    padding:4px 7px;
+    font-size:9px;
+  }
+  #ja-reference-library-window .ja-lib-docxjs-body .jaDocxLayout-wrapper {
+    padding:12px 8px;
+  }
+}
