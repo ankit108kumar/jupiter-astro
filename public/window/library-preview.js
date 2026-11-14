@@ -13,7 +13,6 @@
 
   var PDFJS_URL = "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.5.438/build/pdf.mjs";
   var PDFJS_WORKER_URL = "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.5.438/build/pdf.worker.mjs";
-  var MAMMOTH_URL = "https://cdn.jsdelivr.net/npm/mammoth@1.13.0/mammoth.browser.min.js";
   var JSZIP_URL = "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js";
   var DOCX_PREVIEW_URL = "https://cdn.jsdelivr.net/npm/docx-preview@0.4.1/dist/docx-preview.min.js";
   var SHEETJS_URL = "https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js";
@@ -622,42 +621,6 @@
     image.addEventListener("error", function () {
       if (current && current.id === id) showError("This image could not be decoded by the browser.");
     });
-  }
-
-  function sanitizeDocxHtml(html) {
-    var parsed = new DOMParser().parseFromString(String(html || ""), "text/html");
-    var allowed = new Set([
-      "P","BR","STRONG","B","EM","I","U","S","H1","H2","H3","H4","H5","H6",
-      "UL","OL","LI","BLOCKQUOTE","TABLE","THEAD","TBODY","TFOOT","TR","TH","TD",
-      "A","IMG","DIV","SPAN","PRE","CODE","HR","SUB","SUP"
-    ]);
-    function clean(node) {
-      Array.from(node.childNodes).forEach(function (child) {
-        if (child.nodeType === Node.COMMENT_NODE) { child.remove(); return; }
-        if (child.nodeType !== Node.ELEMENT_NODE) return;
-        if (!allowed.has(child.tagName)) {
-          clean(child);
-          child.replaceWith.apply(child, Array.from(child.childNodes));
-          return;
-        }
-        Array.from(child.attributes).forEach(function (attribute) {
-          var name = attribute.name.toLowerCase();
-          var value = attribute.value.trim();
-          var safe = (child.tagName === "A" && name === "href" && /^(https?:|mailto:)/i.test(value)) ||
-            (child.tagName === "IMG" && name === "src" && /^data:image\/(png|jpe?g|gif|webp);base64,/i.test(value)) ||
-            ((child.tagName === "TD" || child.tagName === "TH") && /^(colspan|rowspan)$/.test(name) && /^\d{1,3}$/.test(value)) ||
-            (child.tagName === "IMG" && /^(alt|title|width|height)$/.test(name) && /^[\w\s.%()-]{0,120}$/.test(value));
-          if (!safe) child.removeAttribute(attribute.name);
-        });
-        if (child.tagName === "A") {
-          child.setAttribute("target", "_blank");
-          child.setAttribute("rel", "noopener noreferrer");
-        }
-        clean(child);
-      });
-    }
-    clean(parsed.body);
-    return parsed.body;
   }
 
   function docxRendererTools() {
