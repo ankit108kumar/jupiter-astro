@@ -195,8 +195,8 @@
 
   function cleanupCurrent() {
     if (!current) return;
-    restoreWindowsFontAliases();
     restoreDocxFallbackFont();
+    restoreWindowsFontAliases();
     cancelPdfPageStates();
     if (current.controller) current.controller.abort();
     if (current.objectUrl) URL.revokeObjectURL(current.objectUrl);
@@ -1313,6 +1313,8 @@
     var id = current.id;
 
     if (current.windowsFontsEnabled) {
+      // Undo the fallback first, then undo the Windows aliases beneath it.
+      restoreDocxFallbackFont();
       restoreWindowsFontAliases();
       current.windowsFontsEnabled = false;
       current.windowsLocalFonts = null;
@@ -1444,8 +1446,8 @@
 
     var stage = panel.querySelector(".ja-lib-preview-stage");
     stage.classList.remove("is-pdf","is-pdf-vertical","is-pdf-horizontal","is-docx","is-spreadsheet","is-pptx");
-    restoreWindowsFontAliases();
     restoreDocxFallbackFont();
+    restoreWindowsFontAliases();
     stage.classList.add("is-docxjs");
     stage.innerHTML =
       '<div class="ja-lib-docxjs-styles"></div>' +
@@ -1473,13 +1475,23 @@
       debug: false
     });
     ensureCurrent(id);
-    var fallbackElements = applyDocxFallbackFont(body);
     var fontDiagnostics = null;
     if (current.windowsFontsEnabled && current.windowsLocalFonts && current.windowsLocalFonts.length) {
+      // Match Windows fonts against the original DOCX-rendered styles first.
+      // Applying the fallback earlier would make Bookman appear to be the
+      // requested font and would prevent the document's own fonts matching.
       fontDiagnostics = await applyWindowsFontAliases(id);
       ensureCurrent(id);
       current.windowsFontDiagnostics = fontDiagnostics;
       current.windowsFontsEnabled = fontDiagnostics.loadedFamilies.length > 0;
+    }
+
+    // Apply the Bookman/serif fallback only after Windows font matching.
+    var fallbackElements = applyDocxFallbackFont(body);
+    if (fontDiagnostics) {
+      fontDiagnostics.fallbackElements = fallbackElements;
+      fontDiagnostics.bookmanDetectedOnWindows =
+        isWindowsLocalFontFamilyAvailable(DOCX_FALLBACK_FONT_FAMILY);
     }
     setTools(docxRendererTools());
     setPreviewStatus(
@@ -1566,8 +1578,8 @@
   }
 
   async function renderDocxPdf(id) {
-    restoreWindowsFontAliases();
     restoreDocxFallbackFont();
+    restoreWindowsFontAliases();
     destroyPdfView();
     var pdfBlob = await convertDocxToPdf(id);
     ensureCurrent(id);
