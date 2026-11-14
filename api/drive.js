@@ -352,7 +352,9 @@ async function convertDocxToPdf(req, res, token) {
     return sendError(res, 413, "This DOCX exceeds the 50 MB conversion limit.");
   }
 
-  const filename = safeFilename(metadata.name || "document.docx");
+  let sourceFilename = metadata.name || "document";
+  if (!/\.docx$/i.test(sourceFilename)) sourceFilename += ".docx";
+  const filename = safeFilename(sourceFilename);
   const form = new FormData();
   form.append("files", new Blob([fileBytes], { type: DOCX_MIME }), filename);
 
