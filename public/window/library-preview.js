@@ -1967,18 +1967,23 @@
   async function convertDocxToPdf(id) {
     ensureCurrent(id);
     var file = current.file || {};
-    if (!file.id) {
+    var isDropbox = String(file.provider || "").toLowerCase() === "dropbox";
+    if (isDropbox && !file.path && !file.id) {
+      throw new Error("This Dropbox file has no path for server-side PDF conversion.");
+    }
+    if (!isDropbox && !file.id) {
       throw new Error("This file has no Google Drive file ID for server-side PDF conversion.");
     }
 
     var cacheKey = [
-      file.id,
+      file.provider || "Google Drive",
+      file.id || file.path,
       file.modifiedTime || "unversioned",
       "libreoffice-v1"
     ].join(":");
 
     var driveCache = window.JupiterLibraryDrive;
-    if (driveCache && typeof driveCache.getConvertedPreview === "function") {
+    if (!isDropbox && driveCache && typeof driveCache.getConvertedPreview === "function") {
       var cached = await driveCache.getConvertedPreview(cacheKey);
       ensureCurrent(id);
       if (cached && cached.blob instanceof Blob && cached.blob.size) {
@@ -1988,22 +1993,36 @@
     }
 
     setLoading("Converting Word document to PDF…");
-    var params = new URLSearchParams({
-      action: "convert-docx",
-      fileId: String(file.id)
-    });
-    if (file.resourceKey) params.set("resourceKey", String(file.resourceKey));
+    var params = new URLSearchParams();
+    if (isDropbox) {
+      params.set("action", "convert-docx");
+      params.set("path", String(file.path || file.id));
+    } else {
+      params.set("action", "convert-docx");
+      params.set("fileId", String(file.id));
+      if (file.resourceKey) params.set("resourceKey", String(file.resourceKey));
+    }
 
+    var endpoint = isDropbox ? "/api/dropbox?" : "/api/drive?";
     var response;
     try {
-      response = await fetch("/api/drive?" + params.toString(), {
+      var headers = { Accept: "application/pdf, application/json" };
+      if (isDropbox) {
+        var user = window.jaAuthUser;
+        if (!user || typeof user.getIdToken !== "function") {
+          throw new Error("Please log in again to convert this Dropbox file.");
+        }
+        headers.Authorization = "Bearer " + await user.getIdToken();
+      }
+      response = await fetch(endpoint + params.toString(), {
         method: "GET",
         credentials: "same-origin",
         signal: current.controller.signal,
-        headers: { Accept: "application/pdf, application/json" }
+        headers: headers
       });
     } catch (error) {
       if (error && error.name === "AbortError") throw error;
+      if (error && error.message && /log in/i.test(error.message)) throw error;
       throw new Error("Could not reach the DOCX-to-PDF conversion service.");
     }
 
@@ -2023,7 +2042,7 @@
     }
     if (!pdfBlob.type) pdfBlob = new Blob([pdfBlob], { type: "application/pdf" });
 
-    if (driveCache && typeof driveCache.setConvertedPreview === "function") {
+    if (!isDropbox && driveCache && typeof driveCache.setConvertedPreview === "function") {
       await driveCache.setConvertedPreview(cacheKey, pdfBlob, file.name || "");
     }
     ensureCurrent(id);
