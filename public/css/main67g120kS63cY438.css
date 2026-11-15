@@ -828,6 +828,34 @@ html[data-palette="wooden"] .panchang-label {
   color: #765238;
 }
 
+
+/* ==========================================
+   WOODEN THEME — DETAILED DASHA HEADER FIX
+   ========================================== */
+
+html[data-palette="wooden"] .ddo-header {
+  /* Solid warm cream background — no dark wood showing through */
+  background: #FFF1D8 !important;
+  background-color: #FFF1D8 !important;
+  background-image: none !important;
+
+  /* Clear separation from table rows */
+  border-bottom: 1px solid #C9A77B !important;
+  box-shadow: 0 2px 8px rgba(62, 40, 25, 0.12);
+
+  /* Disable glass blending on the sticky header */
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Header labels */
+html[data-palette="wooden"] .ddo-header > div {
+  color: #382113 !important;
+  font-weight: 750 !important;
+  text-shadow: none !important;
+}
+
+
 /* ==========================================
    CELESTIAL PASTEL — LIGHT THEME
    ========================================== */
@@ -1009,6 +1037,7 @@ html[data-palette="celestial"] body {
   flex-wrap: wrap;
   gap: 12px;
 }
+
 
 .header-left {
   display: flex;
