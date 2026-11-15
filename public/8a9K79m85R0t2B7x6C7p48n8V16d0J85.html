@@ -25,6 +25,7 @@
 
 <!-- Main CSS -->
 <link rel="stylesheet" href="/css/main67g120kS63cY438.css">
+<link rel="stylesheet" href="/css/detailed-dasha-overview.css">
 <link rel="stylesheet" href="/window/library-window.css">
 <link rel="stylesheet" href="/window/library-preview.css">
 <link rel="stylesheet" href="/window/library-drive.css">
@@ -4888,6 +4889,33 @@ if (offsetInput) {
       };
       renderDashaDrill();
 
+
+      // ==========================================
+      // DETAILED DASHA OVERVIEW — LAZY INITIALISATION
+      // ==========================================
+
+      const ddoContainer = document.getElementById(
+        `${prefix}-dashatree`
+      );
+
+      if (ddoContainer && window.DetailedDashaOverview) {
+        window.DetailedDashaOverview.mount({
+          container: ddoContainer,
+          kData: kData,
+          evalMs: currentEvalMs,
+
+          helpers: {
+            subPeriods: subPeriods,
+            getVargaItems: getVargaItems,
+            houseFrom: houseFrom,
+            houseLord: houseLord,
+            vimOrder: VIM_ORDER,
+            planets: PL.map(([planet]) => planet)
+          }
+        });
+      }
+
+
     } else if (tabKey === 'transit') {
       const trDateIn = document.getElementById(`${prefix}-trEvalDate`);
       const trTimeIn = document.getElementById(`${prefix}-trEvalTime`);
@@ -7577,14 +7605,13 @@ const result = section === 'planets'
 
 	
 </script>
-	
+<script src="/detailed-dasha-overview.js"></script>	
 <script type="module" src="/Firebase.js"></script>
 <script type="module" src="/Account.js"></script>
 <script type="module" src="/Email%20Verification.js"></script>
 <script src="/window/library-window.js"></script>
 <script src="/window/library-preview.js"></script>
 <script src="/window/library-drive.js"></script>
-<script src="/window/library-dropbox.js"></script>
 	
 </body>
 </html>
