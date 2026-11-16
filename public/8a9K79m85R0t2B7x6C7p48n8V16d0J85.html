@@ -241,6 +241,36 @@
 
     </form>
 
+    <!-- FORGOT PASSWORD DIALOGUE PANEL -->
+    <section id="forgotPasswordPanel" class="account-form account-hidden"
+             aria-labelledby="forgotPasswordTitle">
+      <h3 id="forgotPasswordTitle" class="forgot-password-title">Reset your password</h3>
+      <p class="forgot-password-description">
+        Enter the email address associated with your Jupiter Astro account.
+        We’ll send you a password reset link if the account is eligible.
+      </p>
+
+      <form id="forgotPasswordForm" class="account-form">
+        <div class="account-field">
+          <label for="resetPasswordEmail">Email Address</label>
+          <input type="email" id="resetPasswordEmail"
+                 placeholder="Enter your email address"
+                 autocomplete="email" required>
+        </div>
+
+        <div id="forgotPasswordMessage" class="account-message"
+             role="status" aria-live="polite" hidden></div>
+
+        <button type="submit" id="sendResetEmailBtn" class="account-submit">
+          Send Reset Link
+        </button>
+      </form>
+
+      <p class="account-switch">
+        <a href="#" id="backToLoginBtn">Back to Sign In</a>
+      </p>
+    </section>
+
     <!-- Set Password FORM -->
     
 <!-- SET PASSWORD FORM -->
