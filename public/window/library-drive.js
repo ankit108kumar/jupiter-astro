@@ -301,7 +301,7 @@
       } else if (response.status === 404 || /File not found/i.test(message)) {
         message = "The folder or file was not found or is not publicly viewable. Check its sharing permission.";
       } else if (response.status === 401 || response.status === 403) {
-        message = "Google Drive denied read access. Check that the folder is shared as Anyone with the link — Viewer.";
+        message = response.status === 401 ? "Please log in to access the Google Drive Library." : "Google Drive denied access. Check your Library permissions.";
       }
       throw new Error(message);
     }
