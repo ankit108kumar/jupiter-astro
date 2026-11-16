@@ -1,3 +1,5 @@
+const { verifyFirebaseUser } = require("../lib/server-auth");
+
 
 // ------------------------------------------
 // ASTROLOGY QUESTION FILTER
@@ -159,21 +161,23 @@ console.log("JUPITER GEMINI HANDLER:", req.method);
     });
   }
 
-  // 2. Check API key
-  const apiKey = process.env.GEMINI_API_KEY;
-
-  if (!apiKey) {
-    return res.status(500).json({
-      success: false,
-      error: "Gemini API key is not configured"
-    });
-  }
-
   try {
+
+    // Authenticate before revealing configuration status or processing requests.
+    await verifyFirebaseUser(req);
+
+    // 2. Check API key after authentication.
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({
+        success: false,
+        error: "Gemini API key is not configured"
+      });
+    }
 
     // 3. Read user input
     const { message, pageContext } = req.body || {};
-    const unknownCount = Number(req.body?.unknownCount || 0);
+    // The client counter is informational only and is never trusted for access control.\n    const unknownCount = 0;
 
     if (!message || typeof message !== "string") {
       return res.status(400).json({
@@ -367,9 +371,10 @@ ${userMessage}
 
     console.error("Jupiter Gemini error:", error);
 
-    return res.status(500).json({
+    const status = Number(error && error.statusCode) || 500;
+    return res.status(status).json({
       success: false,
-      error: "Internal Gemini processing error"
+      error: status === 500 ? "Internal Gemini processing error" : (error.message || "Access denied")
     });
 
   }

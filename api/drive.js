@@ -1,5 +1,7 @@
 "use strict";
 
+const { verifyFirebaseUser } = require("../lib/server-auth");
+
 const { createSign } = require("node:crypto");
 const { Readable } = require("node:stream");
 
@@ -173,6 +175,39 @@ function safeFilename(value) {
   return String(value || "drive-file")
     .replace(/[\r\n"\\/]/g, "_")
     .slice(0, 180) || "drive-file";
+}
+
+async function listFolder(req, res, token) {
+  const folderId = String(req.query.folderId || ROOT_FOLDER_ID).trim();
+  const pageToken = String(req.query.pageToken || "").trim();
+  if (!/^[A-Za-z0-9_-]{10,200}$/.test(folderId)) {
+    return sendError(res, 400, "Invalid Library folder identifier.");
+  }
+  if (pageToken.length > 4096) return sendError(res, 400, "Invalid Drive page token.");
+  if (!(await assertInsideLibrary(folderId, token))) {
+    return sendError(res, 403, "This folder is not inside the configured Jupiter Astrology Library.");
+  }
+  const url = buildUrl("/files", {
+    q: "'" + folderId + "' in parents and trashed = false",
+    pageSize: 100,
+    orderBy: "folder,name",
+    supportsAllDrives: "true",
+    includeItemsFromAllDrives: "true",
+    fields: "nextPageToken,files(id,name,mimeType,size,modifiedTime,webViewLink,thumbnailLink,resourceKey,capabilities(canDownload),shortcutDetails(targetId,targetMimeType,targetResourceKey))",
+    pageToken
+  });
+  const response = await fetch(url.toString(), {
+    headers: { Authorization: "Bearer " + token, Accept: "application/json" }
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error(data.error && data.error.message || "Google Drive folder listing failed.");
+    error.statusCode = response.status === 403 ? 403 : response.status === 404 ? 404 : 502;
+    throw error;
+  }
+  res.setHeader("Cache-Control", "private, no-store");
+  res.setHeader("Vary", "Authorization");
+  return res.status(200).json(data);
 }
 
 async function downloadFile(req, res, token) {
@@ -429,10 +464,13 @@ module.exports = async function handler(req, res) {
 
   try {
     const action = String(req.query.action || "");
-    if (action !== "download" && action !== "status" && action !== "convert-docx") {
+    if (action !== "download" && action !== "status" && action !== "convert-docx" && action !== "list") {
       return sendError(res, 400, "Unsupported Drive action.");
     }
+    await verifyFirebaseUser(req);
     const token = await getAccessToken();
+
+    if (action === "list") return await listFolder(req, res, token);
 
     if (action === "convert-docx") {
       return await convertDocxToPdf(req, res, token);

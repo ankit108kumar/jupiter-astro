@@ -658,7 +658,7 @@
     }
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", function () {
-        navigator.serviceWorker.register("/window/library-app-sw.js", { scope: "/window/" })
+        navigator.serviceWorker.register("/window/library-app-sw.js", { scope: "/window/", updateViaCache: "none" })
           .catch(function (error) {
             console.warn("Jupiter Astro Library: service worker registration failed.", error);
           });
