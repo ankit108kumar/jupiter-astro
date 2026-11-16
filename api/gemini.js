@@ -1,3 +1,5 @@
+const { verifyFirebaseUser } = require("../lib/server-auth");
+
 
 // ------------------------------------------
 // ASTROLOGY QUESTION FILTER
@@ -171,9 +173,12 @@ console.log("JUPITER GEMINI HANDLER:", req.method);
 
   try {
 
+    // Authenticate and enforce the server-side authorized-email policy.
+    await verifyFirebaseUser(req);
+
     // 3. Read user input
     const { message, pageContext } = req.body || {};
-    const unknownCount = Number(req.body?.unknownCount || 0);
+    // The client counter is informational only and is never trusted for access control.\n    const unknownCount = 0;
 
     if (!message || typeof message !== "string") {
       return res.status(400).json({
