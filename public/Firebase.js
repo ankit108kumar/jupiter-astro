@@ -128,32 +128,32 @@ function updateAccountButton(user) {
   }
 }
 
-/* Gate only the Copy action across shared export menus. PNG/PDF/CSV/TSV
-   exports remain available so this login requirement does not disable
-   unrelated export functionality. */
+/* Require an authenticated Firebase session for all shared Copy / Export
+   controls. The protected Dasha dataset is additionally enforced by its API. */
 function syncCopyExportAccess(user) {
   const locked = !user;
-  document.querySelectorAll('.copy-export-option[data-export-action="copy"]').forEach(option => {
-    option.classList.toggle("ja-auth-locked", locked);
-  });
-
-  if (locked) {
-    document.querySelectorAll(".copy-export-menu").forEach(menu => {
-      menu.hidden = true;
-      const trigger = menu.closest(".copy-export-control")?.querySelector(".copy-export-trigger");
+  document.querySelectorAll(".copy-export-control").forEach(control => {
+    control.classList.toggle("ja-auth-locked", locked);
+    if (locked) {
+      const menu = control.querySelector(".copy-export-menu");
+      const trigger = control.querySelector(".copy-export-trigger");
+      if (menu) menu.hidden = true;
       if (trigger) trigger.setAttribute("aria-expanded", "false");
-    });
-  }
+    }
+  });
 }
 
+/* Capture phase runs before the page's existing menu and export handlers. */
 document.addEventListener("click", function (event) {
   if (window.firebaseAuth && window.firebaseAuth.currentUser) return;
-  const copyOption = event.target && event.target.closest
-    ? event.target.closest('.copy-export-option[data-export-action="copy"]')
+  const control = event.target && event.target.closest
+    ? event.target.closest(".copy-export-control")
     : null;
-  if (!copyOption) return;
+  if (!control) return;
+
   event.preventDefault();
   event.stopImmediatePropagation();
+
   const accountButton = document.getElementById("accountOpenBtn");
   if (accountButton) accountButton.click();
 }, true);
