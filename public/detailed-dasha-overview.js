@@ -13,6 +13,7 @@
 
   const cacheByChart = new WeakMap();
   const activeInstances = new WeakMap();
+  const liveInstances = new Set();
 
   const MONTHS = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -179,76 +180,42 @@
   }
 
   async function buildTimeline(kData, helpers, statusEl) {
-    const details = makePlanetDetails(kData, helpers);
-    const rows = [];
-    const mdList = kData.md.list || [];
-
-    for (let mdIndex = 0; mdIndex < mdList.length; mdIndex++) {
-      const md = mdList[mdIndex];
-
-      const adList = helpers.subPeriods(
-        md.lord,
-        md.start,
-        md.years,
-        365.25
-      );
-
-      for (let adIndex = 0; adIndex < adList.length; adIndex++) {
-        const ad = adList[adIndex];
-
-        const pdList = helpers.subPeriods(
-          ad.lord,
-          ad.start,
-          ad.years,
-          365.25
-        );
-
-        for (let pdIndex = 0; pdIndex < pdList.length; pdIndex++) {
-          const pd = pdList[pdIndex];
-
-          rows.push({
-            id: `${mdIndex}-${adIndex}-${pdIndex}`,
-
-            md: md.lord,
-            ad: ad.lord,
-            pd: pd.lord,
-
-            mdNo: String(mdIndex + 1),
-
-            adNo: sequenceNumber(
-              md.lord, ad.lord, helpers.vimOrder
-            ),
-
-            pdNo: sequenceNumber(
-              ad.lord, pd.lord, helpers.vimOrder
-            ),
-
-            start: pd.start,
-            end: pd.end,
-
-            d1Placement:
-              `${details.d1Placement[md.lord]} – ${details.d1Placement[ad.lord]} – ${details.d1Placement[pd.lord]}`,
-
-            d1Lordship:
-              `${details.d1Lordship[md.lord]} – ${details.d1Lordship[ad.lord]} – ${details.d1Lordship[pd.lord]}`,
-
-            d9Placement:
-              `${details.d9Placement[md.lord]} – ${details.d9Placement[ad.lord]} – ${details.d9Placement[pd.lord]}`
-          });
-        }
-      }
-
-      if (statusEl) {
-        statusEl.textContent =
-          `Preparing timeline… ${mdIndex + 1} of ${mdList.length} Mahadashas`;
-      }
-
-      await nextPaint();
+    const user = window.jaAuthUser;
+    if (!user || typeof user.getIdToken !== "function") {
+      throw new Error("Please sign in to view the Detailed Dasha Overview.");
     }
 
-    rows.sort((a, b) => a.start - b.start);
+    if (statusEl) statusEl.textContent = "Verifying your login and preparing the timeline…";
 
-    return rows;
+    // Keep the existing chart engine for D1/D9 details. The protected API
+    // verifies the Firebase ID token and builds the complete Dasha timeline.
+    const details = makePlanetDetails(kData, helpers);
+    const idToken = await user.getIdToken();
+
+    const response = await fetch("/api/dasha-overview", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + idToken
+      },
+      cache: "no-store",
+      body: JSON.stringify({
+        mdList: (kData.md.list || []).map(md => ({
+          lord: md.lord,
+          start: md.start,
+          years: md.years
+        })),
+        yearDays: 365.25,
+        details
+      })
+    });
+
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok || payload.authorized !== true || !Array.isArray(payload.rows)) {
+      throw new Error(payload.error || "Unable to authorize the Dasha overview.");
+    }
+
+    return payload.rows;
   }
 
   function cacheFor(kData, offsetDays) {
@@ -492,6 +459,18 @@ function renderVirtual(instance, forceCentre) {
 
     if (!container || !kData || !helpers) return;
 
+    // Wait for Firebase's initial session restoration before deciding access.
+    if (window.jaAuthReady && typeof window.jaAuthReady.then === "function") {
+      await window.jaAuthReady;
+    }
+
+    if (!window.jaAuthUser) {
+      const existing = activeInstances.get(container);
+      if (existing && existing.section) existing.section.remove();
+      activeInstances.delete(container);
+      return;
+    }
+
     const previous = activeInstances.get(container);
 
     if (previous && previous.section.isConnected) {
@@ -518,7 +497,9 @@ function renderVirtual(instance, forceCentre) {
       content: ui.content
     };
 
+    instance.options = options;
     activeInstances.set(container, instance);
+    liveInstances.add(instance);
 
     const cache = cacheFor(
       kData,
@@ -594,9 +575,22 @@ ui.loading.hidden = true;
       ui.error.hidden = false;
 
       ui.error.textContent =
-        "Unable to prepare the Dasha overview. Please reopen this tab and try again.";
+        error && error.message
+          ? error.message
+          : "Unable to prepare the Dasha overview. Please reopen this tab and try again.";
     }
   }
+
+  // Remove protected Dasha rows immediately on logout.
+  window.addEventListener("ja-auth-state-changed", event => {
+    const user = event.detail && event.detail.user;
+    if (!user) {
+      liveInstances.forEach(instance => {
+        if (instance.section) instance.section.remove();
+      });
+      liveInstances.clear();
+    }
+  });
 
   window.DetailedDashaOverview = { mount };
 
