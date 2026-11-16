@@ -145,11 +145,17 @@ if (logoutBtn) {
       // Show logout confirmation
       const toast = document.getElementById('logoutToast');
 
-      toast.classList.add('show');
+      if (toast) {
+        toast.textContent = 'You have been logged out successfully.';
+        toast.classList.add('show');
 
-      setTimeout(function () {
-        toast.classList.remove('show');
-      }, 3500);
+        setTimeout(function () {
+          toast.classList.remove('show');
+        }, 3500);
+      } else {
+        // A missing toast must never turn a successful logout into an error.
+        console.warn('Logout succeeded, but the confirmation toast element was not found.');
+      }
 
     } catch (error) {
 
