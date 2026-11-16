@@ -128,32 +128,32 @@ function updateAccountButton(user) {
   }
 }
 
-/* Gate every shared Copy / Export control without changing each chart's
-   existing expanded/collapsed state. The Dasha dataset itself is protected
-   separately by /api/dasha-overview. */
+/* Gate only the Copy action across shared export menus. PNG/PDF/CSV/TSV
+   exports remain available so this login requirement does not disable
+   unrelated export functionality. */
 function syncCopyExportAccess(user) {
   const locked = !user;
-  document.querySelectorAll(".copy-export-control").forEach(control => {
-    control.classList.toggle("ja-auth-locked", locked);
-    if (locked) {
-      const menu = control.querySelector(".copy-export-menu");
-      const trigger = control.querySelector(".copy-export-trigger");
-      if (menu) menu.hidden = true;
-      if (trigger) trigger.setAttribute("aria-expanded", "false");
-    }
+  document.querySelectorAll('.copy-export-option[data-export-action="copy"]').forEach(option => {
+    option.classList.toggle("ja-auth-locked", locked);
   });
+
+  if (locked) {
+    document.querySelectorAll(".copy-export-menu").forEach(menu => {
+      menu.hidden = true;
+      const trigger = menu.closest(".copy-export-control")?.querySelector(".copy-export-trigger");
+      if (trigger) trigger.setAttribute("aria-expanded", "false");
+    });
+  }
 }
 
 document.addEventListener("click", function (event) {
   if (window.firebaseAuth && window.firebaseAuth.currentUser) return;
-  const control = event.target && event.target.closest
-    ? event.target.closest(".copy-export-control")
+  const copyOption = event.target && event.target.closest
+    ? event.target.closest('.copy-export-option[data-export-action="copy"]')
     : null;
-  if (!control) return;
+  if (!copyOption) return;
   event.preventDefault();
   event.stopImmediatePropagation();
-  const menu = control.querySelector(".copy-export-menu");
-  if (menu) menu.hidden = true;
   const accountButton = document.getElementById("accountOpenBtn");
   if (accountButton) accountButton.click();
 }, true);
