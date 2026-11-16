@@ -76,7 +76,10 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    await verifyFirebaseUser(req);
+    // A valid Firebase session is sufficient for this feature.
+    // Do not repeat the Google Sheets allowlist authorization here:
+    // access to the Dasha Overview follows the user's existing signed-in session.
+    await verifyFirebaseUser(req, { requireAuthorizedEmail: false });
 
     const body = req.body || {};
     const mdList = body.mdList;
