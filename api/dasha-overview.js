@@ -180,7 +180,7 @@ module.exports = async function handler(req, res) {
     rows.sort((a, b) => a.start - b.start);
     return res.status(200).json({ authorized: true, rows });
   } catch (error) {
-    const status = Number(error && error.statusCode) || 400;
+    const status = Number(error && error.statusCode) || 500;
     if (status >= 500) console.error("Jupiter Dasha overview API:", error);
     return sendError(res, status, error.message || "Unable to prepare the Detailed Dasha Overview.");
   }
