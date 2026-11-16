@@ -4110,6 +4110,7 @@ padding: 28px 30px;
 
 /* LOGOUT CONFIRMATION TOAST */
 
+#loginToast,
 #logoutToast {
   position: fixed;
   top: 90px;
@@ -4135,6 +4136,7 @@ padding: 28px 30px;
   transition: all 0.25s ease;
 }
 
+#loginToast.show,
 #logoutToast.show {
   opacity: 1;
   visibility: visible;

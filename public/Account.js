@@ -30,6 +30,33 @@
     return;
   }
 
+  // Clear credentials and transient status whenever the signed-out form is
+  // shown again. Passwords and old success/error messages must not persist.
+  function resetSignInForm() {
+    if (signInForm) signInForm.reset();
+    const loginMessage = document.getElementById('loginMessage');
+    if (loginMessage) {
+      loginMessage.textContent = '';
+      loginMessage.className = 'account-message';
+      loginMessage.hidden = true;
+    }
+  }
+
+  function showAuthToast(message, kind) {
+    const toast = document.getElementById(kind === 'login' ? 'loginToast' : 'logoutToast');
+    if (!toast) {
+      console.warn(kind + ' succeeded, but its confirmation toast was not found.');
+      return;
+    }
+
+    toast.textContent = message;
+    toast.classList.add('show');
+    window.clearTimeout(toast._jaToastTimer);
+    toast._jaToastTimer = window.setTimeout(function () {
+      toast.classList.remove('show');
+    }, 3500);
+  }
+
  // OPEN ACCOUNT DIALOGUE
 function openAccount() {
 
@@ -53,11 +80,10 @@ function openAccount() {
 
   } else {
 
-    // Show normal authentication interface
+    // Never restore credentials or messages from a previous session.
+    resetSignInForm();
     tabs.style.display = '';
-
     loggedInPanel.classList.add('account-hidden');
-
     showSignIn();
 
   }
@@ -149,20 +175,9 @@ if (logoutBtn) {
       // Close account popup
       closeAccount();
 
-      // Show logout confirmation
-      const toast = document.getElementById('logoutToast');
-
-      if (toast) {
-        toast.textContent = 'You have been logged out successfully.';
-        toast.classList.add('show');
-
-        setTimeout(function () {
-          toast.classList.remove('show');
-        }, 3500);
-      } else {
-        // A missing toast must never turn a successful logout into an error.
-        console.warn('Logout succeeded, but the confirmation toast element was not found.');
-      }
+      // Clear any previously entered credentials and show confirmation.
+      resetSignInForm();
+      showAuthToast('You have been logged out successfully.', 'logout');
 
     } catch (error) {
 
@@ -435,12 +450,12 @@ signInForm.addEventListener('submit', async function (e) {
       credential.user.email
     );
 
-    messageBox.textContent = 'Login successful!';
-    messageBox.className = 'account-message success';
-
-    // Firebase onAuthStateChanged will update the Account button
-    // Close popup after successful authentication
+    // Firebase onAuthStateChanged updates the account button.
+    // Close the dialogue, clear credentials, and confirm success consistently
+    // with the logout toast.
     closeAccount();
+    resetSignInForm();
+    showAuthToast('You have been logged in successfully.', 'login');
 
   } catch (error) {
 
@@ -588,6 +603,7 @@ signInForm.addEventListener('submit', async function (e) {
         // revealing whether an account exists.
         forgotPasswordMessage.textContent = message;
         forgotPasswordMessage.className = 'account-message error';
+        forgotPasswordMessage.hidden = false;
       } finally {
         submitButton.disabled = false;
         submitButton.textContent = 'Send Reset Link';
