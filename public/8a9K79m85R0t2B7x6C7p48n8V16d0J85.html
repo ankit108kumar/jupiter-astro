@@ -4999,6 +4999,10 @@ if (offsetInput) {
           transitPlanetToggle.classList.toggle('active', planetTableOpen);
           transitPlanetToggle.setAttribute('aria-expanded', String(planetTableOpen));
         }
+        const exportControl = transitInsights && transitInsights.querySelector(
+          '.copy-export-control[data-export-section="transit-planets"]'
+        );
+        if (exportControl) exportControl.hidden = !planetTableOpen;
       };
 
       if (window.jaAuthReady && typeof window.jaAuthReady.then === 'function') {
