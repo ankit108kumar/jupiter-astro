@@ -180,7 +180,8 @@
   }
 
   async function buildTimeline(kData, helpers, statusEl) {
-    const user = window.jaAuthUser;
+    const auth = window.firebaseAuth;
+    const user = auth && auth.currentUser;
     if (!user || typeof user.getIdToken !== "function") {
       throw new Error("Please sign in to view the Detailed Dasha Overview.");
     }
@@ -464,7 +465,7 @@ function renderVirtual(instance, forceCentre) {
       await window.jaAuthReady;
     }
 
-    if (!window.jaAuthUser) {
+    if (!(window.firebaseAuth && window.firebaseAuth.currentUser)) {
       const existing = activeInstances.get(container);
       if (existing && existing.section) existing.section.remove();
       activeInstances.delete(container);
