@@ -1,4 +1,5 @@
 const { verifyFirebaseUser } = require("../lib/server-auth");
+const { updateUnknownQuestionCount } = require("../lib/gemini-usage");
 
 
 // ------------------------------------------
@@ -164,7 +165,7 @@ console.log("JUPITER GEMINI HANDLER:", req.method);
   try {
 
     // Authenticate before revealing configuration status or processing requests.
-    await verifyFirebaseUser(req);
+    const authenticatedUser = await verifyFirebaseUser(req);
 
     // 2. Check API key after authentication.
     const apiKey = process.env.GEMINI_API_KEY;
@@ -177,7 +178,6 @@ console.log("JUPITER GEMINI HANDLER:", req.method);
 
     // 3. Read user input
     const { message, pageContext } = req.body || {};
-    // The client counter is informational only and is never trusted for access control.\n    const unknownCount = 0;
 
     if (!message || typeof message !== "string") {
       return res.status(400).json({
@@ -223,36 +223,28 @@ if (limitMatch) {
 
 const relevance = checkAstrologyRelevance(userMessage);
 
-let updatedUnknownCount = unknownCount;
+if (relevance === "excluded") {
+  return res.status(200).json({
+    success: false,
+    blocked: true,
+    error: "Jupiter AI is exclusively designed for astrology related questions."
+  });
+}
 
-if (relevance === "allowed") {
+// The counter is stored server-side per Firebase UID and UTC day.
+// The browser-supplied counter is deliberately ignored.
+const updatedUnknownCount = await updateUnknownQuestionCount(
+  authenticatedUser.uid,
+  relevance
+);
 
-  // Astrology keyword found: reset counter
-  updatedUnknownCount = 0;
-
-} else if (relevance === "excluded") {
-
-  // Explicitly unrelated topic
+if (relevance === "unknown" && updatedUnknownCount > 1) {
   return res.status(200).json({
     success: false,
     blocked: true,
     unknownCount: updatedUnknownCount,
-    error: "Jupiter AI is exclusively designed for astrology related questions."
+    error: "Please keep your questions related to astrology."
   });
-
-} else {
-
-  // Neither inclusion nor exclusion keyword found
-  updatedUnknownCount++;
-
-  if (updatedUnknownCount > 1) {
-    return res.status(200).json({
-      success: false,
-      blocked: true,
-      unknownCount: updatedUnknownCount,
-      error: "Please keep your questions related to astrology."
-    });
-  }
 }
 
     if (message.length > 10000) {
