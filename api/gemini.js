@@ -161,20 +161,19 @@ console.log("JUPITER GEMINI HANDLER:", req.method);
     });
   }
 
-  // 2. Check API key
-  const apiKey = process.env.GEMINI_API_KEY;
-
-  if (!apiKey) {
-    return res.status(500).json({
-      success: false,
-      error: "Gemini API key is not configured"
-    });
-  }
-
   try {
 
-    // Authenticate and enforce the server-side authorized-email policy.
+    // Authenticate before revealing configuration status or processing requests.
     await verifyFirebaseUser(req);
+
+    // 2. Check API key after authentication.
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({
+        success: false,
+        error: "Gemini API key is not configured"
+      });
+    }
 
     // 3. Read user input
     const { message, pageContext } = req.body || {};
