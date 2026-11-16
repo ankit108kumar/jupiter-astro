@@ -3,7 +3,7 @@
 const { createSign, createHmac, randomBytes, createCipheriv, createDecipheriv, timingSafeEqual } = require("node:crypto");
 const { Readable } = require("node:stream");
 
-const { verifyFirebaseUser: verifyAuthorizedUser } = require("../lib/server-auth");
+const { verifyFirebaseSession } = require("../lib/server-auth");
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const DROPBOX_AUTHORIZE_URL = "https://www.dropbox.com/oauth2/authorize";
 const DROPBOX_TOKEN_URL = "https://api.dropbox.com/oauth2/token";
@@ -140,8 +140,8 @@ function decryptRefreshToken(value) {
   return Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString("utf8");
 }
 
-async function verifyFirebaseUser(req) {
-  return verifyAuthorizedUser(req);
+async function verifyDropboxRequestSession(req) {
+  return verifyFirebaseSession(req);
 }
 
 function getGoogleServiceAccount() {
@@ -497,7 +497,7 @@ async function handleConnect(req, res) {
     res.setHeader("Allow", "POST");
     return sendError(res, 405, "Method not allowed.");
   }
-  const user = await verifyFirebaseUser(req);
+  const user = await verifyDropboxRequestSession(req);
   const config = getDropboxConfig();
   const signed = createSignedState(user.uid);
   setStateCookie(res, signed.cookie, STATE_TTL_SECONDS);
@@ -786,7 +786,7 @@ module.exports = async function handler(req, res) {
     }
     if (action === "connect") return await handleConnect(req, res);
 
-    const user = await verifyFirebaseUser(req);
+    const user = await verifyDropboxRequestSession(req);
     if (action === "status") return await handleStatus(req, res, user);
     if (action === "list") return await handleList(req, res, user);
     if (action === "download") return await handleDownload(req, res, user);

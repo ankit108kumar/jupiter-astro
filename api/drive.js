@@ -1,6 +1,6 @@
 "use strict";
 
-const { verifyFirebaseUser } = require("../lib/server-auth");
+const { verifyFirebaseSession } = require("../lib/server-auth");
 
 const { createSign } = require("node:crypto");
 const { Readable } = require("node:stream");
@@ -467,7 +467,7 @@ module.exports = async function handler(req, res) {
     if (action !== "download" && action !== "status" && action !== "convert-docx" && action !== "list") {
       return sendError(res, 400, "Unsupported Drive action.");
     }
-    await verifyFirebaseUser(req);
+    await verifyFirebaseSession(req);
     const token = await getAccessToken();
 
     if (action === "list") return await listFolder(req, res, token);
