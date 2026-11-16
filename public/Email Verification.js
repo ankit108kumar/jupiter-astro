@@ -58,6 +58,25 @@ function setFormLocked(form, locked) {
 
 
 	
+  // Allow Account.js to restore the safe, unverified state whenever the
+  // signed-out login dialogue is opened or its credentials are cleared.
+  window.jaResetEmailVerification = function (formType) {
+    if (formType !== 'login' && formType !== 'signup') return;
+    verifiedEmails[formType] = '';
+    const form = document.getElementById(
+      formType === 'login' ? 'signInForm' : 'signUpForm'
+    );
+    setFormLocked(form, true);
+    const message = document.getElementById(
+      formType === 'login' ? 'loginMessage' : 'signupMessage'
+    );
+    if (message) {
+      message.textContent = '';
+      message.hidden = true;
+      message.className = 'account-message';
+    }
+  };
+
   // ============ MESSAGE DISPLAY ============
 
   function showMessage(box, message, type) {
