@@ -1,4 +1,3 @@
-const { verifyFirebaseUser } = require("../lib/server-auth");
 const { updateUnknownQuestionCount } = require("../lib/gemini-usage");
 
 
@@ -154,6 +153,14 @@ function checkAstrologyRelevance(message) {
 export default async function handler(req, res) {
 console.log("JUPITER GEMINI HANDLER:", req.method);
 
+function getClientAddress(req) {
+  // Vercel supplies the connecting client address in x-forwarded-for.
+  // Use the first address only; do not accept a client-provided UID.
+  const forwarded = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim();
+  const address = forwarded || String(req.headers["x-real-ip"] || "").trim();
+  return address || "unknown";
+}
+
   // 1. Allow only POST requests
   if (req.method !== "POST") {
     return res.status(405).json({
@@ -163,9 +170,6 @@ console.log("JUPITER GEMINI HANDLER:", req.method);
   }
 
   try {
-
-    // Authenticate before revealing configuration status or processing requests.
-    const authenticatedUser = await verifyFirebaseUser(req);
 
     // 2. Check API key after authentication.
     const apiKey = process.env.GEMINI_API_KEY;
@@ -233,10 +237,9 @@ if (relevance === "excluded") {
 
 // The counter is stored server-side per Firebase UID and UTC day.
 // The browser-supplied counter is deliberately ignored.
-const updatedUnknownCount = await updateUnknownQuestionCount(
-  authenticatedUser.uid,
-  relevance
-);
+const clientAddress = getClientAddress(req);
+const usage = await updateUnknownQuestionCount(clientAddress, relevance);
+const updatedUnknownCount = usage.unknownCount;
 
 if (relevance === "unknown" && updatedUnknownCount > 1) {
   return res.status(200).json({
