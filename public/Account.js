@@ -35,8 +35,7 @@
   function resetSignInForm() {
     if (signInForm) signInForm.reset();
 
-    // Reset the authorization check as well as the visible values. Without
-    // this, a reopened form could retain enabled password/submit controls.
+    // Reset local email-format gating as well as the visible values.
     if (typeof window.jaResetEmailVerification === 'function') {
       window.jaResetEmailVerification('login');
     } else {
@@ -302,31 +301,11 @@ signUpForm.addEventListener('submit', async function (e) {
     // Firebase automatically signs in the newly created user
     const user = credential.user;
 
-    // Send email verification link
-    try {
-
-      await api.sendEmailVerification(user);
-
-      messageBox.textContent =
-        'Your account has been created successfully. A verification link has been sent to ' +
-        email +
-        '. You are signed in for this browser session.';
-
-      messageBox.className = 'account-message success';
-
-    } catch (verificationError) {
-
-      messageBox.textContent =
-        'Your account was created and you are signed in, but the verification email could not be sent. Please try again later.';
-
-      messageBox.className = 'account-message error';
-
-      console.error(
-        'Email verification error:',
-        verificationError
-      );
-
-    }
+    // Firebase signs the user in immediately after account creation.
+    // No separate email-verification step is required for application access.
+    messageBox.textContent =
+      'Your account has been created successfully. You are signed in for this browser session.';
+    messageBox.className = 'account-message success';
 
     
 // Clear and disable password fields after account creation
@@ -546,7 +525,7 @@ signInForm.addEventListener('submit', async function (e) {
         resetPasswordEmail.value = loginEmail.value.trim();
       }
 
-      // Require a fresh authorization check each time the recovery panel opens.
+      // Refresh local email-format validation when the recovery panel opens.
       if (typeof window.jaResetEmailVerification === 'function') {
         window.jaResetEmailVerification('forgot');
       }
@@ -601,8 +580,7 @@ signInForm.addEventListener('submit', async function (e) {
         forgotPasswordMessage.textContent =
           'If an account exists for this email address, a password reset link has been sent. Please check your inbox and spam folder.';
         forgotPasswordMessage.className = 'account-message success';
-        // Keep the authorized email in place; clearing it here would leave
-        // the verification state stale while the submit button stayed enabled.
+        // Keep the email populated so the user can retry without retyping it.
       } catch (error) {
         console.error('Password reset email error:', error);
 
