@@ -449,6 +449,21 @@ function renderVirtual(instance, forceCentre) {
     };
   }
 
+  function disposeInstance(instance) {
+    if (!instance || instance.disposed) return;
+    instance.disposed = true;
+    if (instance.scrollHandler && instance.viewport) {
+      instance.viewport.removeEventListener("scroll", instance.scrollHandler);
+    }
+    if (instance.rafId) cancelAnimationFrame(instance.rafId);
+    if (instance.section) instance.section.remove();
+    liveInstances.delete(instance);
+    if (instance.options && instance.options.container &&
+        activeInstances.get(instance.options.container) === instance) {
+      activeInstances.delete(instance.options.container);
+    }
+  }
+
   async function mount(options) {
     const {
       container,
@@ -467,26 +482,21 @@ function renderVirtual(instance, forceCentre) {
 
     if (!(window.firebaseAuth && window.firebaseAuth.currentUser)) {
       const existing = activeInstances.get(container);
-      if (existing && existing.section) existing.section.remove();
-      activeInstances.delete(container);
+      disposeInstance(existing);
       return;
     }
 
     pendingMounts.delete(container);
     const previous = activeInstances.get(container);
 
-    if (previous && previous.section.isConnected) {
-      const evaluationChanged =
-        previous.evalMs !== evalMs;
-
+    if (previous && previous.section.isConnected && previous.kData === kData && previous.helpers === helpers) {
+      const evaluationChanged = previous.evalMs !== evalMs;
       previous.evalMs = evalMs;
-
-      if (previous.rows && evaluationChanged) {
-        renderVirtual(previous, true);
-      }
-
+      previous.options = options;
+      if (previous.rows && evaluationChanged) renderVirtual(previous, true);
       return;
     }
+    if (previous) disposeInstance(previous);
 
     const ui = buildShell(container);
 
@@ -494,6 +504,11 @@ function renderVirtual(instance, forceCentre) {
       ...ui,
       rows: null,
       evalMs,
+      kData,
+      helpers,
+      disposed: false,
+      rafId: 0,
+      scrollHandler: null,
       viewport: ui.viewport,
       spacer: ui.spacer,
       content: ui.content
@@ -531,7 +546,7 @@ function renderVirtual(instance, forceCentre) {
         instance.rows = await cache.promise;
       }
 
-      if (!ui.section.isConnected) return;
+      if (instance.disposed || activeInstances.get(container) !== instance || !ui.section.isConnected) return;
 
 // Do not expose the table until the complete dataset is ready.
 if (!instance.rows || !instance.rows.length) {
@@ -554,18 +569,16 @@ renderVirtual(instance, true);
 // Hide processing only after the default view is ready.
 ui.loading.hidden = true;
 
-      let scheduled = false;
-
-      ui.viewport.addEventListener("scroll", () => {
-        if (scheduled) return;
-
-        scheduled = true;
-
-        requestAnimationFrame(() => {
-          scheduled = false;
-          renderVirtual(instance, false);
+      instance.scrollHandler = () => {
+        if (instance.disposed || instance.rafId) return;
+        instance.rafId = requestAnimationFrame(() => {
+          instance.rafId = 0;
+          if (!instance.disposed && activeInstances.get(container) === instance) {
+            renderVirtual(instance, false);
+          }
         });
-      }, { passive: true });
+      };
+      ui.viewport.addEventListener("scroll", instance.scrollHandler, { passive: true });
 
     } catch (error) {
       console.error(
@@ -587,13 +600,10 @@ ui.loading.hidden = true;
   window.addEventListener("ja-auth-state-changed", event => {
     const user = event.detail && event.detail.user;
     if (!user) {
-      liveInstances.forEach(instance => {
-        if (instance.options && instance.options.container) {
-          pendingMounts.set(instance.options.container, instance.options);
-        }
-        if (instance.section) instance.section.remove();
+      Array.from(liveInstances).forEach(instance => {
+        if (instance.options && instance.options.container) pendingMounts.set(instance.options.container, instance.options);
+        disposeInstance(instance);
       });
-      liveInstances.clear();
       return;
     }
 
