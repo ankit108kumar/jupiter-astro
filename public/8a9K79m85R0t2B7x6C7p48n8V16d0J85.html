@@ -4013,6 +4013,21 @@ dasha(k, prefix, evalMs = Date.now()) {
     // Calculate transit ascendant for the rising marker
     const trAsc = rev(ascendant(evalJd, k.input.lat, k.input.lon) - lahiri(evalJd));
 
+    // Build the same planetary-detail table used in Overview, but from the
+    // selected transit timestamp and transit Ascendant.
+    const transitKaraka = charaKarakas(tr);
+    const transitCombust = Object.fromEntries(
+      PL.map(([planet]) => [planet, isCombust(planet, tr)])
+    );
+    const transitPlanetaryTable = RenderTabs.planets({
+      ascSign: signOf(trAsc),
+      ch: { asc: trAsc, planets: tr },
+      karakas: transitKaraka,
+      combust: transitCombust
+    });
+    const lifecycleExpanded = window.jaTransitLifecycleExpanded !== false;
+    const transitPlanetTableExpanded = window.jaTransitPlanetTableExpanded === true;
+
     // 2. Divisional (Varga) Calculations (Default: D9 Navamsa)
     const natalVarga = getVargaItems(k, selectedVarga);
     const trVargaItems = PL.map(([p, , ab]) => {
@@ -4203,28 +4218,66 @@ dasha(k, prefix, evalMs = Date.now()) {
         </article>
       </div>
 
-      <!-- ROW 3: COMPARATIVE TABLES BELOW BOTH CHARTS -->
-      <div class="two" style="margin-top:14px;">
-        <article class="card">
-          <header><h3>Transit (Natal Moon D1)</h3></header>
-          <div class="scroll">
-            <table>
-              <thead><tr><th>Graha</th><th>Sign</th><th>Lagna</th><th>Moon</th><th>BAV</th><th>SAV</th><th>Result</th></tr></thead>
-              <tbody>${trRows}</tbody>
-            </table>
-          </div>
-        </article>
+      <!-- Transit insights and planetary detail: authenticated UI section -->
+      <section class="ja-transit-insights-gated"
+               data-ja-auth-required="transit-insights"
+               hidden>
+        <div class="ja-transit-lifecycle-bar">
+          <span>Transit from Moon &amp; Sade Sati Cycle</span>
+          <button type="button"
+                  class="ja-transit-lifecycle-toggle"
+                  id="${prefix}-trLifecycleToggle"
+                  aria-expanded="${lifecycleExpanded}"
+                  aria-controls="${prefix}-trLifecycleContent"
+                  title="Expand or collapse Transit from Moon and Sade Sati Cycle">${lifecycleExpanded ? '−' : '+'}</button>
+        </div>
 
-        <article class="card">
-          <header><h3>Sade Sati &amp; Dhaiya Lifecycle</h3></header>
-          <div class="scroll">
-            <table>
-              <thead><tr><th>Phase</th><th>Starts</th><th>Ends</th><th>Duration</th></tr></thead>
-              <tbody>${ssRows}</tbody>
-            </table>
-          </div>
-        </article>
-      </div>
+        <div class="two ja-transit-lifecycle-content"
+             id="${prefix}-trLifecycleContent"
+             ${lifecycleExpanded ? '' : 'hidden'}>
+          <article class="card">
+            <header><h3>Transit (Natal Moon D1)</h3></header>
+            <div class="scroll">
+              <table>
+                <thead><tr><th>Graha</th><th>Sign</th><th>Lagna</th><th>Moon</th><th>BAV</th><th>SAV</th><th>Result</th></tr></thead>
+                <tbody>${trRows}</tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="card">
+            <header><h3>Sade Sati &amp; Dhaiya Lifecycle</h3></header>
+            <div class="scroll">
+              <table>
+                <thead><tr><th>Phase</th><th>Starts</th><th>Ends</th><th>Duration</th></tr></thead>
+                <tbody>${ssRows}</tbody>
+              </table>
+            </div>
+          </article>
+        </div>
+
+        <div class="ja-transit-planetary-table"
+             id="${prefix}-trPlanetaryTable"
+             ${transitPlanetTableExpanded ? '' : 'hidden'}>
+          ${transitPlanetaryTable}
+        </div>
+
+        <div class="ja-transit-bottom-controls">
+          <button type="button"
+                  class="deg-toggle-btn"
+                  id="${prefix}-trPlanetTableToggleBtn"
+                  aria-expanded="${transitPlanetTableExpanded}"
+                  aria-controls="${prefix}-trPlanetaryTable"
+                  title="Transit planetary details">P</button>
+          ${createCopyExportButton({
+            prefix,
+            section: 'transit-planets',
+            targetId: `${prefix}-trPlanetaryTable`,
+            options: ['copy', 'csv', 'tsv', 'pdf'],
+            initiallyHidden: !transitPlanetTableExpanded
+          })}
+        </div>
+      </section>
     `;
   },
 
@@ -4917,6 +4970,41 @@ if (offsetInput) {
 
 
     } else if (tabKey === 'transit') {
+      const lifecycleToggle = document.getElementById(`${prefix}-trLifecycleToggle`);
+      const lifecycleContent = document.getElementById(`${prefix}-trLifecycleContent`);
+      const transitPlanetToggle = document.getElementById(`${prefix}-trPlanetTableToggleBtn`);
+      const transitPlanetContent = document.getElementById(`${prefix}-trPlanetaryTable`);
+      const transitPlanetExport = targetEl.querySelector(
+        `[data-export-prefix="${prefix}"][data-export-section="transit-planets"]`
+      );
+
+      if (lifecycleToggle && lifecycleContent) {
+        lifecycleToggle.addEventListener('click', () => {
+          if (!window.firebaseAuth || !window.firebaseAuth.currentUser) {
+            document.getElementById('accountOpenBtn')?.click();
+            return;
+          }
+          window.jaTransitLifecycleExpanded = lifecycleContent.hidden;
+          lifecycleContent.hidden = !window.jaTransitLifecycleExpanded;
+          lifecycleToggle.textContent = window.jaTransitLifecycleExpanded ? '−' : '+';
+          lifecycleToggle.setAttribute('aria-expanded', String(window.jaTransitLifecycleExpanded));
+        });
+      }
+
+      if (transitPlanetToggle && transitPlanetContent) {
+        transitPlanetToggle.addEventListener('click', () => {
+          if (!window.firebaseAuth || !window.firebaseAuth.currentUser) {
+            document.getElementById('accountOpenBtn')?.click();
+            return;
+          }
+          window.jaTransitPlanetTableExpanded = transitPlanetContent.hidden;
+          transitPlanetContent.hidden = !window.jaTransitPlanetTableExpanded;
+          transitPlanetToggle.classList.toggle('active', window.jaTransitPlanetTableExpanded);
+          transitPlanetToggle.setAttribute('aria-expanded', String(window.jaTransitPlanetTableExpanded));
+          if (transitPlanetExport) transitPlanetExport.hidden = !window.jaTransitPlanetTableExpanded;
+        });
+      }
+
       const trDateIn = document.getElementById(`${prefix}-trEvalDate`);
       const trTimeIn = document.getElementById(`${prefix}-trEvalTime`);
       const trNowBtn = document.getElementById(`${prefix}-trNowBtn`);
