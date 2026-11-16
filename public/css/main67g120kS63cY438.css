@@ -4232,3 +4232,9 @@ flex-shrink: 0;
 .copy-export-control[hidden] {
   display: none !important;
 }
+
+/* Authentication gate for all shared copy/export controls. */
+.copy-export-control.ja-auth-locked {
+  display: none !important;
+}
+
