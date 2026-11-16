@@ -1,7 +1,7 @@
 /* =========================================================
    JUPITER ASTRO — FIREBASE
    Firebase SDK initialisation and auth-session synchronisation.
-   Load this module before Account.js and Account Form Validation.js.
+   Load this module before Account.js and Email Verification.js.
    ========================================================= */
 
 // ================= FIREBASE SDK IMPORTS =================
@@ -13,7 +13,7 @@
     getAuth,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
-
+    sendEmailVerification,
     sendPasswordResetEmail,
     signOut,
     onAuthStateChanged,
@@ -62,7 +62,7 @@
 
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
-
+    sendEmailVerification,
     sendPasswordResetEmail,
     signOut,
     onAuthStateChanged,
