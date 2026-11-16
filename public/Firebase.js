@@ -145,7 +145,7 @@ function syncCopyExportAccess(user) {
 }
 
 document.addEventListener("click", function (event) {
-  if (window.jaAuthUser) return;
+  if (window.firebaseAuth && window.firebaseAuth.currentUser) return;
   const control = event.target && event.target.closest
     ? event.target.closest(".copy-export-control")
     : null;
