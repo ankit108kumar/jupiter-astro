@@ -4370,3 +4370,52 @@ flex-shrink: 0;
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+
+/* Nav Tara Chakra tables */
+.ja-navtara-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.ja-navtara-table {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 0.82rem;
+}
+
+.ja-navtara-table th,
+.ja-navtara-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.ja-navtara-table thead th {
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.035em;
+}
+
+.ja-navtara-table th:first-child,
+.ja-navtara-table td:first-child {
+  width: 190px;
+}
+
+.ja-navtara-planet {
+  color: var(--ink);
+  font-weight: 750;
+}
+
+.ja-navtara-tara {
+  margin-left: 4px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 450;
+}
