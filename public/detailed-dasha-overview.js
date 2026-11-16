@@ -16,6 +16,21 @@
   const liveInstances = new Set();
   const pendingMounts = new Map();
 
+  // Fixed sign ownership used specifically for the D1 Lordships column.
+  // Rahu and Ketu are shown as co-lords and are marked with an asterisk.
+  const OWNED_SIGNS = {
+    Sun: [4],
+    Moon: [3],
+    Mars: [0, 7],
+    Mercury: [2, 5],
+    Jupiter: [8, 11],
+    Venus: [1, 6],
+    Saturn: [9, 10],
+    Rahu: [10],
+    Ketu: [7]
+  };
+  const CO_LORDS = new Set(["Rahu", "Ketu"]);
+
   const MONTHS = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
@@ -95,33 +110,13 @@
     degrees,
     helpers
   ) {
-    const houses = new Map();
+    const ownedSigns = OWNED_SIGNS[planet] || [];
+    const isCoLord = CO_LORDS.has(planet);
 
-    for (let sign = 0; sign < 12; sign++) {
-      const lord = helpers.houseLord(
-        sign,
-        positions,
-        degrees
-      );
-
-      if (lord === planet) {
-        houses.set(sign, false);
-      }
-    }
-
-    // Co-lord convention:
-    // Rahu = Aquarius, Ketu = Scorpio.
-    if (planet === "Rahu") {
-      houses.set(10, true);
-    }
-
-    if (planet === "Ketu") {
-      houses.set(7, true);
-    }
-
-    return Array.from(houses.entries())
-      .sort((a, b) => a[0] - b[0])
-      .map(([sign, isCoLord]) => {
+    return ownedSigns
+      .slice()
+      .sort((a, b) => a - b)
+      .map(sign => {
         const house = helpers.houseFrom(sign, lagnaSign);
         return `${house}L${isCoLord ? "*" : ""}`;
       })
