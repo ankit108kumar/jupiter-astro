@@ -118,8 +118,6 @@ function addMessage(text, type) {
    SEND QUESTION TO GEMINI
 ------------------------------------------ */
 
-let unknownQuestionCount = 0;
-	
 async function askGemini() {
 
   const question = input.value.trim();
@@ -150,19 +148,23 @@ thinking.innerHTML = `
 
   try {
 
+    const auth = window.firebaseAuth;
+    const currentUser = auth && auth.currentUser;
+
+    if (!currentUser) {
+      throw new Error("Please sign in to use Jupiter AI.");
+    }
+
+    // Firebase ID token is verified by /api/gemini on the server.
+    const idToken = await currentUser.getIdToken();
+
     const response = await fetch("/api/gemini", {
-
       method: "POST",
-
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + idToken
       },
-
-      body: JSON.stringify({
-  message: question,
-  unknownCount: unknownQuestionCount
-})
-
+      body: JSON.stringify({ message: question })
     });
 
     const responseText = await response.text();
