@@ -4223,6 +4223,31 @@ dasha(k, prefix, evalMs = Date.now()) {
                id="${prefix}-trInsightsGated"
                data-ja-auth-required="transit-insights"
                hidden>
+
+        <!-- Nav Tara Chakra: layout-only placeholders for the next feature stage -->
+        <div class="ja-navtara-section">
+          <div class="ja-navtara-bar">
+            <span>Nav Tara Chakra</span>
+            <button type="button"
+                    class="ja-navtara-toggle"
+                    id="${prefix}-trNavTaraToggle"
+                    aria-expanded="true"
+                    aria-controls="${prefix}-trNavTaraContent"
+                    title="Expand or collapse Nav Tara Chakra">−</button>
+          </div>
+          <div class="ja-navtara-content"
+               id="${prefix}-trNavTaraContent">
+            <article class="card ja-navtara-card">
+              <header><h3>Birth Nav Tara Chakra</h3></header>
+              <div class="ja-navtara-placeholder" aria-hidden="true"></div>
+            </article>
+            <article class="card ja-navtara-card">
+              <header><h3>Transit Nav Tara Chakra</h3></header>
+              <div class="ja-navtara-placeholder" aria-hidden="true"></div>
+            </article>
+          </div>
+        </div>
+
         <div class="ja-transit-lifecycle-bar">
           <span>Transit from Moon &amp; Sade Sati Cycle</span>
           <button type="button"
@@ -4972,6 +4997,8 @@ if (offsetInput) {
 
     } else if (tabKey === 'transit') {
       const transitInsights = document.getElementById(`${prefix}-trInsightsGated`);
+      const navTaraToggle = document.getElementById(`${prefix}-trNavTaraToggle`);
+      const navTaraContent = document.getElementById(`${prefix}-trNavTaraContent`);
       const lifecycleToggle = document.getElementById(`${prefix}-trLifecycleToggle`);
       const lifecycleContent = document.getElementById(`${prefix}-trLifecycleContent`);
       const transitPlanetToggle = document.getElementById(`${prefix}-trPlanetTableToggleBtn`);
@@ -4982,12 +5009,20 @@ if (offsetInput) {
         if (transitInsights) transitInsights.hidden = !allowed;
 
         if (!allowed) {
+          window.jaTransitNavTaraExpanded = false;
           window.jaTransitLifecycleExpanded = false;
           window.jaTransitPlanetTableExpanded = false;
         }
 
+        const navTaraOpen = allowed && window.jaTransitNavTaraExpanded !== false;
         const lifecycleOpen = allowed && window.jaTransitLifecycleExpanded !== false;
         const planetTableOpen = allowed && window.jaTransitPlanetTableExpanded === true;
+
+        if (navTaraContent) navTaraContent.hidden = !navTaraOpen;
+        if (navTaraToggle) {
+          navTaraToggle.textContent = navTaraOpen ? '−' : '+';
+          navTaraToggle.setAttribute('aria-expanded', String(navTaraOpen));
+        }
 
         if (lifecycleContent) lifecycleContent.hidden = !lifecycleOpen;
         if (lifecycleToggle) {
@@ -5024,6 +5059,19 @@ if (offsetInput) {
       const transitPlanetExport = targetEl.querySelector(
         `[data-export-prefix="${prefix}"][data-export-section="transit-planets"]`
       );
+
+      if (navTaraToggle && navTaraContent) {
+        navTaraToggle.addEventListener('click', () => {
+          if (!window.firebaseAuth || !window.firebaseAuth.currentUser) {
+            document.getElementById('accountOpenBtn')?.click();
+            return;
+          }
+          window.jaTransitNavTaraExpanded = navTaraContent.hidden;
+          navTaraContent.hidden = !window.jaTransitNavTaraExpanded;
+          navTaraToggle.textContent = window.jaTransitNavTaraExpanded ? '−' : '+';
+          navTaraToggle.setAttribute('aria-expanded', String(window.jaTransitNavTaraExpanded));
+        });
+      }
 
       if (lifecycleToggle && lifecycleContent) {
         lifecycleToggle.addEventListener('click', () => {
