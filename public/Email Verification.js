@@ -40,6 +40,8 @@ function setFormLocked(form, locked) {
   form.querySelectorAll('input[type="password"]')
     .forEach(function(field) {
       field.disabled = locked;
+      const hoverSurface = field.closest('.account-disabled-hover');
+      if (hoverSurface) hoverSurface.classList.toggle('is-locked', locked);
     });
 
   // Lock / unlock the submit button
@@ -47,6 +49,8 @@ function setFormLocked(form, locked) {
 
   if (submitButton) {
     submitButton.disabled = locked;
+    const hoverSurface = submitButton.closest('.account-disabled-hover');
+    if (hoverSurface) hoverSurface.classList.toggle('is-locked', locked);
 
     // Remove old inline styling; CSS handles disabled appearance
     submitButton.style.removeProperty('opacity');
