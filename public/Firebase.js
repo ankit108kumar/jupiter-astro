@@ -154,7 +154,8 @@ document.addEventListener("click", function (event) {
   event.stopImmediatePropagation();
   const menu = control.querySelector(".copy-export-menu");
   if (menu) menu.hidden = true;
-  if (window.accountOpenBtn) window.accountOpenBtn.click();
+  const accountButton = document.getElementById("accountOpenBtn");
+  if (accountButton) accountButton.click();
 }, true);
 
 const copyExportObserver = new MutationObserver(() => {
