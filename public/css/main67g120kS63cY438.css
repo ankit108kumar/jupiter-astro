@@ -4238,3 +4238,66 @@ flex-shrink: 0;
   display: none !important;
 }
 
+
+
+/* Planetary Transits: authenticated lifecycle group and bottom-right P control */
+.ja-transit-insights-gated[hidden],
+.ja-transit-lifecycle-content[hidden],
+.ja-transit-planetary-table[hidden] {
+  display: none !important;
+}
+
+.ja-transit-insights-gated {
+  margin-top: 14px;
+}
+
+.ja-transit-lifecycle-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 42px;
+  padding: 6px 10px 6px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 750;
+}
+
+.ja-transit-lifecycle-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 1.2rem;
+  line-height: 1;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ja-transit-lifecycle-content {
+  margin-top: 10px;
+  gap: 14px;
+}
+
+.ja-transit-planetary-table {
+  margin-top: 12px;
+}
+
+.ja-transit-bottom-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+}
