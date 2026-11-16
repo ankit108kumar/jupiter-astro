@@ -170,7 +170,7 @@ module.exports = async function handler(req, res) {
             start: pd.start,
             end: pd.end,
             d1Placement: details.d1Placement[md.lord] + " – " + details.d1Placement[ad.lord] + " – " + details.d1Placement[pd.lord],
-            d1Lordship: details.d1Lordship[md.lord] + " – " + details.d1Lordship[ad.lord] + " – " + details.d1Lordship[pd.lord],
+            d1Lordship: details.d1Lordship[md.lord] + " \\ " + details.d1Lordship[ad.lord] + " \\ " + details.d1Lordship[pd.lord],
             d9Placement: details.d9Placement[md.lord] + " – " + details.d9Placement[ad.lord] + " – " + details.d9Placement[pd.lord]
           });
         }
