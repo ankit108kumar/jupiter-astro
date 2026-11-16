@@ -1,7 +1,6 @@
 "use strict";
 
-const FIREBASE_LOOKUP_URL = "https://identitytoolkit.googleapis.com/v1/accounts:lookup";
-const FIREBASE_API_KEY = "AIzaSyDwXS689Y4gdyuD9-3ThCwsDiSHkyuNFpU";
+const { verifyFirebaseUser } = require("../lib/server-auth");
 
 const VIM_ORDER = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"];
 const VIM_YEARS = { Ketu: 7, Venus: 20, Sun: 6, Moon: 10, Mars: 7, Rahu: 18, Jupiter: 16, Saturn: 19, Mercury: 17 };
@@ -9,43 +8,6 @@ const VIM_YEARS = { Ketu: 7, Venus: 20, Sun: 6, Moon: 10, Mars: 7, Rahu: 18, Jup
 function sendError(res, status, message) {
   res.setHeader("Cache-Control", "no-store, private");
   return res.status(status).json({ error: message });
-}
-
-// Use the same Firebase ID-token verification mechanism already used by
-// the existing Dropbox API. No client-supplied UID or email is trusted.
-async function verifyFirebaseUser(req) {
-  const authorization = String(req.headers && req.headers.authorization || "");
-  const match = authorization.match(/^Bearer\s+(.+)$/i);
-  if (!match) {
-    const error = new Error("Please log in to view the Detailed Dasha Overview.");
-    error.statusCode = 401;
-    throw error;
-  }
-
-  const response = await fetch(
-    FIREBASE_LOOKUP_URL + "?key=" + encodeURIComponent(process.env.FIREBASE_WEB_API_KEY || FIREBASE_API_KEY),
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Referer: "https://jupiterastrology108.com/"
-      },
-      body: JSON.stringify({ idToken: match[1] }),
-      signal: AbortSignal.timeout(15000)
-    }
-  );
-
-  const data = await response.json().catch(() => ({}));
-  const user = Array.isArray(data.users) && data.users[0];
-
-  if (!response.ok || !user || !user.localId) {
-    const error = new Error("Your login session has expired. Please log in again.");
-    error.statusCode = 401;
-    throw error;
-  }
-
-  return { uid: user.localId, email: user.email || "" };
 }
 
 function sequenceNumber(referenceLord, targetLord) {
