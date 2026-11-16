@@ -4436,3 +4436,33 @@ flex-shrink: 0;
   color: var(--ink);
   font-weight: 800;
 }
+
+
+/* FORGOT PASSWORD DIALOGUE */
+.forgot-password-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.forgot-password-description {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+#forgotPasswordPanel .account-switch {
+  margin-top: 8px;
+}
+
+#forgotPasswordPanel .account-switch a {
+  color: var(--saffron);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+#forgotPasswordPanel .account-switch a:hover {
+  text-decoration: underline;
+}
