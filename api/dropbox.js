@@ -3,7 +3,7 @@
 const { createSign, createHmac, randomBytes, createCipheriv, createDecipheriv, timingSafeEqual } = require("node:crypto");
 const { Readable } = require("node:stream");
 
-const FIREBASE_LOOKUP_URL = "https://identitytoolkit.googleapis.com/v1/accounts:lookup";
+const { verifyFirebaseUser: verifyAuthorizedUser } = require("../lib/server-auth");
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const DROPBOX_AUTHORIZE_URL = "https://www.dropbox.com/oauth2/authorize";
 const DROPBOX_TOKEN_URL = "https://api.dropbox.com/oauth2/token";
@@ -141,37 +141,7 @@ function decryptRefreshToken(value) {
 }
 
 async function verifyFirebaseUser(req) {
-  const authorization = String(req.headers && req.headers.authorization || "");
-  const match = authorization.match(/^Bearer\s+(.+)$/i);
-  if (!match) {
-    const error = new Error("Please log in to use Dropbox.");
-    error.statusCode = 401;
-    throw error;
-  }
-
-  const response = await fetch(FIREBASE_LOOKUP_URL + "?key=" + encodeURIComponent(process.env.FIREBASE_WEB_API_KEY || FIREBASE_API_KEY), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Referer: "https://jupiterastrology108.com/"
-    },
-    body: JSON.stringify({ idToken: match[1] }),
-    signal: AbortSignal.timeout(15000)
-  });
-  const data = await response.json().catch(() => ({}));
-  const user = Array.isArray(data.users) && data.users[0];
-  if (!response.ok || !user || !user.localId) {
-    const error = new Error("Your login session has expired. Please log in again.");
-    error.statusCode = 401;
-    throw error;
-  }
-  if (user.emailVerified === false) {
-    const error = new Error("Please verify your email address before connecting Dropbox.");
-    error.statusCode = 403;
-    throw error;
-  }
-  return { uid: user.localId, email: user.email || "" };
+  return verifyAuthorizedUser(req);
 }
 
 function getGoogleServiceAccount() {
