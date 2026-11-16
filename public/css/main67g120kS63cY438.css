@@ -4468,3 +4468,24 @@ flex-shrink: 0;
 #forgotPasswordPanel .account-switch a:hover {
   text-decoration: underline;
 }
+
+/* Show the native prohibited-action cursor over controls locked pending
+   email authorization. Pointer events pass to the wrapper so the cursor
+   remains visible even though the form controls are disabled. */
+.account-disabled-hover {
+  display: block;
+  width: 100%;
+  cursor: not-allowed;
+}
+
+.account-disabled-hover > input:disabled,
+.account-disabled-hover > button:disabled {
+  pointer-events: none;
+}
+
+.account-disabled-hover > button:disabled {
+  filter: grayscale(0.18);
+  opacity: 0.58;
+  box-shadow: none;
+  transform: none;
+}
