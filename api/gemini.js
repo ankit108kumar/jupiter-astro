@@ -372,9 +372,10 @@ ${userMessage}
 
     console.error("Jupiter Gemini error:", error);
 
-    return res.status(500).json({
+    const status = Number(error && error.statusCode) || 500;
+    return res.status(status).json({
       success: false,
-      error: "Internal Gemini processing error"
+      error: status === 500 ? "Internal Gemini processing error" : (error.message || "Access denied")
     });
 
   }
