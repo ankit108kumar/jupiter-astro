@@ -2815,6 +2815,21 @@ html[data-palette="cosmic"] .cosmic-glow {
   stroke: currentColor;
 }
 
+.header-icon-btn .account-user-initial {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  user-select: none;
+}
+
 .header-icon-btn.is-logged-in:hover {
   opacity: 1;
   color: var(--saffron);
