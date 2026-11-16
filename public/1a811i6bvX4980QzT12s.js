@@ -13,6 +13,9 @@ Jupiter Astro AI Assistant
 
 
   const toggle = document.getElementById("jupiter-ai-toggle");
+  const close = document.getElementById("jupiter-ai-close");
+  const windowBox = document.getElementById("jupiter-ai-window");
+  const input = document.getElementById("jupiter-ai-input");
 
   // The assistant UI is a convenience gate only; the API itself is not
   // connected to Firebase authentication.
@@ -24,17 +27,12 @@ Jupiter Astro AI Assistant
     }
   }
 
-  syncAssistantVisibility(window.jaAuthUser || null);
+  // Register before reading the initial state so no auth event is missed.
   window.addEventListener("ja-auth-state-changed", function (event) {
     syncAssistantVisibility(event.detail && event.detail.user);
   });
 
-
-  const close = document.getElementById("jupiter-ai-close");
-
-  const windowBox = document.getElementById("jupiter-ai-window");
-
-  const input = document.getElementById("jupiter-ai-input");
+  syncAssistantVisibility(window.jaAuthUser || null);
 
   const send = document.getElementById("jupiter-ai-send");
 
