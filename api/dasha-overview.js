@@ -1,6 +1,6 @@
 "use strict";
 
-const { verifyFirebaseUser } = require("../lib/server-auth");
+const { verifyFirebaseSession } = require("../lib/server-auth");
 
 const VIM_ORDER = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"];
 const VIM_YEARS = { Ketu: 7, Venus: 20, Sun: 6, Moon: 10, Mars: 7, Rahu: 18, Jupiter: 16, Saturn: 19, Mercury: 17 };
@@ -77,7 +77,7 @@ module.exports = async function handler(req, res) {
 
   try {
     // A valid Firebase login session is sufficient for this feature.
-    await verifyFirebaseUser(req);
+    await verifyFirebaseSession(req);
 
     const body = req.body || {};
     const mdList = body.mdList;
