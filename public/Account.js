@@ -601,7 +601,8 @@ signInForm.addEventListener('submit', async function (e) {
         forgotPasswordMessage.textContent =
           'If an account exists for this email address, a password reset link has been sent. Please check your inbox and spam folder.';
         forgotPasswordMessage.className = 'account-message success';
-        forgotPasswordForm.reset();
+        // Keep the authorized email in place; clearing it here would leave
+        // the verification state stale while the submit button stayed enabled.
       } catch (error) {
         console.error('Password reset email error:', error);
 
