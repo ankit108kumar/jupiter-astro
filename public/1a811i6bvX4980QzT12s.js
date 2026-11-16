@@ -162,9 +162,18 @@ thinking.innerHTML = `
 
   try {
 
+    const currentUser = window.firebaseAuth && window.firebaseAuth.currentUser;
+    if (!currentUser || typeof currentUser.getIdToken !== "function") {
+      throw new Error("Please sign in to use Jupiter AI.");
+    }
+    const idToken = await currentUser.getIdToken();
+
     const response = await fetch("/api/gemini", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + idToken
+      },
       body: JSON.stringify({ message: question })
     });
 
