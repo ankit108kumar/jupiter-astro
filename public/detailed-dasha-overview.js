@@ -115,7 +115,10 @@
 
     return ownedSigns
       .slice()
-      .sort((a, b) => a - b)
+      // Sort by house number for consistent ascending lordship display.
+      .sort((a, b) =>
+        helpers.houseFrom(a, lagnaSign) - helpers.houseFrom(b, lagnaSign)
+      )
       .map(sign => {
         const house = helpers.houseFrom(sign, lagnaSign);
         return `${house}L${isCoLord ? "*" : ""}`;
