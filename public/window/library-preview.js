@@ -2007,13 +2007,11 @@
     var response;
     try {
       var headers = { Accept: "application/pdf, application/json" };
-      if (isDropbox) {
-        var user = window.jaAuthUser;
-        if (!user || typeof user.getIdToken !== "function") {
-          throw new Error("Please log in again to convert this Dropbox file.");
-        }
-        headers.Authorization = "Bearer " + await user.getIdToken();
+      var user = window.firebaseAuth && window.firebaseAuth.currentUser;
+      if (!user || typeof user.getIdToken !== "function") {
+        throw new Error("Please log in again to convert this file.");
       }
+      headers.Authorization = "Bearer " + await user.getIdToken();
       response = await fetch(endpoint + params.toString(), {
         method: "GET",
         credentials: "same-origin",
