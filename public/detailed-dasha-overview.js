@@ -14,6 +14,7 @@
   const cacheByChart = new WeakMap();
   const activeInstances = new WeakMap();
   const liveInstances = new Set();
+  const pendingMounts = new Map();
 
   const MONTHS = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -459,6 +460,7 @@ function renderVirtual(instance, forceCentre) {
     } = options || {};
 
     if (!container || !kData || !helpers) return;
+    pendingMounts.set(container, options);
 
     // Wait for Firebase's initial session restoration before deciding access.
     if (window.jaAuthReady && typeof window.jaAuthReady.then === "function") {
@@ -472,6 +474,7 @@ function renderVirtual(instance, forceCentre) {
       return;
     }
 
+    pendingMounts.delete(container);
     const previous = activeInstances.get(container);
 
     if (previous && previous.section.isConnected) {
@@ -587,10 +590,20 @@ ui.loading.hidden = true;
     const user = event.detail && event.detail.user;
     if (!user) {
       liveInstances.forEach(instance => {
+        if (instance.options && instance.options.container) {
+          pendingMounts.set(instance.options.container, instance.options);
+        }
         if (instance.section) instance.section.remove();
       });
       liveInstances.clear();
+      return;
     }
+
+    // If the user signs in while already viewing the Dasha tab, restore
+    // the overview without requiring a tab switch.
+    const queued = Array.from(pendingMounts.values());
+    pendingMounts.clear();
+    queued.forEach(options => mount(options));
   });
 
   window.DetailedDashaOverview = { mount };
