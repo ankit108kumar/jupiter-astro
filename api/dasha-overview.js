@@ -15,7 +15,7 @@ function sendError(res, status, message) {
 // the existing Dropbox API. No client-supplied UID or email is trusted.
 async function verifyFirebaseUser(req) {
   const authorization = String(req.headers && req.headers.authorization || "");
-  const match = authorization.match(/^Bearer\\s+(.+)$/i);
+  const match = authorization.match(/^Bearer\s+(.+)$/i);
   if (!match) {
     const error = new Error("Please log in to view the Detailed Dasha Overview.");
     error.statusCode = 401;
