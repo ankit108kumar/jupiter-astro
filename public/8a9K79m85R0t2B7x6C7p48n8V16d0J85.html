@@ -4220,6 +4220,7 @@ dasha(k, prefix, evalMs = Date.now()) {
 
       <!-- Transit insights and planetary detail: authenticated UI section -->
       <section class="ja-transit-insights-gated"
+               id="${prefix}-trInsightsGated"
                data-ja-auth-required="transit-insights"
                hidden>
         <div class="ja-transit-lifecycle-bar">
@@ -4970,6 +4971,25 @@ if (offsetInput) {
 
 
     } else if (tabKey === 'transit') {
+      const transitInsights = document.getElementById(`${prefix}-trInsightsGated`);
+      const syncTransitInsightsAccess = user => {
+        const allowed = !!user;
+        if (transitInsights) transitInsights.hidden = !allowed;
+        if (!allowed) {
+          window.jaTransitLifecycleExpanded = false;
+          window.jaTransitPlanetTableExpanded = false;
+        }
+      };
+
+      if (window.jaAuthReady && typeof window.jaAuthReady.then === 'function') {
+        window.jaAuthReady.then(user => syncTransitInsightsAccess(user));
+      } else {
+        syncTransitInsightsAccess(window.jaAuthUser || null);
+      }
+      window.addEventListener('ja-auth-state-changed', event => {
+        syncTransitInsightsAccess(event.detail && event.detail.user);
+      });
+
       const lifecycleToggle = document.getElementById(`${prefix}-trLifecycleToggle`);
       const lifecycleContent = document.getElementById(`${prefix}-trLifecycleContent`);
       const transitPlanetToggle = document.getElementById(`${prefix}-trPlanetTableToggleBtn`);
