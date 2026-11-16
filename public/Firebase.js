@@ -102,35 +102,39 @@ function publishJaAuthState(user) {
 const accountButton =
   document.getElementById('accountOpenBtn');
 
+const defaultAccountIcon = `
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="12" cy="8" r="4"/>
+    <path d="M5 21a7 7 0 0 1 14 0"/>
+  </svg>
+`;
+
+function updateAccountButton(user) {
+  if (!accountButton) return;
+
+  if (user && user.email) {
+    const initial = String(user.email).trim().charAt(0).toUpperCase() || "?";
+    accountButton.classList.add("is-logged-in");
+    accountButton.innerHTML = '<span class="account-user-initial" aria-hidden="true">' + initial + '</span>';
+    accountButton.title = 'Logged in as "' + user.email + '"';
+    accountButton.setAttribute("aria-label", 'Logged in as "' + user.email + '"');
+    accountButton.setAttribute("data-user-email", user.email);
+  } else {
+    accountButton.classList.remove("is-logged-in");
+    accountButton.innerHTML = defaultAccountIcon;
+    accountButton.title = "Account";
+    accountButton.setAttribute("aria-label", "Open account");
+    accountButton.removeAttribute("data-user-email");
+  }
+}
+
 onAuthStateChanged(auth, function(user) {
 
   // Publish the current login state and notify gated features.
   publishJaAuthState(user);
 
-  // Update Account button appearance
-  if (accountButton) {
-
-    if (user) {
-
-      accountButton.classList.add('is-logged-in');
-      accountButton.title = 'Logged in: ' + user.email;
-      accountButton.setAttribute(
-        'aria-label',
-        'Account - Logged in'
-      );
-
-    } else {
-
-      accountButton.classList.remove('is-logged-in');
-      accountButton.title = 'Account';
-      accountButton.setAttribute(
-        'aria-label',
-        'Open account'
-      );
-
-    }
-
-  }
+  // Update the account icon from Firebase's authoritative auth state.
+  updateAccountButton(user);
 
 }, function (error) {
   console.error("Jupiter Astro: Firebase auth-state listener failed.", error);
