@@ -4028,49 +4028,73 @@ dasha(k, prefix, evalMs = Date.now()) {
     const lifecycleExpanded = window.jaTransitLifecycleExpanded !== false;
     const transitPlanetTableExpanded = window.jaTransitPlanetTableExpanded === true;
 
-    // Nav Tara Chakra uses the natal Moon Nakshatra as the fixed reference
-    // in BOTH Birth and Transit panels. Each planetary row groups its three
-    // Vimshottari-ruled Nakshatras (separated by nine Nakshatras).
+    // Nav Tara Chakra starts from the natal Moon's Janma Nakshatra.
+    // Rows advance sequentially through the 27-star zodiac; the three columns
+    // are the 1st-9th, 10th-18th and 19th-27th stars from that starting point.
+    // Birth and transit grids share this exact arrangement and Tara labels,
+    // while each grid marks occupancy from its own planetary longitudes.
     const navTaraNames = [
       'Janma', 'Sampat', 'Vipat', 'Kshema', 'Pratyari',
       'Sadhaka', 'Naidhana', 'Mitra', 'Parama Mitra'
     ];
-    const navTaraPlanetRows = [
-      ['Ketu', 0], ['Venus', 1], ['Sun', 2],
-      ['Moon', 3], ['Mars', 4], ['Rahu', 5],
-      ['Jupiter', 6], ['Saturn', 7], ['Mercury', 8]
+    const navTaraPlanetNames = [
+      'Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter',
+      'Venus', 'Saturn', 'Rahu', 'Ketu'
     ];
     const birthMoonNakIndex = nakOf(k.ch.planets.Moon.lon).i;
-    const navTaraGrid = `
-      <div class="ja-navtara-table-wrap">
-        <table class="ja-navtara-table">
-          <thead>
-            <tr>
-              <th>Planet</th>
-              <th>Nakshatra 1</th>
-              <th>Nakshatra 2</th>
-              <th>Nakshatra 3</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${navTaraPlanetRows.map(([planet, firstIndex]) => {
-              const taraIndex = (firstIndex - birthMoonNakIndex + 27) % 9;
-              const taraName = navTaraNames[taraIndex];
-              const stars = [firstIndex, firstIndex + 9, firstIndex + 18];
-              return `
-                <tr>
-                  <td class="ja-navtara-planet-cell">
-                    <span class="ja-navtara-planet">${planet}</span>
-                    <span class="ja-navtara-tara">(${taraName})</span>
-                  </td>
-                  ${stars.map(index => `<td>${NAK[index][0]}</td>`).join('')}
-                </tr>
-              `;
-            }).join('')}
-          </tbody>
-        </table>
-      </div>
-    `;
+
+    const renderNavTaraGrid = planetaryPositions => {
+      const rows = Array.from({ length: 9 }, (_, row) => {
+        const firstNakIndex = (birthMoonNakIndex + row) % 27;
+        const rowPlanet = NAK[firstNakIndex][1];
+        const taraName = navTaraNames[row];
+        const nakIndices = [
+          firstNakIndex,
+          (firstNakIndex + 9) % 27,
+          (firstNakIndex + 18) % 27
+        ];
+
+        const cells = nakIndices.map(nakIndex => {
+          const occupants = navTaraPlanetNames.filter(planet => {
+            const position = planetaryPositions && planetaryPositions[planet];
+            return position && Number.isFinite(position.lon) &&
+              nakOf(position.lon).i === nakIndex;
+          });
+          return `<td>${NAK[nakIndex][0]}${occupants.map(planet =>
+            ` <strong class="ja-navtara-occupant">[${planet}]</strong>`
+          ).join('')}</td>`;
+        }).join('');
+
+        return `
+          <tr>
+            <td class="ja-navtara-planet-cell">
+              <span class="ja-navtara-planet">${rowPlanet}</span>
+              <span class="ja-navtara-tara">(${taraName})</span>
+            </td>
+            ${cells}
+          </tr>
+        `;
+      }).join('');
+
+      return `
+        <div class="ja-navtara-table-wrap">
+          <table class="ja-navtara-table">
+            <thead>
+              <tr>
+                <th>Planet</th>
+                <th>Nakshatra 1</th>
+                <th>Nakshatra 2</th>
+                <th>Nakshatra 3</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    };
+
+    const birthNavTaraGrid = renderNavTaraGrid(k.ch.planets);
+    const transitNavTaraGrid = renderNavTaraGrid(tr);
 
     // 2. Divisional (Varga) Calculations (Default: D9 Navamsa)
     const natalVarga = getVargaItems(k, selectedVarga);
@@ -4283,11 +4307,11 @@ dasha(k, prefix, evalMs = Date.now()) {
                id="${prefix}-trNavTaraContent">
             <article class="card ja-navtara-card">
               <header><h3>Birth Nav Tara Chakra</h3></header>
-              ${navTaraGrid}
+              ${birthNavTaraGrid}
             </article>
             <article class="card ja-navtara-card">
               <header><h3>Transit Nav Tara Chakra</h3></header>
-              ${navTaraGrid}
+              ${transitNavTaraGrid}
             </article>
           </div>
         </div>
