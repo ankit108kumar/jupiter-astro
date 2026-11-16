@@ -17,7 +17,8 @@
   // Keep track of verified emails separately
   const verifiedEmails = {
     login: '',
-    signup: ''
+    signup: '',
+    forgot: ''
   };
 
   // Prevent overlapping verification requests
@@ -65,15 +66,21 @@ function setFormLocked(form, locked) {
   // Allow Account.js to restore the safe, unverified state whenever the
   // signed-out login dialogue is opened or its credentials are cleared.
   window.jaResetEmailVerification = function (formType) {
-    if (formType !== 'login' && formType !== 'signup') return;
+    if (!Object.prototype.hasOwnProperty.call(verifiedEmails, formType)) return;
     verifiedEmails[formType] = '';
-    const form = document.getElementById(
-      formType === 'login' ? 'signInForm' : 'signUpForm'
-    );
+    const formId = {
+      login: 'signInForm',
+      signup: 'signUpForm',
+      forgot: 'forgotPasswordForm'
+    }[formType];
+    const messageId = {
+      login: 'loginMessage',
+      signup: 'signupMessage',
+      forgot: 'forgotPasswordMessage'
+    }[formType];
+    const form = document.getElementById(formId);
     setFormLocked(form, true);
-    const message = document.getElementById(
-      formType === 'login' ? 'loginMessage' : 'signupMessage'
-    );
+    const message = document.getElementById(messageId);
     if (message) {
       message.textContent = '';
       message.hidden = true;
@@ -245,9 +252,11 @@ if (result.success && result.authorized === true) {
     verifiedEmails[formType] = email;
 
     // Enable password fields and submit button
-    const currentForm = document.getElementById(
-      formType === 'login' ? 'signInForm' : 'signUpForm'
-    );
+    const currentForm = document.getElementById({
+      login: 'signInForm',
+      signup: 'signUpForm',
+      forgot: 'forgotPasswordForm'
+    }[formType]);
 
     setFormLocked(currentForm, false);
 
@@ -267,9 +276,11 @@ if (result.success && result.authorized === false) {
 
   // Lock password fields and submit button
   setFormLocked(
-    document.getElementById(
-      formType === 'login' ? 'signInForm' : 'signUpForm'
-    ),
+    document.getElementById({
+      login: 'signInForm',
+      signup: 'signUpForm',
+      forgot: 'forgotPasswordForm'
+    }[formType]),
     true
   );
 
@@ -288,9 +299,11 @@ verifiedEmails[formType] = '';
 
 // Lock password fields and submit button
 setFormLocked(
-  document.getElementById(
-    formType === 'login' ? 'signInForm' : 'signUpForm'
-  ),
+  document.getElementById({
+    login: 'signInForm',
+    signup: 'signUpForm',
+    forgot: 'forgotPasswordForm'
+  }[formType]),
   true
 );
 
@@ -337,6 +350,13 @@ showMessage(
       input: document.getElementById('signupEmail'),
       message: document.getElementById('signupMessage'),
       form: document.getElementById('signUpForm')
+    },
+
+    {
+      type: 'forgot',
+      input: document.getElementById('resetPasswordEmail'),
+      message: document.getElementById('forgotPasswordMessage'),
+      form: document.getElementById('forgotPasswordForm')
     }
 
   ];
