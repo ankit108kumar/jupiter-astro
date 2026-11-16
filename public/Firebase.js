@@ -128,13 +128,51 @@ function updateAccountButton(user) {
   }
 }
 
+/* Gate every shared Copy / Export control without changing each chart's
+   existing expanded/collapsed state. The Dasha dataset itself is protected
+   separately by /api/dasha-overview. */
+function syncCopyExportAccess(user) {
+  const locked = !user;
+  document.querySelectorAll(".copy-export-control").forEach(control => {
+    control.classList.toggle("ja-auth-locked", locked);
+    if (locked) {
+      const menu = control.querySelector(".copy-export-menu");
+      const trigger = control.querySelector(".copy-export-trigger");
+      if (menu) menu.hidden = true;
+      if (trigger) trigger.setAttribute("aria-expanded", "false");
+    }
+  });
+}
+
+document.addEventListener("click", function (event) {
+  if (window.jaAuthUser) return;
+  const control = event.target && event.target.closest
+    ? event.target.closest(".copy-export-control")
+    : null;
+  if (!control) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  const menu = control.querySelector(".copy-export-menu");
+  if (menu) menu.hidden = true;
+  if (window.accountOpenBtn) window.accountOpenBtn.click();
+}, true);
+
+const copyExportObserver = new MutationObserver(() => {
+  syncCopyExportAccess(window.jaAuthUser || null);
+});
+copyExportObserver.observe(document.documentElement, {
+  childList: true,
+  subtree: true
+});
+
 onAuthStateChanged(auth, function(user) {
 
   // Publish the current login state and notify gated features.
   publishJaAuthState(user);
 
-  // Update the account icon from Firebase's authoritative auth state.
+  // Update account identity and apply the global copy/export access gate.
   updateAccountButton(user);
+  syncCopyExportAccess(user);
 
 }, function (error) {
   console.error("Jupiter Astro: Firebase auth-state listener failed.", error);
