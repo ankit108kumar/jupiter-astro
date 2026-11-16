@@ -4419,3 +4419,20 @@ flex-shrink: 0;
   font-size: 0.72rem;
   font-weight: 450;
 }
+
+/* Alternate subtle theme-tinted bands for easier row tracking. */
+.ja-navtara-table tbody tr:nth-child(odd) > td {
+  background: var(--saffron-soft, rgba(0, 170, 150, 0.08));
+}
+
+.ja-navtara-table tbody tr:nth-child(even) > td {
+  background: transparent;
+}
+
+/* Keep planetary occupants on a separate line beneath each Nakshatra. */
+.ja-navtara-occupant {
+  display: block;
+  margin-top: 3px;
+  color: var(--ink);
+  font-weight: 800;
+}
