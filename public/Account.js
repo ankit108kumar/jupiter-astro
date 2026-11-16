@@ -34,6 +34,19 @@
   // shown again. Passwords and old success/error messages must not persist.
   function resetSignInForm() {
     if (signInForm) signInForm.reset();
+
+    // Reset the authorization check as well as the visible values. Without
+    // this, a reopened form could retain enabled password/submit controls.
+    if (typeof window.jaResetEmailVerification === 'function') {
+      window.jaResetEmailVerification('login');
+    } else {
+      const passwordField = document.getElementById('loginPassword');
+      const submitButton = signInForm &&
+        signInForm.querySelector('button[type="submit"]');
+      if (passwordField) passwordField.disabled = true;
+      if (submitButton) submitButton.disabled = true;
+    }
+
     const loginMessage = document.getElementById('loginMessage');
     if (loginMessage) {
       loginMessage.textContent = '';
