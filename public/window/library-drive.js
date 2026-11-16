@@ -292,13 +292,8 @@
     try { body = raw ? JSON.parse(raw) : {}; } catch (error) { body = {}; }
     if (!response.ok) {
       var apiError = body.error || {};
-      var reason = apiError && apiError.errors && apiError.errors[0] && apiError.errors[0].reason || "";
-      // Our server endpoints return { error: "message" }, while Google APIs
-      // return { error: { message, errors } }. Support both shapes so auth or
-      // service-account failures are not hidden behind a generic HTTP status.
-      var message = typeof apiError === "string"
-        ? apiError
-        : (apiError.message || ("Google Drive returned HTTP " + response.status + "."));
+      var reason = apiError.errors && apiError.errors[0] && apiError.errors[0].reason || "";
+      var message = apiError.message || ("Google Drive returned HTTP " + response.status + ".");
       if (reason === "accessNotConfigured" || reason === "SERVICE_DISABLED") {
         message = "Google Drive API is not enabled for the Jupiter Astrology Google Cloud project. Enable it, then retry.";
       } else if (/API_KEY_INVALID|API key not valid|API_KEY_SERVICE_BLOCKED/i.test(message + " " + reason)) {
