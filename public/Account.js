@@ -70,51 +70,57 @@
     }, 3500);
   }
 
- // OPEN ACCOUNT DIALOGUE
-function openAccount() {
+  // Keep every account view mutually exclusive. All navigation paths use
+  // this single renderer so rapid tab/panel clicks cannot leave stale views.
+  function setAccountView(view) {
+    const tabs = document.querySelector('.account-tabs');
+    const loggedInPanel = document.getElementById('loggedInPanel');
 
-  const user = window.jaAuthUser || null;
+    signInForm.classList.toggle('account-hidden', view !== 'signin');
+    signUpForm.classList.toggle('account-hidden', view !== 'signup');
+    if (forgotPasswordPanel) {
+      forgotPasswordPanel.classList.toggle('account-hidden', view !== 'forgot');
+    }
+    if (loggedInPanel) {
+      loggedInPanel.classList.toggle('account-hidden', view !== 'loggedIn');
+    }
+    if (tabs) tabs.style.display = view === 'loggedIn' ? 'none' : '';
 
-  const tabs = document.querySelector('.account-tabs');
-  const loggedInPanel = document.getElementById('loggedInPanel');
-
-  if (user) {
-
-    // Show logged-in view
-    tabs.style.display = 'none';
-
-    signInForm.classList.add('account-hidden');
-    signUpForm.classList.add('account-hidden');
-
-    loggedInPanel.classList.remove('account-hidden');
-
-    document.getElementById('loggedInEmail').textContent =
-      user.email || 'Signed-in user';
-
-  } else {
-
-    // Never restore credentials or messages from a previous session.
-    resetSignInForm();
-    tabs.style.display = '';
-    loggedInPanel.classList.add('account-hidden');
-    showSignIn();
-
+    if (signInTab && signUpTab) {
+      signInTab.classList.toggle('active', view === 'signin');
+      signUpTab.classList.toggle('active', view === 'signup');
+      signInTab.setAttribute('aria-selected', String(view === 'signin'));
+      signUpTab.setAttribute('aria-selected', String(view === 'signup'));
+    }
   }
 
-  overlay.classList.add('is-open');
-  overlay.setAttribute('aria-hidden', 'false');
+  // OPEN ACCOUNT DIALOGUE
+  function openAccount() {
+    const user = window.jaAuthUser || null;
 
-  document.body.style.overflow = 'hidden';
+    if (user) {
+      setAccountView('loggedIn');
+      const emailNode = document.getElementById('loggedInEmail');
+      if (emailNode) emailNode.textContent = user.email || 'Signed-in user';
+    } else {
+      resetSignInForm();
+      setAccountView('signin');
+    }
 
-  if (!user) {
-    setTimeout(() => {
-      document.getElementById('loginEmail').focus();
-    }, 100);
-  } else {
-    document.getElementById('logoutBtn').focus();
+    overlay.classList.add('is-open');
+    overlay.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+
+    if (!user) {
+      setTimeout(() => {
+        const email = document.getElementById('loginEmail');
+        if (email) email.focus();
+      }, 100);
+    } else {
+      const logout = document.getElementById('logoutBtn');
+      if (logout) logout.focus();
+    }
   }
-
-}
 
   // CLOSE DIALOGUE
   function closeAccount() {
@@ -130,36 +136,13 @@ function openAccount() {
 
   }
 
-  // SWITCH TO SIGN IN
+  // SWITCH BETWEEN ACCOUNT VIEWS
   function showSignIn() {
-
-    signInForm.classList.remove('account-hidden');
-    signUpForm.classList.add('account-hidden');
-    if (forgotPasswordPanel) forgotPasswordPanel.classList.add('account-hidden');
-
-    signInTab.classList.add('active');
-    signUpTab.classList.remove('active');
-
-    signInTab.setAttribute('aria-selected', 'true');
-    signUpTab.setAttribute('aria-selected', 'false');
-
+    setAccountView('signin');
   }
 
-  // SWITCH TO Set Password
   function showSignUp() {
-
-    // Treat the three signed-out views as mutually exclusive. In particular,
-    // Set Password must always close the Forgot Password panel.
-    signUpForm.classList.remove('account-hidden');
-    signInForm.classList.add('account-hidden');
-    if (forgotPasswordPanel) forgotPasswordPanel.classList.add('account-hidden');
-
-    signUpTab.classList.add('active');
-    signInTab.classList.remove('active');
-
-    signUpTab.setAttribute('aria-selected', 'true');
-    signInTab.setAttribute('aria-selected', 'false');
-
+    setAccountView('signup');
   }
 
   // BUTTON EVENTS
@@ -354,13 +337,17 @@ const signupSubmitButton = document.getElementById('signupSubmitBtn');
 passwordField.value = '';
 confirmField.value = '';
 
-passwordField.disabled = true;
-confirmField.disabled = true;
-signupSubmitButton.disabled = true;
-
-// Remove any previous inline button styling
-signupSubmitButton.style.removeProperty('opacity');
-signupSubmitButton.style.removeProperty('cursor');
+if (typeof window.jaLockEmailVerificationForm === 'function') {
+  window.jaLockEmailVerificationForm('signup');
+} else {
+  passwordField.disabled = true;
+  confirmField.disabled = true;
+  signupSubmitButton.disabled = true;
+  [passwordField, confirmField, signupSubmitButton].forEach(function (element) {
+    const surface = element.closest('.account-disabled-hover');
+    if (surface) surface.classList.add('is-locked');
+  });
+}
 
 
   } catch (error) {
@@ -444,6 +431,8 @@ signInForm.addEventListener('submit', async function (e) {
   messageBox.textContent = 'Authenticating your account...';
   messageBox.className = 'account-message';
 
+  let signInSucceeded = false;
+
   try {
 
     // Set session persistence according to checkbox
@@ -469,6 +458,7 @@ signInForm.addEventListener('submit', async function (e) {
     // Firebase onAuthStateChanged updates the account button.
     // Close the dialogue, clear credentials, and confirm success consistently
     // with the logout toast.
+    signInSucceeded = true;
     closeAccount();
     resetSignInForm();
     showAuthToast('You have been logged in successfully.', 'login');
@@ -511,8 +501,15 @@ signInForm.addEventListener('submit', async function (e) {
 
   } finally {
 
-    submitButton.disabled = false;
-    submitButton.textContent = 'Sign In';
+    // resetSignInForm() deliberately locks the fields after a successful
+    // sign-in. Do not re-enable the button from this finally block.
+    if (signInSucceeded) {
+      submitButton.disabled = true;
+      submitButton.textContent = 'Sign In';
+    } else {
+      submitButton.disabled = false;
+      submitButton.textContent = 'Sign In';
+    }
 
   }
 
@@ -542,12 +539,7 @@ signInForm.addEventListener('submit', async function (e) {
     forgotPasswordBtn.addEventListener('click', function (e) {
       e.preventDefault();
 
-      signInForm.classList.add('account-hidden');
-      signUpForm.classList.add('account-hidden');
-      // Close every other account view before opening password recovery.
-      signInForm.classList.add('account-hidden');
-      signUpForm.classList.add('account-hidden');
-      forgotPasswordPanel.classList.remove('account-hidden');
+      setAccountView('forgot');
 
       const loginEmail = document.getElementById('loginEmail');
       if (loginEmail && loginEmail.value.trim()) {
@@ -574,8 +566,7 @@ signInForm.addEventListener('submit', async function (e) {
   if (backToLoginBtn) {
     backToLoginBtn.addEventListener('click', function (e) {
       e.preventDefault();
-      if (forgotPasswordPanel) forgotPasswordPanel.classList.add('account-hidden');
-      showSignIn();
+      setAccountView('signin');
       setTimeout(function () {
         const loginEmail = document.getElementById('loginEmail');
         if (loginEmail) loginEmail.focus();
@@ -610,7 +601,8 @@ signInForm.addEventListener('submit', async function (e) {
         forgotPasswordMessage.textContent =
           'If an account exists for this email address, a password reset link has been sent. Please check your inbox and spam folder.';
         forgotPasswordMessage.className = 'account-message success';
-        forgotPasswordForm.reset();
+        // Keep the authorized email in place; clearing it here would leave
+        // the verification state stale while the submit button stayed enabled.
       } catch (error) {
         console.error('Password reset email error:', error);
 
