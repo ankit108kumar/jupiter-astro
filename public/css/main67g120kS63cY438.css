@@ -4468,3 +4468,26 @@ flex-shrink: 0;
 #forgotPasswordPanel .account-switch a:hover {
   text-decoration: underline;
 }
+
+/* Red prohibited-action cursor for login controls locked pending email verification. */
+.account-disabled-hover {
+  display: block;
+  width: 100%;
+  cursor: auto;
+}
+
+.account-disabled-hover.is-locked {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9' fill='white' stroke='%23dc2626' stroke-width='2'/%3E%3Cpath d='M5.64 5.64l12.72 12.72' stroke='%23dc2626' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") 12 12, not-allowed;
+}
+
+.account-disabled-hover > input:disabled,
+.account-disabled-hover > button:disabled {
+  pointer-events: none;
+}
+
+.account-disabled-hover > button:disabled {
+  filter: grayscale(0.18);
+  opacity: 0.58;
+  box-shadow: none;
+  transform: none;
+}
