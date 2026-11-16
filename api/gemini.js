@@ -227,19 +227,19 @@ if (limitMatch) {
 
 const relevance = checkAstrologyRelevance(userMessage);
 
+// Count valid Gemini requests on the server, independently of browser state.
+const clientAddress = getClientAddress(req);
+const usage = await updateUnknownQuestionCount(clientAddress, relevance);
+const updatedUnknownCount = usage.unknownCount;
+
 if (relevance === "excluded") {
   return res.status(200).json({
     success: false,
     blocked: true,
+    requestCount: usage.requestCount,
     error: "Jupiter AI is exclusively designed for astrology related questions."
   });
 }
-
-// The counter is stored server-side per Firebase UID and UTC day.
-// The browser-supplied counter is deliberately ignored.
-const clientAddress = getClientAddress(req);
-const usage = await updateUnknownQuestionCount(clientAddress, relevance);
-const updatedUnknownCount = usage.unknownCount;
 
 if (relevance === "unknown" && updatedUnknownCount > 1) {
   return res.status(200).json({
@@ -359,7 +359,8 @@ ${userMessage}
   success: true,
   model: model,
   answer: answer,
-  unknownCount: updatedUnknownCount
+  unknownCount: updatedUnknownCount,
+  requestCount: usage.requestCount
 });
 
   } catch (error) {
