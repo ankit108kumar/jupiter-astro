@@ -18,6 +18,12 @@
 
   const switchToSignup = document.getElementById('switchToSignup');
   const switchToSignin = document.getElementById('switchToSignin');
+  const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+  const forgotPasswordPanel = document.getElementById('forgotPasswordPanel');
+  const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+  const resetPasswordEmail = document.getElementById('resetPasswordEmail');
+  const forgotPasswordMessage = document.getElementById('forgotPasswordMessage');
+  const backToLoginBtn = document.getElementById('backToLoginBtn');
 
   if (!overlay || !openBtn || !closeBtn) {
     console.warn('Account dialogue elements not found.');
@@ -90,6 +96,7 @@ function openAccount() {
 
     signInForm.classList.remove('account-hidden');
     signUpForm.classList.add('account-hidden');
+    if (forgotPasswordPanel) forgotPasswordPanel.classList.add('account-hidden');
 
     signInTab.classList.add('active');
     signUpTab.classList.remove('active');
@@ -499,14 +506,93 @@ signInForm.addEventListener('submit', async function (e) {
     }
   }
 
-  // FORGOT PASSWORD PLACEHOLDER
-  document.getElementById('forgotPasswordBtn')
-    .addEventListener('click', function (e) {
-
+  // FORGOT PASSWORD DIALOGUE
+  if (forgotPasswordBtn && forgotPasswordPanel) {
+    forgotPasswordBtn.addEventListener('click', function (e) {
       e.preventDefault();
 
-      alert('Password reset functionality has not been connected yet.');
+      signInForm.classList.add('account-hidden');
+      signUpForm.classList.add('account-hidden');
+      forgotPasswordPanel.classList.remove('account-hidden');
 
+      const loginEmail = document.getElementById('loginEmail');
+      if (loginEmail && loginEmail.value.trim()) {
+        resetPasswordEmail.value = loginEmail.value.trim();
+      }
+
+      if (forgotPasswordMessage) {
+        forgotPasswordMessage.hidden = true;
+        forgotPasswordMessage.textContent = '';
+        forgotPasswordMessage.className = 'account-message';
+      }
+
+      setTimeout(function () {
+        if (resetPasswordEmail) resetPasswordEmail.focus();
+      }, 50);
     });
+  }
+
+  if (backToLoginBtn) {
+    backToLoginBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (forgotPasswordPanel) forgotPasswordPanel.classList.add('account-hidden');
+      showSignIn();
+      setTimeout(function () {
+        const loginEmail = document.getElementById('loginEmail');
+        if (loginEmail) loginEmail.focus();
+      }, 50);
+    });
+  }
+
+  if (forgotPasswordForm) {
+    forgotPasswordForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const email = resetPasswordEmail.value.trim().toLowerCase();
+      const api = window.firebaseAuthAPI;
+      const auth = window.firebaseAuth;
+      const submitButton = document.getElementById('sendResetEmailBtn');
+
+      if (!api || !auth || typeof api.sendPasswordResetEmail !== 'function') {
+        forgotPasswordMessage.hidden = false;
+        forgotPasswordMessage.textContent = 'Password reset is temporarily unavailable. Please try again later.';
+        forgotPasswordMessage.className = 'account-message error';
+        return;
+      }
+
+      submitButton.disabled = true;
+      submitButton.textContent = 'Sending...';
+      forgotPasswordMessage.hidden = false;
+      forgotPasswordMessage.textContent = 'Sending password reset instructions...';
+      forgotPasswordMessage.className = 'account-message';
+
+      try {
+        await api.sendPasswordResetEmail(auth, email);
+        forgotPasswordMessage.textContent =
+          'If an account exists for this email address, a password reset link has been sent. Please check your inbox and spam folder.';
+        forgotPasswordMessage.className = 'account-message success';
+        forgotPasswordForm.reset();
+      } catch (error) {
+        console.error('Password reset email error:', error);
+
+        let message = 'Unable to send the reset email. Please try again later.';
+        if (error.code === 'auth/invalid-email') {
+          message = 'Please enter a valid email address.';
+        } else if (error.code === 'auth/too-many-requests') {
+          message = 'Too many reset attempts. Please wait before trying again.';
+        } else if (error.code === 'auth/network-request-failed') {
+          message = 'Network error. Please check your internet connection.';
+        }
+
+        // Use a generic response for unknown email addresses to avoid
+        // revealing whether an account exists.
+        forgotPasswordMessage.textContent = message;
+        forgotPasswordMessage.className = 'account-message error';
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Send Reset Link';
+      }
+    });
+  }
 
 })();
