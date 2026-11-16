@@ -4233,8 +4233,8 @@ flex-shrink: 0;
   display: none !important;
 }
 
-/* Hide only the Copy action while signed out; preserve PNG/PDF/CSV/TSV. */
-.copy-export-option[data-export-action="copy"].ja-auth-locked {
+/* Hide the complete Copy / Export control while signed out. */
+.copy-export-control.ja-auth-locked {
   display: none !important;
 }
 
