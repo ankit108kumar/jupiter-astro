@@ -140,7 +140,7 @@ function decryptRefreshToken(value) {
   return Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString("utf8");
 }
 
-async function verifyFirebaseUser(req) {
+async function verifyDropboxRequestSession(req) {
   return verifyFirebaseSession(req);
 }
 
@@ -497,7 +497,7 @@ async function handleConnect(req, res) {
     res.setHeader("Allow", "POST");
     return sendError(res, 405, "Method not allowed.");
   }
-  const user = await verifyFirebaseUser(req);
+  const user = await verifyDropboxRequestSession(req);
   const config = getDropboxConfig();
   const signed = createSignedState(user.uid);
   setStateCookie(res, signed.cookie, STATE_TTL_SECONDS);
@@ -786,7 +786,7 @@ module.exports = async function handler(req, res) {
     }
     if (action === "connect") return await handleConnect(req, res);
 
-    const user = await verifyFirebaseUser(req);
+    const user = await verifyDropboxRequestSession(req);
     if (action === "status") return await handleStatus(req, res, user);
     if (action === "list") return await handleList(req, res, user);
     if (action === "download") return await handleDownload(req, res, user);
