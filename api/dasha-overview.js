@@ -76,6 +76,7 @@ module.exports = async function handler(req, res) {
   }
 
   try {
+    // A valid Firebase login session is sufficient for this feature.
     await verifyFirebaseUser(req);
 
     const body = req.body || {};
