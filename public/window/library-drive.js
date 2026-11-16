@@ -7,7 +7,6 @@
   if (window.__JA_LIBRARY_DRIVE_LOADED) return;
   window.__JA_LIBRARY_DRIVE_LOADED = true;
 
-  var API_ROOT = "https://www.googleapis.com/drive/v3";
   var ROOT = { id: "10ZkA2yVR0xHS9qpWpBRLjOKOCWIrzsNj", name: "Shared Astrology Library" };
   var PAGE_SIZE = 100;
   var CACHE_DB = "ja-library-drive-cache";
@@ -36,12 +35,13 @@
   var driveCount = null;
   var drivePath = null;
 
-  function apiKey() {
-    var config = window.jaFirebaseConfig;
-    if (!config || !(config.driveApiKey || config.apiKey)) {
-      throw new Error("Firebase configuration is not ready. Refresh the page and retry.");
+  async function authHeaders() {
+    var auth = window.firebaseAuth;
+    var user = auth && auth.currentUser;
+    if (!user || typeof user.getIdToken !== "function") {
+      throw new Error("Please log in to access the Google Drive Library.");
     }
-    return config.driveApiKey || config.apiKey;
+    return { Authorization: "Bearer " + await user.getIdToken() };
   }
 
   function contentEl() {
@@ -283,7 +283,7 @@
   async function apiJson(url, signal) {
     var response, raw, body;
     try {
-      response = await fetch(url, { method: "GET", credentials: "omit", signal: signal });
+      response = await fetch(url, { method: "GET", credentials: "same-origin", signal: signal, headers: await authHeaders() });
     } catch (error) {
       if (error && error.name === "AbortError") throw error;
       throw new Error("Could not reach Google Drive. Check your network, Drive API settings and API-key referrer restrictions.");
@@ -309,16 +309,9 @@
   }
 
   async function listFolder(folderId, pageToken, signal) {
-    var url = new URL(API_ROOT + "/files");
-    url.searchParams.set("q", "'" + folderId + "' in parents and trashed = false");
-    url.searchParams.set("pageSize", String(PAGE_SIZE));
-    url.searchParams.set("orderBy", "folder,name");
-    url.searchParams.set("supportsAllDrives", "true");
-    url.searchParams.set("includeItemsFromAllDrives", "true");
-    url.searchParams.set("fields", "nextPageToken,files(id,name,mimeType,size,modifiedTime,webViewLink,thumbnailLink,resourceKey,capabilities(canDownload),shortcutDetails(targetId,targetMimeType,targetResourceKey))");
-    url.searchParams.set("key", apiKey());
-    if (pageToken) url.searchParams.set("pageToken", pageToken);
-    return apiJson(url.toString(), signal);
+    var params = new URLSearchParams({ action: "list", folderId: folderId });
+    if (pageToken) params.set("pageToken", pageToken);
+    return apiJson("/api/drive?" + params.toString(), signal);
   }
 
   async function downloadFile(item, signal) {
@@ -337,7 +330,7 @@
         method: "GET",
         credentials: "same-origin",
         signal: signal,
-        headers: { Accept: "*/*" }
+        headers: Object.assign({ Accept: "*/*" }, await authHeaders())
       });
     } catch (error) {
       if (error && error.name === "AbortError") throw error;
