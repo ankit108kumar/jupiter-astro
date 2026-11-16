@@ -1,5 +1,5 @@
 const { updateUnknownQuestionCount } = require("../lib/gemini-usage");
-const { verifyFirebaseUser } = require("../lib/server-auth");
+const { verifyFirebaseSession } = require("../lib/server-auth");
 
 
 // ------------------------------------------
@@ -173,7 +173,7 @@ function getClientAddress(req) {
   try {
 
     // Require the user's existing Firebase login session only.
-    await verifyFirebaseUser(req);
+    await verifyFirebaseSession(req);
 
     // 2. Check API key after authentication.
     const apiKey = process.env.GEMINI_API_KEY;
