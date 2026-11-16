@@ -14,6 +14,22 @@ Jupiter Astro AI Assistant
 
   const toggle = document.getElementById("jupiter-ai-toggle");
 
+  // The assistant UI is a convenience gate only; the API itself is not
+  // connected to Firebase authentication.
+  function syncAssistantVisibility(user) {
+    const signedIn = !!user;
+    widget.style.display = signedIn ? "" : "none";
+    if (!signedIn && windowBox.classList.contains("ai-open")) {
+      closeAssistant();
+    }
+  }
+
+  syncAssistantVisibility(window.jaAuthUser || null);
+  window.addEventListener("ja-auth-state-changed", function (event) {
+    syncAssistantVisibility(event.detail && event.detail.user);
+  });
+
+
   const close = document.getElementById("jupiter-ai-close");
 
   const windowBox = document.getElementById("jupiter-ai-window");
@@ -148,22 +164,9 @@ thinking.innerHTML = `
 
   try {
 
-    const auth = window.firebaseAuth;
-    const currentUser = auth && auth.currentUser;
-
-    if (!currentUser) {
-      throw new Error("Please sign in to use Jupiter AI.");
-    }
-
-    // Firebase ID token is verified by /api/gemini on the server.
-    const idToken = await currentUser.getIdToken();
-
     const response = await fetch("/api/gemini", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + idToken
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: question })
     });
 
