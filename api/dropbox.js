@@ -3,7 +3,7 @@
 const { createSign, createHmac, randomBytes, createCipheriv, createDecipheriv, timingSafeEqual } = require("node:crypto");
 const { Readable } = require("node:stream");
 
-const { verifyFirebaseUser: verifyAuthorizedUser } = require("../lib/server-auth");
+const { verifyFirebaseSession } = require("../lib/server-auth");
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const DROPBOX_AUTHORIZE_URL = "https://www.dropbox.com/oauth2/authorize";
 const DROPBOX_TOKEN_URL = "https://api.dropbox.com/oauth2/token";
@@ -141,7 +141,7 @@ function decryptRefreshToken(value) {
 }
 
 async function verifyFirebaseUser(req) {
-  return verifyAuthorizedUser(req);
+  return verifyFirebaseSession(req);
 }
 
 function getGoogleServiceAccount() {
