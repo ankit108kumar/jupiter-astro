@@ -266,9 +266,11 @@
         <div id="forgotPasswordMessage" class="account-message"
              role="status" aria-live="polite" hidden></div>
 
-        <button type="submit" id="sendResetEmailBtn" class="account-submit">
-          Send Reset Link
-        </button>
+        <div class="account-disabled-hover" data-disabled-hint="Verify your email address first">
+          <button type="submit" id="sendResetEmailBtn" class="account-submit" disabled>
+            Send Reset Link
+          </button>
+        </div>
       </form>
 
       <p class="account-switch">
@@ -301,29 +303,38 @@
 	
   <div class="account-field">
     <label for="signupPassword">Set Password</label>
-    <input type="password"
-           id="signupPassword"
-           placeholder="Create a password"
-           autocomplete="new-password"
-           minlength="8"
-           required>
+    <div class="account-disabled-hover" data-disabled-hint="Verify your email address first">
+      <input type="password"
+             id="signupPassword"
+             placeholder="Create a password"
+             autocomplete="new-password"
+             minlength="8"
+             disabled
+             required>
+    </div>
   </div>
 
   <div class="account-field">
     <label for="confirmPassword">Confirm Password</label>
-    <input type="password"
-           id="confirmPassword"
-           placeholder="Re-enter your password"
-           autocomplete="new-password"
-           minlength="8"
-           required>
+    <div class="account-disabled-hover" data-disabled-hint="Verify your email address first">
+      <input type="password"
+             id="confirmPassword"
+             placeholder="Re-enter your password"
+             autocomplete="new-password"
+             minlength="8"
+             disabled
+             required>
+    </div>
   </div>
 
-   <button type="submit"
-        id="signupSubmitBtn"
-        class="account-submit">
-  Set Password
-</button>
+   <div class="account-disabled-hover" data-disabled-hint="Verify your email address first">
+     <button type="submit"
+          id="signupSubmitBtn"
+          class="account-submit"
+          disabled>
+       Set Password
+     </button>
+   </div>
 
   <p class="account-switch">
     Already have a password?
