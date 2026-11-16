@@ -4972,12 +4972,32 @@ if (offsetInput) {
 
     } else if (tabKey === 'transit') {
       const transitInsights = document.getElementById(`${prefix}-trInsightsGated`);
+      const lifecycleToggle = document.getElementById(`${prefix}-trLifecycleToggle`);
+      const lifecycleContent = document.getElementById(`${prefix}-trLifecycleContent`);
+      const transitPlanetToggle = document.getElementById(`${prefix}-trPlanetTableToggleBtn`);
+      const transitPlanetContent = document.getElementById(`${prefix}-trPlanetaryTable`);
+
       const syncTransitInsightsAccess = user => {
         const allowed = !!user;
         if (transitInsights) transitInsights.hidden = !allowed;
+
         if (!allowed) {
           window.jaTransitLifecycleExpanded = false;
           window.jaTransitPlanetTableExpanded = false;
+        }
+
+        const lifecycleOpen = allowed && window.jaTransitLifecycleExpanded !== false;
+        const planetTableOpen = allowed && window.jaTransitPlanetTableExpanded === true;
+
+        if (lifecycleContent) lifecycleContent.hidden = !lifecycleOpen;
+        if (lifecycleToggle) {
+          lifecycleToggle.textContent = lifecycleOpen ? '−' : '+';
+          lifecycleToggle.setAttribute('aria-expanded', String(lifecycleOpen));
+        }
+        if (transitPlanetContent) transitPlanetContent.hidden = !planetTableOpen;
+        if (transitPlanetToggle) {
+          transitPlanetToggle.classList.toggle('active', planetTableOpen);
+          transitPlanetToggle.setAttribute('aria-expanded', String(planetTableOpen));
         }
       };
 
@@ -4986,14 +5006,17 @@ if (offsetInput) {
       } else {
         syncTransitInsightsAccess(window.jaAuthUser || null);
       }
-      window.addEventListener('ja-auth-state-changed', event => {
-        syncTransitInsightsAccess(event.detail && event.detail.user);
-      });
 
-      const lifecycleToggle = document.getElementById(`${prefix}-trLifecycleToggle`);
-      const lifecycleContent = document.getElementById(`${prefix}-trLifecycleContent`);
-      const transitPlanetToggle = document.getElementById(`${prefix}-trPlanetTableToggleBtn`);
-      const transitPlanetContent = document.getElementById(`${prefix}-trPlanetaryTable`);
+      // Keep one auth listener per chart instance even when the Transit tab
+      // is re-rendered repeatedly by date, time, or varga changes.
+      const transitAuthHandlerKey = '__jaTransitAuthHandler_' + prefix;
+      if (window[transitAuthHandlerKey]) {
+        window.removeEventListener('ja-auth-state-changed', window[transitAuthHandlerKey]);
+      }
+      window[transitAuthHandlerKey] = event => {
+        syncTransitInsightsAccess(event.detail && event.detail.user);
+      };
+      window.addEventListener('ja-auth-state-changed', window[transitAuthHandlerKey]);
       const transitPlanetExport = targetEl.querySelector(
         `[data-export-prefix="${prefix}"][data-export-section="transit-planets"]`
       );
