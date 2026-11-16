@@ -148,8 +148,11 @@ function openAccount() {
   // SWITCH TO Set Password
   function showSignUp() {
 
+    // Treat the three signed-out views as mutually exclusive. In particular,
+    // Set Password must always close the Forgot Password panel.
     signUpForm.classList.remove('account-hidden');
     signInForm.classList.add('account-hidden');
+    if (forgotPasswordPanel) forgotPasswordPanel.classList.add('account-hidden');
 
     signUpTab.classList.add('active');
     signInTab.classList.remove('active');
@@ -541,11 +544,19 @@ signInForm.addEventListener('submit', async function (e) {
 
       signInForm.classList.add('account-hidden');
       signUpForm.classList.add('account-hidden');
+      // Close every other account view before opening password recovery.
+      signInForm.classList.add('account-hidden');
+      signUpForm.classList.add('account-hidden');
       forgotPasswordPanel.classList.remove('account-hidden');
 
       const loginEmail = document.getElementById('loginEmail');
       if (loginEmail && loginEmail.value.trim()) {
         resetPasswordEmail.value = loginEmail.value.trim();
+      }
+
+      // Require a fresh authorization check each time the recovery panel opens.
+      if (typeof window.jaResetEmailVerification === 'function') {
+        window.jaResetEmailVerification('forgot');
       }
 
       if (forgotPasswordMessage) {
