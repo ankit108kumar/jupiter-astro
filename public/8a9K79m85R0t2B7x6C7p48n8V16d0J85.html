@@ -209,12 +209,14 @@
 		
       <div class="account-field">
         <label for="loginPassword">Password</label>
-        <input type="password"
-               id="loginPassword"
-               placeholder="Enter your password"
-               autocomplete="current-password"
-               disabled
-               required>
+        <div class="account-disabled-hover" data-disabled-hint="Verify your email address first">
+          <input type="password"
+                 id="loginPassword"
+                 placeholder="Enter your password"
+                 autocomplete="current-password"
+                 disabled
+                 required>
+        </div>
       </div>
 
       <div class="account-options">
@@ -230,9 +232,11 @@
 
       </div>
 
-      <button type="submit" class="account-submit" disabled>
-        Sign In
-      </button>
+      <div class="account-disabled-hover" data-disabled-hint="Verify your email address first">
+        <button type="submit" class="account-submit" disabled>
+          Sign In
+        </button>
+      </div>
 
       <p class="account-switch">
   First time here?
