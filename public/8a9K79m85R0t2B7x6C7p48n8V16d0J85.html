@@ -53,6 +53,22 @@
     
 <div class="header-quick-icons">
 
+  <!-- Global text size -->
+  <div class="header-font-controls" role="group" aria-label="Global text size">
+    <button type="button"
+            class="header-font-btn"
+            id="fontSizeDecrease"
+            title="Decrease text size"
+            aria-label="Decrease text size"
+            aria-pressed="false">A−</button>
+    <button type="button"
+            class="header-font-btn"
+            id="fontSizeIncrease"
+            title="Increase text size"
+            aria-label="Increase text size"
+            aria-pressed="false">A+</button>
+  </div>
+
   <!-- Information -->
   <button class="header-icon-btn"
           type="button"
@@ -7908,6 +7924,7 @@ const result = section === 'planets'
   You have been logged out successfully.
 </div>
 
+<script src="/font-scale.js"></script>
 <script src="/detailed-dasha-overview.js"></script>	
 <script type="module" src="/Firebase.js"></script>
 <script type="module" src="/Account.js"></script>
