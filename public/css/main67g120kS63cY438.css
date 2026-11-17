@@ -3841,6 +3841,11 @@ padding: 28px 30px;
   font-size: 0.78rem;
 }
 
+.account-dialog-brand .account-dialog-powered-brand {
+  color: var(--saffron);
+  font-weight: 700;
+}
+
 .account-dialog-close {
   width: 34px;
   height: 34px;
