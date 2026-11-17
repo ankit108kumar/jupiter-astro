@@ -4527,7 +4527,10 @@ flex-shrink: 0;
   border-radius: 9px;
   background: transparent;
   color: var(--muted);
-  font: 700 0.76rem/1 inherit;
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1;
   cursor: pointer;
   user-select: none;
   transition: background .16s ease, color .16s ease, border-color .16s ease,
