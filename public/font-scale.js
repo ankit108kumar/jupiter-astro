@@ -28,8 +28,13 @@
   function isScalableElement(element) {
     if (!(element instanceof Element)) return false;
     const tag = element.tagName;
+    // Brand typography is fixed and must never respond to global A-/A+ scaling.
+    const isBrandElement = element.closest(
+      '.logo, .brand-text > span, .account-dialog-brand'
+    );
     return !/^(SCRIPT|STYLE|LINK|META|NOSCRIPT|SVG|PATH|DEFS|CLIPPATH|SYMBOL|USE)$/i.test(tag)
-      && !element.closest('svg');
+      && !element.closest('svg')
+      && !isBrandElement;
   }
 
   function captureElement(element, isNew) {
