@@ -4497,3 +4497,90 @@ flex-shrink: 0;
   box-shadow: none;
   transform: none;
 }
+
+
+/* ==========================================
+   GLOBAL TYPOGRAPHY SCALE — HEADER CONTROLS
+   Text only; layout dimensions remain untouched.
+========================================== */
+.header-font-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 2px 8px rgba(35, 25, 55, 0.055);
+  flex: 0 0 auto;
+}
+
+.header-font-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 29px;
+  width: 29px;
+  height: 27px;
+  padding: 0 5px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  font: 700 0.76rem/1 inherit;
+  cursor: pointer;
+  user-select: none;
+  transition: background .16s ease, color .16s ease, border-color .16s ease,
+              box-shadow .16s ease, transform .16s ease;
+}
+
+.header-font-btn:hover {
+  color: var(--saffron);
+  background: var(--saffron-soft);
+  border-color: var(--line-strong);
+}
+
+.header-font-btn.is-active,
+.header-font-btn[aria-pressed="true"] {
+  color: var(--saffron);
+  background: var(--saffron-soft);
+  border-color: var(--saffron);
+  box-shadow: inset 0 1px 2px rgba(120, 75, 20, .08),
+              0 1px 5px rgba(120, 75, 20, .10);
+}
+
+.header-font-btn:active {
+  transform: scale(.94);
+}
+
+.header-font-btn:focus-visible {
+  outline: 2px solid var(--saffron);
+  outline-offset: 2px;
+}
+
+.header-font-btn:disabled {
+  opacity: .38;
+  cursor: not-allowed;
+}
+
+/* Every element receives its own captured base font size. This avoids
+   changing rem-based padding, margins, widths, heights, and gaps. */
+body.ja-font-scale-enabled [data-ja-font-scale-target] {
+  font-size: calc(var(--ja-font-base-size) * var(--ja-font-scale)) !important;
+}
+
+@media (max-width: 600px) {
+  .header-font-controls {
+    gap: 2px;
+    padding: 2px;
+    border-radius: 10px;
+  }
+
+  .header-font-btn {
+    min-width: 27px;
+    width: 27px;
+    height: 26px;
+    border-radius: 8px;
+    font-size: .72rem;
+  }
+}
