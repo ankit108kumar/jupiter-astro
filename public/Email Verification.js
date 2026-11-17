@@ -17,6 +17,49 @@
   const verifiedEmails = { login: '', signup: '', forgot: '' };
   const activeRequests = new Map();
 
+  // Best-effort activity logging. The Apps Script endpoint writes events to
+  // the private .logs worksheet. Never send passwords, tokens or reset links.
+  let jaLogSessionId = '';
+  try {
+    jaLogSessionId = sessionStorage.getItem('ja_auth_log_session') || '';
+    if (!jaLogSessionId) {
+      jaLogSessionId = (window.crypto && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : 'ja-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+      sessionStorage.setItem('ja_auth_log_session', jaLogSessionId);
+    }
+  } catch (_) {
+    jaLogSessionId = 'ja-' + Date.now();
+  }
+
+  window.jaLogAuthEvent = function (eventName, status, email, reason, metadata) {
+    const payload = {
+      action: 'logEvent',
+      event: String(eventName || '').slice(0, 64),
+      status: String(status || '').slice(0, 24),
+      email: String(email || '').trim().toLowerCase().slice(0, 254),
+      reason: String(reason || '').slice(0, 200),
+      sessionId: jaLogSessionId,
+      source: 'JupiterAstro website',
+      userAgent: navigator.userAgent.slice(0, 300),
+      metadata: metadata && typeof metadata === 'object' ? metadata : {}
+    };
+
+    try {
+      fetch(AUTH_CHECK_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+        keepalive: true
+      }).catch(function (error) {
+        console.warn('Activity log could not be sent:', error);
+      });
+    } catch (error) {
+      console.warn('Activity log could not be sent:', error);
+    }
+  };
+
   const FORM_CONFIG = {
     login: { form: 'signInForm', message: 'loginMessage' },
     signup: { form: 'signUpForm', message: 'signupMessage' },
@@ -157,6 +200,7 @@
     timeoutId = setTimeout(function () {
       cleanup();
       if (isCurrentEmail()) {
+        window.jaLogAuthEvent('EMAIL_AUTHORIZATION_CHECK', 'FAILED', email, 'Verification timed out');
         setFormLocked(getForm(formType), true);
         showMessage(messageBox, 'Verification timed out. Please try again later.', 'error');
       }
@@ -167,6 +211,7 @@
       if (!isCurrentEmail()) return;
 
       if (result && result.status === 'rate_limited') {
+        window.jaLogAuthEvent('EMAIL_AUTHORIZATION_CHECK', 'BLOCKED', email, 'Rate limited');
         setFormLocked(getForm(formType), true);
         showMessage(messageBox,
           'Please wait ' + Number(result.retryAfter || 0) +
@@ -175,6 +220,7 @@
       }
 
       if (result && result.success === true && result.authorized === true) {
+        window.jaLogAuthEvent('EMAIL_AUTHORIZATION_CHECK', 'SUCCESS', email, 'Email is authorized for ' + formType);
         verifiedEmails[formType] = email;
         setFormLocked(getForm(formType), false);
         showMessage(messageBox, 'Email authorized successfully.', 'success');
@@ -185,6 +231,7 @@
       setFormLocked(getForm(formType), true);
 
       if (result && result.success === true && result.authorized === false) {
+        window.jaLogAuthEvent(formType === 'signup' ? 'SET_PASSWORD' : 'AUTHORIZATION', 'BLOCKED', email, 'Email is not on the authorized allowlist');
         showMessage(messageBox,
           'This email ID ' + email +
           ' is not authorized. Please contact consult@jupiterastrology108.com for authorization.',
@@ -197,6 +244,7 @@
     script.onerror = function () {
       cleanup();
       if (!isCurrentEmail()) return;
+      window.jaLogAuthEvent('EMAIL_AUTHORIZATION_CHECK', 'FAILED', email, 'Verification request failed');
       setFormLocked(getForm(formType), true);
       showMessage(messageBox,
         'Verification request failed. Please try again later.', 'error');
