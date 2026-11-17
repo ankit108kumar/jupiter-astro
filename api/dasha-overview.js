@@ -107,8 +107,9 @@ module.exports = async function handler(req, res) {
       return { lord: md.lord, start, years };
     });
 
-    // Each row uses its own Mahadasha lord as the single reference
-    // for MD, AD and PD numbering. The MD itself therefore always equals 1.
+    // Use the first Mahadasha in the supplied timeline as the common
+    // reference for MD, AD and PD sequence numbering.
+    const firstMdLord = safeMds[0].lord;
     const rows = [];
 
     for (let mdIndex = 0; mdIndex < safeMds.length; mdIndex++) {
@@ -127,9 +128,9 @@ module.exports = async function handler(req, res) {
             md: md.lord,
             ad: ad.lord,
             pd: pd.lord,
-            mdNo: sequenceNumber(md.lord, md.lord),
-            adNo: sequenceNumber(md.lord, ad.lord),
-            pdNo: sequenceNumber(md.lord, pd.lord),
+            mdNo: sequenceNumber(firstMdLord, md.lord),
+            adNo: sequenceNumber(firstMdLord, ad.lord),
+            pdNo: sequenceNumber(firstMdLord, pd.lord),
             start: pd.start,
             end: pd.end,
             d1Placement: details.d1Placement[md.lord] + " – " + details.d1Placement[ad.lord] + " – " + details.d1Placement[pd.lord],
