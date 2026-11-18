@@ -4128,7 +4128,7 @@ dasha(k, prefix, evalMs = Date.now()) {
           const occupantHtml = occupants.map(planet =>
             `<strong class="ja-navtara-occupant" style="color:${PLANET_COLORS[planet] || 'var(--ink)'}">${planet}</strong>`
           ).join(', ');
-          return `<td>${NAK[nakIndex][0]}${occupantHtml ? ` ${occupantHtml}` : ''}</td>`;
+          return `<td>${NAK[nakIndex][0]}${occupantHtml ? ` <span class="ja-navtara-occupants">${occupantHtml}</span>` : ''}</td>`;
         }).join('');
 
         return `
