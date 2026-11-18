@@ -1,6 +1,6 @@
 /* =========================================================
    JUPITER ASTRO — TRANSIT TIMELINE FLOATING WINDOW
-   Shortcut: Ctrl + Shift + T (Cmd + Shift + T on Mac)
+   Shortcut: Ctrl + Shift + F8 (Cmd + Option + T on Mac)
    Step 1: Library-style window shell and appearance modes.
    Step 2: Login-gated date/time controls tied to the active
            Research Kundali evaluation timestamp.
@@ -561,13 +561,17 @@
   }
 
   document.addEventListener("keydown", function (event) {
-    var isTimelineShortcut = event.key && event.key.toLowerCase() === "t";
     var isMac = isApplePlatform();
-    var requestedModifier = isMac
-      ? event.metaKey && event.altKey && !event.ctrlKey
-      : event.ctrlKey && event.altKey && !event.metaKey;
+    // Avoid Ctrl+Alt on Windows/Linux: it aliases AltGr on many keyboard layouts.
+    // F8 is not used by Chrome's standard shortcut list, so the Windows chord
+    // is Ctrl+Shift+F8 rather than the unreliable Ctrl+Alt+T.
+    var isTimelineShortcut = isMac
+      ? event.code === "KeyT" && event.metaKey && event.altKey &&
+        !event.ctrlKey && !event.shiftKey
+      : (event.code === "F8" || event.key === "F8") &&
+        event.ctrlKey && event.shiftKey && !event.altKey && !event.metaKey;
 
-    if (requestedModifier && !event.shiftKey && isTimelineShortcut) {
+    if (isTimelineShortcut) {
       event.preventDefault();
       event.stopPropagation();
       openWindow();
@@ -604,6 +608,6 @@
     restore: restoreWindow,
     syncFromContext: syncFromContext,
     isOpen: openState,
-    shortcut: isApplePlatform() ? "⌘ + Option + T" : "Ctrl + Alt + T"
+    shortcut: isApplePlatform() ? "⌘ + Option + T" : "Ctrl + Shift + F8"
   };
 })();
