@@ -240,6 +240,10 @@
   white-space: nowrap;
 }
 
+.ddo-planet-name {
+  font-weight: 500;
+}
+
 .ddo-sequence-counts {
   flex: 0 0 auto;
   font: inherit;
