@@ -28,6 +28,7 @@
 <link rel="stylesheet" href="/css/main67g120kS63cY438.css">
 <link rel="stylesheet" href="/css/detailed-dasha-overview.css">
 <link rel="stylesheet" href="/window/library-window.css">
+<link rel="stylesheet" href="/window/transit-timeline.css">
 <link rel="stylesheet" href="/window/library-preview.css">
 <link rel="stylesheet" href="/window/library-drive.css">
 
@@ -4237,6 +4238,7 @@ dasha(k, prefix, evalMs = Date.now()) {
 
         <!-- Replaces 'Current Transits' with 'Now' button -->
         <button type="button" class="btn-step btn-now" id="${prefix}-trNowBtn" style="height:31px; padding:0 12px; margin-bottom:1px;">Now</button>
+        <button type="button" class="jtt-inline-launch" id="${prefix}-openTransitTimelineBtn" title="Open Transit Timeline (Ctrl/Command + Shift + T)">Transit Timeline ↗</button>
 
         <!-- Date Steppers -->
         <div class="step-group" style="height:31px; margin-bottom:1px;">
@@ -4732,6 +4734,29 @@ function renderKundaliComponent(
   let currentEvalMs = Date.now();
   let activeTabKey = 'overview';
 
+  const timelineContext = {
+    getSnapshot: () => ({
+      evalMs: currentEvalMs,
+      chartTitle: title + (recordId ? ' (' + recordId + ')' : ''),
+      janmaRashi: SIGNS[kData.moonSign][0],
+      dasha: dashaChain(kData.md.list, currentEvalMs, 365.25)
+        .slice(0, 3).map(p => p.lord).join(' - ') || '—'
+    }),
+    setEvaluationTime: ms => {
+      const timestamp = Number(ms);
+      if (!Number.isFinite(timestamp) || !Number.isFinite(new Date(timestamp).getTime())) {
+        throw new Error('Invalid transit evaluation timestamp.');
+      }
+      currentEvalMs = timestamp;
+      updateDashaHeader();
+      btns.forEach(button => button.setAttribute('aria-selected', String(button.dataset.v === 'transit')));
+      const lalButton = targetEl.querySelector('.lal-kitab-varshphal-btn');
+      if (lalButton) lalButton.setAttribute('aria-selected', 'false');
+      openTab('transit');
+    }
+  };
+  window.JupiterTransitTimelineContext = timelineContext;
+
   function updateDashaHeader() {
   const chain = dashaChain(kData.md.list, currentEvalMs, 365.25);
 
@@ -4788,11 +4813,16 @@ function renderKundaliComponent(
   const btns = targetEl.querySelectorAll('.tab-btn');
 
   function openTab(tabKey) {
+    window.JupiterTransitTimelineContext = timelineContext;
     activeTabKey = tabKey;
     // Pass currentEvalMs to render the selected event date
     body.innerHTML = tabKey === 'transit'
   ? RenderTabs[tabKey](kData, prefix, currentEvalMs, window.trSelectedVarga || 9)
   : RenderTabs[tabKey](kData, prefix, currentEvalMs);
+
+    if (window.JupiterTransitTimeline && window.JupiterTransitTimeline.isOpen()) {
+      window.JupiterTransitTimeline.syncFromContext();
+    }
 
     if (tabKey === 'overview') {
       const d1 = getVargaItems(kData, 1);
@@ -5236,7 +5266,14 @@ if (offsetInput) {
       const trDateIn = document.getElementById(`${prefix}-trEvalDate`);
       const trTimeIn = document.getElementById(`${prefix}-trEvalTime`);
       const trNowBtn = document.getElementById(`${prefix}-trNowBtn`);
+      const openTimelineBtn = document.getElementById(`${prefix}-openTransitTimelineBtn`);
       const vargaSelect = document.getElementById(`${prefix}-vargaSelect`);
+
+      if (openTimelineBtn) {
+        openTimelineBtn.addEventListener('click', () => {
+          if (window.JupiterTransitTimeline) window.JupiterTransitTimeline.open();
+        });
+      }
       const trSavBtn = document.getElementById(`${prefix}-trSavToggleBtn`);
 
       if (vargaSelect) {
@@ -7933,6 +7970,7 @@ const result = section === 'planets'
 <script type="module" src="/Account.js"></script>
 <script type="module" src="/Email%20Verification.js"></script>
 <script src="/window/library-window.js"></script>
+<script src="/window/transit-timeline.js"></script>
 <script src="/window/library-preview.js"></script>
 <script src="/window/library-drive.js"></script>
 	
