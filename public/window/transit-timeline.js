@@ -568,10 +568,15 @@
     var isTimelineShortcut = event.key && event.key.toLowerCase() === "t";
     var isMac = isApplePlatform();
     var primaryModifier = isMac
-      ? event.metaKey && !event.ctrlKey
-      : event.ctrlKey && !event.metaKey;
+      ? event.metaKey && !event.ctrlKey && !event.altKey
+      : event.ctrlKey && !event.metaKey && !event.altKey;
+    // Chrome reserves Ctrl/Cmd + Shift + T for restoring a closed tab.
+    // Offer an app-specific alternative while retaining the requested shortcut.
+    var alternateModifier = isMac
+      ? event.metaKey && event.altKey && !event.ctrlKey
+      : event.ctrlKey && event.altKey && !event.metaKey;
 
-    if (primaryModifier && event.shiftKey && !event.altKey && isTimelineShortcut) {
+    if ((primaryModifier || alternateModifier) && event.shiftKey && isTimelineShortcut) {
       event.preventDefault();
       event.stopPropagation();
       openWindow();
@@ -608,6 +613,8 @@
     restore: restoreWindow,
     syncFromContext: syncFromContext,
     isOpen: openState,
-    shortcut: isApplePlatform() ? "⌘ + Shift + T" : "Ctrl + Shift + T"
+    shortcut: isApplePlatform()
+      ? "⌘ + Shift + T (alternate: ⌘ + Option + Shift + T)"
+      : "Ctrl + Shift + T (alternate: Ctrl + Alt + Shift + T)"
   };
 })();
