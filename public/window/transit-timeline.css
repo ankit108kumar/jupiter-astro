@@ -826,3 +826,47 @@
     border-top: 0;
   }
 }
+
+
+/* Active Kundali selector: multi-chart Research workspace support. */
+#ja-transit-timeline-window .jtt-active-kundali-item {
+  align-items: center;
+  min-width: 0;
+}
+
+#ja-transit-timeline-window [data-jtt-chart-select] {
+  min-width: 0;
+  max-width: min(420px, 100%);
+  height: 30px;
+  padding: 0 28px 0 9px;
+  border: 1px solid var(--jtt-line-strong);
+  border-radius: 8px;
+  outline: none;
+  color: var(--jtt-ink);
+  background: var(--jtt-panel-alt);
+  font: 650 12px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+#ja-transit-timeline-window [data-jtt-chart-select]:focus {
+  border-color: var(--jtt-accent);
+  box-shadow: 0 0 0 3px var(--jtt-accent-soft);
+}
+
+#ja-transit-timeline-window [data-jtt-chart-select][hidden],
+#ja-transit-timeline-window [data-jtt-chart-title][hidden] {
+  display: none !important;
+}
+
+@media (max-width: 760px) {
+  #ja-transit-timeline-window .jtt-active-kundali-item {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  #ja-transit-timeline-window [data-jtt-chart-select] {
+    max-width: 100%;
+    flex: 1 1 170px;
+  }
+}
