@@ -581,3 +581,248 @@
 
 
 
+
+
+/* Compact single-row Transit Timeline layout (November 2026). */
+#ja-transit-timeline-window .jtt-main {
+  padding: 17px 22px 22px;
+}
+
+#ja-transit-timeline-window .jtt-heading-row {
+  display: block;
+  margin: 0 0 12px;
+}
+
+#ja-transit-timeline-window .jtt-context-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, .8fr) minmax(0, 1.55fr);
+  width: 100%;
+  min-width: 0;
+  padding: 9px 2px;
+  border-radius: 10px;
+}
+
+#ja-transit-timeline-window .jtt-context-item {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+#ja-transit-timeline-window .jtt-context-item > span {
+  flex: 0 0 auto;
+  font-size: 9px;
+  letter-spacing: .55px;
+  white-space: nowrap;
+}
+
+#ja-transit-timeline-window .jtt-context-item strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  overflow-wrap: normal;
+  white-space: nowrap;
+}
+
+#ja-transit-timeline-window .jtt-control-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 11px;
+}
+
+#ja-transit-timeline-window .jtt-control-heading {
+  display: none;
+}
+
+#ja-transit-timeline-window .jtt-fields-row {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-end;
+  flex-wrap: nowrap;
+  gap: 8px;
+  min-width: 0;
+}
+
+#ja-transit-timeline-window .jtt-field {
+  flex: 0 0 164px;
+  min-width: 0;
+  gap: 4px;
+  font-size: 10px;
+  letter-spacing: .45px;
+}
+
+#ja-transit-timeline-window .jtt-field input {
+  height: 34px;
+  padding: 0 9px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+#ja-transit-timeline-window .jtt-time-field {
+  flex-basis: 132px;
+  max-width: 132px;
+}
+
+#ja-transit-timeline-window .jtt-now-button {
+  height: 34px;
+  padding: 0 13px;
+  border-radius: 8px;
+  font-size: 11px;
+  white-space: nowrap;
+  transition: background .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+
+#ja-transit-timeline-window .jtt-now-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+}
+
+#ja-transit-timeline-window .jtt-stepper-row {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  gap: 7px;
+  min-width: 0;
+  margin: 0;
+}
+
+#ja-transit-timeline-window .step-group {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 2px;
+  height: auto;
+  margin: 0;
+  padding: 2px 3px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  white-space: nowrap;
+}
+
+#ja-transit-timeline-window .group-label {
+  margin: 0 3px 0 1px;
+  color: var(--jtt-muted);
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: .4px;
+}
+
+#ja-transit-timeline-window .btn-step {
+  min-height: 27px;
+  padding: 4px 6px;
+  border: 1px solid var(--jtt-line);
+  border-radius: 7px;
+  background: var(--jtt-panel-alt);
+  color: var(--jtt-ink);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background .15s ease, border-color .15s ease, color .15s ease, transform .15s ease;
+}
+
+#ja-transit-timeline-window .btn-step:hover {
+  transform: translateY(-1px);
+  border-color: var(--jtt-accent);
+  background: var(--jtt-accent-soft);
+  color: var(--jtt-accent);
+}
+
+@media (max-width: 1160px) {
+  #ja-transit-timeline-window .jtt-control-panel {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  #ja-transit-timeline-window .jtt-stepper-row {
+    flex: 1 1 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 760px) {
+  #ja-transit-timeline-window .jtt-main {
+    padding: 14px 12px 18px;
+  }
+
+  #ja-transit-timeline-window .jtt-context-card {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, .8fr) minmax(0, 1.3fr);
+    padding: 8px 0;
+  }
+
+  #ja-transit-timeline-window .jtt-context-item {
+    gap: 6px;
+    padding: 0 8px;
+  }
+
+  #ja-transit-timeline-window .jtt-context-item > span {
+    font-size: 8px;
+    letter-spacing: .2px;
+  }
+
+  #ja-transit-timeline-window .jtt-context-item strong {
+    font-size: 11px;
+  }
+
+  #ja-transit-timeline-window .jtt-control-panel {
+    padding: 10px;
+  }
+
+  #ja-transit-timeline-window .jtt-fields-row {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  #ja-transit-timeline-window .jtt-field {
+    flex: 1 1 145px;
+  }
+
+  #ja-transit-timeline-window .jtt-time-field {
+    flex: 1 1 120px;
+    max-width: none;
+  }
+
+  #ja-transit-timeline-window .jtt-stepper-row {
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  #ja-transit-timeline-window .step-group {
+    gap: 1px;
+    padding: 2px 0;
+  }
+}
+
+@media (max-width: 520px) {
+  #ja-transit-timeline-window .jtt-context-card {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 9px 0;
+  }
+
+  #ja-transit-timeline-window .jtt-context-item {
+    border-right: 0;
+    white-space: normal;
+  }
+
+  #ja-transit-timeline-window .jtt-context-item strong {
+    white-space: normal;
+  }
+
+  #ja-transit-timeline-window .jtt-dasha-item {
+    grid-column: auto;
+    margin: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+}
