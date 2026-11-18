@@ -251,26 +251,37 @@
     return number + suffix + " House";
   }
 
-  function renderDurationCell(interval) {
+  function renderDurationCell(interval, displayHtml, label) {
+    var display = displayHtml || '<span class="jtt-cell-muted">—</span>';
     if (!interval || !interval.startText || !interval.endText) {
-      return '<span class="jtt-cell-sub jtt-cell-muted">—</span>';
+      return '<span class="jtt-duration-value">' + display + '</span>';
     }
-    return '<span class="jtt-cell-sub jtt-duration-text">' +
-      escapeTableText(interval.startText) + ' to ' +
-      escapeTableText(interval.endText) + '</span>';
+    var fullDuration = interval.startText + ' to ' + interval.endText;
+    return '<span class="jtt-duration-wrap" tabindex="0" role="button"' +
+      ' data-jtt-duration="' + escapeTableText(fullDuration) + '"' +
+      ' data-jtt-duration-label="' + escapeTableText(label || 'Transit duration') + '"' +
+      ' aria-label="' + escapeTableText((label || 'Transit duration') + '. Hover or focus to view duration') + '">' +
+      '<span class="jtt-duration-value">' + display + '</span>' +
+      '<span class="jtt-duration-hint" aria-hidden="true">◷</span>' +
+    '</span>';
   }
 
   function renderNatalPlanetMatches(items) {
     if (!Array.isArray(items) || !items.length) {
       return '<span class="jtt-cell-muted">—</span>';
     }
+    var abbreviations = {
+      Sun: 'Su', Moon: 'Mo', Mars: 'Ma', Mercury: 'Me',
+      Jupiter: 'Ju', Venus: 'Ve', Saturn: 'Sa', Rahu: 'Ra', Ketu: 'Ke'
+    };
     return '<div class="jtt-natal-matches">' + items.map(function (item) {
       var markers = Array.isArray(item.markers) && item.markers.length
         ? '<sup class="jtt-planet-markers">' + item.markers.map(escapeTableText).join(" ") + '</sup>'
         : '';
       return '<span class="jtt-natal-match" style="color:' +
-        escapeTableText(item.color || "var(--jtt-ink)") + '">' +
-        escapeTableText(item.name) + markers + '</span>';
+        escapeTableText(item.color || "var(--jtt-ink)") + '" title="' +
+        escapeTableText(item.name) + '">' +
+        escapeTableText(abbreviations[item.name] || item.name.slice(0, 2)) + markers + '</span>';
     }).join('<span class="jtt-match-separator">, </span>') + '</div>';
   }
 
@@ -279,31 +290,38 @@
       return '<div class="jtt-table-empty">No planetary transit data is available for the selected Kundali.</div>';
     }
 
+    function houseScore(house, score) {
+      var hasScore = score !== null && score !== undefined && score !== "" &&
+        Number.isFinite(Number(score));
+      var value = hasScore ? ' [' + escapeTableText(score) + ']' : '';
+      return '<span class="jtt-house-score">' + escapeTableText(house) + 'H' + value + '</span>';
+    }
+
+    var abbreviations = {
+      Sun: 'Su', Moon: 'Mo', Mars: 'Ma', Mercury: 'Me',
+      Jupiter: 'Ju', Venus: 'Ve', Saturn: 'Sa', Rahu: 'Ra', Ketu: 'Ke'
+    };
+
     var rowsHtml = data.rows.map(function (row) {
       var markers = Array.isArray(row.markers) && row.markers.length
         ? '<sup class="jtt-planet-markers">' + row.markers.map(escapeTableText).join(" ") + '</sup>'
         : '';
-      var bav = row.bav == null ? '' : escapeTableText(row.bav);
-      var sav = row.sav == null ? '' : escapeTableText(row.sav);
+      var nakshatraLord = abbreviations[row.nakshatraLord] || '';
+      var nakshatraHtml = escapeTableText(row.nakshatra) +
+        (nakshatraLord ? ' <span class="jtt-nak-lord">(' + nakshatraLord + ')</span>' : '');
       var murti = row.planet === "Moon" ? "" : escapeTableText(row.murti || "");
+      var navamsaNumber = Number.isFinite(Number(row.navamsaIndex)) ? Number(row.navamsaIndex) : '';
 
       return '<tr>' +
-        '<td class="jtt-planet-cell"><strong style="color:' + escapeTableText(row.color) + '">' +
-          escapeTableText(row.planet) + '</strong>' + markers + '</td>' +
-        '<td><strong class="jtt-cell-main">' + escapeTableText(row.sign) + '</strong>' +
-          renderDurationCell(row.signDuration) + '</td>' +
-        '<td><strong class="jtt-cell-main">' + ordinalHouse(row.fromLagna) + '</strong>' +
-          '<span class="jtt-cell-sub jtt-cell-number">' + sav + '</span></td>' +
-        '<td><strong class="jtt-cell-main">' + ordinalHouse(row.fromMoon) + '</strong>' +
-          '<span class="jtt-cell-sub jtt-cell-number">' + bav + '</span></td>' +
+        '<td class="jtt-planet-cell"><strong>' + escapeTableText(row.planet) + '</strong>' + markers + '</td>' +
+        '<td class="jtt-sign-cell">' + renderDurationCell(row.signDuration, escapeTableText(row.sign), 'Sign duration') + '</td>' +
+        '<td class="jtt-house-cell">' + houseScore(row.fromLagna, row.sav) + '</td>' +
+        '<td class="jtt-house-cell">' + houseScore(row.fromMoon, row.bav) + '</td>' +
         '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInSign) + '</td>' +
-        '<td><strong class="jtt-cell-main">' + escapeTableText(row.nakshatra) + '</strong>' +
-          renderDurationCell(row.nakshatraDuration) + '</td>' +
-        '<td><strong class="jtt-cell-main">' + escapeTableText(row.countFromJanmaNakshatra) + '</strong>' +
-          '<span class="jtt-cell-sub">' + escapeTableText(row.nakshatraLord || "") + '</span></td>' +
+        '<td class="jtt-nakshatra-cell">' + renderDurationCell(row.nakshatraDuration, nakshatraHtml, 'Nakshatra duration') + '</td>' +
+        '<td class="jtt-count-cell">' + escapeTableText(row.countFromJanmaNakshatra) + '</td>' +
         '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInNakshatra) + '</td>' +
-        '<td><strong class="jtt-cell-main">' + escapeTableText(row.navamsa) + '</strong>' +
-          renderDurationCell(row.navamsaDuration) + '</td>' +
+        '<td class="jtt-navamsa-cell">' + renderDurationCell(row.navamsaDuration, escapeTableText(navamsaNumber), 'Navamsa duration') + '</td>' +
         '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInNavamsa) + '</td>' +
         '<td class="jtt-blank-cell"></td>' +
         '<td class="jtt-blank-cell"></td>' +
@@ -320,7 +338,7 @@
           '<th>From Moon</th>' +
           '<th rowspan="2">Natal Planet (Sign)</th>' +
           '<th>Nakshatra</th>' +
-          '<th>Count from Janam Nakshatra</th>' +
+          '<th rowspan="2">Nk. Count</th>' +
           '<th rowspan="2">Natal Planet (Nakshatra)</th>' +
           '<th>Navamsa</th>' +
           '<th rowspan="2">Natal Planet (Navamsa)</th>' +
@@ -333,12 +351,276 @@
           '<th>SAV</th>' +
           '<th>BAV (Planet)</th>' +
           '<th>Duration</th>' +
-          '<th>Nakshatra Lord</th>' +
           '<th>Duration</th>' +
         '</tr>' +
       '</thead>' +
       '<tbody>' + rowsHtml + '</tbody>' +
     '</table>';
+  }
+
+  var activeDurationTooltip = null;
+  var activeDurationWrapper = null;
+  var durationHideTimer = null;
+  var durationRemoveTimer = null;
+
+  function clearDurationHideTimer() {
+    if (durationHideTimer) { clearTimeout(durationHideTimer); durationHideTimer = null; }
+    if (durationRemoveTimer) { clearTimeout(durationRemoveTimer); durationRemoveTimer = null; }
+  }
+  function removeDurationTooltip() {
+    clearDurationHideTimer();
+    if (activeDurationTooltip && activeDurationTooltip.parentNode) activeDurationTooltip.remove();
+    activeDurationTooltip = null;
+    activeDurationWrapper = null;
+  }
+  function scheduleDurationTooltipHide() {
+    clearDurationHideTimer();
+    if (!activeDurationTooltip) return;
+    durationHideTimer = setTimeout(function () {
+      if (!activeDurationTooltip) return;
+      activeDurationTooltip.classList.remove("is-open");
+      durationRemoveTimer = setTimeout(removeDurationTooltip, 220);
+    }, 2000);
+  }
+  function copyPlainText(value) {
+    function fallbackCopy() {
+      return new Promise(function (resolve, reject) {
+        var field = document.createElement("textarea");
+        field.value = value;
+        field.style.position = "fixed";
+        field.style.opacity = "0";
+        document.body.appendChild(field);
+        field.select();
+        var copied = false;
+        try { copied = document.execCommand("copy"); } catch (error) {}
+        field.remove();
+        copied ? resolve() : reject(new Error("Clipboard access is unavailable."));
+      });
+    }
+    return navigator.clipboard && navigator.clipboard.writeText
+      ? navigator.clipboard.writeText(value).catch(fallbackCopy)
+      : fallbackCopy();
+  }
+  function positionDurationTooltip(wrapper, tooltip) {
+    var rect = wrapper.getBoundingClientRect();
+    var computed = getComputedStyle(windowEl);
+    [
+      "--jtt-bg", "--jtt-panel", "--jtt-panel-alt", "--jtt-ink",
+      "--jtt-muted", "--jtt-line", "--jtt-line-strong", "--jtt-accent",
+      "--jtt-accent-soft"
+    ].forEach(function (property) {
+      tooltip.style.setProperty(property, computed.getPropertyValue(property).trim());
+    });
+    tooltip.style.visibility = "hidden";
+    tooltip.style.left = "8px";
+    tooltip.style.top = "8px";
+    if (tooltip.parentNode !== document.body) document.body.appendChild(tooltip);
+    var tipRect = tooltip.getBoundingClientRect();
+    var left = Math.max(8, Math.min(rect.left, window.innerWidth - tipRect.width - 8));
+    var top = rect.bottom + 8;
+    if (top + tipRect.height > window.innerHeight - 8) top = rect.top - tipRect.height - 8;
+    top = Math.max(8, Math.min(top, window.innerHeight - tipRect.height - 8));
+    tooltip.style.left = Math.round(left) + "px";
+    tooltip.style.top = Math.round(top) + "px";
+    tooltip.style.visibility = "visible";
+  }
+  function showDurationTooltip(wrapper) {
+    if (!wrapper) return;
+    clearDurationHideTimer();
+    var duration = wrapper.getAttribute("data-jtt-duration") || "";
+    var label = wrapper.getAttribute("data-jtt-duration-label") || "Duration";
+    if (!duration) return;
+
+    if (activeDurationWrapper === wrapper && activeDurationTooltip) {
+      positionDurationTooltip(wrapper, activeDurationTooltip);
+      activeDurationTooltip.classList.add("is-open");
+      return;
+    }
+    removeDurationTooltip();
+    activeDurationWrapper = wrapper;
+
+    var tooltip = document.createElement("div");
+    tooltip.className = "jtt-duration-tooltip";
+    tooltip.setAttribute("role", "tooltip");
+    var heading = document.createElement("span");
+    heading.className = "jtt-duration-tooltip-heading";
+    heading.textContent = label;
+    var text = document.createElement("span");
+    text.className = "jtt-duration-tooltip-text";
+    text.textContent = duration;
+    text.tabIndex = 0;
+    var copyButton = document.createElement("button");
+    copyButton.type = "button";
+    copyButton.className = "jtt-duration-tooltip-copy";
+    copyButton.setAttribute("aria-label", "Copy complete duration");
+    copyButton.title = "Copy duration";
+    copyButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path></svg>';
+    tooltip.appendChild(heading);
+    tooltip.appendChild(text);
+    tooltip.appendChild(copyButton);
+
+    tooltip.addEventListener("pointerenter", clearDurationHideTimer);
+    tooltip.addEventListener("pointerleave", function (event) {
+      if (activeDurationWrapper && activeDurationWrapper.contains(event.relatedTarget)) return;
+      scheduleDurationTooltipHide();
+    });
+    tooltip.addEventListener("focusin", clearDurationHideTimer);
+    tooltip.addEventListener("focusout", function (event) {
+      if (tooltip.contains(event.relatedTarget) ||
+          (activeDurationWrapper && activeDurationWrapper.contains(event.relatedTarget))) return;
+      scheduleDurationTooltipHide();
+    });
+    tooltip.addEventListener("click", function (event) {
+      var button = event.target.closest(".jtt-duration-tooltip-copy");
+      if (!button) return;
+      copyPlainText(duration).then(function () {
+        button.classList.add("is-copied");
+        button.title = "Copied";
+        button.setAttribute("aria-label", "Duration copied");
+        setTimeout(function () {
+          if (!button.isConnected) return;
+          button.classList.remove("is-copied");
+          button.title = "Copy duration";
+          button.setAttribute("aria-label", "Copy complete duration");
+        }, 1200);
+      }).catch(function (error) {
+        console.error("Could not copy transit duration.", error);
+        button.title = "Copy failed";
+      });
+    });
+    tooltip.addEventListener("dblclick", function (event) {
+      if (!event.target.closest(".jtt-duration-tooltip-text")) return;
+      var selection = window.getSelection();
+      var range = document.createRange();
+      range.selectNodeContents(text);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    });
+
+    activeDurationTooltip = tooltip;
+    positionDurationTooltip(wrapper, tooltip);
+    setTimeout(function () {
+      if (activeDurationTooltip === tooltip) tooltip.classList.add("is-open");
+    }, 10);
+  }
+  function bindDurationTooltips(host) {
+    host.querySelectorAll(".jtt-duration-wrap[data-jtt-duration]").forEach(function (wrapper) {
+      wrapper.addEventListener("pointerenter", function () { showDurationTooltip(wrapper); });
+      wrapper.addEventListener("pointerleave", function (event) {
+        if (activeDurationTooltip && activeDurationTooltip.contains(event.relatedTarget)) return;
+        scheduleDurationTooltipHide();
+      });
+      wrapper.addEventListener("focusin", function () { showDurationTooltip(wrapper); });
+      wrapper.addEventListener("focusout", function (event) {
+        if (wrapper.contains(event.relatedTarget) ||
+            (activeDurationTooltip && activeDurationTooltip.contains(event.relatedTarget))) return;
+        scheduleDurationTooltipHide();
+      });
+    });
+  }
+
+  var transitExportHeaders = [
+    "Planet", "Sign / Duration", "From Lagna / SAV", "From Moon / BAV (Planet)",
+    "Natal Planet (Sign)", "Nakshatra / Duration", "Nk. Count",
+    "Natal Planet (Nakshatra)", "Navamsa / Duration", "Natal Planet (Navamsa)",
+    "Vedha (from)", "Reverse Vedha (from)", "Murti Nirnay"
+  ];
+  function getTransitExportMatrix() {
+    var table = windowEl && windowEl.querySelector("[data-jtt-table-scroll] table");
+    if (!table) throw new Error("The planetary table is not available.");
+    var rows = [transitExportHeaders];
+    table.querySelectorAll("tbody tr").forEach(function (tr) {
+      rows.push(Array.from(tr.querySelectorAll("td")).map(function (cell) {
+        var durationWrap = cell.querySelector(".jtt-duration-wrap");
+        if (durationWrap) {
+          var value = durationWrap.querySelector(".jtt-duration-value");
+          var duration = durationWrap.getAttribute("data-jtt-duration") || "";
+          return [value ? value.textContent.trim() : "", duration].filter(Boolean).join(" | ");
+        }
+        return cell.textContent.replace(/\s+/g, " ").trim();
+      }));
+    });
+    return rows;
+  }
+  function delimitedText(matrix, delimiter) {
+    return matrix.map(function (row) {
+      return row.map(function (value) {
+        var text = String(value == null ? "" : value);
+        return delimiter === "\t"
+          ? text.replace(/\t/g, " ").replace(/\r?\n/g, " ")
+          : '"' + text.replace(/"/g, '""') + '"';
+      }).join(delimiter);
+    }).join("\r\n");
+  }
+  function downloadTransitTableFile(content, mime, extension) {
+    var blob = new Blob(["\uFEFF", content], { type: mime + ";charset=utf-8;" });
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement("a");
+    link.href = url;
+    link.download = "planetary-transit-table." + extension;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+  function closeGlobalExportMenu() {
+    if (!windowEl) return;
+    var menu = windowEl.querySelector("[data-jtt-global-export-menu]");
+    var button = windowEl.querySelector('[data-jtt-action="export-toggle"]');
+    if (menu) menu.hidden = true;
+    if (button) button.setAttribute("aria-expanded", "false");
+  }
+  async function runTransitTableExport(format) {
+    try {
+      var matrix = getTransitExportMatrix();
+      if (format === "copy") {
+        await copyPlainText(delimitedText(matrix, "\t"));
+        setNotice("Planetary table copied.", false);
+      } else if (format === "csv") {
+        downloadTransitTableFile(delimitedText(matrix, ","), "text/csv", "csv");
+        setNotice("CSV export prepared.", false);
+      } else if (format === "tsv") {
+        downloadTransitTableFile(delimitedText(matrix, "\t"), "text/tab-separated-values", "tsv");
+        setNotice("TSV export prepared.", false);
+      } else if (format === "pdf") {
+        if (typeof window.downloadPlanetaryTablePDF !== "function") {
+          throw new Error("The shared PDF exporter is unavailable.");
+        }
+        var temp = document.createElement("div");
+        temp.style.position = "fixed";
+        temp.style.left = "-10000px";
+        var pdfTable = document.createElement("table");
+        var thead = document.createElement("thead");
+        var headerRow = document.createElement("tr");
+        matrix[0].forEach(function (heading) {
+          var th = document.createElement("th");
+          th.textContent = heading;
+          headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+        pdfTable.appendChild(thead);
+        var tbody = document.createElement("tbody");
+        matrix.slice(1).forEach(function (row) {
+          var tr = document.createElement("tr");
+          row.forEach(function (value) {
+            var td = document.createElement("td");
+            td.textContent = value;
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+        pdfTable.appendChild(tbody);
+        temp.appendChild(pdfTable);
+        document.body.appendChild(temp);
+        try { await window.downloadPlanetaryTablePDF(temp); }
+        finally { temp.remove(); }
+        setNotice("PDF export prepared.", false);
+      }
+    } catch (error) {
+      console.error("Transit table export failed.", error);
+      setNotice(error && error.message ? error.message : "Unable to export the planetary table.", true);
+    }
+    closeGlobalExportMenu();
   }
 
   function renderTransitTableFromContext() {
@@ -353,7 +635,9 @@
     }
 
     try {
+      removeDurationTooltip();
       host.innerHTML = renderTransitTable(context.getTransitTableData());
+      bindDurationTooltips(host);
     } catch (error) {
       console.error("Transit Timeline could not render the planetary table.", error);
       host.innerHTML = '<div class="jtt-table-empty is-error">Unable to load planetary transit data. Check the active Research Kundali.</div>';
@@ -485,6 +769,18 @@
             '<button class="jtt-info-button" type="button" data-jtt-action="info" title="Transit Timeline information" aria-label="Transit Timeline information" aria-expanded="false" aria-controls="jtt-info-popover">i</button>' +
             '<div class="jtt-info-popover" id="jtt-info-popover" data-jtt-info-popover hidden role="note">' +
               'Connected to the active Research Kundali. Date and time changes are shared with Planetary Transits.' +
+            '</div>' +
+          '</div>' +
+          '<div class="jtt-global-export-wrap">' +
+            '<button class="jtt-global-export-button" type="button" data-jtt-action="export-toggle" title="Copy or export planetary table" aria-label="Copy or export planetary table" aria-expanded="false" aria-controls="jtt-global-export-menu">' +
+              '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path></svg>' +
+            '</button>' +
+            '<div class="jtt-global-export-menu" id="jtt-global-export-menu" data-jtt-global-export-menu hidden>' +
+              '<div class="jtt-global-export-heading">Planetary Table</div>' +
+              '<button type="button" data-jtt-export-action="copy"><span>Copy table</span><kbd>TSV</kbd></button>' +
+              '<button type="button" data-jtt-export-action="csv"><span>Download CSV</span><kbd>.csv</kbd></button>' +
+              '<button type="button" data-jtt-export-action="tsv"><span>Download TSV</span><kbd>.tsv</kbd></button>' +
+              '<button type="button" data-jtt-export-action="pdf"><span>Export PDF</span><kbd>.pdf</kbd></button>' +
             '</div>' +
           '</div>' +
           '<button class="jtt-tool-button" type="button" data-jtt-action="fullscreen" title="Enter full screen" aria-label="Enter full screen">⛶</button>' +
@@ -672,6 +968,9 @@
   }
 
   function handleWindowClick(event) {
+    var exportWrap = event.target.closest(".jtt-global-export-wrap");
+    if (!exportWrap) closeGlobalExportMenu();
+
     var infoWrap = event.target.closest(".jtt-info-wrap");
     if (!infoWrap) {
       var existingInfo = windowEl.querySelector("[data-jtt-info-popover]");
@@ -694,7 +993,19 @@
         if (infoPopover) infoPopover.hidden = !isOpen;
         actionButton.setAttribute("aria-expanded", isOpen ? "true" : "false");
       }
+      if (action === "export-toggle") {
+        var exportMenu = windowEl.querySelector("[data-jtt-global-export-menu]");
+        var isExportOpen = exportMenu && exportMenu.hidden;
+        if (exportMenu) exportMenu.hidden = !isExportOpen;
+        actionButton.setAttribute("aria-expanded", isExportOpen ? "true" : "false");
+      }
       if (action === "now") applyEvaluationTime(Date.now());
+      return;
+    }
+
+    var exportOption = event.target.closest("[data-jtt-export-action]");
+    if (exportOption) {
+      runTransitTableExport(exportOption.getAttribute("data-jtt-export-action"));
       return;
     }
 
