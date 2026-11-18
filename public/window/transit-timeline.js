@@ -372,8 +372,8 @@
           '<div class="jtt-unified-divider" aria-hidden="true"></div>' +
           '<div class="jtt-control-panel" aria-label="Transit evaluation controls">' +
             '<div class="jtt-fields-row">' +
-              '<label class="jtt-field"><span>Transit Date</span><input type="date" data-jtt-field="date" aria-label="Transit date"></label>' +
-              '<label class="jtt-field jtt-time-field"><span>Transit Time</span><input type="time" data-jtt-field="time" aria-label="Transit time" step="60"></label>' +
+              '<label class="jtt-field jtt-date-field"><span>Date</span><input type="date" data-jtt-field="date" aria-label="Transit date"></label>' +
+              '<label class="jtt-field jtt-time-field"><span>Time</span><input type="time" data-jtt-field="time" aria-label="Transit time" step="60"></label>' +
               '<button class="jtt-now-button" type="button" data-jtt-action="now">Now</button>' +
             '</div>' +
             '<div class="jtt-stepper-row">' +
