@@ -448,11 +448,6 @@
         width: rect.width,
         height: rect.height
       };
-      windowEl.style.left = rect.left + "px";
-      windowEl.style.top = rect.top + "px";
-      windowEl.style.width = rect.width + "px";
-      windowEl.style.height = rect.height + "px";
-      windowEl.style.transform = "none";
       windowEl.classList.add("jtt-maximized");
       maximized = true;
     } else {
