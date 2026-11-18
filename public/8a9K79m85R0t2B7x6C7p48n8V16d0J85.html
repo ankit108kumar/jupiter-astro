@@ -4813,6 +4813,7 @@ function renderKundaliComponent(
   const btns = targetEl.querySelectorAll('.tab-btn');
 
   function openTab(tabKey) {
+    window.JupiterTransitTimelineContext = timelineContext;
     activeTabKey = tabKey;
     // Pass currentEvalMs to render the selected event date
     body.innerHTML = tabKey === 'transit'
