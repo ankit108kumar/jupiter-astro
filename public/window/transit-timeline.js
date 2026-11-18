@@ -262,7 +262,6 @@
       ' data-jtt-duration-label="' + escapeTableText(label || 'Transit duration') + '"' +
       ' aria-label="' + escapeTableText((label || 'Transit duration') + '. Hover or focus to view duration') + '">' +
       '<span class="jtt-duration-value">' + display + '</span>' +
-      '<span class="jtt-duration-hint" aria-hidden="true">◷</span>' +
     '</span>';
   }
 
@@ -293,7 +292,9 @@
     function houseScore(house, score) {
       var hasScore = score !== null && score !== undefined && score !== "" &&
         Number.isFinite(Number(score));
-      var value = hasScore ? ' [' + escapeTableText(score) + ']' : '';
+      var value = hasScore
+        ? '<span class="jtt-house-score-detail"> [' + escapeTableText(score) + ']</span>'
+        : '';
       return '<span class="jtt-house-score">' + escapeTableText(house) + 'H' + value + '</span>';
     }
 
@@ -310,6 +311,11 @@
       var nakshatraHtml = escapeTableText(row.nakshatra) +
         (nakshatraLord ? ' <span class="jtt-nak-lord">(' + nakshatraLord + ')</span>' : '');
       var murti = row.planet === "Moon" ? "" : escapeTableText(row.murti || "");
+      var murtiTone = row.planet === "Moon" ? "" :
+        row.murti === "Gold" ? " jtt-murti-gold" :
+        row.murti === "Silver" ? " jtt-murti-silver" :
+        row.murti === "Copper" ? " jtt-murti-copper" :
+        row.murti === "Iron" ? " jtt-murti-iron" : "";
       var navamsaNumber = Number.isFinite(Number(row.navamsaIndex)) ? Number(row.navamsaIndex) : '';
 
       return '<tr>' +
@@ -321,11 +327,11 @@
         '<td class="jtt-nakshatra-cell">' + renderDurationCell(row.nakshatraDuration, nakshatraHtml, 'Nakshatra duration') + '</td>' +
         '<td class="jtt-count-cell">' + escapeTableText(row.countFromJanmaNakshatra) + '</td>' +
         '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInNakshatra) + '</td>' +
-        '<td class="jtt-navamsa-cell">' + renderDurationCell(row.navamsaDuration, escapeTableText(navamsaNumber), 'Navamsa duration') + '</td>' +
+        '<td class="jtt-navamsa-cell">' + renderDurationCell(row.navamsaDuration, escapeTableText(row.navamsa || navamsaNumber), 'Navamsa duration') + '</td>' +
         '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInNavamsa) + '</td>' +
         '<td class="jtt-blank-cell"></td>' +
         '<td class="jtt-blank-cell"></td>' +
-        '<td class="jtt-murti-cell">' + murti + '</td>' +
+        '<td class="jtt-murti-cell' + murtiTone + '">' + murti + '</td>' +
       '</tr>';
     }).join("");
 
@@ -336,15 +342,15 @@
           '<th>Sign</th>' +
           '<th>From Lagna</th>' +
           '<th>From Moon</th>' +
-          '<th rowspan="2">Natal Planet (Sign)</th>' +
+          '<th rowspan="2" title="Natal Planet (Sign)">Natal (Sign)</th>' +
           '<th>Nakshatra</th>' +
           '<th rowspan="2">Nk. Count</th>' +
-          '<th rowspan="2">Natal Planet (Nakshatra)</th>' +
+          '<th rowspan="2" title="Natal Planet (Nakshatra)">Natal (Nak.)</th>' +
           '<th>Navamsa</th>' +
-          '<th rowspan="2">Natal Planet (Navamsa)</th>' +
+          '<th rowspan="2" title="Natal Planet (Navamsa)">Natal (D9)</th>' +
           '<th rowspan="2">Vedha (from)</th>' +
-          '<th rowspan="2">Reverse Vedha (from)</th>' +
-          '<th rowspan="2">Murti Nirnay</th>' +
+          '<th rowspan="2" title="Reverse Vedha (from)">Rev. Vedha</th>' +
+          '<th rowspan="2" title="Murti Nirnay">Murti</th>' +
         '</tr>' +
         '<tr>' +
           '<th>Duration</th>' +
@@ -403,7 +409,9 @@
   }
   function positionDurationTooltip(wrapper, tooltip) {
     var rect = wrapper.getBoundingClientRect();
+    var windowRect = windowEl.getBoundingClientRect();
     var computed = getComputedStyle(windowEl);
+
     [
       "--jtt-bg", "--jtt-panel", "--jtt-panel-alt", "--jtt-ink",
       "--jtt-muted", "--jtt-line", "--jtt-line-strong", "--jtt-accent",
@@ -411,15 +419,26 @@
     ].forEach(function (property) {
       tooltip.style.setProperty(property, computed.getPropertyValue(property).trim());
     });
+
     tooltip.style.visibility = "hidden";
     tooltip.style.left = "8px";
     tooltip.style.top = "8px";
-    if (tooltip.parentNode !== document.body) document.body.appendChild(tooltip);
+
+    // Keep the portal inside the floating window. Native fullscreen renders
+    // only descendants of its top-layer element; a body-level tooltip vanishes.
+    if (tooltip.parentNode !== windowEl) windowEl.appendChild(tooltip);
+
     var tipRect = tooltip.getBoundingClientRect();
-    var left = Math.max(8, Math.min(rect.left, window.innerWidth - tipRect.width - 8));
-    var top = rect.bottom + 8;
-    if (top + tipRect.height > window.innerHeight - 8) top = rect.top - tipRect.height - 8;
-    top = Math.max(8, Math.min(top, window.innerHeight - tipRect.height - 8));
+    var availableWidth = Math.max(0, windowEl.clientWidth - 16);
+    var left = rect.left - windowRect.left;
+    left = Math.max(8, Math.min(left, availableWidth - tipRect.width + 8));
+
+    var top = rect.bottom - windowRect.top + 8;
+    if (top + tipRect.height > windowEl.clientHeight - 8) {
+      top = rect.top - windowRect.top - tipRect.height - 8;
+    }
+    top = Math.max(8, Math.min(top, windowEl.clientHeight - tipRect.height - 8));
+
     tooltip.style.left = Math.round(left) + "px";
     tooltip.style.top = Math.round(top) + "px";
     tooltip.style.visibility = "visible";
@@ -839,7 +858,7 @@
     launcher.id = LAUNCHER_ID;
     launcher.innerHTML =
       '<button type="button" aria-label="Restore Transit Timeline">' +
-        '<span aria-hidden="true">◷</span><span>Transit Timeline</span><span aria-hidden="true">↗</span>' +
+        '<span>Transit Timeline</span><span aria-hidden="true">↗</span>' +
       '</button>';
     launcher.querySelector("button").addEventListener("click", restoreWindow);
     document.body.appendChild(launcher);
