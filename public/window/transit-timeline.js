@@ -265,9 +265,12 @@
       return '<span class="jtt-cell-muted">—</span>';
     }
     return '<div class="jtt-natal-matches">' + items.map(function (item) {
+      var markers = Array.isArray(item.markers) && item.markers.length
+        ? '<sup class="jtt-planet-markers">' + item.markers.map(escapeTableText).join(" ") + '</sup>'
+        : '';
       return '<span class="jtt-natal-match" style="color:' +
         escapeTableText(item.color || "var(--jtt-ink)") + '">' +
-        escapeTableText(item.name) + '</span>';
+        escapeTableText(item.name) + markers + '</span>';
     }).join('<span class="jtt-match-separator">, </span>') + '</div>';
   }
 
