@@ -1308,3 +1308,233 @@
     min-width: 1080px;
   }
 }
+
+
+/* Core planetary transit table — Stage 3. */
+#ja-transit-timeline-window .jtt-table-panel {
+  width: 100%;
+  min-width: 990px;
+  margin-top: 13px;
+  overflow: hidden;
+  border: 1px solid var(--jtt-line);
+  border-radius: 12px;
+  background: var(--jtt-panel);
+  box-shadow: 0 4px 16px rgba(0,0,0,.035);
+}
+
+#ja-transit-timeline-window .jtt-table-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--jtt-accent) var(--jtt-panel-alt);
+}
+
+#ja-transit-timeline-window .jtt-planetary-table {
+  width: 100%;
+  min-width: 1940px;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  color: var(--jtt-ink);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+#ja-transit-timeline-window .jtt-planetary-table th,
+#ja-transit-timeline-window .jtt-planetary-table td {
+  padding: 9px 10px;
+  border-right: 1px solid var(--jtt-line);
+  border-bottom: 1px solid var(--jtt-line);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+#ja-transit-timeline-window .jtt-planetary-table thead th {
+  position: sticky;
+  z-index: 4;
+  top: 0;
+  color: var(--jtt-muted);
+  background: var(--jtt-panel-alt);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .35px;
+  white-space: normal;
+}
+
+#ja-transit-timeline-window .jtt-planetary-table thead tr:first-child th {
+  height: 38px;
+  vertical-align: middle;
+}
+
+#ja-transit-timeline-window .jtt-planetary-table thead tr:nth-child(2) th {
+  top: 38px;
+  height: 30px;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+#ja-transit-timeline-window .jtt-planetary-table tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--jtt-panel-alt) 48%, transparent);
+}
+
+#ja-transit-timeline-window .jtt-planetary-table tbody tr:hover {
+  background: var(--jtt-accent-soft);
+}
+
+#ja-transit-timeline-window .jtt-planetary-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+#ja-transit-timeline-window .jtt-planetary-table th:first-child,
+#ja-transit-timeline-window .jtt-planetary-table td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  width: 105px;
+  min-width: 105px;
+  background: var(--jtt-panel);
+  box-shadow: 1px 0 0 var(--jtt-line);
+}
+
+#ja-transit-timeline-window .jtt-planetary-table thead th:first-child {
+  z-index: 7;
+  background: var(--jtt-panel-alt);
+}
+
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(2),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(2) { width: 185px; }
+
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(3),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(3),
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(4),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(4) { width: 95px; }
+
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(5),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(5),
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(8),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(8),
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(10),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(10) { width: 160px; }
+
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(6),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(6),
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(9),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(9) { width: 180px; }
+
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(7),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(7) { width: 130px; }
+
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(11),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(11),
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(12),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(12) { width: 115px; }
+
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(13),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(13) { width: 125px; }
+
+#ja-transit-timeline-window .jtt-planet-cell strong {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+#ja-transit-timeline-window .jtt-planet-markers {
+  display: inline-block;
+  margin-left: 2px;
+  color: var(--jtt-muted);
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+  vertical-align: super;
+  white-space: nowrap;
+}
+
+#ja-transit-timeline-window .jtt-cell-main {
+  display: block;
+  color: var(--jtt-ink);
+  font-size: 11px;
+  font-weight: 750;
+  white-space: normal;
+}
+
+#ja-transit-timeline-window .jtt-cell-sub {
+  display: block;
+  margin-top: 4px;
+  color: var(--jtt-muted);
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1.35;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+#ja-transit-timeline-window .jtt-cell-number {
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+#ja-transit-timeline-window .jtt-cell-muted {
+  color: var(--jtt-muted);
+}
+
+#ja-transit-timeline-window .jtt-natal-matches {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 1px 3px;
+  min-width: 0;
+  line-height: 1.55;
+}
+
+#ja-transit-timeline-window .jtt-natal-match {
+  font-size: 11px;
+  font-weight: 750;
+  white-space: normal;
+}
+
+#ja-transit-timeline-window .jtt-match-separator {
+  color: var(--jtt-muted);
+  font-size: 10px;
+}
+
+#ja-transit-timeline-window .jtt-blank-cell {
+  background: transparent;
+}
+
+#ja-transit-timeline-window .jtt-murti-cell {
+  color: var(--jtt-ink);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: normal;
+}
+
+#ja-transit-timeline-window .jtt-table-empty {
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  color: var(--jtt-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+#ja-transit-timeline-window .jtt-table-empty.is-error {
+  color: #C65364;
+}
+
+@media (max-width: 1040px) {
+  #ja-transit-timeline-window .jtt-table-panel {
+    min-width: 990px;
+  }
+
+  #ja-transit-timeline-window .jtt-planetary-table {
+    min-width: 1940px;
+  }
+}
