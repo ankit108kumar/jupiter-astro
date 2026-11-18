@@ -347,54 +347,52 @@
   cursor: pointer;
 }
 
-#ja-transit-timeline-window .jtt-steppers {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  gap: 18px;
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid var(--jtt-line);
-}
-
-#ja-transit-timeline-window .jtt-step-group {
+/* Reuse Planetary Transits step-group and btn-step styling in the popup.
+   Theme tokens keep the independent Apple Light mode visually coherent. */
+#ja-transit-timeline-window .jtt-stepper-row {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-}
-
-#ja-transit-timeline-window .jtt-step-label {
-  color: var(--jtt-muted);
-  font-size: 10px;
-  font-weight: 750;
-  letter-spacing: .75px;
-  text-transform: uppercase;
-}
-
-#ja-transit-timeline-window .jtt-step-buttons {
-  display: flex;
+  align-items: flex-end;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 10px;
+  margin-top: 14px;
 }
 
-#ja-transit-timeline-window .jtt-step-buttons button {
-  min-width: 43px;
-  height: 30px;
-  padding: 0 9px;
-  border: 1px solid var(--jtt-line);
-  border-radius: 7px;
-  color: var(--jtt-ink);
-  background: var(--jtt-panel-alt);
+#ja-transit-timeline-window .step-group {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 31px;
+  margin-bottom: 1px;
+  background: var(--jtt-panel);
+  border: 1px solid var(--jtt-line-strong);
+  border-radius: 8px;
+  padding: 2px 4px;
+}
+
+#ja-transit-timeline-window .group-label {
   font-size: 11px;
-  font-weight: 650;
-  font-variant-numeric: tabular-nums;
-  cursor: pointer;
+  font-weight: 600;
+  color: var(--jtt-muted);
+  margin: 0 4px;
 }
 
-#ja-transit-timeline-window .jtt-step-buttons button:hover {
-  border-color: var(--jtt-accent);
-  color: var(--jtt-accent);
+#ja-transit-timeline-window .btn-step {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 6px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: var(--jtt-panel-alt);
+  color: var(--jtt-ink);
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+#ja-transit-timeline-window .btn-step:hover {
   background: var(--jtt-accent-soft);
+  border-color: var(--jtt-line-strong);
+  color: var(--jtt-accent);
 }
 
 #ja-transit-timeline-window .jtt-notice {
@@ -582,31 +580,4 @@
 }
 
 
-/* Launch the standalone Transit Timeline from the existing transit controls. */
-.jtt-inline-launch {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 31px;
-  margin-bottom: 1px;
-  padding: 0 12px;
-  border: 1px solid var(--line-strong);
-  border-radius: 8px;
-  color: var(--ink);
-  background: var(--surface);
-  font: inherit;
-  font-size: 0.78rem;
-  font-weight: 700;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: color .15s ease, border-color .15s ease, background .15s ease;
-}
-.jtt-inline-launch:hover {
-  color: var(--saffron);
-  border-color: var(--saffron);
-  background: var(--saffron-soft);
-}
-.jtt-inline-launch:focus-visible {
-  outline: 2px solid var(--saffron);
-  outline-offset: 2px;
-}
+

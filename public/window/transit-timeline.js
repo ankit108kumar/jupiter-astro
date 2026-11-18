@@ -337,25 +337,27 @@
             '<label class="jtt-field jtt-time-field"><span>Transit Time</span><input type="time" data-jtt-field="time" aria-label="Transit time" step="60"></label>' +
             '<button class="jtt-now-button" type="button" data-jtt-action="now">Now</button>' +
           '</div>' +
-          '<div class="jtt-steppers">' +
-            '<div class="jtt-step-group"><span class="jtt-step-label">Stepper for Date</span><div class="jtt-step-buttons">' +
-              '<button type="button" data-jtt-year="-1">−1y</button>' +
-              '<button type="button" data-jtt-day="-30">−30d</button>' +
-              '<button type="button" data-jtt-day="-7">−7d</button>' +
-              '<button type="button" data-jtt-day="-1">−1d</button>' +
-              '<button type="button" data-jtt-day="1">+1d</button>' +
-              '<button type="button" data-jtt-day="7">+7d</button>' +
-              '<button type="button" data-jtt-day="30">+30d</button>' +
-              '<button type="button" data-jtt-year="1">+1y</button>' +
-            '</div></div>' +
-            '<div class="jtt-step-group"><span class="jtt-step-label">Stepper for Time</span><div class="jtt-step-buttons">' +
-              '<button type="button" data-jtt-min="-60">−1h</button>' +
-              '<button type="button" data-jtt-min="-10">−10m</button>' +
-              '<button type="button" data-jtt-min="-1">−1m</button>' +
-              '<button type="button" data-jtt-min="1">+1m</button>' +
-              '<button type="button" data-jtt-min="10">+10m</button>' +
-              '<button type="button" data-jtt-min="60">+1h</button>' +
-            '</div></div>' +
+          '<div class="jtt-stepper-row">' +
+            '<div class="step-group" style="height:31px; margin-bottom:1px;">' +
+              '<span class="group-label">Date:</span>' +
+              '<button type="button" class="btn-step" data-tr-year="-1">-1y</button>' +
+              '<button type="button" class="btn-step" data-tr-day="-30">-30d</button>' +
+              '<button type="button" class="btn-step" data-tr-day="-7">-7d</button>' +
+              '<button type="button" class="btn-step" data-tr-day="-1">-1d</button>' +
+              '<button type="button" class="btn-step" data-tr-day="1">+1d</button>' +
+              '<button type="button" class="btn-step" data-tr-day="7">+7d</button>' +
+              '<button type="button" class="btn-step" data-tr-day="30">+30d</button>' +
+              '<button type="button" class="btn-step" data-tr-year="1">+1y</button>' +
+            '</div>' +
+            '<div class="step-group" style="height:31px; margin-bottom:1px;">' +
+              '<span class="group-label">Time:</span>' +
+              '<button type="button" class="btn-step" data-tr-min="-60">-1h</button>' +
+              '<button type="button" class="btn-step" data-tr-min="-10">-10m</button>' +
+              '<button type="button" class="btn-step" data-tr-min="-1">-1m</button>' +
+              '<button type="button" class="btn-step" data-tr-min="1">+1m</button>' +
+              '<button type="button" class="btn-step" data-tr-min="10">+10m</button>' +
+              '<button type="button" class="btn-step" data-tr-min="60">+1h</button>' +
+            '</div>' +
           '</div>' +
         '</section>' +
         '<div class="jtt-notice" role="status" aria-live="polite" hidden></div>' +
@@ -505,21 +507,21 @@
       return;
     }
 
-    var dayButton = event.target.closest("[data-jtt-day]");
+    var dayButton = event.target.closest("[data-tr-day]");
     if (dayButton) {
-      stepDate(Number(dayButton.getAttribute("data-jtt-day")) || 0, 0);
+      stepDate(Number(dayButton.getAttribute("data-tr-day")) || 0, 0);
       return;
     }
 
-    var yearButton = event.target.closest("[data-jtt-year]");
+    var yearButton = event.target.closest("[data-tr-year]");
     if (yearButton) {
-      stepDate(0, Number(yearButton.getAttribute("data-jtt-year")) || 0);
+      stepDate(0, Number(yearButton.getAttribute("data-tr-year")) || 0);
       return;
     }
 
-    var minuteButton = event.target.closest("[data-jtt-min]");
+    var minuteButton = event.target.closest("[data-tr-min]");
     if (minuteButton) {
-      stepTime(Number(minuteButton.getAttribute("data-jtt-min")) || 0);
+      stepTime(Number(minuteButton.getAttribute("data-tr-min")) || 0);
     }
   }
 
@@ -567,16 +569,11 @@
   document.addEventListener("keydown", function (event) {
     var isTimelineShortcut = event.key && event.key.toLowerCase() === "t";
     var isMac = isApplePlatform();
-    var primaryModifier = isMac
-      ? event.metaKey && !event.ctrlKey && !event.altKey
-      : event.ctrlKey && !event.metaKey && !event.altKey;
-    // Chrome reserves Ctrl/Cmd + Shift + T for restoring a closed tab.
-    // Offer an app-specific alternative while retaining the requested shortcut.
-    var alternateModifier = isMac
+    var requestedModifier = isMac
       ? event.metaKey && event.altKey && !event.ctrlKey
       : event.ctrlKey && event.altKey && !event.metaKey;
 
-    if ((primaryModifier || alternateModifier) && event.shiftKey && isTimelineShortcut) {
+    if (requestedModifier && !event.shiftKey && isTimelineShortcut) {
       event.preventDefault();
       event.stopPropagation();
       openWindow();
@@ -613,8 +610,6 @@
     restore: restoreWindow,
     syncFromContext: syncFromContext,
     isOpen: openState,
-    shortcut: isApplePlatform()
-      ? "⌘ + Shift + T (alternate: ⌘ + Option + Shift + T)"
-      : "Ctrl + Shift + T (alternate: Ctrl + Alt + Shift + T)"
+    shortcut: isApplePlatform() ? "⌘ + Option + T" : "Ctrl + Alt + T"
   };
 })();
