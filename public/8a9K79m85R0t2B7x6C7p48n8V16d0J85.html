@@ -1672,14 +1672,13 @@ function getTransitTimelineTableData(k, evalMs) {
       const moonAtIngress = siderealPlanetLongitude('Moon', msToJd(signDuration.startMs));
       const ingressMoonSign = signOf(moonAtIngress);
       const countFromJanmaRashi = houseFrom(ingressMoonSign, k.moonSign);
-      const metal = countFromJanmaRashi === 1 || countFromJanmaRashi === 6 || countFromJanmaRashi === 11
-        ? 'Swarna'
+      murti = countFromJanmaRashi === 1 || countFromJanmaRashi === 6 || countFromJanmaRashi === 11
+        ? 'Gold'
         : countFromJanmaRashi === 2 || countFromJanmaRashi === 5 || countFromJanmaRashi === 9
-          ? 'Rajata'
+          ? 'Silver'
           : countFromJanmaRashi === 3 || countFromJanmaRashi === 7 || countFromJanmaRashi === 10
-            ? 'Tamra'
-            : 'Loha';
-      murti = metal + ' · ' + SIGNS[ingressMoonSign][0] + ' (' + countFromJanmaRashi + ')';
+            ? 'Copper'
+            : 'Iron';
     }
 
     const bav = planet === 'Ketu'
@@ -1703,6 +1702,7 @@ function getTransitTimelineTableData(k, evalMs) {
       nakshatraLord: NAK[nak.i][1],
       natalPlanetsInNakshatra: matchingPlanets(lon => nakOf(lon).i === nak.i),
       navamsa: SIGNS[navamsa][0],
+      navamsaIndex: navamsa + 1,
       navamsaDuration,
       natalPlanetsInNavamsa: matchingPlanets(lon => vargaSign(lon, 9) === navamsa),
       vedha: '',
