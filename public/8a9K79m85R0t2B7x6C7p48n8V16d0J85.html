@@ -2929,7 +2929,7 @@ if (!placed) {
     activeSign = sign;
 
     card.innerHTML = `
-      <div class="zh-title">${d.name} (${d.sanskrit})</div>
+      <div class="zh-title">${d.name}</div>
       <div class="zh-subtitle">
         ${d.element} · ${d.polarity} · ${d.modality}
       </div>
@@ -3604,7 +3604,7 @@ function getSecondaryChart(k, key) {
     const h = parseInt(key, 10);
     const lagna = (k.ascSign + h - 1) % 12;
     const d1 = getVargaItems(k, 1);
-    return { lagna, items: d1.items, title: `${ordinal(h)} House Kundali (${SIGNS[lagna][1]})` };
+    return { lagna, items: d1.items, title: `${ordinal(h)} House Kundali (${SIGNS[lagna][0]})` };
   }
   const vw = getVargaItems(k, 9);
   return { lagna: vw.lagna, items: vw.items, title: 'D9 · Navamsa Chart' };
@@ -3832,10 +3832,10 @@ const RenderTabs = {
 </header>
           <dl class="kv" id="${prefix}-metadata">
             <dt>Atmakaraka</dt><dd>${k.karakas[0].planet} <span class="sub">${dms(k.karakas[0].deg, false)}</span></dd>
-            <dt>Karakamsa</dt><dd>${SIGNS[navamsaOf(k.ch.planets[k.karakas[0].planet].lon)][1]} <span class="sub">AK in navamsa</span></dd>
+            <dt>Karakamsa</dt><dd>${SIGNS[navamsaOf(k.ch.planets[k.karakas[0].planet].lon)][0]} <span class="sub">AK in navamsa</span></dd>
             <dt>Darakaraka</dt><dd>${k.karakas[k.karakas.length - 1].planet}</dd>
-            <dt>Arudha Lagna</dt><dd>${SIGNS[k.padas[0].sign][1]} <span class="sub">house ${houseFrom(k.padas[0].sign, k.ascSign)}</span></dd>
-            <dt>Upapada</dt><dd>${SIGNS[k.padas[11].sign][1]} <span class="sub">house ${houseFrom(k.padas[11].sign, k.ascSign)}</span></dd>
+            <dt>Arudha Lagna</dt><dd>${SIGNS[k.padas[0].sign][0]} <span class="sub">house ${houseFrom(k.padas[0].sign, k.ascSign)}</span></dd>
+            <dt>Upapada</dt><dd>${SIGNS[k.padas[11].sign][0]} <span class="sub">house ${houseFrom(k.padas[11].sign, k.ascSign)}</span></dd>
             <dt>Dasha at birth</dt>
 <dd>
   ${(() => {
@@ -3940,7 +3940,7 @@ ${createCopyExportButton({
         ${k.lp.houses.map(x => `
           <article class="card lp-card">
             <header><h3>${AREAS[x.h - 1][1]}</h3>${pill(x.verdict)}</header>
-            <p class="sub">${ordinal(x.h)} house · ${SIGNS[x.sign][1]} · Lord ${x.lord} in ${ordinal(x.lordHouse)}</p>
+            <p class="sub">${ordinal(x.h)} house · ${SIGNS[x.sign][0]} · Lord ${x.lord} in ${ordinal(x.lordHouse)}</p>
             <div class="meter"><i class="${x.verdict[0]}" style="width:${Math.max(10, Math.min(100, (x.score + 4) * 10))}%"></i></div>
             <p style="margin:2px 0 0; font-size:.85rem;">SAV: <b>${x.sav}</b> · Score: <b>${x.score}</b></p>
             <details><summary>Why</summary>
@@ -3956,10 +3956,10 @@ ${createCopyExportButton({
     const kmap = Object.fromEntries(k.karakas.map(x => [x.planet, x.code]));
     let rows = `
       <tr class="lagna">
-        <td><span class="pname">Lagna</span></td><td>${SIGNS[k.ascSign][1]}</td>
+        <td><span class="pname">Lagna</span></td><td>${SIGNS[k.ascSign][0]}</td>
         <td class="num">${dms(k.ch.asc % 30)}</td><td class="num">${dms(k.ch.asc)}</td>
         <td>${NAK[nakOf(k.ch.asc).i][0]} · ${nakOf(k.ch.asc).pada}</td>
-        <td class="num c">1</td><td>${SIGNS[navamsaOf(k.ch.asc)][1]}</td>
+        <td class="num c">1</td><td>${SIGNS[navamsaOf(k.ch.asc)][0]}</td>
         <td></td><td></td><td>${vargottamaIn(k.ch.asc).join(', ')}</td>
       </tr>
     `;
@@ -3968,10 +3968,10 @@ ${createCopyExportButton({
       const st = [dg ? dg[1] : '', pl.retro && p !== 'Rahu' && p !== 'Ketu' ? 'Retro' : '', k.combust[p] ? 'Combust' : ''].filter(Boolean).join(', ');
       rows += `
         <tr>
-          <td><span class="pname">${p}</span></td><td>${SIGNS[s][1]}</td>
+          <td><span class="pname">${p}</span></td><td>${SIGNS[s][0]}</td>
           <td class="num">${dms(pl.lon % 30)}</td><td class="num">${dms(pl.lon)}</td>
           <td>${NAK[nakOf(pl.lon).i][0]} · ${nakOf(pl.lon).pada}</td>
-          <td class="num c">${houseFrom(s, k.ascSign)}</td><td>${SIGNS[navamsaOf(pl.lon)][1]}</td>
+          <td class="num c">${houseFrom(s, k.ascSign)}</td><td>${SIGNS[navamsaOf(pl.lon)][0]}</td>
           <td>${kmap[p] || ''}</td><td>${st}</td>
           <td>${vargottamaIn(pl.lon).join(', ')}</td>
         </tr>
@@ -4201,7 +4201,7 @@ dasha(k, prefix, evalMs = Date.now()) {
       const good = GOCHAR_GOOD[p].includes(fm);
       return `
         <tr>
-          <td><b>${p}</b></td><td>${SIGNS[s][1]}</td>
+          <td><b>${p}</b></td><td>${SIGNS[s][0]}</td>
           <td class="num c">${houseFrom(s, k.ascSign)}</td>
           <td class="num c">${fm}</td>
           <td class="num c">${k.av.bav[p] ? k.av.bav[p][s] : '—'}</td>
@@ -4272,12 +4272,12 @@ dasha(k, prefix, evalMs = Date.now()) {
               <button type="button" class="sav-toggle-btn ${window.jaShowSavD1 ? 'active' : ''}" id="${prefix}-trSavToggleBtn" title="Toggle Sarvashtakavarga (SAV)">SV</button>
             </div>
             <span style="font-size:0.82rem; color:var(--muted);">
-              Lagna: <b style="color:var(--saffron);">${SIGNS[k.ascSign][1]} (${dms(k.ch.asc % 30, false)})</b>
+              Lagna: <b style="color:var(--saffron);">${SIGNS[k.ascSign][0]} (${dms(k.ch.asc % 30, false)})</b>
             </span>
           </header>
           <div id="${prefix}-tr-natal-d1">${drawNorthChart(d1.lagna, d1.items, 'Natal D1', 12, window.jaShowSavD1 ? k.av.sav : null)}</div>
           <p style="text-align:center; font-size:0.75rem; color:var(--muted); margin:4px 0 0;">
-            Birth: <b>${String(k.input.d).padStart(2,'0')}/${String(k.input.m).padStart(2,'0')}/${k.input.y} ${String(k.input.hh).padStart(2,'0')}:${String(k.input.mm).padStart(2,'0')}</b> · Moon: <b>${SIGNS[k.moonSign][1]}</b>
+            Birth: <b>${String(k.input.d).padStart(2,'0')}/${String(k.input.m).padStart(2,'0')}/${k.input.y} ${String(k.input.hh).padStart(2,'0')}:${String(k.input.mm).padStart(2,'0')}</b> · Moon: <b>${SIGNS[k.moonSign][0]}</b>
           </p>
         </article>
 
@@ -4329,7 +4329,7 @@ dasha(k, prefix, evalMs = Date.now()) {
           </header>
           <div>${drawNorthChart(natalVarga.lagna, natalVarga.items, `Natal D${selectedVarga}`)}</div>
           <p style="text-align:center; font-size:0.75rem; color:var(--muted); margin:4px 0 0;">
-            Natal D${selectedVarga} Lagna: <b>${SIGNS[natalVarga.lagna][1]}</b>
+            Natal D${selectedVarga} Lagna: <b>${SIGNS[natalVarga.lagna][0]}</b>
           </p>
         </article>
 
@@ -4703,7 +4703,7 @@ const rahuBav = Array.from({ length: 12 }, (_, s) =>
     const arItems = [{ t: 'As', sign: k.ascSign, asc: true }, ...k.padas.map((p, i) => ({ t: padaLabel(i + 1), sign: p.sign, al: i === 0 || i === 11 }))];
     const arRows = k.padas.map((p, i) => `
       <tr>
-        <td><b>${padaLabel(i + 1)}</b></td><td>${PADA_NAMES[i]}</td><td>${SIGNS[p.sign][1]}</td>
+        <td><b>${padaLabel(i + 1)}</b></td><td>${PADA_NAMES[i]}</td><td>${SIGNS[p.sign][0]}</td>
         <td class="num c">${houseFrom(p.sign, k.ascSign)}</td><td class="num c">${houseFrom(p.sign, alSign)}</td>
       </tr>
     `).join('');
@@ -4758,8 +4758,8 @@ function renderKundaliComponent(
         <p>${esc(subtitle)}</p>
       </div>
       <div class="chips">
-        <span class="chip"><span>Lagna</span>${SIGNS[kData.ascSign][1]}</span>
-        <span class="chip"><span>Rashi</span>${SIGNS[kData.moonSign][1]}</span>
+        <span class="chip"><span>Lagna</span>${SIGNS[kData.ascSign][0]}</span>
+        <span class="chip"><span>Rashi</span>${SIGNS[kData.moonSign][0]}</span>
         <span class="chip"><span>Nakshatra</span>${NAK[nk.i][0]} (Pada ${nk.pada})</span>
         <span class="chip"><span>Dasha</span><b id="${prefix}-dashaChipValue">${dNow}</b></span>
       
