@@ -338,7 +338,7 @@
             '<button class="jtt-now-button" type="button" data-jtt-action="now">Now</button>' +
           '</div>' +
           '<div class="jtt-stepper-row">' +
-            '<div class="step-group">' +
+            '<div class="step-group" style="height:31px; margin-bottom:1px;">' +
               '<span class="group-label">Date:</span>' +
               '<button type="button" class="btn-step" data-tr-year="-1">-1y</button>' +
               '<button type="button" class="btn-step" data-tr-day="-30">-30d</button>' +
@@ -349,7 +349,7 @@
               '<button type="button" class="btn-step" data-tr-day="30">+30d</button>' +
               '<button type="button" class="btn-step" data-tr-year="1">+1y</button>' +
             '</div>' +
-            '<div class="step-group">' +
+            '<div class="step-group" style="height:31px; margin-bottom:1px;">' +
               '<span class="group-label">Time:</span>' +
               '<button type="button" class="btn-step" data-tr-min="-60">-1h</button>' +
               '<button type="button" class="btn-step" data-tr-min="-10">-10m</button>' +
