@@ -4436,11 +4436,10 @@ flex-shrink: 0;
   background: transparent;
 }
 
-/* Keep planetary occupants on a separate line beneath each Nakshatra. */
+/* Keep planetary occupants inline beside their Nakshatra, comma-separated. */
 .ja-navtara-occupant {
-  display: block;
-  margin-top: 3px;
-  color: var(--ink);
+  display: inline;
+  margin: 0;
   font-weight: 800;
 }
 
