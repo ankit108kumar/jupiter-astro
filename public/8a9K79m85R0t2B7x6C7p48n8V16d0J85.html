@@ -4749,6 +4749,9 @@ function renderKundaliComponent(
       }
       currentEvalMs = timestamp;
       updateDashaHeader();
+      btns.forEach(button => button.setAttribute('aria-selected', String(button.dataset.v === 'transit')));
+      const lalButton = targetEl.querySelector('.lal-kitab-varshphal-btn');
+      if (lalButton) lalButton.setAttribute('aria-selected', 'false');
       openTab('transit');
     }
   };
