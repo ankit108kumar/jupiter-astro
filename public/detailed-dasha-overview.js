@@ -274,6 +274,15 @@
       })[ch]);
   }
 
+  // Use the same planet palette as the main SVG Kundali charts.
+  function coloredPlanetName(name) {
+    const planet = String(name == null ? "" : name);
+    const colors = window.JA_PLANET_COLORS || {};
+    const color = colors[planet];
+    const style = color ? ` style="color:${escapeHtml(color)}"` : "";
+    return `<span class="ddo-planet-name"${style}>${escapeHtml(planet)}</span>`;
+  }
+
   
 function renderVirtual(instance, forceCentre) {
   const {
@@ -355,7 +364,7 @@ function renderVirtual(instance, forceCentre) {
            data-row-index="${i}">
 
         <div class="ddo-cell ddo-sequence" role="cell">
-          <span class="ddo-planet-sequence">${escapeHtml(row.md)}-${escapeHtml(row.ad)}-${escapeHtml(row.pd)}</span>
+          <span class="ddo-planet-sequence">${coloredPlanetName(row.md)}<span class="ddo-sequence-separator">-</span>${coloredPlanetName(row.ad)}<span class="ddo-sequence-separator">-</span>${coloredPlanetName(row.pd)}</span>
           <span class="ddo-sequence-counts">(${escapeHtml(row.mdNo)}-${escapeHtml(row.adNo)}-${escapeHtml(row.pdNo)})</span>
         </div>
 
