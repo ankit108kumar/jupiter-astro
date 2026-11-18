@@ -4720,6 +4720,119 @@ const rahuBav = Array.from({ length: 12 }, (_, s) =>
   }
 };
 
+/* ================= TRANSIT TIMELINE CHART REGISTRY =================
+   Tracks Research Kundalis that are currently mounted in the workspace.
+   Removed chart cards are pruned automatically from the selector.
+   ====================================================================== */
+function getJupiterTransitTimelineRegistry() {
+  if (window.JupiterTransitTimelineCharts) {
+    return window.JupiterTransitTimelineCharts;
+  }
+
+  const charts = new Map();
+  let activeId = null;
+  let observer = null;
+
+  function notify() {
+    window.dispatchEvent(new CustomEvent('ja-transit-charts-changed', {
+      detail: { activeId, count: charts.size }
+    }));
+  }
+
+  function prune() {
+    let changed = false;
+    charts.forEach((entry, id) => {
+      if (!entry.targetEl || !entry.targetEl.isConnected) {
+        charts.delete(id);
+        changed = true;
+      }
+    });
+
+    if (activeId && !charts.has(activeId)) {
+      const ids = Array.from(charts.keys());
+      activeId = ids.length ? ids[ids.length - 1] : null;
+      changed = true;
+    }
+
+    if (activeId && charts.has(activeId)) {
+      window.JupiterTransitTimelineContext = charts.get(activeId).context;
+    } else if (!charts.size) {
+      window.JupiterTransitTimelineContext = null;
+    }
+
+    if (changed) notify();
+    return changed;
+  }
+
+  function observeRemovals() {
+    if (observer || !document.body || typeof MutationObserver === 'undefined') return;
+    observer = new MutationObserver(() => prune());
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  function register(context, targetEl, title, recordId) {
+    if (!context || !context.id || !targetEl) return;
+    charts.set(context.id, {
+      id: context.id,
+      context,
+      targetEl,
+      title: title || context.getSnapshot().chartTitle || 'Research Kundali',
+      recordId: recordId || ''
+    });
+
+    // A newly generated chart is active by default, matching previous behaviour.
+    activeId = context.id;
+    window.JupiterTransitTimelineContext = context;
+    observeRemovals();
+    notify();
+  }
+
+  function setActive(id, activateChart) {
+    prune();
+    const entry = charts.get(id);
+    if (!entry) return false;
+
+    const changed = activeId !== id;
+    activeId = id;
+    window.JupiterTransitTimelineContext = entry.context;
+    if (changed) notify();
+
+    if (activateChart && typeof entry.context.activate === 'function') {
+      entry.context.activate();
+    } else if (window.JupiterTransitTimeline &&
+               window.JupiterTransitTimeline.isOpen()) {
+      window.JupiterTransitTimeline.syncFromContext();
+    }
+    return true;
+  }
+
+  function getCharts() {
+    prune();
+    return Array.from(charts.values()).map(entry => {
+      let snapshot = null;
+      try {
+        snapshot = entry.context.getSnapshot();
+      } catch (error) {
+        console.warn('Could not read a registered Research Kundali.', error);
+      }
+      return { id: entry.id, title: entry.title, recordId: entry.recordId, snapshot };
+    });
+  }
+
+  function getActiveId() {
+    prune();
+    return activeId;
+  }
+
+  window.JupiterTransitTimelineCharts = {
+    register,
+    setActive,
+    getCharts,
+    getActiveId
+  };
+  return window.JupiterTransitTimelineCharts;
+}
+
 /* ================= FULL UI COMPONENT CONTROLLER ================= */
 function renderKundaliComponent(
   targetEl, kData, prefix, title, subtitle, recordId = ''
@@ -4734,19 +4847,28 @@ function renderKundaliComponent(
   let activeTabKey = 'overview';
 
   const timelineContext = {
+    id: prefix,
     getSnapshot: () => ({
+      chartId: prefix,
       evalMs: currentEvalMs,
       chartTitle: title + (recordId ? ' (' + recordId + ')' : ''),
       janmaRashi: SIGNS[kData.moonSign][0],
+      lagna: SIGNS[kData.ascSign][0],
+      nakshatra: NAK[nk.i][0],
       dasha: dashaChain(kData.md.list, currentEvalMs, 365.25)
         .slice(0, 3).map(p => p.lord).join(' - ') || '—'
     }),
+    activate: () => {
+      updateDashaHeader();
+      openTab('transit');
+    },
     setEvaluationTime: ms => {
       const timestamp = Number(ms);
       if (!Number.isFinite(timestamp) || !Number.isFinite(new Date(timestamp).getTime())) {
         throw new Error('Invalid transit evaluation timestamp.');
       }
       currentEvalMs = timestamp;
+      getJupiterTransitTimelineRegistry().setActive(prefix, false);
       updateDashaHeader();
       btns.forEach(button => button.setAttribute('aria-selected', String(button.dataset.v === 'transit')));
       const lalButton = targetEl.querySelector('.lal-kitab-varshphal-btn');
@@ -4754,7 +4876,14 @@ function renderKundaliComponent(
       openTab('transit');
     }
   };
-  window.JupiterTransitTimelineContext = timelineContext;
+
+  const transitChartTitle = title + (recordId ? ' (' + recordId + ')' : '');
+  getJupiterTransitTimelineRegistry().register(
+    timelineContext,
+    targetEl,
+    transitChartTitle,
+    recordId
+  );
 
   function updateDashaHeader() {
   const chain = dashaChain(kData.md.list, currentEvalMs, 365.25);
@@ -4811,8 +4940,21 @@ function renderKundaliComponent(
   const body = targetEl.querySelector('.tab-body');
   const btns = targetEl.querySelectorAll('.tab-btn');
 
+  targetEl.setAttribute('data-ja-transit-chart-prefix', prefix);
+  if (!targetEl.__jaTransitChartFocusBound) {
+    const activateThisChart = () => {
+      const chartPrefix = targetEl.getAttribute('data-ja-transit-chart-prefix');
+      if (chartPrefix && window.JupiterTransitTimelineCharts) {
+        window.JupiterTransitTimelineCharts.setActive(chartPrefix, false);
+      }
+    };
+    targetEl.addEventListener('pointerdown', activateThisChart, true);
+    targetEl.addEventListener('focusin', activateThisChart, true);
+    targetEl.__jaTransitChartFocusBound = true;
+  }
+
   function openTab(tabKey) {
-    window.JupiterTransitTimelineContext = timelineContext;
+    getJupiterTransitTimelineRegistry().setActive(prefix, false);
     activeTabKey = tabKey;
     // Pass currentEvalMs to render the selected event date
     body.innerHTML = tabKey === 'transit'
