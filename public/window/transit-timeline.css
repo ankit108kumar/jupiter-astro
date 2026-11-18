@@ -580,3 +580,33 @@
     animation: none !important;
   }
 }
+
+
+/* Launch the standalone Transit Timeline from the existing transit controls. */
+.jtt-inline-launch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 31px;
+  margin-bottom: 1px;
+  padding: 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  color: var(--ink);
+  background: var(--surface);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color .15s ease, border-color .15s ease, background .15s ease;
+}
+.jtt-inline-launch:hover {
+  color: var(--saffron);
+  border-color: var(--saffron);
+  background: var(--saffron-soft);
+}
+.jtt-inline-launch:focus-visible {
+  outline: 2px solid var(--saffron);
+  outline-offset: 2px;
+}
