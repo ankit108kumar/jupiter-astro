@@ -233,6 +233,130 @@
     }
   }
 
+  function escapeTableText(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function ordinalHouse(value) {
+    var number = Number(value);
+    if (!Number.isFinite(number)) return "—";
+    var suffix = number % 10 === 1 && number !== 11 ? "st"
+      : number % 10 === 2 && number !== 12 ? "nd"
+      : number % 10 === 3 && number !== 13 ? "rd" : "th";
+    return number + suffix + " House";
+  }
+
+  function renderDurationCell(interval) {
+    if (!interval || !interval.startText || !interval.endText) {
+      return '<span class="jtt-cell-sub jtt-cell-muted">—</span>';
+    }
+    return '<span class="jtt-cell-sub jtt-duration-text">' +
+      escapeTableText(interval.startText) + ' to ' +
+      escapeTableText(interval.endText) + '</span>';
+  }
+
+  function renderNatalPlanetMatches(items) {
+    if (!Array.isArray(items) || !items.length) {
+      return '<span class="jtt-cell-muted">—</span>';
+    }
+    return '<div class="jtt-natal-matches">' + items.map(function (item) {
+      return '<span class="jtt-natal-match" style="color:' +
+        escapeTableText(item.color || "var(--jtt-ink)") + '">' +
+        escapeTableText(item.name) + '</span>';
+    }).join('<span class="jtt-match-separator">, </span>') + '</div>';
+  }
+
+  function renderTransitTable(data) {
+    if (!data || !Array.isArray(data.rows) || !data.rows.length) {
+      return '<div class="jtt-table-empty">No planetary transit data is available for the selected Kundali.</div>';
+    }
+
+    var rowsHtml = data.rows.map(function (row) {
+      var markers = Array.isArray(row.markers) && row.markers.length
+        ? '<sup class="jtt-planet-markers">' + row.markers.map(escapeTableText).join(" ") + '</sup>'
+        : '';
+      var bav = row.bav == null ? '' : escapeTableText(row.bav);
+      var sav = row.sav == null ? '' : escapeTableText(row.sav);
+      var murti = row.planet === "Moon" ? "" : escapeTableText(row.murti || "");
+
+      return '<tr>' +
+        '<td class="jtt-planet-cell"><strong style="color:' + escapeTableText(row.color) + '">' +
+          escapeTableText(row.planet) + '</strong>' + markers + '</td>' +
+        '<td><strong class="jtt-cell-main">' + escapeTableText(row.sign) + '</strong>' +
+          renderDurationCell(row.signDuration) + '</td>' +
+        '<td><strong class="jtt-cell-main">' + ordinalHouse(row.fromLagna) + '</strong>' +
+          '<span class="jtt-cell-sub jtt-cell-number">' + sav + '</span></td>' +
+        '<td><strong class="jtt-cell-main">' + ordinalHouse(row.fromMoon) + '</strong>' +
+          '<span class="jtt-cell-sub jtt-cell-number">' + bav + '</span></td>' +
+        '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInSign) + '</td>' +
+        '<td><strong class="jtt-cell-main">' + escapeTableText(row.nakshatra) + '</strong>' +
+          renderDurationCell(row.nakshatraDuration) + '</td>' +
+        '<td><strong class="jtt-cell-main">' + escapeTableText(row.countFromJanmaNakshatra) + '</strong>' +
+          '<span class="jtt-cell-sub">' + escapeTableText(row.nakshatraLord || "") + '</span></td>' +
+        '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInNakshatra) + '</td>' +
+        '<td><strong class="jtt-cell-main">' + escapeTableText(row.navamsa) + '</strong>' +
+          renderDurationCell(row.navamsaDuration) + '</td>' +
+        '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInNavamsa) + '</td>' +
+        '<td class="jtt-blank-cell"></td>' +
+        '<td class="jtt-blank-cell"></td>' +
+        '<td class="jtt-murti-cell">' + murti + '</td>' +
+      '</tr>';
+    }).join("");
+
+    return '<table class="jtt-planetary-table">' +
+      '<thead>' +
+        '<tr>' +
+          '<th rowspan="2" class="jtt-sticky-planet">Planet</th>' +
+          '<th>Sign</th>' +
+          '<th>From Lagna</th>' +
+          '<th>From Moon</th>' +
+          '<th rowspan="2">Natal Planet (Sign)</th>' +
+          '<th>Nakshatra</th>' +
+          '<th>Count from Janam Nakshatra</th>' +
+          '<th rowspan="2">Natal Planet (Nakshatra)</th>' +
+          '<th>Navamsa</th>' +
+          '<th rowspan="2">Natal Planet (Navamsa)</th>' +
+          '<th rowspan="2">Vedha (from)</th>' +
+          '<th rowspan="2">Reverse Vedha (from)</th>' +
+          '<th rowspan="2">Murti Nirnay</th>' +
+        '</tr>' +
+        '<tr>' +
+          '<th>Duration</th>' +
+          '<th>SAV</th>' +
+          '<th>BAV (Planet)</th>' +
+          '<th>Duration</th>' +
+          '<th>Nakshatra Lord</th>' +
+          '<th>Duration</th>' +
+        '</tr>' +
+      '</thead>' +
+      '<tbody>' + rowsHtml + '</tbody>' +
+    '</table>';
+  }
+
+  function renderTransitTableFromContext() {
+    if (!windowEl) return;
+    var host = windowEl.querySelector("[data-jtt-table-scroll]");
+    if (!host) return;
+
+    var context = window.JupiterTransitTimelineContext;
+    if (!context || typeof context.getTransitTableData !== "function") {
+      host.innerHTML = '<div class="jtt-table-empty">Open or select a Research Kundali to populate the planetary transit table.</div>';
+      return;
+    }
+
+    try {
+      host.innerHTML = renderTransitTable(context.getTransitTableData());
+    } catch (error) {
+      console.error("Transit Timeline could not render the planetary table.", error);
+      host.innerHTML = '<div class="jtt-table-empty is-error">Unable to load planetary transit data. Check the active Research Kundali.</div>';
+    }
+  }
+
   function syncFromContext() {
     if (!windowEl) return;
     var snapshot = readContextSnapshot();
@@ -250,6 +374,7 @@
       if (janma) janma.textContent = "—";
       if (selected) selected.textContent = "Waiting for a connected Kundali";
       setNotice("", false);
+      renderTransitTableFromContext();
       if (dateInput && !dateInput.value) dateInput.value = dateInputValue(new Date());
       if (timeInput && !timeInput.value) timeInput.value = timeInputValue(new Date());
       return;
@@ -265,6 +390,7 @@
     if (janma) janma.textContent = snapshot.janmaRashi || "—";
     if (selected) selected.textContent = "Evaluation: " + displayDateTime(Number(snapshot.evalMs));
     setNotice("", false);
+    renderTransitTableFromContext();
   }
 
   function readControlsTimestamp() {
@@ -401,12 +527,10 @@
           '</div>' +
         '</section>' +
         '<div class="jtt-notice" role="status" aria-live="polite" hidden></div>' +
-        '<section class="jtt-stage-panel">' +
-          '<div class="jtt-stage-icon" aria-hidden="true">' +
-            '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7v5l3.5 2"></path></svg>' +
+        '<section class="jtt-table-panel" data-jtt-transit-table aria-label="Core planetary transit table">' +
+          '<div class="jtt-table-scroll" data-jtt-table-scroll>' +
+            '<div class="jtt-table-empty">Open or select a Research Kundali to populate the planetary transit table.</div>' +
           '</div>' +
-          '<strong>Timeline workspace</strong>' +
-          '<p>The popup and shared evaluation controls are ready. Planetary rows, duration details, natal matches, Vedha and Murti Nirnaya will be added in the next implementation stage.</p>' +
         '</section>' +
       '</main>';
 
