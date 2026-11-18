@@ -1538,3 +1538,10 @@
     min-width: 1940px;
   }
 }
+
+
+/* Natal match planet status markers inherit the native chart flags. */
+#ja-transit-timeline-window .jtt-natal-match .jtt-planet-markers {
+  margin-left: 1px;
+  font-size: 8px;
+}
