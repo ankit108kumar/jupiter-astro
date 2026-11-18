@@ -319,11 +319,6 @@
       '</header>' +
       '<main class="jtt-main">' +
         '<div class="jtt-heading-row">' +
-          '<div class="jtt-heading-copy">' +
-            '<div class="jtt-eyebrow">RESEARCH WORKSPACE</div>' +
-            '<h2>Transit Timeline</h2>' +
-            '<p data-jtt-selected>Waiting for a connected Kundali</p>' +
-          '</div>' +
           '<div class="jtt-context-card">' +
             '<div class="jtt-context-item"><span>ACTIVE KUNDALI</span><strong data-jtt-chart-title>No active Research Kundali</strong></div>' +
             '<div class="jtt-context-item"><span>JANMA RASHI</span><strong data-jtt-janma>—</strong></div>' +
@@ -331,7 +326,6 @@
           '</div>' +
         '</div>' +
         '<section class="jtt-control-panel" aria-label="Transit evaluation controls">' +
-          '<div class="jtt-control-heading"><strong>Transit Evaluation</strong><span>Shared with Planetary Transits</span></div>' +
           '<div class="jtt-fields-row">' +
             '<label class="jtt-field"><span>Transit Date</span><input type="date" data-jtt-field="date" aria-label="Transit date"></label>' +
             '<label class="jtt-field jtt-time-field"><span>Transit Time</span><input type="time" data-jtt-field="time" aria-label="Transit time" step="60"></label>' +
