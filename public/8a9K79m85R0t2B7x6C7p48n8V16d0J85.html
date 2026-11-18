@@ -1502,7 +1502,7 @@ function transitDivisionIndex(longitude, division) {
 
 function findTransitDivisionBoundary(planet, evalJd, currentIndex, division, direction, dailySpeed) {
   const width = division === 'sign' ? 30 : division === 'nakshatra' ? 40 / 3 : 10 / 3;
-  const maxDays = division === 'sign' ? 1800 : division === 'nakshatra' ? 240 : 100;
+  const maxDays = division === 'sign' ? 1800 : division === 'nakshatra' ? 900 : 365;
   const stepDays = Math.min(1, Math.max(0.01, width / Math.max(dailySpeed, 0.015) / 8));
 
   let sameSideJd = evalJd;
@@ -1540,6 +1540,39 @@ function formatTransitTimelineDateTime(timestamp) {
     date.getFullYear() + ' ' + pad2(date.getHours()) + ':' + pad2(date.getMinutes());
 }
 
+function getTransitDivisionInterval(planet, evalMs, longitude, division) {
+  // Extension point for the user's forthcoming duration JSON. The eventual
+  // JSON format can be adapted here without changing table rendering.
+  const provider = window.JA_TRANSIT_DURATION_PROVIDER;
+  if (typeof provider === 'function') {
+    try {
+      const override = provider({
+        planet,
+        evalMs: Number(evalMs),
+        longitude,
+        division
+      });
+      if (override && Number.isFinite(Number(override.startMs)) &&
+          Number.isFinite(Number(override.endMs)) &&
+          Number(override.startMs) < Number(evalMs) &&
+          Number(override.endMs) > Number(evalMs)) {
+        const startMs = Number(override.startMs);
+        const endMs = Number(override.endMs);
+        return {
+          startMs,
+          endMs,
+          startText: formatTransitTimelineDateTime(startMs),
+          endText: formatTransitTimelineDateTime(endMs),
+          source: 'duration-json-override'
+        };
+      }
+    } catch (error) {
+      console.warn('Transit duration override provider failed; using basic ephemeris.', error);
+    }
+  }
+  return getBasicTransitDivisionInterval(planet, evalMs, longitude, division);
+}
+
 function getBasicTransitDivisionInterval(planet, evalMs, longitude, division) {
   const evalJd = msToJd(evalMs);
   const currentIndex = transitDivisionIndex(longitude, division);
@@ -1572,9 +1605,7 @@ function getBasicTransitDivisionInterval(planet, evalMs, longitude, division) {
 
 function transitPlanetStatusMarkers(planet, position, sign, transitPositions) {
   const markers = [];
-  // Nodes are retrograde by definition in this engine and are not separately
-  // tagged R in the existing Research chart's planet-detail display.
-  if (position.retro && planet !== 'Rahu' && planet !== 'Ketu') markers.push('R');
+  if (position.retro) markers.push('R');
   if (isCombust(planet, transitPositions)) markers.push('C');
 
   const status = dignity(planet, sign);
@@ -1600,7 +1631,30 @@ function getTransitTimelineTableData(k, evalMs) {
   const natalPlanets = PL.map(([name]) => name);
   const matchingPlanets = predicate => natalPlanets
     .filter(name => predicate(k.ch.planets[name].lon))
-    .map(name => ({ name, color: PLANET_COLORS[name] }));
+    .map(name => {
+      const natalPosition = k.ch.planets[name];
+      const natalSign = signOf(natalPosition.lon);
+      const markers = [];
+      if (natalPosition.retro) markers.push('R');
+      if (k.combust && k.combust[name]) markers.push('C');
+      const status = dignity(name, natalSign);
+      if (status && status[0] === 'ex') markers.push('↑');
+      else if (status && status[0] === 'deb') markers.push('↓');
+      if (vargottamaIn(natalPosition.lon).includes('D9')) markers.push('□');
+      return { name, color: PLANET_COLORS[name], markers };
+    });
+
+  const intervalCache = new Map();
+  const getInterval = (planet, longitude, division) => {
+    const key = planet + '|' + division;
+    if (!intervalCache.has(key)) {
+      intervalCache.set(
+        key,
+        getTransitDivisionInterval(planet, cacheKey, longitude, division)
+      );
+    }
+    return intervalCache.get(key);
+  };
 
   const rows = PL.map(([planet]) => {
     const position = transitPositions[planet];
@@ -1608,9 +1662,9 @@ function getTransitTimelineTableData(k, evalMs) {
     const nak = nakOf(position.lon);
     const navamsa = vargaSign(position.lon, 9);
 
-    const signDuration = getBasicTransitDivisionInterval(planet, cacheKey, position.lon, 'sign');
-    const nakshatraDuration = getBasicTransitDivisionInterval(planet, cacheKey, position.lon, 'nakshatra');
-    const navamsaDuration = getBasicTransitDivisionInterval(planet, cacheKey, position.lon, 'navamsa');
+    const signDuration = getInterval(planet, position.lon, 'sign');
+    const nakshatraDuration = getInterval(planet, position.lon, 'nakshatra');
+    const navamsaDuration = getInterval(planet, position.lon, 'navamsa');
 
     let murti = '';
     // Murti Nirnay is intentionally left blank for Moon.
@@ -1625,7 +1679,7 @@ function getTransitTimelineTableData(k, evalMs) {
           : countFromJanmaRashi === 3 || countFromJanmaRashi === 7 || countFromJanmaRashi === 10
             ? 'Tamra'
             : 'Loha';
-      murti = metal + ' · ' + countFromJanmaRashi;
+      murti = metal + ' · ' + SIGNS[ingressMoonSign][0] + ' (' + countFromJanmaRashi + ')';
     }
 
     const bav = planet === 'Ketu'
