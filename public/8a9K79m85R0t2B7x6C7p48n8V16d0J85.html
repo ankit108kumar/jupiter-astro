@@ -1422,8 +1422,252 @@ function ashtakavarga(pos1, ascSign) {
     bav[p] = Array(12).fill(0);
     AV[p].forEach((places, ci) => places.forEach(h => { bav[p][(refs[ci] + h - 1) % 12] += 1; }));
   }
+  // Rahu BAV is calculated with the established Rahu rules used by the
+  // Ashtakavarga view. Store it beside the seven classical BAV arrays so every
+  // view reuses exactly the same twelve sign-wise values.
+  bav.Rahu = calculateRahuBav(pos1, ascSign);
+
   const sav = Array(12).fill(0).map((_, s) => SEVEN.reduce((t, p) => t + bav[p][s], 0));
   return { bav, sav };
+}
+
+const RAHU_BAV_RULES = {
+  Sun: [1, 2, 3, 5, 7, 8, 10],
+  Moon: [1, 3, 5, 7, 8, 9, 10],
+  Mars: [2, 3, 5, 12],
+  Mercury: [2, 4, 7, 8, 12],
+  Jupiter: [1, 3, 4, 6, 8],
+  Venus: [6, 7, 11, 12],
+  Saturn: [3, 5, 7, 10, 11, 12],
+  Lagna: [3, 4, 5, 9, 12]
+};
+
+function calculateRahuBav(pos1, ascSign) {
+  return Array.from({ length: 12 }, (_, sign) =>
+    SEVEN.reduce((sum, planet) => {
+      const house = (sign - pos1[planet] + 12) % 12 + 1;
+      return sum + (RAHU_BAV_RULES[planet].includes(house) ? 1 : 0);
+    }, 0) +
+    (RAHU_BAV_RULES.Lagna.includes((sign - ascSign + 12) % 12 + 1) ? 1 : 0)
+  );
+}
+
+/* ================= TRANSIT TIMELINE DATA ADAPTER =================
+   One selected-kundali adapter supplies all nine rows to the floating
+   Transit Timeline. Transit positions are cached by evaluation timestamp.
+   Duration intervals use the same in-app sidereal ephemeris; a future JSON
+   duration provider can override the basic interval without changing the UI.
+   ====================================================================== */
+const TRANSIT_POSITION_CACHE = new Map();
+const TRANSIT_TIMELINE_DATA_CACHE = new WeakMap();
+
+function getTransitPlanetPositions(evalMs) {
+  const key = Math.trunc(Number(evalMs));
+  if (TRANSIT_POSITION_CACHE.has(key)) return TRANSIT_POSITION_CACHE.get(key);
+
+  const positions = siderealAt(msToJd(key)).planets;
+  TRANSIT_POSITION_CACHE.set(key, positions);
+  while (TRANSIT_POSITION_CACHE.size > 32) {
+    TRANSIT_POSITION_CACHE.delete(TRANSIT_POSITION_CACHE.keys().next().value);
+  }
+  return positions;
+}
+
+function siderealPlanetLongitude(planet, jd) {
+  const d = jd - 2451543.5;
+  const sun = sunPos(d);
+  let tropical;
+
+  if (planet === 'Sun') tropical = sun.lon;
+  else if (planet === 'Moon') tropical = moonLon(d, sun);
+  else if (planet === 'Rahu') tropical = nodeLon(jd);
+  else if (planet === 'Ketu') tropical = rev(nodeLon(jd) + 180);
+  else tropical = planetLon(planet, d, sun);
+
+  return rev(tropical - lahiri(jd));
+}
+
+function signedLongitudeDelta(from, to) {
+  let delta = to - from;
+  if (delta > 180) delta -= 360;
+  if (delta < -180) delta += 360;
+  return delta;
+}
+
+function transitDivisionIndex(longitude, division) {
+  if (division === 'sign') return signOf(longitude);
+  if (division === 'nakshatra') return nakOf(longitude).i;
+  return vargaSign(longitude, 9);
+}
+
+function findTransitDivisionBoundary(planet, evalJd, currentIndex, division, direction, dailySpeed) {
+  const width = division === 'sign' ? 30 : division === 'nakshatra' ? 40 / 3 : 10 / 3;
+  const maxDays = division === 'sign' ? 1800 : division === 'nakshatra' ? 240 : 100;
+  const stepDays = Math.min(1, Math.max(0.01, width / Math.max(dailySpeed, 0.015) / 8));
+
+  let sameSideJd = evalJd;
+
+  for (let elapsed = stepDays; elapsed <= maxDays + stepDays / 2; elapsed += stepDays) {
+    const outsideJd = evalJd + direction * elapsed;
+    const outsideLon = siderealPlanetLongitude(planet, outsideJd);
+
+    if (transitDivisionIndex(outsideLon, division) !== currentIndex) {
+      let same = sameSideJd;
+      let other = outsideJd;
+
+      // Refine the nearest ingress/egress boundary to substantially better
+      // than the minute precision used by the display.
+      for (let n = 0; n < 30; n++) {
+        const mid = (same + other) / 2;
+        const midLon = siderealPlanetLongitude(planet, mid);
+        if (transitDivisionIndex(midLon, division) === currentIndex) same = mid;
+        else other = mid;
+      }
+      return (same + other) / 2;
+    }
+
+    sameSideJd = outsideJd;
+  }
+
+  return null;
+}
+
+function formatTransitTimelineDateTime(timestamp) {
+  if (!Number.isFinite(timestamp)) return '';
+  const date = new Date(Math.round(timestamp / 60000) * 60000);
+  const pad2 = value => String(value).padStart(2, '0');
+  return pad2(date.getDate()) + '/' + pad2(date.getMonth() + 1) + '/' +
+    date.getFullYear() + ' ' + pad2(date.getHours()) + ':' + pad2(date.getMinutes());
+}
+
+function getBasicTransitDivisionInterval(planet, evalMs, longitude, division) {
+  const evalJd = msToJd(evalMs);
+  const currentIndex = transitDivisionIndex(longitude, division);
+  const probeDays = 0.05;
+  const before = siderealPlanetLongitude(planet, evalJd - probeDays);
+  const after = siderealPlanetLongitude(planet, evalJd + probeDays);
+  const dailySpeed = Math.abs(signedLongitudeDelta(before, after) / (probeDays * 2));
+
+  const startJd = findTransitDivisionBoundary(
+    planet, evalJd, currentIndex, division, -1, dailySpeed
+  );
+  const endJd = findTransitDivisionBoundary(
+    planet, evalJd, currentIndex, division, 1, dailySpeed
+  );
+
+  if (!Number.isFinite(startJd) || !Number.isFinite(endJd)) return null;
+
+  const startMs = jdToMs(startJd);
+  const endMs = jdToMs(endJd);
+  if (!(startMs < evalMs && endMs > evalMs)) return null;
+
+  return {
+    startMs,
+    endMs,
+    startText: formatTransitTimelineDateTime(startMs),
+    endText: formatTransitTimelineDateTime(endMs),
+    source: 'basic-ephemeris'
+  };
+}
+
+function transitPlanetStatusMarkers(planet, position, sign, transitPositions) {
+  const markers = [];
+  // Nodes are retrograde by definition in this engine and are not separately
+  // tagged R in the existing Research chart's planet-detail display.
+  if (position.retro && planet !== 'Rahu' && planet !== 'Ketu') markers.push('R');
+  if (isCombust(planet, transitPositions)) markers.push('C');
+
+  const status = dignity(planet, sign);
+  if (status && status[0] === 'ex') markers.push('↑');
+  else if (status && status[0] === 'deb') markers.push('↓');
+
+  if (vargottamaIn(position.lon).includes('D9')) markers.push('□');
+  return markers;
+}
+
+function getTransitTimelineTableData(k, evalMs) {
+  let chartCache = TRANSIT_TIMELINE_DATA_CACHE.get(k);
+  if (!chartCache) {
+    chartCache = new Map();
+    TRANSIT_TIMELINE_DATA_CACHE.set(k, chartCache);
+  }
+
+  const cacheKey = Math.trunc(Number(evalMs));
+  if (chartCache.has(cacheKey)) return chartCache.get(cacheKey);
+
+  const transitPositions = getTransitPlanetPositions(cacheKey);
+  const natalMoonNak = nakOf(k.ch.planets.Moon.lon).i;
+  const natalPlanets = PL.map(([name]) => name);
+  const matchingPlanets = predicate => natalPlanets
+    .filter(name => predicate(k.ch.planets[name].lon))
+    .map(name => ({ name, color: PLANET_COLORS[name] }));
+
+  const rows = PL.map(([planet]) => {
+    const position = transitPositions[planet];
+    const sign = signOf(position.lon);
+    const nak = nakOf(position.lon);
+    const navamsa = vargaSign(position.lon, 9);
+
+    const signDuration = getBasicTransitDivisionInterval(planet, cacheKey, position.lon, 'sign');
+    const nakshatraDuration = getBasicTransitDivisionInterval(planet, cacheKey, position.lon, 'nakshatra');
+    const navamsaDuration = getBasicTransitDivisionInterval(planet, cacheKey, position.lon, 'navamsa');
+
+    let murti = '';
+    // Murti Nirnay is intentionally left blank for Moon.
+    if (planet !== 'Moon' && signDuration && Number.isFinite(signDuration.startMs)) {
+      const moonAtIngress = siderealPlanetLongitude('Moon', msToJd(signDuration.startMs));
+      const ingressMoonSign = signOf(moonAtIngress);
+      const countFromJanmaRashi = houseFrom(ingressMoonSign, k.moonSign);
+      const metal = countFromJanmaRashi === 1 || countFromJanmaRashi === 6 || countFromJanmaRashi === 11
+        ? 'Swarna'
+        : countFromJanmaRashi === 2 || countFromJanmaRashi === 5 || countFromJanmaRashi === 9
+          ? 'Rajata'
+          : countFromJanmaRashi === 3 || countFromJanmaRashi === 7 || countFromJanmaRashi === 10
+            ? 'Tamra'
+            : 'Loha';
+      murti = metal + ' · ' + countFromJanmaRashi;
+    }
+
+    const bav = planet === 'Ketu'
+      ? null
+      : (k.av.bav[planet] ? k.av.bav[planet][sign] : null);
+
+    return {
+      planet,
+      color: PLANET_COLORS[planet],
+      markers: transitPlanetStatusMarkers(planet, position, sign, transitPositions),
+      sign: SIGNS[sign][0],
+      signDuration,
+      fromLagna: houseFrom(sign, k.ascSign),
+      sav: k.av.sav[sign],
+      fromMoon: houseFrom(sign, k.moonSign),
+      bav,
+      natalPlanetsInSign: matchingPlanets(lon => signOf(lon) === sign),
+      nakshatra: NAK[nak.i][0],
+      nakshatraDuration,
+      countFromJanmaNakshatra: ((nak.i - natalMoonNak + 27) % 27) + 1,
+      nakshatraLord: NAK[nak.i][1],
+      natalPlanetsInNakshatra: matchingPlanets(lon => nakOf(lon).i === nak.i),
+      navamsa: SIGNS[navamsa][0],
+      navamsaDuration,
+      natalPlanetsInNavamsa: matchingPlanets(lon => vargaSign(lon, 9) === navamsa),
+      vedha: '',
+      reverseVedha: '',
+      murti
+    };
+  });
+
+  const data = {
+    evalMs: cacheKey,
+    chartTitle: k.input && k.input.name ? k.input.name : 'Research Kundali',
+    rows
+  };
+
+  chartCache.set(cacheKey, data);
+  while (chartCache.size > 4) {
+    chartCache.delete(chartCache.keys().next().value);
+  }
+  return data;
 }
 
 /* ================= VIMSHOTTARI DASHA ================= */
@@ -4056,7 +4300,7 @@ dasha(k, prefix, evalMs = Date.now()) {
     // 1. Generate Natal D1 Birth Chart data
     const d1 = getVargaItems(k, 1);
     const evalJd = msToJd(evalMs);
-    const tr = siderealAt(evalJd).planets;
+    const tr = getTransitPlanetPositions(evalMs);
     const titems = PL.map(([p, , ab]) => {
       const sign = signOf(tr[p].lon);
       // Construct a temporary mock kData object for transit planets check
@@ -4670,22 +4914,7 @@ const activeYear = (typeof window.trSelectedLkYear === 'number' && window.trSele
   ashtaka(k) {
     const savItems = k.av.sav.map((v, s) => ({ t: String(v), sign: s }));
     const bavColor = v => v >= 6 ? '#16a34a' : v <= 3 ? '#dc2626' : '#2563eb';
-    const rahuRules = {
-  Sun: [1,2,3,5,7,8,10],
-  Moon: [1,3,5,7,8,9,10],
-  Mars: [2,3,5,12],
-  Mercury: [2,4,7,8,12],
-  Jupiter: [1,3,4,6,8],
-  Venus: [6,7,11,12],
-  Saturn: [3,5,7,10,11,12],
-  Lagna: [3,4,5,9,12]
-};
-
-const rahuBav = Array.from({ length: 12 }, (_, s) =>
-  SEVEN.reduce((sum, p) =>
-    sum + (rahuRules[p].includes((s - k.pos1[p] + 12) % 12 + 1) ? 1 : 0), 0
-  ) + (rahuRules.Lagna.includes((s - k.ascSign + 12) % 12 + 1) ? 1 : 0)
-);
+    const rahuBav = k.av.bav.Rahu;
     let avRows = `<tr><td class="sub">House</td>${SHORT.map((_, s) => `<td class="num c sub">${houseFrom(s, k.ascSign)}</td>`).join('')}<td></td></tr>`;
     SEVEN.forEach(p => {
       avRows += `<tr><td><b>${p}</b></td>${k.av.bav[p].map(v => `<td class="num c" style="color:${bavColor(v)}">${v}</td>`).join('')}<td class="num c">${k.av.bav[p].reduce((a, b) => a + b, 0)}</td></tr>`;
@@ -4858,6 +5087,9 @@ function renderKundaliComponent(
       dasha: dashaChain(kData.md.list, currentEvalMs, 365.25)
         .slice(0, 3).map(p => p.lord).join(' - ') || '—'
     }),
+    // Returns the selected chart's natal data joined with the cached transit
+    // positions for this evaluation instant. No per-cell ephemeris recalculation.
+    getTransitTableData: () => getTransitTimelineTableData(kData, currentEvalMs),
     activate: () => {
       updateDashaHeader();
       openTab('transit');
