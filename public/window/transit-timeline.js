@@ -448,6 +448,12 @@
         width: rect.width,
         height: rect.height
       };
+      // Clear any drag/restore inline bounds so the maximized CSS can fill the viewport.
+      windowEl.style.left = "";
+      windowEl.style.top = "";
+      windowEl.style.width = "";
+      windowEl.style.height = "";
+      windowEl.style.transform = "";
       windowEl.classList.add("jtt-maximized");
       maximized = true;
     } else {
