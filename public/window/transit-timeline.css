@@ -1545,3 +1545,299 @@
   margin-left: 1px;
   font-size: 8px;
 }
+
+
+/* Transit table readability, duration tooltips and global export — November 2026. */
+#ja-transit-timeline-window {
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+#ja-transit-timeline-window .jtt-planetary-table {
+  min-width: 1760px;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 11.5px;
+  line-height: 1.42;
+  font-variant-numeric: tabular-nums;
+}
+
+#ja-transit-timeline-window .jtt-planetary-table th,
+#ja-transit-timeline-window .jtt-planetary-table td { padding: 8px 8px; }
+
+#ja-transit-timeline-window .jtt-planetary-table thead th {
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: .15px;
+  line-height: 1.3;
+}
+
+#ja-transit-timeline-window .jtt-planetary-table thead tr:nth-child(2) th {
+  font-size: 9px;
+  font-weight: 600;
+}
+
+#ja-transit-timeline-window .jtt-planetary-table th:first-child,
+#ja-transit-timeline-window .jtt-planetary-table td:first-child { width: 92px; min-width: 92px; }
+
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(2),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(2) { width: 145px; }
+
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(3),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(3),
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(4),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(4) { width: 105px; }
+
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(5),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(5),
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(8),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(8),
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(10),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(10) { width: 135px; }
+
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(6),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(6) { width: 145px; }
+
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(7),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(7) { width: 82px; }
+
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(9),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(9) { width: 92px; }
+
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(11),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(11),
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(12),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(12) { width: 95px; }
+
+#ja-transit-timeline-window .jtt-planetary-table th:nth-child(13),
+#ja-transit-timeline-window .jtt-planetary-table td:nth-child(13) { width: 90px; }
+
+#ja-transit-timeline-window .jtt-planet-cell strong {
+  color: var(--jtt-ink) !important;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+#ja-transit-timeline-window .jtt-cell-main { font-size: 11px; font-weight: 450; }
+
+#ja-transit-timeline-window .jtt-cell-number,
+#ja-transit-timeline-window .jtt-house-score,
+#ja-transit-timeline-window .jtt-count-cell,
+#ja-transit-timeline-window .jtt-navamsa-cell,
+#ja-transit-timeline-window .jtt-murti-cell {
+  color: var(--jtt-ink);
+  font-size: 11px;
+  font-weight: 450;
+  font-variant-numeric: tabular-nums;
+}
+
+#ja-transit-timeline-window .jtt-sign-cell .jtt-duration-value {
+  color: var(--jtt-ink);
+  font-size: 11.5px;
+  font-weight: 650;
+}
+
+#ja-transit-timeline-window .jtt-nak-lord { color: var(--jtt-muted); font-size: 10px; font-weight: 450; }
+#ja-transit-timeline-window .jtt-house-score { display: inline-block; white-space: nowrap; }
+#ja-transit-timeline-window .jtt-natal-match { font-size: 10.5px; font-weight: 500; }
+#ja-transit-timeline-window .jtt-planet-markers { font-size: 8px; font-weight: 700; }
+
+#ja-transit-timeline-window .jtt-duration-wrap {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  max-width: 100%;
+  color: var(--jtt-ink);
+  cursor: help;
+  outline: none;
+  text-decoration: underline dotted color-mix(in srgb, var(--jtt-muted) 55%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  user-select: text;
+}
+
+#ja-transit-timeline-window .jtt-duration-wrap:focus-visible {
+  border-radius: 3px;
+  outline: 2px solid var(--jtt-accent);
+  outline-offset: 3px;
+}
+
+#ja-transit-timeline-window .jtt-duration-hint {
+  color: var(--jtt-muted);
+  font-size: 9px;
+  opacity: .62;
+  text-decoration: none;
+}
+
+.jtt-duration-tooltip {
+  position: fixed;
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: max-content;
+  max-width: min(380px, calc(100vw - 20px));
+  padding: 10px 12px;
+  border: 1px solid var(--jtt-line-strong, rgba(120,120,130,.22));
+  border-radius: 10px;
+  color: var(--jtt-ink, #1D1D1F);
+  background: color-mix(in srgb, var(--jtt-panel, #fff) 86%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
+  backdrop-filter: blur(18px) saturate(1.25);
+  box-shadow: 0 8px 28px rgba(0,0,0,.16);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.jtt-duration-tooltip.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.jtt-duration-tooltip-heading {
+  flex: 0 0 auto;
+  color: var(--jtt-muted, #6E6E73);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+}
+
+.jtt-duration-tooltip-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--jtt-ink, #1D1D1F);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  user-select: text;
+  cursor: text;
+  font-variant-numeric: tabular-nums;
+}
+
+.jtt-duration-tooltip-copy {
+  display: inline-flex;
+  flex: 0 0 26px;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--jtt-line, rgba(120,120,130,.2));
+  border-radius: 7px;
+  color: var(--jtt-muted, #6E6E73);
+  background: transparent;
+  cursor: pointer;
+}
+
+.jtt-duration-tooltip-copy svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.jtt-duration-tooltip-copy:hover,
+.jtt-duration-tooltip-copy.is-copied {
+  color: var(--jtt-accent, #007AFF);
+  border-color: var(--jtt-accent, #007AFF);
+}
+
+#ja-transit-timeline-window .jtt-global-export-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#ja-transit-timeline-window .jtt-global-export-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--jtt-line-strong);
+  border-radius: 50%;
+  color: var(--jtt-ink);
+  background: var(--jtt-panel);
+  cursor: pointer;
+  transition: color 150ms ease, border-color 150ms ease, transform 150ms ease;
+}
+
+#ja-transit-timeline-window .jtt-global-export-button:hover,
+#ja-transit-timeline-window .jtt-global-export-button[aria-expanded="true"] {
+  color: var(--jtt-accent);
+  border-color: var(--jtt-accent);
+  transform: translateY(-1px);
+}
+
+#ja-transit-timeline-window .jtt-global-export-button svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+#ja-transit-timeline-window .jtt-global-export-menu {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 190px;
+  padding: 6px;
+  border: 1px solid var(--jtt-line-strong);
+  border-radius: 11px;
+  background: var(--jtt-panel);
+  box-shadow: 0 12px 30px rgba(0,0,0,.16);
+}
+
+#ja-transit-timeline-window .jtt-global-export-menu[hidden] { display: none !important; }
+#ja-transit-timeline-window .jtt-global-export-heading {
+  padding: 6px 8px 7px;
+  color: var(--jtt-muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+}
+
+#ja-transit-timeline-window .jtt-global-export-menu button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px;
+  border: 0;
+  border-radius: 7px;
+  color: var(--jtt-ink);
+  background: transparent;
+  font-size: 11px;
+  font-weight: 550;
+  text-align: left;
+  cursor: pointer;
+}
+
+#ja-transit-timeline-window .jtt-global-export-menu button:hover { background: var(--jtt-accent-soft); }
+
+#ja-transit-timeline-window .jtt-global-export-menu kbd {
+  padding: 2px 5px;
+  border: 1px solid var(--jtt-line);
+  border-radius: 4px;
+  color: var(--jtt-muted);
+  background: var(--jtt-panel-alt);
+  font-family: inherit;
+  font-size: 9px;
+  line-height: 1.3;
+}
