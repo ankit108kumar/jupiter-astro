@@ -1175,3 +1175,136 @@
     min-width: 990px;
   }
 }
+
+
+/* Compact inline date/time fields with right-aligned steppers — November 2026. */
+#ja-transit-timeline-window .jtt-control-panel {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 16px;
+  padding: 9px 12px 11px;
+  overflow: visible;
+}
+
+#ja-transit-timeline-window .jtt-fields-row {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 12px;
+  min-width: 0;
+}
+
+#ja-transit-timeline-window .jtt-field {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 7px;
+  min-width: 0;
+  margin: 0;
+  color: var(--jtt-muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .35px;
+  white-space: nowrap;
+}
+
+#ja-transit-timeline-window .jtt-field > span {
+  flex: 0 0 auto;
+  min-width: 0;
+  color: var(--jtt-muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .25px;
+  white-space: nowrap;
+}
+
+#ja-transit-timeline-window .jtt-date-field {
+  flex: 0 0 auto;
+}
+
+#ja-transit-timeline-window .jtt-date-field > span {
+  width: 31px;
+}
+
+#ja-transit-timeline-window .jtt-date-field input {
+  flex: 0 0 148px;
+  width: 148px;
+  height: 32px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+
+#ja-transit-timeline-window .jtt-time-field {
+  flex: 0 0 auto;
+  max-width: none;
+}
+
+#ja-transit-timeline-window .jtt-time-field > span {
+  width: 32px;
+}
+
+#ja-transit-timeline-window .jtt-time-field input {
+  flex: 0 0 112px;
+  width: 112px;
+  height: 32px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+
+#ja-transit-timeline-window .jtt-now-button {
+  flex: 0 0 auto;
+  height: 32px;
+  padding: 0 11px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+#ja-transit-timeline-window .jtt-stepper-row {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  gap: 12px;
+  min-width: 0;
+  margin: 0;
+}
+
+#ja-transit-timeline-window .step-group {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 1px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+}
+
+#ja-transit-timeline-window .group-label {
+  flex: 0 0 auto;
+  margin: 0 3px 0 0;
+  font-size: 9px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+#ja-transit-timeline-window .btn-step {
+  flex: 0 0 auto;
+  min-height: 25px;
+  padding: 3px 4px;
+  border-radius: 6px;
+  font-size: 10px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+@media (max-width: 1200px) {
+  #ja-transit-timeline-window .jtt-unified-panel {
+    min-width: 1080px;
+  }
+}
