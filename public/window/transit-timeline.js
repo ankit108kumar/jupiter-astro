@@ -217,10 +217,7 @@
       charts.forEach(function (chart) {
         var option = document.createElement("option");
         option.value = chart.id;
-        var rashi = chart.snapshot && chart.snapshot.janmaRashi
-          ? " · " + chart.snapshot.janmaRashi + " Rashi"
-          : "";
-        option.textContent = chart.title + rashi;
+        option.textContent = chart.title;
         chartSelect.appendChild(option);
       });
 
@@ -252,7 +249,7 @@
       if (chartTitle) chartTitle.textContent = "No active Research Kundali";
       if (janma) janma.textContent = "—";
       if (selected) selected.textContent = "Waiting for a connected Kundali";
-      setNotice("Generate or open a Research Kundali to connect its Planetary Transits evaluation.", false);
+      setNotice("", false);
       if (dateInput && !dateInput.value) dateInput.value = dateInputValue(new Date());
       if (timeInput && !timeInput.value) timeInput.value = timeInputValue(new Date());
       return;
@@ -267,7 +264,7 @@
     if (chartTitle) chartTitle.textContent = snapshot.chartTitle || "Active Research Kundali";
     if (janma) janma.textContent = snapshot.janmaRashi || "—";
     if (selected) selected.textContent = "Evaluation: " + displayDateTime(Number(snapshot.evalMs));
-    setNotice("Connected to the active Research Kundali. Date and time changes are shared with Planetary Transits.", false);
+    setNotice("", false);
   }
 
   function readControlsTimestamp() {
@@ -355,44 +352,51 @@
         '</div>' +
         '<div class="jtt-window-title">Jupiter Astro · Transit Timeline</div>' +
         '<div class="jtt-titlebar-tools">' +
+          '<div class="jtt-info-wrap">' +
+            '<button class="jtt-info-button" type="button" data-jtt-action="info" title="Transit Timeline information" aria-label="Transit Timeline information" aria-expanded="false" aria-controls="jtt-info-popover">i</button>' +
+            '<div class="jtt-info-popover" id="jtt-info-popover" data-jtt-info-popover hidden role="note">' +
+              'Connected to the active Research Kundali. Date and time changes are shared with Planetary Transits.' +
+            '</div>' +
+          '</div>' +
           '<button class="jtt-tool-button" type="button" data-jtt-action="fullscreen" title="Enter full screen" aria-label="Enter full screen">⛶</button>' +
           '<button class="jtt-theme-toggle" type="button" data-jtt-action="theme" title="Switch appearance" aria-label="Switch appearance" aria-pressed="false"></button>' +
         '</div>' +
       '</header>' +
       '<main class="jtt-main">' +
-        '<div class="jtt-heading-row">' +
+        '<section class="jtt-unified-panel" aria-label="Active Kundali and transit evaluation">' +
           '<div class="jtt-context-card">' +
             '<div class="jtt-context-item jtt-active-kundali-item"><span>ACTIVE KUNDALI</span><strong data-jtt-chart-title>No active Research Kundali</strong><select data-jtt-chart-select aria-label="Select active Kundali" hidden></select></div>' +
-            '<div class="jtt-context-item"><span>JANMA RASHI</span><strong data-jtt-janma>—</strong></div>' +
-            '<div class="jtt-context-item jtt-dasha-item"><span>RUNNING DASHA · MD – AD – PD</span><strong data-jtt-dasha>—</strong></div>' +
+            '<div class="jtt-context-item jtt-janma-item"><span>JANMA RASHI</span><strong data-jtt-janma>—</strong></div>' +
+            '<div class="jtt-context-item jtt-dasha-item"><span>RUNNING DASHA</span><strong data-jtt-dasha>—</strong></div>' +
           '</div>' +
-        '</div>' +
-        '<section class="jtt-control-panel" aria-label="Transit evaluation controls">' +
-          '<div class="jtt-fields-row">' +
-            '<label class="jtt-field"><span>Transit Date</span><input type="date" data-jtt-field="date" aria-label="Transit date"></label>' +
-            '<label class="jtt-field jtt-time-field"><span>Transit Time</span><input type="time" data-jtt-field="time" aria-label="Transit time" step="60"></label>' +
-            '<button class="jtt-now-button" type="button" data-jtt-action="now">Now</button>' +
-          '</div>' +
-          '<div class="jtt-stepper-row">' +
-            '<div class="step-group" style="height:31px; margin-bottom:1px;">' +
-              '<span class="group-label">Date:</span>' +
-              '<button type="button" class="btn-step" data-tr-year="-1">-1y</button>' +
-              '<button type="button" class="btn-step" data-tr-day="-30">-30d</button>' +
-              '<button type="button" class="btn-step" data-tr-day="-7">-7d</button>' +
-              '<button type="button" class="btn-step" data-tr-day="-1">-1d</button>' +
-              '<button type="button" class="btn-step" data-tr-day="1">+1d</button>' +
-              '<button type="button" class="btn-step" data-tr-day="7">+7d</button>' +
-              '<button type="button" class="btn-step" data-tr-day="30">+30d</button>' +
-              '<button type="button" class="btn-step" data-tr-year="1">+1y</button>' +
+          '<div class="jtt-unified-divider" aria-hidden="true"></div>' +
+          '<div class="jtt-control-panel" aria-label="Transit evaluation controls">' +
+            '<div class="jtt-fields-row">' +
+              '<label class="jtt-field"><span>Transit Date</span><input type="date" data-jtt-field="date" aria-label="Transit date"></label>' +
+              '<label class="jtt-field jtt-time-field"><span>Transit Time</span><input type="time" data-jtt-field="time" aria-label="Transit time" step="60"></label>' +
+              '<button class="jtt-now-button" type="button" data-jtt-action="now">Now</button>' +
             '</div>' +
-            '<div class="step-group" style="height:31px; margin-bottom:1px;">' +
-              '<span class="group-label">Time:</span>' +
-              '<button type="button" class="btn-step" data-tr-min="-60">-1h</button>' +
-              '<button type="button" class="btn-step" data-tr-min="-10">-10m</button>' +
-              '<button type="button" class="btn-step" data-tr-min="-1">-1m</button>' +
-              '<button type="button" class="btn-step" data-tr-min="1">+1m</button>' +
-              '<button type="button" class="btn-step" data-tr-min="10">+10m</button>' +
-              '<button type="button" class="btn-step" data-tr-min="60">+1h</button>' +
+            '<div class="jtt-stepper-row">' +
+              '<div class="step-group" style="height:31px; margin-bottom:1px;">' +
+                '<span class="group-label">Date:</span>' +
+                '<button type="button" class="btn-step" data-tr-year="-1">-1y</button>' +
+                '<button type="button" class="btn-step" data-tr-day="-30">-30d</button>' +
+                '<button type="button" class="btn-step" data-tr-day="-7">-7d</button>' +
+                '<button type="button" class="btn-step" data-tr-day="-1">-1d</button>' +
+                '<button type="button" class="btn-step" data-tr-day="1">+1d</button>' +
+                '<button type="button" class="btn-step" data-tr-day="7">+7d</button>' +
+                '<button type="button" class="btn-step" data-tr-day="30">+30d</button>' +
+                '<button type="button" class="btn-step" data-tr-year="1">+1y</button>' +
+              '</div>' +
+              '<div class="step-group" style="height:31px; margin-bottom:1px;">' +
+                '<span class="group-label">Time:</span>' +
+                '<button type="button" class="btn-step" data-tr-min="-60">-1h</button>' +
+                '<button type="button" class="btn-step" data-tr-min="-10">-10m</button>' +
+                '<button type="button" class="btn-step" data-tr-min="-1">-1m</button>' +
+                '<button type="button" class="btn-step" data-tr-min="1">+1m</button>' +
+                '<button type="button" class="btn-step" data-tr-min="10">+10m</button>' +
+                '<button type="button" class="btn-step" data-tr-min="60">+1h</button>' +
+              '</div>' +
             '</div>' +
           '</div>' +
         '</section>' +
@@ -541,6 +545,14 @@
   }
 
   function handleWindowClick(event) {
+    var infoWrap = event.target.closest(".jtt-info-wrap");
+    if (!infoWrap) {
+      var existingInfo = windowEl.querySelector("[data-jtt-info-popover]");
+      var existingInfoButton = windowEl.querySelector('[data-jtt-action="info"]');
+      if (existingInfo) existingInfo.hidden = true;
+      if (existingInfoButton) existingInfoButton.setAttribute("aria-expanded", "false");
+    }
+
     var actionButton = event.target.closest("[data-jtt-action]");
     if (actionButton) {
       var action = actionButton.getAttribute("data-jtt-action");
@@ -549,6 +561,12 @@
       if (action === "maximize") toggleMaximize();
       if (action === "fullscreen") toggleFullscreen();
       if (action === "theme") toggleTheme();
+      if (action === "info") {
+        var infoPopover = windowEl.querySelector("[data-jtt-info-popover]");
+        var isOpen = infoPopover && infoPopover.hidden;
+        if (infoPopover) infoPopover.hidden = !isOpen;
+        actionButton.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      }
       if (action === "now") applyEvaluationTime(Date.now());
       return;
     }
