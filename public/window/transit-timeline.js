@@ -1,6 +1,6 @@
 /* =========================================================
    JUPITER ASTRO — TRANSIT TIMELINE FLOATING WINDOW
-   Shortcut: Ctrl + Shift + F8 (Cmd + Option + T on Mac)
+   Shortcut: Ctrl + Shift + X (Cmd + Option + T on Mac)
    Step 1: Library-style window shell and appearance modes.
    Step 2: Login-gated date/time controls tied to the active
            Research Kundali evaluation timestamp.
@@ -195,9 +195,51 @@
     notice.classList.toggle("is-error", !!isError);
   }
 
+  function syncChartSelector(snapshot) {
+    if (!windowEl) return;
+    var chartTitle = windowEl.querySelector("[data-jtt-chart-title]");
+    var chartSelect = windowEl.querySelector("[data-jtt-chart-select]");
+    var registry = window.JupiterTransitTimelineCharts;
+    var charts = registry && typeof registry.getCharts === "function"
+      ? registry.getCharts()
+      : [];
+    var activeId = registry && typeof registry.getActiveId === "function"
+      ? registry.getActiveId()
+      : "";
+
+    if (!chartSelect || !chartTitle) return;
+
+    if (charts.length > 1) {
+      chartTitle.hidden = true;
+      chartSelect.hidden = false;
+      while (chartSelect.firstChild) chartSelect.removeChild(chartSelect.firstChild);
+
+      charts.forEach(function (chart) {
+        var option = document.createElement("option");
+        option.value = chart.id;
+        var rashi = chart.snapshot && chart.snapshot.janmaRashi
+          ? " · " + chart.snapshot.janmaRashi + " Rashi"
+          : "";
+        option.textContent = chart.title + rashi;
+        chartSelect.appendChild(option);
+      });
+
+      chartSelect.value = activeId || (snapshot && snapshot.chartId) || charts[0].id;
+    } else {
+      chartSelect.hidden = true;
+      chartTitle.hidden = false;
+      if (charts.length === 1) {
+        chartTitle.textContent = charts[0].title;
+      } else if (!snapshot) {
+        chartTitle.textContent = "No active Research Kundali";
+      }
+    }
+  }
+
   function syncFromContext() {
     if (!windowEl) return;
     var snapshot = readContextSnapshot();
+    syncChartSelector(snapshot);
     var dateInput = windowEl.querySelector('[data-jtt-field="date"]');
     var timeInput = windowEl.querySelector('[data-jtt-field="time"]');
     var dasha = windowEl.querySelector("[data-jtt-dasha]");
@@ -320,7 +362,7 @@
       '<main class="jtt-main">' +
         '<div class="jtt-heading-row">' +
           '<div class="jtt-context-card">' +
-            '<div class="jtt-context-item"><span>ACTIVE KUNDALI</span><strong data-jtt-chart-title>No active Research Kundali</strong></div>' +
+            '<div class="jtt-context-item jtt-active-kundali-item"><span>ACTIVE KUNDALI</span><strong data-jtt-chart-title>No active Research Kundali</strong><select data-jtt-chart-select aria-label="Select active Kundali" hidden></select></div>' +
             '<div class="jtt-context-item"><span>JANMA RASHI</span><strong data-jtt-janma>—</strong></div>' +
             '<div class="jtt-context-item jtt-dasha-item"><span>RUNNING DASHA · MD – AD – PD</span><strong data-jtt-dasha>—</strong></div>' +
           '</div>' +
@@ -380,6 +422,16 @@
     var timeInput = windowEl.querySelector('[data-jtt-field="time"]');
     if (dateInput) dateInput.addEventListener("change", updateFromFields);
     if (timeInput) timeInput.addEventListener("change", updateFromFields);
+
+    var chartSelect = windowEl.querySelector("[data-jtt-chart-select]");
+    if (chartSelect) {
+      chartSelect.addEventListener("change", function () {
+        var registry = window.JupiterTransitTimelineCharts;
+        if (registry && typeof registry.setActive === "function") {
+          registry.setActive(chartSelect.value, true);
+        }
+      });
+    }
 
     applyTheme(themeMode, false);
     enableDragging();
@@ -562,14 +614,12 @@
 
   document.addEventListener("keydown", function (event) {
     var isMac = isApplePlatform();
-    // Avoid Ctrl+Alt on Windows/Linux: it aliases AltGr on many keyboard layouts.
-    // F8 is not used by Chrome's standard shortcut list, so the Windows chord
-    // is Ctrl+Shift+F8 rather than the unreliable Ctrl+Alt+T.
+    // Avoid Ctrl+Alt (AltGr) on Windows/Linux. Use the requested alphabet chord.
     var isTimelineShortcut = isMac
       ? event.code === "KeyT" && event.metaKey && event.altKey &&
         !event.ctrlKey && !event.shiftKey
-      : (event.code === "F8" || event.key === "F8") &&
-        event.ctrlKey && event.shiftKey && !event.altKey && !event.metaKey;
+      : event.code === "KeyX" && event.ctrlKey && event.shiftKey &&
+        !event.altKey && !event.metaKey;
 
     if (isTimelineShortcut) {
       event.preventDefault();
@@ -584,6 +634,10 @@
   }, true);
 
   document.addEventListener("fullscreenchange", syncFullscreenButton);
+
+  window.addEventListener("ja-transit-charts-changed", function () {
+    if (windowEl) syncFromContext();
+  });
 
   window.addEventListener("ja-auth-state-changed", function (event) {
     var user = event && event.detail &&
@@ -608,6 +662,6 @@
     restore: restoreWindow,
     syncFromContext: syncFromContext,
     isOpen: openState,
-    shortcut: isApplePlatform() ? "⌘ + Option + T" : "Ctrl + Shift + F8"
+    shortcut: isApplePlatform() ? "⌘ + Option + T" : "Ctrl + Shift + X"
   };
 })();
