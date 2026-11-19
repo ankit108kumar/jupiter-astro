@@ -1031,27 +1031,8 @@
     closeGlobalExportMenu();
   }
 
-  var activeHouseResultTooltip = null;
-  var houseResultHideTimer = null;
-  var houseResultBoundHosts = new WeakSet();
-
-  function removeHouseResultTooltip() {
-    if (houseResultHideTimer) {
-      clearTimeout(houseResultHideTimer);
-      houseResultHideTimer = null;
-    }
-    if (activeHouseResultTooltip && activeHouseResultTooltip.parentNode) {
-      activeHouseResultTooltip.remove();
-    }
-    activeHouseResultTooltip = null;
-  }
-
-  function scheduleHouseResultTooltipHide() {
-    if (houseResultHideTimer) clearTimeout(houseResultHideTimer);
-    houseResultHideTimer = setTimeout(removeHouseResultTooltip, 500);
-  }
-
   var houseSignificationsPromise = null;
+  var houseSignificationBoundHosts = new WeakSet();
 
   function loadHouseSignifications() {
     if (!houseSignificationsPromise) {
@@ -1074,103 +1055,54 @@
     return houseSignificationsPromise;
   }
 
-  function positionHouseResultTooltip(trigger, tooltip) {
-    if (!trigger || !trigger.isConnected || !tooltip || !tooltip.isConnected) return;
-    var windowRect = windowEl.getBoundingClientRect();
-    var rect = trigger.getBoundingClientRect();
-    var tipRect = tooltip.getBoundingClientRect();
-    var maxLeft = Math.max(8, windowEl.clientWidth - tipRect.width - 8);
-    var left = Math.max(8, Math.min(rect.left - windowRect.left, maxLeft));
-    var maxTop = Math.max(8, windowEl.clientHeight - tipRect.height - 8);
-    var top = rect.bottom - windowRect.top + 8;
-    if (top > maxTop) top = rect.top - windowRect.top - tipRect.height - 8;
-    top = Math.max(8, Math.min(top, maxTop));
-    tooltip.style.left = Math.round(left) + "px";
-    tooltip.style.top = Math.round(top) + "px";
-    tooltip.style.visibility = "visible";
-  }
+  function showHouseSignification(houseNumber) {
+    var houseKey = "house:" + houseNumber;
+    clearPlanetSignificationTimers();
+    activePlanetSignification = houseKey;
 
-  function showHouseResultTooltip(trigger) {
-    var houseNumber = Number(trigger.getAttribute("data-result-house"));
-    if (!Number.isInteger(houseNumber) || houseNumber < 1 || houseNumber > 12) return;
+    var panel = ensurePlanetSignificationPanel();
+    if (!panel) return;
 
-    var api = window.JupiterTransitTimeline &&
-      window.JupiterTransitTimeline.transitResultBasic;
-    var result = api && typeof api.getResult === "function"
-      ? api.getResult(trigger.getAttribute("data-result-planet"), houseNumber)
-      : null;
-
-    if (houseResultHideTimer) {
-      clearTimeout(houseResultHideTimer);
-      houseResultHideTimer = null;
-    }
-    removeHouseResultTooltip();
-
-    var tooltip = document.createElement("div");
-    tooltip.className = "jtt-transit-result-tooltip";
-    tooltip.setAttribute("role", "tooltip");
-
-    var houseHeading = document.createElement("div");
-    houseHeading.className = "jtt-transit-result-heading";
-    houseHeading.textContent = houseNumber + "H · House Signification";
-
-    var houseDescription = document.createElement("div");
-    houseDescription.className = "jtt-house-signification-description";
-    houseDescription.textContent = "Loading house signification…";
-    tooltip.appendChild(houseHeading);
-    tooltip.appendChild(houseDescription);
-
-    if (result && result.result) {
-      var resultHeading = document.createElement("div");
-      resultHeading.className = "jtt-transit-result-heading jtt-transit-result-subheading";
-      resultHeading.textContent = "Transit Result : Basic · " + result.planet + " · " + result.house + "H";
-      var resultDescription = document.createElement("div");
-      resultDescription.className = "jtt-transit-result-description";
-      resultDescription.textContent = result.result;
-      tooltip.appendChild(resultHeading);
-      tooltip.appendChild(resultDescription);
-    }
-
-    var computed = getComputedStyle(windowEl);
-    [
-      "--jtt-bg", "--jtt-panel", "--jtt-panel-alt", "--jtt-ink",
-      "--jtt-muted", "--jtt-line", "--jtt-line-strong", "--jtt-accent",
-      "--jtt-accent-soft"
-    ].forEach(function (property) {
-      tooltip.style.setProperty(property, computed.getPropertyValue(property).trim());
-    });
-    tooltip.style.visibility = "hidden";
-    tooltip.style.left = "8px";
-    tooltip.style.top = "8px";
-    windowEl.appendChild(tooltip);
-    activeHouseResultTooltip = tooltip;
-    positionHouseResultTooltip(trigger, tooltip);
+    var title = panel.querySelector(".jtt-planet-signification-title");
+    var body = panel.querySelector(".jtt-planet-signification-body");
+    title.textContent = "House " + houseNumber;
+    body.textContent = "Loading house signification…";
+    panel.hidden = false;
+    panel.classList.remove("is-visible");
+    void panel.offsetWidth;
+    panel.classList.add("is-visible");
 
     loadHouseSignifications().then(function (houses) {
-      if (activeHouseResultTooltip !== tooltip || !trigger.isConnected) return;
-      var house = houses.find(function (entry) { return Number(entry.house) === houseNumber; });
-      houseHeading.textContent = house
-        ? house.name + " House · " + houseNumber + "H"
-        : houseNumber + "H · House Signification";
-      houseDescription.textContent = house && house.description
-        ? house.description : "No house signification is available.";
-      positionHouseResultTooltip(trigger, tooltip);
+      if (activePlanetSignification !== houseKey || !panel.isConnected) return;
+      var entry = houses.find(function (item) {
+        return Number(item.house) === houseNumber;
+      });
+      title.textContent = entry
+        ? entry.name + " House · " + houseNumber + "H"
+        : "House " + houseNumber;
+      body.textContent = entry && entry.description
+        ? entry.description
+        : "No house signification is available.";
     }).catch(function (error) {
-      if (activeHouseResultTooltip !== tooltip) return;
-      houseDescription.textContent = "House signification could not be loaded.";
+      if (activePlanetSignification !== houseKey || !panel.isConnected) return;
+      body.textContent = "House signification could not be loaded.";
       console.error("Jupiter Astro: Unable to load house significations.", error);
-      positionHouseResultTooltip(trigger, tooltip);
     });
   }
+
   function bindHouseResultTooltips(host) {
-    if (!host || houseResultBoundHosts.has(host)) return;
-    houseResultBoundHosts.add(host);
+    if (!host || houseSignificationBoundHosts.has(host)) return;
+    houseSignificationBoundHosts.add(host);
 
     host.addEventListener("pointerover", function (event) {
       var target = event.target && event.target.closest
         ? event.target.closest(".jtt-house-result-trigger") : null;
       if (!target || !host.contains(target)) return;
-      showHouseResultTooltip(target);
+      if (event.relatedTarget && target.contains(event.relatedTarget)) return;
+      var houseNumber = Number(target.getAttribute("data-result-house"));
+      if (Number.isInteger(houseNumber) && houseNumber >= 1 && houseNumber <= 12) {
+        showHouseSignification(houseNumber);
+      }
     });
 
     host.addEventListener("pointerout", function (event) {
@@ -1178,19 +1110,23 @@
         ? event.target.closest(".jtt-house-result-trigger") : null;
       if (!target || !host.contains(target)) return;
       if (event.relatedTarget && target.contains(event.relatedTarget)) return;
-      scheduleHouseResultTooltipHide();
+      hidePlanetSignification();
     });
 
     host.addEventListener("focusin", function (event) {
       var target = event.target && event.target.closest
         ? event.target.closest(".jtt-house-result-trigger") : null;
-      if (target && host.contains(target)) showHouseResultTooltip(target);
+      if (!target || !host.contains(target)) return;
+      var houseNumber = Number(target.getAttribute("data-result-house"));
+      if (Number.isInteger(houseNumber) && houseNumber >= 1 && houseNumber <= 12) {
+        showHouseSignification(houseNumber);
+      }
     });
 
     host.addEventListener("focusout", function (event) {
       var target = event.target && event.target.closest
         ? event.target.closest(".jtt-house-result-trigger") : null;
-      if (target && host.contains(target)) scheduleHouseResultTooltipHide();
+      if (target && host.contains(target)) hidePlanetSignification();
     });
   }
 
@@ -1394,7 +1330,6 @@
 
     try {
       removeDurationTooltip();
-      removeHouseResultTooltip();
       host.innerHTML = renderTransitTable(context.getTransitTableData());
       bindDurationTooltips(host);
       bindHouseResultTooltips(host);
