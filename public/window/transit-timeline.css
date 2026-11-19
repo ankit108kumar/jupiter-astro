@@ -2103,3 +2103,27 @@
   font-size: .9em;
   font-weight: 400;
 }
+
+
+/* Latta Dosha marker: literal {L} superscript with native hover tooltip. */
+#ja-transit-timeline-window .jtt-latta-marker,
+.ja-navtara-latta {
+  color: #DC2626;
+  font-size: .78em;
+  font-weight: 750;
+  line-height: 0;
+  vertical-align: super;
+  cursor: help;
+  white-space: nowrap;
+}
+.ja-navtara-latta {
+  margin-left: 2px;
+}
+
+/* SAV and BAV score thresholds; keep the score muted in size and weight. */
+#ja-transit-timeline-window .jtt-house-score-detail.jtt-score-good {
+  color: #16803C;
+}
+#ja-transit-timeline-window .jtt-house-score-detail.jtt-score-bad {
+  color: #DC2626;
+}
