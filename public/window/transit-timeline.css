@@ -265,10 +265,12 @@
   font-weight: 700;
 }
 
+/* Keep the three key context values on the active theme accent. */
 #ja-transit-timeline-window .jtt-active-kundali-item strong,
 #ja-transit-timeline-window .jtt-janma-item strong,
-#ja-transit-timeline-window .jtt-dasha-item strong {
-  color: var(--jtt-accent);
+#ja-transit-timeline-window .jtt-dasha-item strong,
+#ja-transit-timeline-window .jtt-active-kundali-item [data-jtt-chart-select] {
+  color: var(--jtt-accent) !important;
 }
 
 #ja-transit-timeline-window .jtt-control-panel {
@@ -1341,9 +1343,28 @@
   border-spacing: 0;
   table-layout: fixed;
   color: var(--jtt-ink);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 12px;
+  font-weight: 450;
+  font-variant-numeric: tabular-nums;
   line-height: 1.4;
+}
+
+/* Explicitly apply Inter to every table cell so inherited/global rules cannot override it. */
+#ja-transit-timeline-window .jtt-planetary-table th,
+#ja-transit-timeline-window .jtt-planetary-table td {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+#ja-transit-timeline-window .jtt-planetary-table tbody td {
+  font-size: 12px;
+  font-weight: 450;
+}
+
+#ja-transit-timeline-window .jtt-planetary-table tbody td strong,
+#ja-transit-timeline-window .jtt-planetary-table tbody td b {
+  font-weight: 650;
 }
 
 #ja-transit-timeline-window .jtt-planetary-table th,
