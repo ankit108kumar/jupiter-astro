@@ -4618,3 +4618,19 @@ body.ja-font-scale-enabled [data-ja-font-scale-target] {
 .ja-navtara-latta {
   font-weight: 400 !important;
 }
+
+
+/* Divisional chart descriptions sourced from the Varga reference table. */
+.varga-description {
+  flex: 1 1 100%;
+  width: 100%;
+  margin: -2px 0 5px;
+  color: var(--muted);
+  font-size: .76rem;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: left;
+}
+.kchart > header {
+  flex-wrap: wrap;
+}
