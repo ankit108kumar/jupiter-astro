@@ -2127,3 +2127,11 @@
 #ja-transit-timeline-window .jtt-house-score-detail.jtt-score-bad {
   color: #DC2626;
 }
+
+
+/* Keep all transit-table superscript markers light and unobtrusive. */
+#ja-transit-timeline-window sup,
+#ja-transit-timeline-window .jtt-planet-markers,
+#ja-transit-timeline-window .jtt-latta-marker {
+  font-weight: 400 !important;
+}
