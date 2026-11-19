@@ -1433,6 +1433,13 @@
     calculateLatta: calculateLatta,
     calculateLattaTarget: calculateLattaTarget,
     lattaRules: LATTA_RULES,
+    transitResultBasic: {
+      name: "Transit Result : Basic",
+      rules: JANMA_RASI_TRANSIT_RULES,
+      getResult: getJanmaRasiTransitResult,
+      calculate: calculateJanmaRasiTransit
+    },
+    // Backward-compatible aliases for existing callers.
     janmaRasiTransitRules: JANMA_RASI_TRANSIT_RULES,
     getJanmaRasiTransitResult: getJanmaRasiTransitResult,
     calculateJanmaRasiTransit: calculateJanmaRasiTransit,
