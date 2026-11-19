@@ -4598,3 +4598,17 @@ body.ja-font-scale-enabled [data-ja-font-scale-target] {
     font-size: .72rem;
   }
 }
+
+
+/* Latta Dosha markers in Birth and Transit Nav Tara Chakra. */
+.ja-navtara-latta {
+  display: inline-block;
+  margin-left: 2px;
+  color: #DC2626;
+  font-size: .78em;
+  font-weight: 750;
+  line-height: 0;
+  vertical-align: super;
+  cursor: help;
+  white-space: nowrap;
+}
