@@ -1090,6 +1090,80 @@
     });
   }
 
+  var activeTransitBasicTooltip = null;
+  var transitBasicTooltipHideTimer = null;
+
+  function removeTransitBasicTooltip() {
+    if (transitBasicTooltipHideTimer) {
+      clearTimeout(transitBasicTooltipHideTimer);
+      transitBasicTooltipHideTimer = null;
+    }
+    if (activeTransitBasicTooltip) activeTransitBasicTooltip.remove();
+    activeTransitBasicTooltip = null;
+  }
+
+  function scheduleTransitBasicTooltipHide() {
+    if (transitBasicTooltipHideTimer) clearTimeout(transitBasicTooltipHideTimer);
+    transitBasicTooltipHideTimer = setTimeout(removeTransitBasicTooltip, 500);
+  }
+
+  function showTransitBasicTooltip(trigger) {
+    var houseNumber = Number(trigger.getAttribute("data-result-house"));
+    var planet = trigger.getAttribute("data-result-planet");
+    if (!Number.isInteger(houseNumber) || houseNumber < 1 || houseNumber > 12) return;
+
+    var api = window.JupiterTransitTimeline &&
+      window.JupiterTransitTimeline.transitResultBasic;
+    var result = api && typeof api.getResult === "function"
+      ? api.getResult(planet, houseNumber) : null;
+
+    removeTransitBasicTooltip();
+    if (!result || !result.result) return;
+
+    var tooltip = document.createElement("div");
+    tooltip.className = "jtt-transit-result-tooltip";
+    tooltip.setAttribute("role", "tooltip");
+
+    var heading = document.createElement("div");
+    heading.className = "jtt-transit-result-heading";
+    heading.textContent = "Transit Result : Basic · " + (result.planet || planet) +
+      " · " + (result.house || houseNumber) + "H";
+
+    var description = document.createElement("div");
+    description.className = "jtt-transit-result-description";
+    description.textContent = result.result;
+    tooltip.appendChild(heading);
+    tooltip.appendChild(description);
+
+    var computed = getComputedStyle(windowEl);
+    [
+      "--jtt-bg", "--jtt-panel", "--jtt-panel-alt", "--jtt-ink",
+      "--jtt-muted", "--jtt-line", "--jtt-line-strong", "--jtt-accent",
+      "--jtt-accent-soft"
+    ].forEach(function (property) {
+      tooltip.style.setProperty(property, computed.getPropertyValue(property).trim());
+    });
+
+    tooltip.style.visibility = "hidden";
+    tooltip.style.left = "8px";
+    tooltip.style.top = "8px";
+    windowEl.appendChild(tooltip);
+    activeTransitBasicTooltip = tooltip;
+
+    var windowRect = windowEl.getBoundingClientRect();
+    var triggerRect = trigger.getBoundingClientRect();
+    var tipRect = tooltip.getBoundingClientRect();
+    var maxLeft = Math.max(8, windowEl.clientWidth - tipRect.width - 8);
+    var left = Math.max(8, Math.min(triggerRect.left - windowRect.left, maxLeft));
+    var maxTop = Math.max(8, windowEl.clientHeight - tipRect.height - 8);
+    var top = triggerRect.bottom - windowRect.top + 8;
+    if (top > maxTop) top = triggerRect.top - windowRect.top - tipRect.height - 8;
+    top = Math.max(8, Math.min(top, maxTop));
+    tooltip.style.left = Math.round(left) + "px";
+    tooltip.style.top = Math.round(top) + "px";
+    tooltip.style.visibility = "visible";
+  }
+
   function bindHouseResultTooltips(host) {
     if (!host || houseSignificationBoundHosts.has(host)) return;
     houseSignificationBoundHosts.add(host);
@@ -1100,9 +1174,9 @@
       if (!target || !host.contains(target)) return;
       if (event.relatedTarget && target.contains(event.relatedTarget)) return;
       var houseNumber = Number(target.getAttribute("data-result-house"));
-      if (Number.isInteger(houseNumber) && houseNumber >= 1 && houseNumber <= 12) {
-        showHouseSignification(houseNumber);
-      }
+      if (!Number.isInteger(houseNumber) || houseNumber < 1 || houseNumber > 12) return;
+      showHouseSignification(houseNumber);
+      showTransitBasicTooltip(target);
     });
 
     host.addEventListener("pointerout", function (event) {
@@ -1111,6 +1185,7 @@
       if (!target || !host.contains(target)) return;
       if (event.relatedTarget && target.contains(event.relatedTarget)) return;
       hidePlanetSignification();
+      scheduleTransitBasicTooltipHide();
     });
 
     host.addEventListener("focusin", function (event) {
@@ -1118,15 +1193,17 @@
         ? event.target.closest(".jtt-house-result-trigger") : null;
       if (!target || !host.contains(target)) return;
       var houseNumber = Number(target.getAttribute("data-result-house"));
-      if (Number.isInteger(houseNumber) && houseNumber >= 1 && houseNumber <= 12) {
-        showHouseSignification(houseNumber);
-      }
+      if (!Number.isInteger(houseNumber) || houseNumber < 1 || houseNumber > 12) return;
+      showHouseSignification(houseNumber);
+      showTransitBasicTooltip(target);
     });
 
     host.addEventListener("focusout", function (event) {
       var target = event.target && event.target.closest
         ? event.target.closest(".jtt-house-result-trigger") : null;
-      if (target && host.contains(target)) hidePlanetSignification();
+      if (!target || !host.contains(target)) return;
+      hidePlanetSignification();
+      scheduleTransitBasicTooltipHide();
     });
   }
 
