@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "title": "Divisional Chart (Varga) Reference",
+  "source": {
+    "type": "user-provided-image",
+    "note": "Descriptions transcribed from the supplied reference image. Navamsa description combines its continuation across the page break."
+  },
+  "divisions": [
+    {
+      "division": 1,
+      "name": "Rasi",
+      "symbol": "D-1",
+      "description": "Existence at the physical level"
+    },
+    {
+      "division": 2,
+      "name": "Hora",
+      "symbol": "D-2",
+      "description": "Wealth and money"
+    },
+    {
+      "division": 3,
+      "name": "Drekkana",
+      "symbol": "D-3",
+      "description": "Everything related to brothers and sisters"
+    },
+    {
+      "division": 4,
+      "name": "Chaturthamsa",
+      "symbol": "D-4",
+      "description": "Residence, houses owned, properties and fortune"
+    },
+    {
+      "division": 5,
+      "name": "Panchamsa",
+      "symbol": "D-5",
+      "description": "Fame, authority and power"
+    },
+    {
+      "division": 6,
+      "name": "Shashthamsa",
+      "symbol": "D-6",
+      "description": "Health troubles"
+    },
+    {
+      "division": 7,
+      "name": "Saptamsa",
+      "symbol": "D-7",
+      "description": "Everything related to children (and grand-children)"
+    },
+    {
+      "division": 8,
+      "name": "Ashtamsa",
+      "symbol": "D-8",
+      "description": "Sudden and unexpected troubles, litigation etc"
+    },
+    {
+      "division": 9,
+      "name": "Navamsa",
+      "symbol": "D-9",
+      "description": "Marriage and everything related to spouse(s), dharma (duty and righteousness), interaction with other people, basic skills, inner self"
+    },
+    {
+      "division": 10,
+      "name": "Dasamsa",
+      "symbol": "D-10",
+      "description": "Career, activities and achievements in society"
+    },
+    {
+      "division": 11,
+      "name": "Rudramsa",
+      "symbol": "D-11",
+      "description": "Death and destruction"
+    },
+    {
+      "division": 12,
+      "name": "Dwadasamsa",
+      "symbol": "D-12",
+      "description": "Everything related to parents (also uncles, aunts and grand-parents, i.e. blood-relatives of parents)"
+    },
+    {
+      "division": 16,
+      "name": "Shodasamsa",
+      "symbol": "D-16",
+      "description": "Vehicles, pleasures, comforts and discomforts"
+    },
+    {
+      "division": 20,
+      "name": "Vimsamsa",
+      "symbol": "D-20",
+      "description": "Religious activities and spiritual matters"
+    },
+    {
+      "division": 24,
+      "name": "Chaturvimsamsa",
+      "symbol": "D-24",
+      "description": "Learning, knowledge and education"
+    },
+    {
+      "division": 27,
+      "name": "Nakshatramsa",
+      "symbol": "D-27",
+      "description": "Strengths and weaknesses, inherent nature"
+    },
+    {
+      "division": 30,
+      "name": "Trimsamsa",
+      "symbol": "D-30",
+      "description": "Evils and punishment, sub-conscious self, some diseases"
+    },
+    {
+      "division": 40,
+      "name": "Khavedamsa",
+      "symbol": "D-40",
+      "description": "Auspicious and inauspicious events"
+    },
+    {
+      "division": 45,
+      "name": "Akshavedamsa",
+      "symbol": "D-45",
+      "description": "All matters"
+    },
+    {
+      "division": 60,
+      "name": "Shashtyamsa",
+      "symbol": "D-60",
+      "description": "Karma of past life, all matters"
+    }
+  ]
+}
