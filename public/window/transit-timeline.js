@@ -1082,18 +1082,40 @@
 
     tooltip.appendChild(heading);
     tooltip.appendChild(description);
-    document.body.appendChild(tooltip);
+
+    // Portal inside the floating window: body-level overlays are trapped
+    // below this window's isolated stacking context and disappear in fullscreen.
+    var windowRect = windowEl.getBoundingClientRect();
+    var computed = getComputedStyle(windowEl);
+    [
+      "--jtt-bg", "--jtt-panel", "--jtt-panel-alt", "--jtt-ink",
+      "--jtt-muted", "--jtt-line", "--jtt-line-strong", "--jtt-accent",
+      "--jtt-accent-soft"
+    ].forEach(function (property) {
+      tooltip.style.setProperty(property, computed.getPropertyValue(property).trim());
+    });
+
+    tooltip.style.visibility = "hidden";
+    tooltip.style.left = "8px";
+    tooltip.style.top = "8px";
+    windowEl.appendChild(tooltip);
     activeHouseResultTooltip = tooltip;
 
     var rect = trigger.getBoundingClientRect();
-    var left = Math.max(10, Math.min(rect.left, window.innerWidth - 330));
-    tooltip.style.left = left + "px";
-    tooltip.style.top = (rect.bottom + 8) + "px";
-
     var tipRect = tooltip.getBoundingClientRect();
-    if (tipRect.bottom > window.innerHeight - 10) {
-      tooltip.style.top = Math.max(10, rect.top - tipRect.height - 8) + "px";
+    var maxLeft = Math.max(8, windowEl.clientWidth - tipRect.width - 8);
+    var left = Math.max(8, Math.min(rect.left - windowRect.left, maxLeft));
+
+    var maxTop = Math.max(8, windowEl.clientHeight - tipRect.height - 8);
+    var top = rect.bottom - windowRect.top + 8;
+    if (top > maxTop) {
+      top = rect.top - windowRect.top - tipRect.height - 8;
     }
+    top = Math.max(8, Math.min(top, maxTop));
+
+    tooltip.style.left = Math.round(left) + "px";
+    tooltip.style.top = Math.round(top) + "px";
+    tooltip.style.visibility = "visible";
   }
 
   function bindHouseResultTooltips(host) {
