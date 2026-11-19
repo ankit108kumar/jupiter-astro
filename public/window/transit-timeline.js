@@ -812,7 +812,6 @@
         '<section class="jtt-unified-panel" aria-label="Active Kundali and transit evaluation">' +
           '<div class="jtt-context-card">' +
             '<div class="jtt-context-item jtt-active-kundali-item"><span>ACTIVE KUNDALI</span><strong data-jtt-chart-title>No active Research Kundali</strong><select data-jtt-chart-select aria-label="Select active Kundali" hidden></select></div>' +
-            '<div class="jtt-context-item jtt-janma-item"><span>JANMA RASHI</span><strong data-jtt-janma>—</strong></div>' +
             '<div class="jtt-context-item jtt-dasha-item"><span>RUNNING DASHA</span><strong data-jtt-dasha>—</strong></div>' +
           '</div>' +
           '<div class="jtt-unified-divider" aria-hidden="true"></div>' +
