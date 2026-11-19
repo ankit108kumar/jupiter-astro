@@ -5154,7 +5154,15 @@ function renderKundaliComponent(
       lagna: SIGNS[kData.ascSign][0],
       nakshatra: NAK[nk.i][0],
       dasha: dashaChain(kData.md.list, currentEvalMs, 365.25)
-        .slice(0, 3).map(p => p.lord).join(' - ') || '—'
+        .slice(0, 3).map(p => p.lord).join(' - ') || '—',
+      dashaSequence: dashaChain(kData.md.list, currentEvalMs, 365.25)
+        .slice(0, 3).map(p => {
+          const natalPosition = kData.ch.planets[p.lord];
+          const house = natalPosition
+            ? houseFrom(signOf(natalPosition.lon), kData.ascSign)
+            : null;
+          return { lord: p.lord, house };
+        })
     }),
     // Returns the selected chart's natal data joined with the cached transit
     // positions for this evaluation instant. No per-cell ephemeris recalculation.
