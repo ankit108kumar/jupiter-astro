@@ -1150,6 +1150,193 @@
     });
   }
 
+  // Planet significations are loaded only for the first-column hover feature.
+  var planetSignificationsPromise = null;
+  var activePlanetSignification = null;
+  var planetSignificationHideTimer = null;
+  var planetSignificationRemoveTimer = null;
+  var planetSignificationBoundHosts = new WeakSet();
+
+  function loadPlanetSignifications() {
+    if (!planetSignificationsPromise) {
+      planetSignificationsPromise = fetch("/data/planet-significations.json", {
+        credentials: "same-origin",
+        cache: "force-cache"
+      }).then(function (response) {
+        if (!response.ok) throw new Error("Planet signification database returned HTTP " + response.status);
+        return response.json();
+      }).then(function (database) {
+        if (!database || !database.planets || typeof database.planets !== "object") {
+          throw new Error("Planet signification database has an invalid structure.");
+        }
+        return database.planets;
+      }).catch(function (error) {
+        planetSignificationsPromise = null;
+        throw error;
+      });
+    }
+    return planetSignificationsPromise;
+  }
+
+  function ensurePlanetSignificationPanel() {
+    if (!windowEl) return null;
+    var existing = windowEl.querySelector(".jtt-planet-signification-panel");
+    if (existing) return existing;
+
+    var tablePanel = windowEl.querySelector("[data-jtt-transit-table]");
+    if (!tablePanel || !tablePanel.parentNode) return null;
+
+    var panel = document.createElement("section");
+    panel.className = "jtt-planet-signification-panel";
+    panel.setAttribute("aria-live", "polite");
+    panel.setAttribute("aria-atomic", "true");
+    panel.hidden = true;
+
+    var title = document.createElement("div");
+    title.className = "jtt-planet-signification-title";
+    var body = document.createElement("div");
+    body.className = "jtt-planet-signification-body";
+    panel.appendChild(title);
+    panel.appendChild(body);
+    tablePanel.insertAdjacentElement("afterend", panel);
+    return panel;
+  }
+
+  function appendFormattedSignification(container, entry) {
+    var text = String(entry.signification || "");
+    var emphasis = Array.isArray(entry.emphasizedTerms) ? entry.emphasizedTerms : [];
+    var italics = Array.isArray(entry.italicTerms) ? entry.italicTerms : [];
+    var highlights = Array.isArray(entry.highlightedTerms) ? entry.highlightedTerms : [];
+    var terms = Array.from(new Set(emphasis.concat(italics, highlights).filter(Boolean)))
+      .sort(function (a, b) { return b.length - a.length; });
+
+    if (!terms.length) {
+      container.textContent = text;
+      return;
+    }
+
+    var expression = new RegExp("(" + terms.map(function (term) {
+      return term.replace(/[.*+?^${}()|[\]\\]/g, "\\  function renderTransitTableFromContext() {");
+    }).join("|") + ")", "gi");
+    var cursor = 0;
+    var match;
+    while ((match = expression.exec(text)) !== null) {
+      if (match.index > cursor) {
+        container.appendChild(document.createTextNode(text.slice(cursor, match.index)));
+      }
+      var token = match[0];
+      var node = document.createElement("span");
+      var isEmphasized = emphasis.some(function (term) { return term.toLowerCase() === token.toLowerCase(); });
+      var isItalic = italics.some(function (term) { return term.toLowerCase() === token.toLowerCase(); });
+      var isHighlighted = highlights.some(function (term) { return term.toLowerCase() === token.toLowerCase(); });
+      if (isEmphasized && isItalic) {
+        var strongItalic = document.createElement("strong");
+        var italic = document.createElement("em");
+        italic.textContent = token;
+        strongItalic.appendChild(italic);
+        node.appendChild(strongItalic);
+      } else if (isEmphasized) {
+        var strong = document.createElement("strong");
+        strong.textContent = token;
+        node.appendChild(strong);
+      } else if (isItalic) {
+        var em = document.createElement("em");
+        em.textContent = token;
+        node.appendChild(em);
+      } else {
+        node.textContent = token;
+      }
+      if (isHighlighted) node.className = "jtt-signification-highlight";
+      container.appendChild(node);
+      cursor = match.index + token.length;
+    }
+    if (cursor < text.length) container.appendChild(document.createTextNode(text.slice(cursor)));
+  }
+
+  function clearPlanetSignificationTimers() {
+    if (planetSignificationHideTimer) {
+      clearTimeout(planetSignificationHideTimer);
+      planetSignificationHideTimer = null;
+    }
+    if (planetSignificationRemoveTimer) {
+      clearTimeout(planetSignificationRemoveTimer);
+      planetSignificationRemoveTimer = null;
+    }
+  }
+
+  function showPlanetSignification(planet) {
+    clearPlanetSignificationTimers();
+    activePlanetSignification = planet;
+    var panel = ensurePlanetSignificationPanel();
+    if (!panel) return;
+
+    var title = panel.querySelector(".jtt-planet-signification-title");
+    var body = panel.querySelector(".jtt-planet-signification-body");
+    title.textContent = planet;
+    body.textContent = "Loading planetary signification…";
+    panel.hidden = false;
+    panel.classList.remove("is-visible");
+    // Reflow makes repeated hover on the same panel restart the fade-in reliably.
+    void panel.offsetWidth;
+    panel.classList.add("is-visible");
+
+    loadPlanetSignifications().then(function (planets) {
+      if (activePlanetSignification !== planet || !panel.isConnected) return;
+      var entry = planets[planet];
+      if (!entry || !entry.signification) {
+        body.textContent = "No signification is available for this planet.";
+        return;
+      }
+      body.replaceChildren();
+      appendFormattedSignification(body, entry);
+    }).catch(function (error) {
+      if (activePlanetSignification !== planet || !panel.isConnected) return;
+      body.textContent = "Planetary signification could not be loaded.";
+      console.error("Jupiter Astro: Unable to load planetary significations.", error);
+    });
+  }
+
+  function hidePlanetSignification() {
+    clearPlanetSignificationTimers();
+    if (!activePlanetSignification) return;
+    planetSignificationHideTimer = setTimeout(function () {
+      var panel = ensurePlanetSignificationPanel();
+      if (!panel) {
+        activePlanetSignification = null;
+        return;
+      }
+      panel.classList.remove("is-visible");
+      activePlanetSignification = null;
+      planetSignificationRemoveTimer = setTimeout(function () {
+        if (!activePlanetSignification) panel.hidden = true;
+      }, 260);
+    }, 1000);
+  }
+
+  function bindPlanetSignificationHover(host) {
+    if (!host || planetSignificationBoundHosts.has(host)) return;
+    planetSignificationBoundHosts.add(host);
+
+    host.addEventListener("pointerover", function (event) {
+      var name = event.target && event.target.closest
+        ? event.target.closest(".jtt-planet-cell strong") : null;
+      if (!name || !host.contains(name)) return;
+      if (event.relatedTarget && name.contains(event.relatedTarget)) return;
+      var cell = name.closest(".jtt-planet-cell");
+      if (!cell) return;
+      var planet = name.textContent.trim();
+      if (planet) showPlanetSignification(planet);
+    });
+
+    host.addEventListener("pointerout", function (event) {
+      var name = event.target && event.target.closest
+        ? event.target.closest(".jtt-planet-cell strong") : null;
+      if (!name || !host.contains(name)) return;
+      if (event.relatedTarget && name.contains(event.relatedTarget)) return;
+      hidePlanetSignification();
+    });
+  }
+
   function renderTransitTableFromContext() {
     if (!windowEl) return;
     var host = windowEl.querySelector("[data-jtt-table-scroll]");
@@ -1167,6 +1354,8 @@
       host.innerHTML = renderTransitTable(context.getTransitTableData());
       bindDurationTooltips(host);
       bindHouseResultTooltips(host);
+      bindPlanetSignificationHover(host);
+      ensurePlanetSignificationPanel();
     } catch (error) {
       console.error("Transit Timeline could not render the planetary table.", error);
       host.innerHTML = '<div class="jtt-table-empty is-error">Unable to load planetary transit data. Check the active Research Kundali.</div>';
