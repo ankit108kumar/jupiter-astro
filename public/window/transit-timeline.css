@@ -2142,3 +2142,63 @@
   color: #16A34A;
   font-weight: 700;
 }
+
+
+/* Active Kundali selector sizes to its option text instead of filling the header. */
+#ja-transit-timeline-window [data-jtt-chart-select] {
+  flex: 0 1 auto;
+  width: max-content;
+  min-width: 0;
+  max-width: min(520px, 100%);
+}
+
+/* Dasha house references remain muted while planet names retain theme accent. */
+#ja-transit-timeline-window .jtt-dasha-house {
+  color: var(--jtt-muted);
+  font-size: .88em;
+  font-weight: 450;
+  white-space: nowrap;
+}
+
+/* House numbers open the matching Transit Result : Basic interpretation. */
+#ja-transit-timeline-window .jtt-house-result-trigger {
+  cursor: help;
+  outline: none;
+}
+#ja-transit-timeline-window .jtt-house-result-trigger:focus-visible {
+  border-radius: 3px;
+  box-shadow: 0 0 0 2px var(--jtt-accent-soft);
+}
+
+.jtt-transit-result-tooltip {
+  position: fixed;
+  z-index: 2147483000;
+  width: max-content;
+  max-width: 320px;
+  padding: 10px 12px;
+  border: 1px solid #D7DFEA;
+  border-radius: 9px;
+  background: #FFFFFF;
+  color: #182337;
+  box-shadow: 0 8px 24px rgba(20, 35, 55, .18);
+  pointer-events: none;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  animation: jtt-result-tooltip-in .12s ease-out;
+}
+.jtt-transit-result-heading {
+  margin-bottom: 4px;
+  color: #64748B;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: .02em;
+}
+.jtt-transit-result-description {
+  color: #182337;
+  font-size: 12.5px;
+  font-weight: 450;
+  line-height: 1.4;
+}
+@keyframes jtt-result-tooltip-in {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
