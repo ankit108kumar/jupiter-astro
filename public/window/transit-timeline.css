@@ -2030,3 +2030,60 @@
     padding: 6px 5px;
   }
 }
+
+
+/* Final typography and control refinements — November 2026. */
+#ja-transit-timeline-window .jtt-context-card {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+#ja-transit-timeline-window .jtt-active-kundali-item {
+  border-right: 1px solid var(--jtt-line);
+}
+#ja-transit-timeline-window .jtt-dasha-item {
+  border-right: 0;
+}
+#ja-transit-timeline-window .jtt-context-item > span,
+#ja-transit-timeline-window .jtt-context-item strong {
+  font-weight: 500;
+}
+#ja-transit-timeline-window .jtt-context-item strong {
+  font-weight: 600;
+}
+#ja-transit-timeline-window .jtt-fields-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) auto;
+  align-items: end;
+}
+#ja-transit-timeline-window .jtt-date-field,
+#ja-transit-timeline-window .jtt-time-field {
+  min-width: 0;
+  max-width: none;
+  width: 100%;
+}
+#ja-transit-timeline-window .jtt-field input {
+  width: 100%;
+  min-width: 0;
+}
+#ja-transit-timeline-window .btn-step {
+  font-weight: 400 !important;
+}
+#ja-transit-timeline-window .jtt-planetary-table thead th {
+  font-weight: 500 !important;
+}
+#ja-transit-timeline-window .jtt-sign-cell,
+#ja-transit-timeline-window .jtt-sign-cell .jtt-duration-value {
+  font-weight: 400 !important;
+}
+#ja-transit-timeline-window .jtt-planetary-table tbody td strong,
+#ja-transit-timeline-window .jtt-planetary-table tbody td b {
+  font-weight: 500;
+}
+@media (max-width: 680px) {
+  #ja-transit-timeline-window .jtt-fields-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  #ja-transit-timeline-window .jtt-now-button {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
