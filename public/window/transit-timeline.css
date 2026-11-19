@@ -2135,3 +2135,10 @@
 #ja-transit-timeline-window .jtt-latta-marker {
   font-weight: 400 !important;
 }
+
+
+/* Reverse Vedha uses a positive green X; ordinary Vedha remains red. */
+#ja-transit-timeline-window .jtt-vedha-mark.jtt-reverse-vedha-mark {
+  color: #16A34A;
+  font-weight: 700;
+}
