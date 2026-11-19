@@ -585,11 +585,72 @@
     return result;
   }
 
-  function renderVedhaCell(planets, titlePrefix) {
+  // Reverse Vedha rules transcribed from the supplied reference images.
+  // A listed source-house occupied by the named causing planet maps to the
+  // corresponding Reverse Vedha house. Other planets in that destination
+  // house receive the Reverse Vedha indicator in their own row.
+  var REVERSE_VEDHA_RULES = {
+    Sun: {
+      4: 3, 5: 6, 9: 10, 12: 11
+    },
+    Mars: {
+      5: 3, 9: 6, 12: 11
+    },
+    Saturn: {
+      5: 3, 9: 6, 12: 11
+    },
+    Rahu: {
+      5: 3, 9: 6, 12: 11
+    },
+    Ketu: {
+      5: 3, 9: 6, 12: 11
+    },
+    Mercury: {
+      3: 2, 6: 5, 7: 8, 9: 10, 12: 11
+    },
+    Jupiter: {
+      3: 2, 4: 5, 10: 9, 11: 11
+    },
+    Venus: {
+      6: 2, 7: 5, 10: 9
+    }
+  };
+
+  function computeReverseVedha(rows) {
+    var result = {};
+    if (!Array.isArray(rows)) return result;
+
+    var positions = rows.map(function (row) {
+      return {
+        planet: String(row && row.planet || ""),
+        house: getHouseFromJanmaRashi(row)
+      };
+    });
+
+    positions.forEach(function (causer) {
+      var rules = REVERSE_VEDHA_RULES[causer.planet];
+      if (!rules || !Object.prototype.hasOwnProperty.call(rules, causer.house)) return;
+
+      var affectedHouse = rules[causer.house];
+      positions.forEach(function (affected) {
+        if (!affected.planet || affected.planet === causer.planet ||
+            affected.house !== affectedHouse) return;
+
+        (result[affected.planet] || (result[affected.planet] = [])).push(causer.planet);
+      });
+    });
+
+    Object.keys(result).forEach(function (planet) {
+      result[planet] = Array.from(new Set(result[planet]));
+    });
+    return result;
+  }
+
+  function renderVedhaCell(planets, titlePrefix, markClass) {
     if (!Array.isArray(planets) || !planets.length) return '<td class="jtt-vedha-cell"></td>';
     var names = planets.map(escapeTableText).join(", ");
     return '<td class="jtt-vedha-cell" title="' + escapeTableText(titlePrefix + ": " + names) + '">' +
-      '<span class="jtt-vedha-mark">X</span> ' +
+      '<span class="jtt-vedha-mark' + (markClass ? ' ' + markClass : '') + '">X</span> ' +
       '<span class="jtt-vedha-planets">(' + names + ')</span></td>';
   }
 
@@ -620,6 +681,7 @@
     };
 
     var vedhaResults = computeVedha(data.rows);
+    var reverseVedhaResults = computeReverseVedha(data.rows);
     var lattaHits = getLattaSourcesByTargetNakshatra(data.rows.map(function (row) {
       return { planet: row.planet, nakshatra: row.nakshatra };
     }));
@@ -655,7 +717,7 @@
         '<td class="jtt-navamsa-cell">' + renderDurationCell(row.navamsaDuration, escapeTableText(row.navamsa || navamsaNumber), 'Navamsa duration') + '</td>' +
         '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInNavamsa) + '</td>' +
         renderVedhaCell(vedhaResults[row.planet], "Vedha caused by") +
-        '<td class="jtt-blank-cell"></td>' +
+        renderVedhaCell(reverseVedhaResults[row.planet], "Reverse Vedha caused by", "jtt-reverse-vedha-mark") +
         '<td class="jtt-murti-cell' + murtiTone + '">' + murti + '</td>' +
       '</tr>';
     }).join("");
