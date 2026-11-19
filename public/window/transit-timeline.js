@@ -285,6 +285,94 @@
     }).join('<span class="jtt-match-separator">, </span>') + '</div>';
   }
 
+  // Latta (planetary kick) rules transcribed from the supplied source.
+  // The occupied nakshatra is counted as number 1. Forward = increasing
+  // nakshatra order; backward = decreasing order, both cyclic over 27.
+  var LATTA_NAKSHATRAS = [
+    "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira",
+    "Ardra", "Punarvasu", "Pushya", "Ashlesha", "Magha",
+    "Purva Phalguni", "Uttara Phalguni", "Hasta", "Chitra",
+    "Swati", "Vishakha", "Anuradha", "Jyeshtha", "Mula",
+    "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishtha",
+    "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"
+  ];
+
+  // count is inclusive: e.g. 12th from Mrigashira = Vishakha.
+  var LATTA_RULES = {
+    Sun:     { count: 12, direction: "forward", type: "Purolatta" },
+    Mars:    { count: 3,  direction: "forward", type: "Purolatta" },
+    Jupiter: { count: 6,  direction: "forward", type: "Purolatta" },
+    Saturn:  { count: 8,  direction: "forward", type: "Purolatta" },
+    Moon:    { count: 22, direction: "backward", type: "Prishtha latta" },
+    Mercury: { count: 7,  direction: "backward", type: "Prishtha latta" },
+    Venus:   { count: 5,  direction: "backward", type: "Prishtha latta" },
+    Rahu:    { count: 9,  direction: "backward", type: "Prishtha latta" }
+  };
+
+  var LATTA_NAKSHATRA_ALIASES = {
+    "mrig": "Mrigashira",
+    "mrigasira": "Mrigashira",
+    "mrigashirsha": "Mrigashira",
+    "mrigashira": "Mrigashira",
+    "dhanishta": "Dhanishtha",
+    "poorva phalguni": "Purva Phalguni",
+    "pubba": "Purva Phalguni",
+    "uttara phalguni": "Uttara Phalguni",
+    "uthraphalguni": "Uttara Phalguni",
+    "poorva ashadha": "Purva Ashadha",
+    "uttara ashadha": "Uttara Ashadha",
+    "shravana": "Shravana",
+    "sravana": "Shravana",
+    "shatabhisha": "Shatabhisha",
+    "shatabhishak": "Shatabhisha",
+    "poorva bhadrapada": "Purva Bhadrapada",
+    "uttara bhadrapada": "Uttara Bhadrapada"
+  };
+
+  function normalizeLattaNakshatra(value) {
+    var name = String(value == null ? "" : value).trim()
+      .replace(/\\s*\\([^)]*\\)\\s*$/, "")
+      .replace(/\\s+/g, " ");
+    if (!name) return null;
+    var key = name.toLowerCase();
+    var alias = LATTA_NAKSHATRA_ALIASES[key];
+    if (alias) return alias;
+    return LATTA_NAKSHATRAS.find(function (item) {
+      return item.toLowerCase() === key;
+    }) || null;
+  }
+
+  function calculateLattaTarget(planet, sourceNakshatra) {
+    var rule = LATTA_RULES[String(planet || "").trim()];
+    var source = normalizeLattaNakshatra(sourceNakshatra);
+    if (!rule || !source) return null;
+
+    var sourceIndex = LATTA_NAKSHATRAS.indexOf(source);
+    var directionStep = rule.direction === "forward" ? 1 : -1;
+    var targetIndex = (sourceIndex + directionStep * (rule.count - 1) + 27) % 27;
+    return {
+      planet: String(planet),
+      type: rule.type,
+      direction: rule.direction,
+      count: rule.count,
+      sourceNakshatra: source,
+      targetNakshatra: LATTA_NAKSHATRAS[targetIndex]
+    };
+  }
+
+  // Accepts the existing Transit Timeline row array ({ planet, nakshatra }).
+  // This is calculation-only: it does not add a column or alter the UI yet.
+  function calculateLatta(rows) {
+    var results = {};
+    if (!Array.isArray(rows)) return results;
+    rows.forEach(function (row) {
+      if (!row || !row.planet) return;
+      var result = calculateLattaTarget(row.planet, row.nakshatra);
+      if (result) results[result.planet] = result;
+    });
+    return results;
+  }
+
   // Rasi Gochara Vedha: auspicious transit house -> corresponding Vedha house.
   // Houses are counted from Janma Rashi (natal Moon). The source table supplies
   // rules for the seven classical planets only; Rahu/Ketu are not inferred.
@@ -1215,6 +1303,9 @@
     restore: restoreWindow,
     syncFromContext: syncFromContext,
     isOpen: openState,
+    calculateLatta: calculateLatta,
+    calculateLattaTarget: calculateLattaTarget,
+    lattaRules: LATTA_RULES,
     shortcut: isApplePlatform() ? "⌘ + Option + T" : "Ctrl + Shift + X"
   };
 })();
