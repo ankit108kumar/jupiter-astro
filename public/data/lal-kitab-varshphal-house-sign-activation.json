@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "title": "Lal Kitab / Varshphal — House and Sign Activation Periods",
+  "description": "House-wise sign mapping and age ranges transcribed from the user-provided reference image.",
+  "source": {
+    "type": "user-provided-image",
+    "heading": "House No. · Sign · Impact on Age",
+    "transcriptionNote": "The image shows two age-range columns under Impact on Age. Empty cells in the second age-range column are preserved as null; no missing ages have been inferred."
+  },
+  "ageRangeColumns": [
+    {
+      "id": "primary",
+      "label": "Impact on Age — first range"
+    },
+    {
+      "id": "secondary",
+      "label": "Impact on Age — second range"
+    }
+  ],
+  "houses": [
+    {
+      "house": 1,
+      "sign": "Aries",
+      "symbol": "♈",
+      "activationAges": {
+        "primary": {
+          "start": 1,
+          "end": 3
+        },
+        "secondary": {
+          "start": 37,
+          "end": 39
+        }
+      }
+    },
+    {
+      "house": 2,
+      "sign": "Taurus",
+      "symbol": "♉",
+      "activationAges": {
+        "primary": {
+          "start": 4,
+          "end": 6
+        },
+        "secondary": {
+          "start": 40,
+          "end": 42
+        }
+      }
+    },
+    {
+      "house": 3,
+      "sign": "Gemini",
+      "symbol": "♊",
+      "activationAges": {
+        "primary": {
+          "start": 7,
+          "end": 9
+        },
+        "secondary": {
+          "start": 43,
+          "end": 45
+        }
+      }
+    },
+    {
+      "house": 4,
+      "sign": "Cancer",
+      "symbol": "♋",
+      "activationAges": {
+        "primary": {
+          "start": 19,
+          "end": 21
+        },
+        "secondary": {
+          "start": 55,
+          "end": 57
+        }
+      }
+    },
+    {
+      "house": 5,
+      "sign": "Leo",
+      "symbol": "♌",
+      "activationAges": {
+        "primary": {
+          "start": 22,
+          "end": 24
+        },
+        "secondary": {
+          "start": 58,
+          "end": 60
+        }
+      }
+    },
+    {
+      "house": 6,
+      "sign": "Virgo",
+      "symbol": "♍",
+      "activationAges": {
+        "primary": {
+          "start": 25,
+          "end": 27
+        },
+        "secondary": null
+      }
+    },
+    {
+      "house": 7,
+      "sign": "Libra",
+      "symbol": "♎",
+      "activationAges": {
+        "primary": {
+          "start": 28,
+          "end": 30
+        },
+        "secondary": null
+      }
+    },
+    {
+      "house": 8,
+      "sign": "Scorpio",
+      "symbol": "♏",
+      "activationAges": {
+        "primary": {
+          "start": 31,
+          "end": 33
+        },
+        "secondary": null
+      }
+    },
+    {
+      "house": 9,
+      "sign": "Sagittarius",
+      "symbol": "♐",
+      "activationAges": {
+        "primary": {
+          "start": 34,
+          "end": 36
+        },
+        "secondary": null
+      }
+    },
+    {
+      "house": 10,
+      "sign": "Capricorn",
+      "symbol": "♑",
+      "activationAges": {
+        "primary": {
+          "start": 10,
+          "end": 12
+        },
+        "secondary": {
+          "start": 46,
+          "end": 48
+        }
+      }
+    },
+    {
+      "house": 11,
+      "sign": "Aquarius",
+      "symbol": "♒",
+      "activationAges": {
+        "primary": {
+          "start": 13,
+          "end": 15
+        },
+        "secondary": {
+          "start": 49,
+          "end": 51
+        }
+      }
+    },
+    {
+      "house": 12,
+      "sign": "Pisces",
+      "symbol": "♓",
+      "activationAges": {
+        "primary": {
+          "start": 16,
+          "end": 18
+        },
+        "secondary": {
+          "start": 52,
+          "end": 54
+        }
+      }
+    }
+  ]
+}
