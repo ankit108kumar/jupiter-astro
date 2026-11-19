@@ -43,7 +43,7 @@
   border: 1px solid var(--jtt-line);
   border-radius: 15px;
   box-shadow: var(--jtt-shadow);
-  font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font: 16.8px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   isolation: isolate;
 }
 
@@ -134,7 +134,7 @@
   min-width: 0;
   text-align: center;
   color: var(--jtt-ink);
-  font-size: 13px;
+  font-size: 15.6px;
   font-weight: 650;
   letter-spacing: .15px;
   pointer-events: none;
@@ -207,7 +207,7 @@
 #ja-transit-timeline-window .jtt-eyebrow {
   margin-bottom: 5px;
   color: var(--jtt-accent);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 1.25px;
 }
@@ -215,7 +215,7 @@
 #ja-transit-timeline-window .jtt-heading-copy h2 {
   margin: 0;
   color: var(--jtt-ink);
-  font-size: clamp(21px, 2.2vw, 29px);
+  font-size: clamp(25.2px, 2.2vw, 34.8px);
   line-height: 1.18;
   letter-spacing: -.55px;
 }
@@ -223,7 +223,7 @@
 #ja-transit-timeline-window .jtt-heading-copy p {
   margin: 7px 0 0;
   color: var(--jtt-muted);
-  font-size: 12px;
+  font-size: 14.4px;
 }
 
 #ja-transit-timeline-window .jtt-context-card {
@@ -253,7 +253,7 @@
 
 #ja-transit-timeline-window .jtt-context-item > span {
   color: var(--jtt-muted);
-  font-size: 9px;
+  font-size: 10.8px;
   font-weight: 750;
   letter-spacing: .75px;
 }
@@ -261,7 +261,7 @@
 #ja-transit-timeline-window .jtt-context-item strong {
   overflow-wrap: anywhere;
   color: var(--jtt-ink);
-  font-size: 13px;
+  font-size: 15.6px;
   font-weight: 700;
 }
 
@@ -291,13 +291,13 @@
 
 #ja-transit-timeline-window .jtt-control-heading strong {
   color: var(--jtt-ink);
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 750;
 }
 
 #ja-transit-timeline-window .jtt-control-heading span {
   color: var(--jtt-muted);
-  font-size: 11px;
+  font-size: 13.2px;
 }
 
 #ja-transit-timeline-window .jtt-fields-row {
@@ -313,7 +313,7 @@
   gap: 6px;
   min-width: 180px;
   color: var(--jtt-muted);
-  font-size: 11px;
+  font-size: 13.2px;
   font-weight: 700;
 }
 
@@ -326,7 +326,7 @@
   outline: none;
   color: var(--jtt-ink);
   background: var(--jtt-panel-alt);
-  font-size: 13px;
+  font-size: 15.6px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -348,7 +348,7 @@
   border-radius: 8px;
   color: var(--jtt-accent);
   background: var(--jtt-accent-soft);
-  font-size: 12px;
+  font-size: 14.4px;
   font-weight: 750;
   cursor: pointer;
 }
@@ -376,7 +376,7 @@
 }
 
 #ja-transit-timeline-window .group-label {
-  font-size: 11px;
+  font-size: 13.2px;
   font-weight: 600;
   color: var(--jtt-muted);
   margin: 0 4px;
@@ -384,7 +384,7 @@
 
 #ja-transit-timeline-window .btn-step {
   font-family: inherit;
-  font-size: 11px;
+  font-size: 13.2px;
   font-weight: 600;
   padding: 3px 6px;
   border: 1px solid transparent;
@@ -408,7 +408,7 @@
   border-radius: 9px;
   color: var(--jtt-muted);
   background: var(--jtt-panel);
-  font-size: 11px;
+  font-size: 13.2px;
   line-height: 1.45;
 }
 
@@ -451,7 +451,7 @@
 
 #ja-transit-timeline-window .jtt-stage-panel > strong {
   color: var(--jtt-ink);
-  font-size: 14px;
+  font-size: 16.8px;
   font-weight: 750;
 }
 
@@ -459,7 +459,7 @@
   max-width: 540px;
   margin: 0;
   color: var(--jtt-muted);
-  font-size: 12px;
+  font-size: 14.4px;
   line-height: 1.6;
 }
 
@@ -619,7 +619,7 @@
 
 #ja-transit-timeline-window .jtt-context-item > span {
   flex: 0 0 auto;
-  font-size: 9px;
+  font-size: 10.8px;
   letter-spacing: .55px;
   white-space: nowrap;
 }
@@ -657,7 +657,7 @@
   flex: 0 0 164px;
   min-width: 0;
   gap: 4px;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: .45px;
 }
 
@@ -665,7 +665,7 @@
   height: 34px;
   padding: 0 9px;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 14.4px;
 }
 
 #ja-transit-timeline-window .jtt-time-field {
@@ -677,7 +677,7 @@
   height: 34px;
   padding: 0 13px;
   border-radius: 8px;
-  font-size: 11px;
+  font-size: 13.2px;
   white-space: nowrap;
   transition: background .15s ease, transform .15s ease, box-shadow .15s ease;
 }
@@ -715,7 +715,7 @@
 #ja-transit-timeline-window .group-label {
   margin: 0 3px 0 1px;
   color: var(--jtt-muted);
-  font-size: 9px;
+  font-size: 10.8px;
   font-weight: 750;
   letter-spacing: .4px;
 }
@@ -729,7 +729,7 @@
   color: var(--jtt-ink);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
   font-family: inherit;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 650;
   line-height: 1;
   white-space: nowrap;
@@ -772,12 +772,12 @@
   }
 
   #ja-transit-timeline-window .jtt-context-item > span {
-    font-size: 8px;
+    font-size: 9.6px;
     letter-spacing: .2px;
   }
 
   #ja-transit-timeline-window .jtt-context-item strong {
-    font-size: 11px;
+    font-size: 13.2px;
   }
 
   #ja-transit-timeline-window .jtt-control-panel {
@@ -932,7 +932,7 @@
 #ja-transit-timeline-window .jtt-context-item > span {
   flex: 0 0 auto;
   color: var(--jtt-muted);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 750;
   letter-spacing: .5px;
   white-space: nowrap;
@@ -942,7 +942,7 @@
   min-width: 0;
   overflow: hidden;
   color: var(--jtt-ink);
-  font-size: 13px;
+  font-size: 15.6px;
   font-weight: 750;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1003,7 +1003,7 @@
 
 #ja-transit-timeline-window .jtt-dasha-item strong {
   color: var(--jtt-accent);
-  font-size: 14px;
+  font-size: 16.8px;
 }
 
 #ja-transit-timeline-window .jtt-unified-divider {
@@ -1039,7 +1039,7 @@
   min-width: 0;
   gap: 4px;
   color: var(--jtt-muted);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: .4px;
 }
 
@@ -1048,7 +1048,7 @@
   height: 34px;
   padding: 0 9px;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 14.4px;
 }
 
 #ja-transit-timeline-window .jtt-time-field {
@@ -1062,7 +1062,7 @@
   height: 34px;
   padding: 0 12px;
   border-radius: 8px;
-  font-size: 11px;
+  font-size: 13.2px;
   white-space: nowrap;
 }
 
@@ -1096,7 +1096,7 @@
   flex: 0 0 auto;
   margin: 0 3px 0 1px;
   color: var(--jtt-muted);
-  font-size: 9px;
+  font-size: 10.8px;
   font-weight: 750;
   white-space: nowrap;
 }
@@ -1110,7 +1110,7 @@
   border-radius: 7px;
   background: var(--jtt-panel-alt);
   color: var(--jtt-ink);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 650;
   line-height: 1;
   white-space: nowrap;
@@ -1163,7 +1163,7 @@
   color: var(--jtt-ink);
   background: var(--jtt-panel);
   box-shadow: 0 10px 30px rgba(0,0,0,.14);
-  font-size: 12px;
+  font-size: 14.4px;
   line-height: 1.5;
   white-space: normal;
 }
@@ -1211,7 +1211,7 @@
   min-width: 0;
   margin: 0;
   color: var(--jtt-muted);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 750;
   letter-spacing: .35px;
   white-space: nowrap;
@@ -1221,7 +1221,7 @@
   flex: 0 0 auto;
   min-width: 0;
   color: var(--jtt-muted);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 750;
   letter-spacing: .25px;
   white-space: nowrap;
@@ -1240,7 +1240,7 @@
   width: 148px;
   height: 32px;
   padding: 0 8px;
-  font-size: 12px;
+  font-size: 14.4px;
 }
 
 #ja-transit-timeline-window .jtt-time-field {
@@ -1257,14 +1257,14 @@
   width: 112px;
   height: 32px;
   padding: 0 8px;
-  font-size: 12px;
+  font-size: 14.4px;
 }
 
 #ja-transit-timeline-window .jtt-now-button {
   flex: 0 0 auto;
   height: 32px;
   padding: 0 11px;
-  font-size: 11px;
+  font-size: 13.2px;
   white-space: nowrap;
 }
 
@@ -1294,7 +1294,7 @@
 #ja-transit-timeline-window .group-label {
   flex: 0 0 auto;
   margin: 0 3px 0 0;
-  font-size: 9px;
+  font-size: 10.8px;
   font-weight: 750;
   white-space: nowrap;
 }
@@ -1304,7 +1304,7 @@
   min-height: 25px;
   padding: 3px 4px;
   border-radius: 6px;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1;
   white-space: nowrap;
 }
@@ -1344,7 +1344,7 @@
   table-layout: fixed;
   color: var(--jtt-ink);
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-size: 12px;
+  font-size: 14.4px;
   font-weight: 450;
   font-variant-numeric: tabular-nums;
   line-height: 1.4;
@@ -1358,7 +1358,7 @@
 }
 
 #ja-transit-timeline-window .jtt-planetary-table tbody td {
-  font-size: 12px;
+  font-size: 14.4px;
   font-weight: 450;
 }
 
@@ -1383,7 +1383,7 @@
   top: 0;
   color: var(--jtt-muted);
   background: var(--jtt-panel-alt);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: .35px;
   white-space: normal;
@@ -1462,7 +1462,7 @@
 
 #ja-transit-timeline-window .jtt-planet-cell strong {
   display: inline-block;
-  font-size: 13px;
+  font-size: 15.6px;
   font-weight: 800;
   white-space: nowrap;
 }
@@ -1471,7 +1471,7 @@
   display: inline-block;
   margin-left: 2px;
   color: var(--jtt-muted);
-  font-size: 9px;
+  font-size: 10.8px;
   font-weight: 800;
   line-height: 1;
   vertical-align: super;
@@ -1481,7 +1481,7 @@
 #ja-transit-timeline-window .jtt-cell-main {
   display: block;
   color: var(--jtt-ink);
-  font-size: 11px;
+  font-size: 13.2px;
   font-weight: 750;
   white-space: normal;
 }
@@ -1490,7 +1490,7 @@
   display: block;
   margin-top: 4px;
   color: var(--jtt-muted);
-  font-size: 9px;
+  font-size: 10.8px;
   font-weight: 500;
   line-height: 1.35;
   white-space: normal;
@@ -1500,7 +1500,7 @@
 }
 
 #ja-transit-timeline-window .jtt-cell-number {
-  font-size: 11px;
+  font-size: 13.2px;
   font-weight: 700;
   text-align: center;
 }
@@ -1519,14 +1519,14 @@
 }
 
 #ja-transit-timeline-window .jtt-natal-match {
-  font-size: 11px;
+  font-size: 13.2px;
   font-weight: 750;
   white-space: normal;
 }
 
 #ja-transit-timeline-window .jtt-match-separator {
   color: var(--jtt-muted);
-  font-size: 10px;
+  font-size: 12px;
 }
 
 #ja-transit-timeline-window .jtt-blank-cell {
@@ -1535,7 +1535,7 @@
 
 #ja-transit-timeline-window .jtt-murti-cell {
   color: var(--jtt-ink);
-  font-size: 11px;
+  font-size: 13.2px;
   font-weight: 800;
   white-space: normal;
 }
@@ -1547,7 +1547,7 @@
   justify-content: center;
   padding: 30px;
   color: var(--jtt-muted);
-  font-size: 13px;
+  font-size: 15.6px;
   text-align: center;
 }
 
@@ -1569,7 +1569,7 @@
 /* Natal match planet status markers inherit the native chart flags. */
 #ja-transit-timeline-window .jtt-natal-match .jtt-planet-markers {
   margin-left: 1px;
-  font-size: 8px;
+  font-size: 9.6px;
 }
 
 
@@ -1581,7 +1581,7 @@
 #ja-transit-timeline-window .jtt-planetary-table {
   min-width: 1760px;
   font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-size: 11.5px;
+  font-size: 13.8px;
   line-height: 1.42;
   font-variant-numeric: tabular-nums;
 }
@@ -1590,14 +1590,14 @@
 #ja-transit-timeline-window .jtt-planetary-table td { padding: 8px 8px; }
 
 #ja-transit-timeline-window .jtt-planetary-table thead th {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 650;
   letter-spacing: .15px;
   line-height: 1.3;
 }
 
 #ja-transit-timeline-window .jtt-planetary-table thead tr:nth-child(2) th {
-  font-size: 9px;
+  font-size: 10.8px;
   font-weight: 600;
 }
 
@@ -1638,11 +1638,11 @@
 
 #ja-transit-timeline-window .jtt-planet-cell strong {
   color: var(--jtt-ink) !important;
-  font-size: 12px;
+  font-size: 14.4px;
   font-weight: 750;
 }
 
-#ja-transit-timeline-window .jtt-cell-main { font-size: 11px; font-weight: 450; }
+#ja-transit-timeline-window .jtt-cell-main { font-size: 13.2px; font-weight: 450; }
 
 #ja-transit-timeline-window .jtt-cell-number,
 #ja-transit-timeline-window .jtt-house-score,
@@ -1650,21 +1650,21 @@
 #ja-transit-timeline-window .jtt-navamsa-cell,
 #ja-transit-timeline-window .jtt-murti-cell {
   color: var(--jtt-ink);
-  font-size: 11px;
+  font-size: 13.2px;
   font-weight: 450;
   font-variant-numeric: tabular-nums;
 }
 
 #ja-transit-timeline-window .jtt-sign-cell .jtt-duration-value {
   color: var(--jtt-ink);
-  font-size: 11.5px;
+  font-size: 13.8px;
   font-weight: 650;
 }
 
-#ja-transit-timeline-window .jtt-nak-lord { color: var(--jtt-muted); font-size: 10px; font-weight: 450; }
+#ja-transit-timeline-window .jtt-nak-lord { color: var(--jtt-muted); font-size: 12px; font-weight: 450; }
 #ja-transit-timeline-window .jtt-house-score { display: inline-block; white-space: nowrap; }
-#ja-transit-timeline-window .jtt-natal-match { font-size: 10.5px; font-weight: 500; }
-#ja-transit-timeline-window .jtt-planet-markers { font-size: 8px; font-weight: 700; }
+#ja-transit-timeline-window .jtt-natal-match { font-size: 12.6px; font-weight: 500; }
+#ja-transit-timeline-window .jtt-planet-markers { font-size: 9.6px; font-weight: 700; }
 
 #ja-transit-timeline-window .jtt-duration-wrap {
   display: inline-flex;
@@ -1718,7 +1718,7 @@
 .jtt-duration-tooltip-heading {
   flex: 0 0 auto;
   color: var(--jtt-muted, #6E6E73);
-  font-size: 9px;
+  font-size: 10.8px;
   font-weight: 700;
   letter-spacing: .4px;
   text-transform: uppercase;
@@ -1728,7 +1728,7 @@
   flex: 1 1 auto;
   min-width: 0;
   color: var(--jtt-ink, #1D1D1F);
-  font-size: 11px;
+  font-size: 13.2px;
   font-weight: 500;
   line-height: 1.4;
   user-select: text;
@@ -1823,7 +1823,7 @@
 #ja-transit-timeline-window .jtt-global-export-heading {
   padding: 6px 8px 7px;
   color: var(--jtt-muted);
-  font-size: 9px;
+  font-size: 10.8px;
   font-weight: 800;
   letter-spacing: .6px;
   text-transform: uppercase;
@@ -1840,7 +1840,7 @@
   border-radius: 7px;
   color: var(--jtt-ink);
   background: transparent;
-  font-size: 11px;
+  font-size: 13.2px;
   font-weight: 550;
   text-align: left;
   cursor: pointer;
@@ -1855,7 +1855,7 @@
   color: var(--jtt-muted);
   background: var(--jtt-panel-alt);
   font-family: inherit;
-  font-size: 9px;
+  font-size: 10.8px;
   line-height: 1.3;
 }
 
@@ -1932,7 +1932,7 @@
 /* Compact, wrap-friendly multi-line headings. */
 #ja-transit-timeline-window .jtt-planetary-table thead th {
   padding: 6px 6px;
-  font-size: 9px;
+  font-size: 10.8px;
   line-height: 1.22;
   letter-spacing: .05px;
   font-weight: 650;
@@ -1948,21 +1948,21 @@
 #ja-transit-timeline-window .jtt-planetary-table thead tr:nth-child(2) th {
   top: 0;
   height: auto;
-  font-size: 8px;
+  font-size: 9.6px;
   font-weight: 600;
 }
 
 /* SAV/BAV scores are supporting details, not primary house text. */
 #ja-transit-timeline-window .jtt-house-score {
   color: var(--jtt-ink);
-  font-size: 10.5px;
+  font-size: 12.6px;
   font-weight: 550;
   white-space: nowrap;
 }
 
 #ja-transit-timeline-window .jtt-house-score-detail {
   color: var(--jtt-muted);
-  font-size: 9.5px;
+  font-size: 11.4px;
   font-weight: 450;
 }
 
@@ -1977,7 +1977,7 @@
 
 /* Murti Nirnay uses distinct, restrained status colours. */
 #ja-transit-timeline-window .jtt-murti-cell {
-  font-size: 10.5px;
+  font-size: 12.6px;
   font-weight: 700;
   white-space: nowrap;
 }
