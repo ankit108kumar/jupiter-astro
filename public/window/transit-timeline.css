@@ -2210,3 +2210,59 @@
   z-index: 2147483647;
   visibility: hidden;
 }
+
+
+/* Wide, temporary planetary-signification panel shown only from planet-name hover. */
+#ja-transit-timeline-window .jtt-planet-signification-panel {
+  display: block;
+  width: 100%;
+  margin: 20px 0 8px;
+  padding: 18px 22px;
+  border: 1px solid var(--jtt-line-strong);
+  border-radius: 15px;
+  background: var(--jtt-panel);
+  color: var(--jtt-ink);
+  box-shadow: 0 8px 26px rgba(15, 23, 42, .065);
+  opacity: 0;
+  transform: translateY(7px);
+  transition: opacity 260ms ease, transform 260ms ease;
+  pointer-events: none;
+}
+#ja-transit-timeline-window .jtt-planet-signification-panel[hidden] {
+  display: none !important;
+}
+#ja-transit-timeline-window .jtt-planet-signification-panel.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+#ja-transit-timeline-window .jtt-planet-signification-title {
+  margin: 0 0 8px;
+  color: var(--jtt-accent);
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+#ja-transit-timeline-window .jtt-planet-signification-body {
+  color: var(--jtt-ink);
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px;
+  font-weight: 350;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+#ja-transit-timeline-window .jtt-planet-signification-body strong {
+  font-weight: 600;
+}
+#ja-transit-timeline-window .jtt-planet-signification-body em {
+  font-style: italic;
+}
+#ja-transit-timeline-window .jtt-planet-signification-highlight {
+  color: #DC2626;
+}
+@media (prefers-reduced-motion: reduce) {
+  #ja-transit-timeline-window .jtt-planet-signification-panel {
+    transition: none;
+    transform: none;
+  }
+}
