@@ -276,7 +276,7 @@
     };
     return '<div class="jtt-natal-matches">' + items.map(function (item) {
       var markers = Array.isArray(item.markers) && item.markers.length
-        ? '<sup class="jtt-planet-markers">' + item.markers.map(escapeTableText).join(" ") + '</sup>'
+        ? '<sup class="jtt-planet-markers">[' + item.markers.map(escapeTableText).join("][") + ']</sup>'
         : '';
       return '<span class="jtt-natal-match" style="color:' +
         escapeTableText(item.color || "var(--jtt-ink)") + '" title="' +
@@ -306,7 +306,7 @@
 
     var rowsHtml = data.rows.map(function (row) {
       var markers = Array.isArray(row.markers) && row.markers.length
-        ? '<sup class="jtt-planet-markers">' + row.markers.map(escapeTableText).join(" ") + '</sup>'
+        ? '<sup class="jtt-planet-markers">[' + row.markers.map(escapeTableText).join("][") + ']</sup>'
         : '';
       var nakshatraLord = abbreviations[row.nakshatraLord] || '';
       var nakshatraHtml = escapeTableText(row.nakshatra) +
@@ -339,26 +339,19 @@
     return '<table class="jtt-planetary-table">' +
       '<thead>' +
         '<tr>' +
-          '<th rowspan="2" class="jtt-sticky-planet">Planet</th>' +
+          '<th class="jtt-sticky-planet">Planet</th>' +
           '<th>Sign</th>' +
           '<th>From Lagna</th>' +
           '<th>From Moon</th>' +
-          '<th rowspan="2" title="Natal Planet (Sign)">Natal (Sign)</th>' +
+          '<th title="Natal Planet (Sign)">Natal (Sign)</th>' +
           '<th>Nakshatra</th>' +
-          '<th rowspan="2">Nk. Count</th>' +
-          '<th rowspan="2" title="Natal Planet (Nakshatra)">Natal (Nak.)</th>' +
+          '<th>Nk. Count</th>' +
+          '<th title="Natal Planet (Nakshatra)">Natal (Nak.)</th>' +
           '<th>Navamsa</th>' +
-          '<th rowspan="2" title="Natal Planet (Navamsa)">Natal (D9)</th>' +
-          '<th rowspan="2">Vedha (from)</th>' +
-          '<th rowspan="2" title="Reverse Vedha (from)">Rev. Vedha</th>' +
-          '<th rowspan="2" title="Murti Nirnay">Murti</th>' +
-        '</tr>' +
-        '<tr>' +
-          '<th>Duration</th>' +
-          '<th>SAV</th>' +
-          '<th>BAV (Planet)</th>' +
-          '<th>Duration</th>' +
-          '<th>Duration</th>' +
+          '<th title="Natal Planet (Navamsa)">Natal (D9)</th>' +
+          '<th>Vedha (from)</th>' +
+          '<th title="Reverse Vedha (from)">Rev. Vedha</th>' +
+          '<th title="Murti Nirnay">Murti</th>' +
         '</tr>' +
       '</thead>' +
       '<tbody>' + rowsHtml + '</tbody>' +
