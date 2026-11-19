@@ -4408,6 +4408,16 @@ dasha(k, prefix, evalMs = Date.now()) {
     const birthMoonNakIndex = nakOf(k.ch.planets.Moon.lon).i;
 
     const renderNavTaraGrid = planetaryPositions => {
+      const lattaRows = navTaraPlanetNames.map(planet => {
+        const position = planetaryPositions && planetaryPositions[planet];
+        if (!position || !Number.isFinite(position.lon)) return null;
+        const nakIndex = nakOf(position.lon).i;
+        return { planet, nakshatra: NAK[nakIndex][0] };
+      }).filter(Boolean);
+      const lattaHits = window.JupiterTransitTimeline &&
+        typeof window.JupiterTransitTimeline.getLattaSourcesByTargetNakshatra === 'function'
+        ? window.JupiterTransitTimeline.getLattaSourcesByTargetNakshatra(lattaRows)
+        : {};
       const rows = Array.from({ length: 9 }, (_, row) => {
         const firstNakIndex = (birthMoonNakIndex + row) % 27;
         const rowPlanet = NAK[firstNakIndex][1];
@@ -4427,7 +4437,12 @@ dasha(k, prefix, evalMs = Date.now()) {
           const occupantHtml = occupants.map(planet =>
             `<strong class="ja-navtara-occupant" style="color:${PLANET_COLORS[planet] || 'var(--ink)'}">${planet}</strong>`
           ).join(', ');
-          return `<td>${NAK[nakIndex][0]}${occupantHtml ? ` <span class="ja-navtara-occupants">${occupantHtml}</span>` : ''}</td>`;
+          const nakshatraName = NAK[nakIndex][0];
+          const lattaSources = lattaHits[nakshatraName] || [];
+          const lattaMarker = lattaSources.length
+            ? `<sup class="ja-navtara-latta" title="Latta caused by: ${lattaSources.join(', ')}">{L}</sup>`
+            : '';
+          return `<td>${nakshatraName}${lattaMarker}${occupantHtml ? ` <span class="ja-navtara-occupants">${occupantHtml}</span>` : ''}</td>`;
         }).join('');
 
         return `
