@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "title": "Planet Significations",
+  "source": {
+    "type": "user-provided-reference-image",
+    "heading": "Planet (Signification)",
+    "transcriptionPolicy": "Wording follows the supplied image. emphasizedTerms and italicTerms preserve its visible typography."
+  },
+  "planets": {
+    "Jupiter": {
+      "signification": "Knowledge, Good Habits, Child, Teaching, Veda, Rising of All, Respect, Stored Money, Good Deeds, Sympathy, Love & Care of Husband, Liver (Issues, Fat, Diabetes), Old Literature, Spiritual Education, Guide, Consultant, Astrologer, Travel Agent, Trustee in Temple, Cashier, Philosopher, Gold, Working on Commission,",
+      "emphasizedTerms": [
+        "Knowledge",
+        "Child",
+        "Good Deeds",
+        "Diabetes",
+        "Consultant",
+        "Cashier",
+        "Gold"
+      ],
+      "italicTerms": []
+    },
+    "Sun": {
+      "signification": "Gold, Father, Good Result of Deeds, Patience, Courage, Win in War, Spirit, Power, Light, Visiting Hills / Forest, Eye, King, Senior in Job/ profession, Jeweller, Political Science, Statistics, Tablets, Grocery, Fruit Juice, Mantra Diksha, Heart, Stomach, Baldness, Pain, Fever, Anxiety, Problem in Blood Circulation, Injury with Tool.",
+      "emphasizedTerms": [
+        "Gold",
+        "Father",
+        "Power",
+        "Tablets",
+        "Grocery",
+        "Heart",
+        "Stomach",
+        "Baldness",
+        "Anxiety"
+      ],
+      "italicTerms": []
+    },
+    "Moon": {
+      "signification": "Mother, Efficiency of Mother, Happiness, Seashore, White things in house, Crown of King, Medal, Fruits, Pearl, Silver, Kansa (Metal), Milk, Water, Cow, Beauty, Left Eye, Property, Travel, Captain of Ship, Hostess (Travel), Seller of Wine, Organizing House, Pharmacist, Fine Arts, Nurse, Chemistry, Entertainment, Farm House, Liquid (Fluid) in body, Blood, Mental issues like depression or Aggression, Uneasiness, Quarrel, Issues in Sleep, Anima, Breast related issues, Hormones.",
+      "emphasizedTerms": [
+        "Mother",
+        "Happiness",
+        "White things",
+        "Pearl",
+        "Silver",
+        "Milk",
+        "Water",
+        "Cow",
+        "Property",
+        "Pharmacist",
+        "Nurse",
+        "Entertainment",
+        "Liquid",
+        "Blood"
+      ],
+      "italicTerms": [
+        "depression or Aggression",
+        "Breast related issues"
+      ]
+    },
+    "Mars": {
+      "signification": "Power and Energy of Body, Siblings, Brutal Attack, War Zone, Courage, Fire of Kitchen Tools, War Tools, Thief, Enemy, Excitement, Extra Marital Relationship, False Commitment, Unnecessary Talks, Bad Deeds, Mechanic, Technician, Engineer, War, Quarrel, Theft, Fire Extinguisher, Machines, Tools, Soldier, Police, Butcher.",
+      "emphasizedTerms": [
+        "Energy",
+        "Siblings",
+        "Courage",
+        "Fire of Kitchen",
+        "Thief",
+        "Mechanic",
+        "Theft",
+        "Soldier",
+        "Police"
+      ],
+      "italicTerms": []
+    },
+    "Mercury": {
+      "signification": "Good Communication Skill, Art, Efficiency, Implementation of Knowledge, Truth, Lord Vishnu Related things, Friend, Accountancy, Astrology, Journalism, Teaching, Studying Writing, Communicating, Poetry, Anxiety, Impatience, Complexity of Thoughts, Skin Disease, Stammering, Bad Voice and Throat, Bad Dreams, Deafness, Problem in ENT, Instability of thoughts, Documents.",
+      "emphasizedTerms": [
+        "Communication Skill",
+        "Vishnu",
+        "Friend",
+        "Accountancy",
+        "Journalism",
+        "Writing",
+        "Skin Disease",
+        "Deafness"
+      ],
+      "highlightedTerms": [
+        "Impatience"
+      ],
+      "italicTerms": []
+    },
+    "Venus": {
+      "signification": "Quality of Property, Vehicle, Clothes and Jewellery, Fragrance, Bed, Richness, Luxury, Marriage, Functions and Events, Poet, Dancer, Singer, Furniture, Clothes Seller, Beautification and Beautician, Artist, photographer, Face, Eye Sight, Hormonal System, Eye Disease, Diabetes, Issues in Kidney, Tiredness and lousiness.",
+      "emphasizedTerms": [
+        "Quality",
+        "Vehicle",
+        "Clothes",
+        "Jewellery",
+        "Fragrance",
+        "Bed",
+        "Luxury",
+        "Marriage",
+        "Artist",
+        "Eye Sight",
+        "Eye Disease",
+        "lousiness"
+      ],
+      "italicTerms": []
+    },
+    "Saturn": {
+      "signification": "Age, Death, Fear, Insult, Disease, Pain, Poverty, Sin, Labor Work, Grave Maker, Unhygienic, Stability, Inferior society, Buffalo, Loan, Iron, Service, Imprisonment, Coal, Property Dealer, Plumber, Contractor, Leather Trader, Watchman, Ice cream Vendor, Legs, Large Intestine, Aggression, Paralysis, Madness, Insane, Tiredness, Unexpected Threats.",
+      "emphasizedTerms": [
+        "Age",
+        "Death",
+        "Insult",
+        "Disease",
+        "Poverty",
+        "Labor",
+        "Unhygienic",
+        "Loan",
+        "Service",
+        "Property Dealer",
+        "Plumber",
+        "Leather",
+        "Ice cream"
+      ],
+      "italicTerms": []
+    },
+    "Rahu": {
+      "signification": "Laziness, Unhygienic, Scattered, Pessimist, Castle in the Air, To Create Fake View, Dual Personality, Wireless, Hidden Money, Underworld, Diplomacy, Coded Language, Coded Message, Refusal, Radio, Aviation, Telephone, Electricity, Poison, Medicine, Travel Planner Powerlessness, Slow, Ignorant, Cheap Talk, Hiccups, Foot ailment, Theft, Gambler, Dacoit Smuggler, Cheat, To condemn.",
+      "emphasizedTerms": [
+        "Laziness",
+        "Castle in the Air",
+        "Dual Personality",
+        "Wireless",
+        "Diplomacy",
+        "Aviation",
+        "Electricity",
+        "Medicine",
+        "Planner",
+        "Theft",
+        "Dacoit Smuggler",
+        "condemn"
+      ],
+      "italicTerms": []
+    },
+    "Ketu": {
+      "signification": "Spirituality, Service, Selflessness, Restriction / Bondage, Spiritual Growth, Blind Faith, Deity Worship, Charity, Secular, Fabricated religious event, Unpredictable Work Efficiency, Knowledge of Mantra, Less talkative, Philosophy, Self-knowledge, Meditation, Pain in the Eyes, Pain from Enemy, Stomach ailment, Injury from Sharp Object, Malefactions Speech, Thorn, Poisonous Allergy, Dispassionate, Wrong Treatment, Operation (Surgery), Deafness, Worms in Intestine, Secret Task, Tough Job Occult Science, Foreign Language, Computer Engineer.",
+      "emphasizedTerms": [
+        "Selflessness",
+        "Restriction",
+        "Blind Faith",
+        "Less talkative",
+        "Philosophy",
+        "Meditation",
+        "Malefactions",
+        "Thorn",
+        "Dispassionate",
+        "Operation",
+        "Secret Task",
+        "Occult Science"
+      ],
+      "italicTerms": []
+    }
+  }
+}
