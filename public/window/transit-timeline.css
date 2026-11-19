@@ -1369,7 +1369,7 @@
 
 #ja-transit-timeline-window .jtt-planetary-table th,
 #ja-transit-timeline-window .jtt-planetary-table td {
-  padding: 11px 10px;
+  padding: 15px 10px;
   border-right: 1px solid var(--jtt-line);
   border-bottom: 1px solid var(--jtt-line);
   text-align: left;
@@ -1390,7 +1390,7 @@
 }
 
 #ja-transit-timeline-window .jtt-planetary-table thead tr:first-child th {
-  height: 38px;
+  height: 46px;
   vertical-align: middle;
 }
 
