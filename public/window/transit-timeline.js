@@ -627,16 +627,18 @@
       };
     });
 
-    positions.forEach(function (causer) {
-      var rules = REVERSE_VEDHA_RULES[causer.planet];
-      if (!rules || !Object.prototype.hasOwnProperty.call(rules, causer.house)) return;
+    // The planet in the listed (adverse) house is the recipient of Reverse
+    // Vedha. Any other planet in its paired Reverse Vedha house relieves it.
+    positions.forEach(function (recipient) {
+      var rules = REVERSE_VEDHA_RULES[recipient.planet];
+      if (!rules || !Object.prototype.hasOwnProperty.call(rules, recipient.house)) return;
 
-      var affectedHouse = rules[causer.house];
-      positions.forEach(function (affected) {
-        if (!affected.planet || affected.planet === causer.planet ||
-            affected.house !== affectedHouse) return;
+      var reverseVedhaHouse = rules[recipient.house];
+      positions.forEach(function (relievingPlanet) {
+        if (!relievingPlanet.planet || relievingPlanet.planet === recipient.planet ||
+            relievingPlanet.house !== reverseVedhaHouse) return;
 
-        (result[affected.planet] || (result[affected.planet] = [])).push(causer.planet);
+        (result[recipient.planet] || (result[recipient.planet] = [])).push(relievingPlanet.planet);
       });
     });
 
