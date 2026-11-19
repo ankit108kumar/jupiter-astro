@@ -1369,7 +1369,7 @@
 
 #ja-transit-timeline-window .jtt-planetary-table th,
 #ja-transit-timeline-window .jtt-planetary-table td {
-  padding: 9px 10px;
+  padding: 11px 10px;
   border-right: 1px solid var(--jtt-line);
   border-bottom: 1px solid var(--jtt-line);
   text-align: left;
@@ -1394,18 +1394,17 @@
   vertical-align: middle;
 }
 
-#ja-transit-timeline-window .jtt-planetary-table thead tr:nth-child(2) th {
-  top: 38px;
-  height: 30px;
-  font-size: 9px;
-  font-weight: 750;
-}
+
 
 #ja-transit-timeline-window .jtt-planetary-table tbody tr:nth-child(even) {
   background: color-mix(in srgb, var(--jtt-panel-alt) 48%, transparent);
 }
 
 #ja-transit-timeline-window .jtt-planetary-table tbody tr:hover {
+  background: var(--jtt-accent-soft);
+}
+
+#ja-transit-timeline-window .jtt-planetary-table tbody tr:hover > td:first-child {
   background: var(--jtt-accent-soft);
 }
 
@@ -1536,7 +1535,7 @@
 #ja-transit-timeline-window .jtt-murti-cell {
   color: var(--jtt-ink);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
   white-space: normal;
 }
 
@@ -1674,9 +1673,7 @@
   color: var(--jtt-ink);
   cursor: help;
   outline: none;
-  text-decoration: underline dotted color-mix(in srgb, var(--jtt-muted) 55%, transparent);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
+  text-decoration: none;
   user-select: text;
 }
 
