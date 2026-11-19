@@ -1125,6 +1125,23 @@
       syncFromContext();
       return true;
     } catch (error) {
+      // The shared timestamp is assigned before the Research Kundali refreshes
+      // its Planetary Transits tab. A rendering error after that assignment
+      // must not be reported as a failed time update or break Timeline sync.
+      try {
+        var latestSnapshot = context.getSnapshot();
+        if (latestSnapshot && Number(latestSnapshot.evalMs) === timestamp) {
+          console.warn(
+            "Evaluation time was updated; a Planetary Transits refresh raised an error.",
+            error
+          );
+          syncFromContext();
+          return true;
+        }
+      } catch (syncError) {
+        console.warn("Transit Timeline could not refresh after the time update.", syncError);
+      }
+
       console.error("Transit Timeline could not update the selected evaluation time.", error);
       setNotice("Unable to update the Planetary Transits evaluation time.", true);
       return false;
