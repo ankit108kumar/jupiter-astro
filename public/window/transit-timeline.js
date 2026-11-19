@@ -373,6 +373,23 @@
     return results;
   }
 
+  // Index existing Latta calculations by the Nakshatra being hit.
+  // This deliberately reuses calculateLatta(); it does not recalculate planetary offsets.
+  function getLattaSourcesByTargetNakshatra(rows) {
+    var hits = {};
+    var sourceResults = calculateLatta(rows);
+    Object.keys(sourceResults).forEach(function (sourcePlanet) {
+      var item = sourceResults[sourcePlanet];
+      var target = normalizeLattaNakshatra(item.targetNakshatra);
+      if (!target) return;
+      (hits[target] || (hits[target] = [])).push(sourcePlanet);
+    });
+    Object.keys(hits).forEach(function (nakshatra) {
+      hits[nakshatra] = Array.from(new Set(hits[nakshatra]));
+    });
+    return hits;
+  }
+
   // Transit-from-Janma-Rasi reference tables (Tables 53–59, supplied book pages 315–318).
   // House numbers are counted from Janma Rasi. Snapshot and typical-result wording
   // are transcribed from the supplied source; this is reference data only for now.
@@ -581,11 +598,18 @@
       return '<div class="jtt-table-empty">No planetary transit data is available for the selected Kundali.</div>';
     }
 
-    function houseScore(house, score) {
+    function houseScore(house, score, scoreType) {
       var hasScore = score !== null && score !== undefined && score !== "" &&
         Number.isFinite(Number(score));
+      var numericScore = hasScore ? Number(score) : null;
+      var scoreClass = '';
+      if (hasScore && scoreType === "sav") {
+        scoreClass = numericScore > 29 ? ' jtt-score-good' : numericScore < 25 ? ' jtt-score-bad' : '';
+      } else if (hasScore && scoreType === "bav") {
+        scoreClass = numericScore >= 6 ? ' jtt-score-good' : numericScore <= 3 ? ' jtt-score-bad' : '';
+      }
       var value = hasScore
-        ? '<span class="jtt-house-score-detail"> [' + escapeTableText(score) + ']</span>'
+        ? '<span class="jtt-house-score-detail' + scoreClass + '"> [' + escapeTableText(score) + ']</span>'
         : '';
       return '<span class="jtt-house-score">' + escapeTableText(house) + 'H' + value + '</span>';
     }
@@ -596,12 +620,20 @@
     };
 
     var vedhaResults = computeVedha(data.rows);
+    var lattaHits = getLattaSourcesByTargetNakshatra(data.rows.map(function (row) {
+      return { planet: row.planet, nakshatra: row.nakshatra };
+    }));
     var rowsHtml = data.rows.map(function (row) {
       var markers = Array.isArray(row.markers) && row.markers.length
         ? '<sup class="jtt-planet-markers">[' + row.markers.map(escapeTableText).join("][") + ']</sup>'
         : '';
       var nakshatraLord = abbreviations[row.nakshatraLord] || '';
-      var nakshatraHtml = escapeTableText(row.nakshatra) +
+      var nakshatraName = normalizeLattaNakshatra(row.nakshatra);
+      var lattaSources = nakshatraName ? (lattaHits[nakshatraName] || []) : [];
+      var lattaMarker = lattaSources.length
+        ? ' <sup class="jtt-latta-marker" title="Latta caused by: ' + escapeTableText(lattaSources.join(", ")) + '">{L}</sup>'
+        : '';
+      var nakshatraHtml = escapeTableText(row.nakshatra) + lattaMarker +
         (nakshatraLord ? ' <span class="jtt-nak-lord">(' + nakshatraLord + ')</span>' : '');
       var murti = row.planet === "Moon" ? "" : escapeTableText(row.murti || "");
       var murtiTone = row.planet === "Moon" ? "" :
@@ -614,8 +646,8 @@
       return '<tr>' +
         '<td class="jtt-planet-cell"><strong>' + escapeTableText(row.planet) + '</strong>' + markers + '</td>' +
         '<td class="jtt-sign-cell">' + renderDurationCell(row.signDuration, escapeTableText(row.sign), 'Sign duration') + '</td>' +
-        '<td class="jtt-house-cell">' + houseScore(row.fromLagna, row.sav) + '</td>' +
-        '<td class="jtt-house-cell">' + houseScore(row.fromMoon, row.bav) + '</td>' +
+        '<td class="jtt-house-cell">' + houseScore(row.fromLagna, row.sav, 'sav') + '</td>' +
+        '<td class="jtt-house-cell">' + houseScore(row.fromMoon, row.bav, 'bav') + '</td>' +
         '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInSign) + '</td>' +
         '<td class="jtt-nakshatra-cell">' + renderDurationCell(row.nakshatraDuration, nakshatraHtml, 'Nakshatra duration') + '</td>' +
         '<td class="jtt-count-cell">' + escapeTableText(row.countFromJanmaNakshatra) + '</td>' +
@@ -1432,6 +1464,7 @@
     isOpen: openState,
     calculateLatta: calculateLatta,
     calculateLattaTarget: calculateLattaTarget,
+    getLattaSourcesByTargetNakshatra: getLattaSourcesByTargetNakshatra,
     lattaRules: LATTA_RULES,
     transitResultBasic: {
       name: "Transit Result : Basic",
