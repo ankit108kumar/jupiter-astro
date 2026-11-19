@@ -661,7 +661,7 @@
       return '<div class="jtt-table-empty">No planetary transit data is available for the selected Kundali.</div>';
     }
 
-    function houseScore(house, score, scoreType) {
+    function houseScore(house, score, scoreType, planet) {
       var hasScore = score !== null && score !== undefined && score !== "" &&
         Number.isFinite(Number(score));
       var numericScore = hasScore ? Number(score) : null;
@@ -671,10 +671,17 @@
       } else if (hasScore && scoreType === "bav") {
         scoreClass = numericScore >= 6 ? ' jtt-score-good' : numericScore <= 3 ? ' jtt-score-bad' : '';
       }
+      var houseNumber = Number(house);
+      var houseMarkup = Number.isInteger(houseNumber) && houseNumber >= 1 && houseNumber <= 12
+        ? '<span class="jtt-house-result-trigger" data-result-planet="' + escapeTableText(planet) +
+          '" data-result-house="' + houseNumber + '" tabindex="0" role="button" aria-label="' +
+          escapeTableText(planet + ' transit result, ' + houseNumber + 'th house') + '">' +
+          houseNumber + 'H</span>'
+        : escapeTableText(house) + 'H';
       var value = hasScore
         ? '<span class="jtt-house-score-detail' + scoreClass + '"> [' + escapeTableText(score) + ']</span>'
         : '';
-      return '<span class="jtt-house-score">' + escapeTableText(house) + 'H' + value + '</span>';
+      return '<span class="jtt-house-score">' + houseMarkup + value + '</span>';
     }
 
     var abbreviations = {
@@ -710,8 +717,8 @@
       return '<tr>' +
         '<td class="jtt-planet-cell"><strong>' + escapeTableText(row.planet) + '</strong>' + markers + '</td>' +
         '<td class="jtt-sign-cell">' + renderDurationCell(row.signDuration, escapeTableText(row.sign), 'Sign duration') + '</td>' +
-        '<td class="jtt-house-cell">' + houseScore(row.fromLagna, row.sav, 'sav') + '</td>' +
-        '<td class="jtt-house-cell">' + houseScore(row.fromMoon, row.bav, 'bav') + '</td>' +
+        '<td class="jtt-house-cell">' + houseScore(row.fromLagna, row.sav, 'sav', row.planet) + '</td>' +
+        '<td class="jtt-house-cell">' + houseScore(row.fromMoon, row.bav, 'bav', row.planet) + '</td>' +
         '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInSign) + '</td>' +
         '<td class="jtt-nakshatra-cell">' + renderDurationCell(row.nakshatraDuration, nakshatraHtml, 'Nakshatra duration') + '</td>' +
         '<td class="jtt-count-cell">' + escapeTableText(row.countFromJanmaNakshatra) + '</td>' +
@@ -1024,6 +1031,103 @@
     closeGlobalExportMenu();
   }
 
+  var activeHouseResultTooltip = null;
+  var houseResultHideTimer = null;
+  var houseResultBoundHosts = new WeakSet();
+
+  function removeHouseResultTooltip() {
+    if (houseResultHideTimer) {
+      clearTimeout(houseResultHideTimer);
+      houseResultHideTimer = null;
+    }
+    if (activeHouseResultTooltip && activeHouseResultTooltip.parentNode) {
+      activeHouseResultTooltip.remove();
+    }
+    activeHouseResultTooltip = null;
+  }
+
+  function scheduleHouseResultTooltipHide() {
+    if (houseResultHideTimer) clearTimeout(houseResultHideTimer);
+    houseResultHideTimer = setTimeout(removeHouseResultTooltip, 500);
+  }
+
+  function showHouseResultTooltip(trigger) {
+    var api = window.JupiterTransitTimeline &&
+      window.JupiterTransitTimeline.transitResultBasic;
+    if (!api || typeof api.getResult !== "function") return;
+
+    var result = api.getResult(
+      trigger.getAttribute("data-result-planet"),
+      Number(trigger.getAttribute("data-result-house"))
+    );
+    if (!result) return;
+
+    if (houseResultHideTimer) {
+      clearTimeout(houseResultHideTimer);
+      houseResultHideTimer = null;
+    }
+    removeHouseResultTooltip();
+
+    var tooltip = document.createElement("div");
+    tooltip.className = "jtt-transit-result-tooltip";
+    tooltip.setAttribute("role", "tooltip");
+
+    var heading = document.createElement("div");
+    heading.className = "jtt-transit-result-heading";
+    heading.textContent = result.planet + " · " + result.house + "H · " + result.snapshot;
+
+    var description = document.createElement("div");
+    description.className = "jtt-transit-result-description";
+    description.textContent = result.result;
+
+    tooltip.appendChild(heading);
+    tooltip.appendChild(description);
+    document.body.appendChild(tooltip);
+    activeHouseResultTooltip = tooltip;
+
+    var rect = trigger.getBoundingClientRect();
+    var left = Math.max(10, Math.min(rect.left, window.innerWidth - 330));
+    tooltip.style.left = left + "px";
+    tooltip.style.top = (rect.bottom + 8) + "px";
+
+    var tipRect = tooltip.getBoundingClientRect();
+    if (tipRect.bottom > window.innerHeight - 10) {
+      tooltip.style.top = Math.max(10, rect.top - tipRect.height - 8) + "px";
+    }
+  }
+
+  function bindHouseResultTooltips(host) {
+    if (!host || houseResultBoundHosts.has(host)) return;
+    houseResultBoundHosts.add(host);
+
+    host.addEventListener("pointerover", function (event) {
+      var target = event.target && event.target.closest
+        ? event.target.closest(".jtt-house-result-trigger") : null;
+      if (!target || !host.contains(target)) return;
+      showHouseResultTooltip(target);
+    });
+
+    host.addEventListener("pointerout", function (event) {
+      var target = event.target && event.target.closest
+        ? event.target.closest(".jtt-house-result-trigger") : null;
+      if (!target || !host.contains(target)) return;
+      if (event.relatedTarget && target.contains(event.relatedTarget)) return;
+      scheduleHouseResultTooltipHide();
+    });
+
+    host.addEventListener("focusin", function (event) {
+      var target = event.target && event.target.closest
+        ? event.target.closest(".jtt-house-result-trigger") : null;
+      if (target && host.contains(target)) showHouseResultTooltip(target);
+    });
+
+    host.addEventListener("focusout", function (event) {
+      var target = event.target && event.target.closest
+        ? event.target.closest(".jtt-house-result-trigger") : null;
+      if (target && host.contains(target)) scheduleHouseResultTooltipHide();
+    });
+  }
+
   function renderTransitTableFromContext() {
     if (!windowEl) return;
     var host = windowEl.querySelector("[data-jtt-table-scroll]");
@@ -1037,8 +1141,10 @@
 
     try {
       removeDurationTooltip();
+      removeHouseResultTooltip();
       host.innerHTML = renderTransitTable(context.getTransitTableData());
       bindDurationTooltips(host);
+      bindHouseResultTooltips(host);
     } catch (error) {
       console.error("Transit Timeline could not render the planetary table.", error);
       host.innerHTML = '<div class="jtt-table-empty is-error">Unable to load planetary transit data. Check the active Research Kundali.</div>';
@@ -1073,7 +1179,23 @@
 
     if (dateInput) dateInput.value = dateInputValue(date);
     if (timeInput) timeInput.value = timeInputValue(date);
-    if (dasha) dasha.textContent = snapshot.dasha || "—";
+    if (dasha) {
+      if (Array.isArray(snapshot.dashaSequence) && snapshot.dashaSequence.length) {
+        dasha.replaceChildren();
+        snapshot.dashaSequence.forEach(function (item, index) {
+          if (index) dasha.appendChild(document.createTextNode(" - "));
+          dasha.appendChild(document.createTextNode(item.lord || ""));
+          if (Number.isInteger(Number(item.house)) && Number(item.house) >= 1 && Number(item.house) <= 12) {
+            var house = document.createElement("span");
+            house.className = "jtt-dasha-house";
+            house.textContent = " (" + item.house + ")";
+            dasha.appendChild(house);
+          }
+        });
+      } else {
+        dasha.textContent = snapshot.dasha || "—";
+      }
+    }
     if (chartTitle) chartTitle.textContent = snapshot.chartTitle || "Active Research Kundali";
     if (janma) janma.textContent = snapshot.janmaRashi || "—";
     if (selected) selected.textContent = "Evaluation: " + displayDateTime(Number(snapshot.evalMs));
