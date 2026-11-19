@@ -159,9 +159,10 @@
     return String(value).padStart(2, "0");
   }
 
+  // The visible date field uses Indian-style DD/MM/YYYY formatting.
   function dateInputValue(date) {
-    return date.getFullYear() + "-" +
-      pad(date.getMonth() + 1) + "-" + pad(date.getDate());
+    return pad(date.getDate()) + "/" +
+      pad(date.getMonth() + 1) + "/" + date.getFullYear();
   }
 
   function timeInputValue(date) {
@@ -705,14 +706,22 @@
     var timeInput = windowEl.querySelector('[data-jtt-field="time"]');
     if (!dateInput || !timeInput || !dateInput.value || !timeInput.value) return null;
 
-    var dateParts = dateInput.value.split("-").map(Number);
+    var dateMatch = dateInput.value.trim().match(/^(\\d{2})\\/(\\d{2})\\/(\\d{4})$/);
     var timeParts = timeInput.value.split(":").map(Number);
-    if (dateParts.length !== 3 || timeParts.length < 2) return null;
+    if (!dateMatch || timeParts.length < 2) return null;
+
+    var day = Number(dateMatch[1]);
+    var month = Number(dateMatch[2]);
+    var year = Number(dateMatch[3]);
+    if (year < 1000 || month < 1 || month > 12 || day < 1 || day > 31) return null;
 
     var date = new Date(
-      dateParts[0], dateParts[1] - 1, dateParts[2],
+      year, month - 1, day,
       timeParts[0] || 0, timeParts[1] || 0, 0, 0
     );
+    // Reject impossible dates instead of allowing JavaScript to roll them over.
+    if (date.getFullYear() !== year || date.getMonth() !== month - 1 ||
+        date.getDate() !== day) return null;
     return Number.isFinite(date.getTime()) ? date.getTime() : null;
   }
 
@@ -816,7 +825,7 @@
           '<div class="jtt-unified-divider" aria-hidden="true"></div>' +
           '<div class="jtt-control-panel" aria-label="Transit evaluation controls">' +
             '<div class="jtt-fields-row">' +
-              '<label class="jtt-field jtt-date-field"><span>Date</span><input type="date" data-jtt-field="date" aria-label="Transit date"></label>' +
+              '<label class="jtt-field jtt-date-field"><span>Date</span><input type="text" data-jtt-field="date" aria-label="Transit date" placeholder="DD/MM/YYYY" inputmode="numeric" maxlength="10" autocomplete="off" spellcheck="false"></label>' +
               '<label class="jtt-field jtt-time-field"><span>Time</span><input type="time" data-jtt-field="time" aria-label="Transit time" step="60"></label>' +
               '<button class="jtt-now-button" type="button" data-jtt-action="now">Now</button>' +
             '</div>' +
