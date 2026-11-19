@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "title": "House Significations",
+  "source": {
+    "type": "user-provided-image",
+    "note": "Transcribed from the supplied reference image; Ninth House description includes its continuation across the page break."
+  },
+  "houses": [
+    {
+      "house": 1,
+      "name": "First",
+      "description": "Physical body, complexion, appearance, head, intelligence, strength, energy, fame, success, nature of birth, caste."
+    },
+    {
+      "house": 2,
+      "name": "Second",
+      "description": "Wealth, assets, family, speech, eyes, mouth, face, voice, food."
+    },
+    {
+      "house": 3,
+      "name": "Third",
+      "description": "Younger co-borns, confidants, courage, mental strength, communication skills, creativity, throat, ears, arms, father’s death (7th from 9th), expenditure on vehicles and house (12th from 4th), travels."
+    },
+    {
+      "house": 4,
+      "name": "Fourth",
+      "description": "Mother, vehicles, house, lands, immovable property, motherland, childhood, wealth from real estate, education, relatives, happiness, comforts, pleasures, peace, state of mind, heart."
+    },
+    {
+      "house": 5,
+      "name": "Fifth",
+      "description": "Children, poorvapunya (good deeds of previous lives), intelligence, knowledge & scholarship, devotion, mantras (prayers), stomach, digestive system, authority/power, fame, love, affection, emotions, judgment, speculation."
+    },
+    {
+      "house": 6,
+      "name": "Sixth",
+      "description": "Enemies, service, servants, relatives, mental tension, injuries, health, diseases, agriculture, accidents, mental affliction, mother’s younger brother, hips."
+    },
+    {
+      "house": 7,
+      "name": "Seventh",
+      "description": "Marriage, marital life, life partner, sex, passion (and related happiness), long journeys, partners, business, death, the portion of the body below the navel."
+    },
+    {
+      "house": 8,
+      "name": "Eighth",
+      "description": "Longevity, debts, disease, ill-fame, inheritance, loss of friends, occult studies, evils, gifts, unearned wealth, windfall, disgrace, secrets, genitals."
+    },
+    {
+      "house": 9,
+      "name": "Ninth",
+      "description": "Father, teacher, boss, fortune, religiousness, spirituality, God, higher studies & high knowledge, fortune in a foreign land, foreign trips, diksha (joining a religious order), past life and the cause of birth, grandchildren, principles, dharma, intuition, compassion, sympathy, leadership, charity, thighs."
+    },
+    {
+      "house": 10,
+      "name": "Tenth",
+      "description": "Growth, profession, career, karma (action), conduct in society, fame, honors, awards, self-respect, dignity, knees."
+    },
+    {
+      "house": 11,
+      "name": "Eleventh",
+      "description": "Elder co-borns, income, gains, realization of hopes, friends, ankles."
+    },
+    {
+      "house": 12,
+      "name": "Twelfth",
+      "description": "Losses, expenditure, punishment, imprisonment, hospitalization, pleasures in bed, misfortune, bad habits, sleep, meditation, donation, secret enemies, heaven, left eye, feet, residence away from the place of birth, moksha (emancipation/liberation)."
+    }
+  ]
+}
