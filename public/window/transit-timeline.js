@@ -317,7 +317,7 @@
     if (typeof value === "number" && Number.isInteger(value)) {
       return value >= 1 && value <= 12 ? value : null;
     }
-    var match = String(value == null ? "" : value).match(/(?:^|\\s)(1[0-2]|[1-9])(?:H)?(?:$|\\s)/i);
+    var match = String(value == null ? "" : value).match(/^\s*(1[0-2]|[1-9])\s*H?(?:\s|$)/i);
     return match ? Number(match[1]) : null;
   }
 
