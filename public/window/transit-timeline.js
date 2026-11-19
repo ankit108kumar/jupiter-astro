@@ -285,6 +285,87 @@
     }).join('<span class="jtt-match-separator">, </span>') + '</div>';
   }
 
+  // Rasi Gochara Vedha: auspicious transit house -> corresponding Vedha house.
+  // Houses are counted from Janma Rashi (natal Moon). The source table supplies
+  // rules for the seven classical planets only; Rahu/Ketu are not inferred.
+  var VEDHA_RULES = {
+    Sun:     { 3: 9, 6: 12, 10: 4, 11: 5 },
+    Moon:    { 1: 5, 3: 9, 6: 12, 7: 2, 10: 4, 11: 8 },
+    Mars:    { 3: 12, 6: 9, 11: 5 },
+    Mercury: { 2: 5, 4: 3, 6: 9, 8: 1, 10: 8, 11: 12 },
+    Jupiter: { 2: 12, 5: 4, 7: 3, 9: 10, 11: 8 },
+    Venus:   { 1: 8, 2: 7, 3: 1, 4: 10, 5: 9, 8: 5, 9: 11, 11: 6, 12: 3 },
+    Saturn:  { 3: 12, 6: 9, 11: 5 }
+  };
+
+  // Father-son exceptions: Sun/Saturn and Moon/Mercury do not cause
+  // Vedha on each other, in either direction.
+  var VEDHA_EXEMPT_PAIRS = [
+    ["Sun", "Saturn"],
+    ["Moon", "Mercury"]
+  ];
+
+  function isVedhaExemptPair(planetA, planetB) {
+    return VEDHA_EXEMPT_PAIRS.some(function (pair) {
+      return (pair[0] === planetA && pair[1] === planetB) ||
+        (pair[0] === planetB && pair[1] === planetA);
+    });
+  }
+
+  function getHouseFromJanmaRashi(row) {
+    var value = row && row.fromMoon;
+    if (typeof value === "number" && Number.isInteger(value)) {
+      return value >= 1 && value <= 12 ? value : null;
+    }
+    var match = String(value == null ? "" : value).match(/(?:^|\\s)(1[0-2]|[1-9])(?:H)?(?:$|\\s)/i);
+    return match ? Number(match[1]) : null;
+  }
+
+  function computeVedha(rows) {
+    var result = {};
+    var reverse = {};
+    if (!Array.isArray(rows)) return { vedha: result, reverseVedha: reverse };
+
+    var positions = rows.map(function (row) {
+      return {
+        planet: String(row && row.planet || ""),
+        house: getHouseFromJanmaRashi(row)
+      };
+    });
+
+    positions.forEach(function (target) {
+      var rules = VEDHA_RULES[target.planet];
+      var favourableHouse = target.house;
+      if (!rules || !Object.prototype.hasOwnProperty.call(rules, favourableHouse)) return;
+
+      var vedhaHouse = rules[favourableHouse];
+      positions.forEach(function (obstructor) {
+        if (!obstructor.planet || obstructor.planet === target.planet ||
+            obstructor.house !== vedhaHouse ||
+            isVedhaExemptPair(target.planet, obstructor.planet)) return;
+
+        (result[target.planet] || (result[target.planet] = [])).push(obstructor.planet);
+        (reverse[obstructor.planet] || (reverse[obstructor.planet] = [])).push(target.planet);
+      });
+    });
+
+    Object.keys(result).forEach(function (planet) {
+      result[planet] = Array.from(new Set(result[planet]));
+    });
+    Object.keys(reverse).forEach(function (planet) {
+      reverse[planet] = Array.from(new Set(reverse[planet]));
+    });
+    return { vedha: result, reverseVedha: reverse };
+  }
+
+  function renderVedhaCell(planets, titlePrefix) {
+    if (!Array.isArray(planets) || !planets.length) return '<td class="jtt-vedha-cell"></td>';
+    var names = planets.map(escapeTableText).join(", ");
+    return '<td class="jtt-vedha-cell" title="' + escapeTableText(titlePrefix + ": " + names) + '">' +
+      '<span class="jtt-vedha-mark">X</span> ' +
+      '<span class="jtt-vedha-planets">(' + names + ')</span></td>';
+  }
+
   function renderTransitTable(data) {
     if (!data || !Array.isArray(data.rows) || !data.rows.length) {
       return '<div class="jtt-table-empty">No planetary transit data is available for the selected Kundali.</div>';
@@ -304,6 +385,7 @@
       Jupiter: 'Ju', Venus: 'Ve', Saturn: 'Sa', Rahu: 'Ra', Ketu: 'Ke'
     };
 
+    var vedhaResults = computeVedha(data.rows);
     var rowsHtml = data.rows.map(function (row) {
       var markers = Array.isArray(row.markers) && row.markers.length
         ? '<sup class="jtt-planet-markers">[' + row.markers.map(escapeTableText).join("][") + ']</sup>'
@@ -330,8 +412,8 @@
         '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInNakshatra) + '</td>' +
         '<td class="jtt-navamsa-cell">' + renderDurationCell(row.navamsaDuration, escapeTableText(row.navamsa || navamsaNumber), 'Navamsa duration') + '</td>' +
         '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInNavamsa) + '</td>' +
-        '<td class="jtt-blank-cell"></td>' +
-        '<td class="jtt-blank-cell"></td>' +
+        renderVedhaCell(vedhaResults.vedha[row.planet], "Vedha caused by") +
+        renderVedhaCell(vedhaResults.reverseVedha[row.planet], "Reverse Vedha obstructing") +
         '<td class="jtt-murti-cell' + murtiTone + '">' + murti + '</td>' +
       '</tr>';
     }).join("");
