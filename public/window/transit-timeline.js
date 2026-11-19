@@ -323,8 +323,7 @@
 
   function computeVedha(rows) {
     var result = {};
-    var reverse = {};
-    if (!Array.isArray(rows)) return { vedha: result, reverseVedha: reverse };
+    if (!Array.isArray(rows)) return result;
 
     var positions = rows.map(function (row) {
       return {
@@ -345,17 +344,13 @@
             isVedhaExemptPair(target.planet, obstructor.planet)) return;
 
         (result[target.planet] || (result[target.planet] = [])).push(obstructor.planet);
-        (reverse[obstructor.planet] || (reverse[obstructor.planet] = [])).push(target.planet);
       });
     });
 
     Object.keys(result).forEach(function (planet) {
       result[planet] = Array.from(new Set(result[planet]));
     });
-    Object.keys(reverse).forEach(function (planet) {
-      reverse[planet] = Array.from(new Set(reverse[planet]));
-    });
-    return { vedha: result, reverseVedha: reverse };
+    return result;
   }
 
   function renderVedhaCell(planets, titlePrefix) {
@@ -412,8 +407,8 @@
         '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInNakshatra) + '</td>' +
         '<td class="jtt-navamsa-cell">' + renderDurationCell(row.navamsaDuration, escapeTableText(row.navamsa || navamsaNumber), 'Navamsa duration') + '</td>' +
         '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInNavamsa) + '</td>' +
-        renderVedhaCell(vedhaResults.vedha[row.planet], "Vedha caused by") +
-        renderVedhaCell(vedhaResults.reverseVedha[row.planet], "Reverse Vedha obstructing") +
+        renderVedhaCell(vedhaResults[row.planet], "Vedha caused by") +
+        '<td class="jtt-blank-cell"></td>' +
         '<td class="jtt-murti-cell' + murtiTone + '">' + murti + '</td>' +
       '</tr>';
     }).join("");
