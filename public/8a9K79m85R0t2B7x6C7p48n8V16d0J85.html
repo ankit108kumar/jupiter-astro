@@ -1347,10 +1347,22 @@ function isCombust(name, planets) {
 
 /* ================= DIVISIONAL CHARTS (VARGAS) ================= */
 const VARGAS = [
-  [1, 'Rashi', 'Body, overall life'], [2, 'Hora', 'Wealth'], [3, 'Drekkana', 'Siblings, courage'], [4, 'Chaturthamsa', 'Property, residence'],
-  [7, 'Saptamsa', 'Children'], [9, 'Navamsa', 'Spouse, dharma'], [10, 'Dasamsa', 'Career, reputation'], [12, 'Dwadasamsa', 'Parents'],
-  [16, 'Shodasamsa', 'Comforts, vehicles'], [20, 'Vimsamsa', 'Spiritual life'], [24, 'Chaturvimsamsa', 'Learning, knowledge'], [27, 'Nakshatramsa', 'Strengths, weaknesses'],
-  [30, 'Trimsamsa', 'Misfortune, shadow'], [40, 'Khavedamsa', 'Auspicious matters'], [45, 'Akshavedamsa', 'Character'], [60, 'Shashtyamsa', 'Past karma']
+  [1, 'Rashi', 'Existence at the physical level'],
+  [2, 'Hora', 'Wealth and money'],
+  [3, 'Drekkana', 'Everything related to brothers and sisters'],
+  [4, 'Chaturthamsa', 'Residence, houses owned, properties and fortune'],
+  [7, 'Saptamsa', 'Everything related to children (and grand-children)'],
+  [9, 'Navamsa', 'Marriage and everything related to spouse(s), dharma (duty and righteousness), interaction with other people, basic skills, inner self'],
+  [10, 'Dasamsa', 'Career, activities and achievements in society'],
+  [12, 'Dwadasamsa', 'Everything related to parents (also uncles, aunts and grand-parents, i.e. blood-relatives of parents)'],
+  [16, 'Shodasamsa', 'Vehicles, pleasures, comforts and discomforts'],
+  [20, 'Vimsamsa', 'Religious activities and spiritual matters'],
+  [24, 'Chaturvimsamsa', 'Learning, knowledge and education'],
+  [27, 'Nakshatramsa', 'Strengths and weaknesses, inherent nature'],
+  [30, 'Trimsamsa', 'Evils and punishment, sub-conscious self, some diseases'],
+  [40, 'Khavedamsa', 'Auspicious and inauspicious events'],
+  [45, 'Akshavedamsa', 'All matters'],
+  [60, 'Shashtyamsa', 'Karma of past life, all matters']
 ];
 function vargaSign(lon, n) {
   const s = signOf(lon), deg = lon - s * 30, odd = s % 2 === 0, q = s % 3, el = s % 4;
@@ -3896,8 +3908,9 @@ function getSecondaryChart(k, key) {
   if (key.startsWith('D')) {
     const n = parseInt(key.substring(1), 10);
     const vw = getVargaItems(k, n);
-    const title = (VARGAS.find(v => v[0] === n) || [n, `D${n}`])[1];
-    return { lagna: vw.lagna, items: vw.items, title: `D${n} · ${title} Chart` };
+    const vargaMeta = VARGAS.find(v => v[0] === n) || [n, `D${n}`, ''];
+    const title = vargaMeta[1];
+    return { lagna: vw.lagna, items: vw.items, title: `D${n} · ${title} Chart`, description: vargaMeta[2] || '' };
   } else if (key === 'Chandra') {
     const d1 = getVargaItems(k, 1);
     return { lagna: k.moonSign, items: d1.items, title: 'Chandra Kundali (Moon Lagna)' };
@@ -4016,6 +4029,7 @@ const RenderTabs = {
         <article class="card kchart">
           <header style="display:flex; justify-content:space-between; align-items:center;">
             <h3>D1 · Rashi Chart</h3>
+            <p class="varga-description">Existence at the physical level</p>
             <div style="display:flex; align-items:center; gap:6px;">
               <button type="button" class="deg-toggle-btn ${window.jaShowDeg ? 'active' : ''}" id="${prefix}-degToggleBtn" title="Toggle Planetary Degrees">D</button>
               <button type="button" class="sav-toggle-btn ${window.jaShowSavD1 ? 'active' : ''}" id="${prefix}-savToggleBtn" title="Toggle Sarvashtakavarga (SAV)">SV</button>
@@ -4032,7 +4046,8 @@ const RenderTabs = {
         </article>
         <article class="card kchart">
           <header style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-            <h3>${secChart.title}</h3>
+            <h3 title="${secChart.description || ''}">${secChart.title}</h3>
+            ${secChart.description ? `<p class="varga-description">${secChart.description}</p>` : ''}
             <div style="display:flex; align-items:center; gap:6px;">
               
 <div class="chart-dd" id="${prefix}-secChartSelect">
@@ -4049,7 +4064,7 @@ const RenderTabs = {
     ${VARGAS.filter(([n]) => n > 1).map(([n, title]) => `
       <button type="button"
               class="chart-dd-option ${secKey === 'D' + n ? 'selected' : ''}"
-              data-value="D${n}">
+              data-value="D${n}" title="${(VARGAS.find(v => v[0] === n) || [n, '', ''])[2] || ''}">
         D${n} · ${title}
       </button>
     `).join('')}
@@ -4502,9 +4517,11 @@ dasha(k, prefix, evalMs = Date.now()) {
       deg: getVargaDeg(trAsc, selectedVarga)
     });
 
-    const currentVargaTitle = (VARGAS.find(v => v[0] === selectedVarga) || [selectedVarga, `D${selectedVarga}`])[1];
-    const vargaOptions = VARGAS.filter(([n]) => n > 1).map(([n, title]) => 
-      `<option value="${n}" ${n === selectedVarga ? 'selected' : ''}>D${n} · ${title}</option>`
+    const currentVargaMeta = VARGAS.find(v => v[0] === selectedVarga) || [selectedVarga, `D${selectedVarga}`, ''];
+    const currentVargaTitle = currentVargaMeta[1];
+    const currentVargaDescription = currentVargaMeta[2] || '';
+    const vargaOptions = VARGAS.filter(([n]) => n > 1).map(([n, title, description]) => 
+      `<option value="${n}" title="${description || ''}" ${n === selectedVarga ? 'selected' : ''}>D${n} · ${title}</option>`
     ).join('');
 
     const evalDate = new Date(evalMs);
@@ -4636,7 +4653,8 @@ dasha(k, prefix, evalMs = Date.now()) {
         <!-- LEFT: NATAL DIVISIONAL CHART WITH SELECTOR -->
         <article class="card kchart">
           <header style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-            <h3>D${selectedVarga} · Natal ${currentVargaTitle}</h3>
+            <h3 title="${currentVargaDescription}">D${selectedVarga} · Natal ${currentVargaTitle}</h3>
+            <p class="varga-description">${currentVargaDescription}</p>
             <div style="display:flex; align-items:center; gap:6px;">
               <label for="${prefix}-vargaSelect" style="font-size:0.72rem; color:var(--muted); font-weight:600;">SELECT:</label>
               <select id="${prefix}-vargaSelect" style="font-size:0.8rem; font-weight:600; padding:3px 8px; border-radius:6px; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); cursor:pointer;">
@@ -4653,7 +4671,8 @@ dasha(k, prefix, evalMs = Date.now()) {
         <!-- RIGHT: TRANSIT IN DIVISIONAL CHART -->
         <article class="card kchart">
           <header style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>D${selectedVarga} · Gochar (${currentVargaTitle})</h3>
+            <h3 title="${currentVargaDescription}">D${selectedVarga} · Gochar (${currentVargaTitle})</h3>
+            <p class="varga-description">${currentVargaDescription}</p>
             <span style="font-size:0.82rem; color:var(--muted);">
               From Natal D${selectedVarga} Lagna
             </span>
