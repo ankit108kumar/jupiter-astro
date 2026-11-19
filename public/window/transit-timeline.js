@@ -373,6 +373,133 @@
     return results;
   }
 
+  // Transit-from-Janma-Rasi reference tables (Tables 53–59, supplied book pages 315–318).
+  // House numbers are counted from Janma Rasi. Snapshot and typical-result wording
+  // are transcribed from the supplied source; this is reference data only for now.
+  var JANMA_RASI_TRANSIT_RULES = {
+    Sun: {
+      1: { snapshot: "Bad", result: "Financial loss, many travels, discomfort" },
+      2: { snapshot: "Bad", result: "Unhappiness, eye troubles, fear" },
+      3: { snapshot: "Good", result: "Wealth, good health, victory" },
+      4: { snapshot: "Bad", result: "Marital disharmony, loss of name" },
+      5: { snapshot: "Bad", result: "Bad health, fear from enemies" },
+      6: { snapshot: "Good", result: "Success over enemies, good health" },
+      7: { snapshot: "Bad", result: "Travels, physical pain" },
+      8: { snapshot: "Bad", result: "Disease, setbacks in marriage" },
+      9: { snapshot: "Bad", result: "Mental worries, obstacles" },
+      10: { snapshot: "Good", result: "Success, honors, gains" },
+      11: { snapshot: "Good", result: "Good health, prosperity, honors" },
+      12: { snapshot: "Bad", result: "Expenditure, losses" }
+    },
+    Moon: {
+      1: { snapshot: "Good", result: "Comfort, good spirits" },
+      2: { snapshot: "Bad", result: "Obstacles, losses" },
+      3: { snapshot: "Good", result: "Gains, happiness" },
+      4: { snapshot: "Bad", result: "Lack of peace of mind, distrust" },
+      5: { snapshot: "Bad", result: "Failures, disappointments, sadness" },
+      6: { snapshot: "Good", result: "Happiness, health, wealth" },
+      7: { snapshot: "Good", result: "Respect, gains" },
+      8: { snapshot: "Bad", result: "Losses, tension, worries" },
+      9: { snapshot: "Bad", result: "Mental uneasiness" },
+      10: { snapshot: "Good", result: "Success, gains, authority" },
+      11: { snapshot: "Good", result: "Prosperity, comforts, gains" },
+      12: { snapshot: "Bad", result: "Injuries, expenditure, sadness" }
+    },
+    Mars: {
+      1: { snapshot: "Bad", result: "Troubles, bodily afflictions" },
+      2: { snapshot: "Bad", result: "Accidents, losses, thefts, quarrels" },
+      3: { snapshot: "Good", result: "Gains, power, wealth" },
+      4: { snapshot: "Bad", result: "Stomach problems, fevers, bad health" },
+      5: { snapshot: "Bad", result: "Troubles from enemies, trouble with children" },
+      6: { snapshot: "Good", result: "Success over enemies, wealth, success, well-being" },
+      7: { snapshot: "Bad", result: "Quarrels, marital troubles, eye problems" },
+      8: { snapshot: "Bad", result: "Worries, accidents, bad name, losses" },
+      9: { snapshot: "Bad", result: "Losses, insults, illness" },
+      10: { snapshot: "Bad", result: "Change of place, unexpected wealth" },
+      11: { snapshot: "Good", result: "Authority, gains, good name" },
+      12: { snapshot: "Bad", result: "Expenses, quarrels with wife, diseases" }
+    },
+    Mercury: {
+      1: { snapshot: "Bad", result: "Quarrels, imprisonment, losses, poor advice" },
+      2: { snapshot: "Good", result: "Success, wealth, gains" },
+      3: { snapshot: "Bad", result: "Wandering, losses, trouble from authorities" },
+      4: { snapshot: "Good", result: "Prosperity in family, gains" },
+      5: { snapshot: "Bad", result: "Quarrels with wife and children, suffering" },
+      6: { snapshot: "Good", result: "Renown, success, ornaments" },
+      7: { snapshot: "Bad", result: "Quarrels, mental discomfort, addictions" },
+      8: { snapshot: "Good", result: "Childbirth, happiness, gains, success" },
+      9: { snapshot: "Bad", result: "Mental worries, obstacles" },
+      10: { snapshot: "Good", result: "Money, happiness, domestic harmony, success" },
+      11: { snapshot: "Good", result: "Childbirth, happiness, wealth" },
+      12: { snapshot: "Bad", result: "Disease, domestic disharmony, disease, losses" }
+    },
+    Jupiter: {
+      1: { snapshot: "Bad", result: "Loss of money and intelligence, wandering" },
+      2: { snapshot: "Good", result: "Happiness, domestic harmony, success" },
+      3: { snapshot: "Bad", result: "Obstacles, loss of position, travels" },
+      4: { snapshot: "Bad", result: "Troubles, defeat, losses" },
+      5: { snapshot: "Good", result: "Childbirth, intelligence, prosperity, wealth" },
+      6: { snapshot: "Bad", result: "Mental uneasiness, enemies, worries" },
+      7: { snapshot: "Good", result: "Health, happiness, erotic pleasures, sense of well-being" },
+      8: { snapshot: "Bad", result: "Disease, imprisonment, illness, grief" },
+      9: { snapshot: "Good", result: "Success, wealth, childbirth, religiousness" },
+      10: { snapshot: "Bad", result: "Loss of position and money, ill-health, wandering" },
+      11: { snapshot: "Good", result: "Recovery of health and position, happiness" },
+      12: { snapshot: "Bad", result: "Fall from grace, misconduct, grief" }
+    },
+    Venus: {
+      1: { snapshot: "Good", result: "Comforts, pleasures, happiness, good spirits" },
+      2: { snapshot: "Good", result: "Money, fortune, erotic pleasures, childbirth" },
+      3: { snapshot: "Good", result: "Respect, wealth, good spirits" },
+      4: { snapshot: "Good", result: "Prosperity, success of enemies, comforts" },
+      5: { snapshot: "Good", result: "Fame, power, good name" },
+      6: { snapshot: "Bad", result: "Loss of fame, bad name, quarrels" },
+      7: { snapshot: "Bad", result: "Humiliation, disease, troubles" },
+      8: { snapshot: "Bad", result: "Fears, mental worries, injuries, troubles from women" },
+      9: { snapshot: "Good", result: "Fortune, luxuries, marital happiness" },
+      10: { snapshot: "Bad", result: "Virtuous acts, unpleasant events, disgrace" },
+      11: { snapshot: "Good", result: "Gains, happiness, prosperity, comforts" },
+      12: { snapshot: "Bad", result: "New friends, money, pleasures, gains" }
+    },
+    Saturn: {
+      1: { snapshot: "Bad", result: "Fear of incarceration, worries, foreign trips" },
+      2: { snapshot: "Bad", result: "Physical weakness, discomfort, wealth, unhappiness" },
+      3: { snapshot: "Good", result: "Wealth, health, happiness, all-round success" },
+      4: { snapshot: "Bad", result: "Stomach problems, wickedness, separation from family" },
+      5: { snapshot: "Bad", result: "Separation from children, uneasiness, quarrels" },
+      6: { snapshot: "Good", result: "Freedom from disease and enemies, success" },
+      7: { snapshot: "Bad", result: "Wandering, quarrels with spouse, trouble from authorities" },
+      8: { snapshot: "Bad", result: "Suffering, loss of status and balance, imprisonment" },
+      9: { snapshot: "Bad", result: "Diseases, suffering, loss of status" },
+      10: { snapshot: "Bad", result: "Loss of money, bad name, changes in career, laziness" },
+      11: { snapshot: "Good", result: "Wealth, success, gains" },
+      12: { snapshot: "Bad", result: "Grief, misery, losses, ill-health, frustration" }
+    }
+  };
+
+  // Lookup a planet's source-defined transit snapshot from Janma Rasi.
+  function getJanmaRasiTransitResult(planet, house) {
+    var planetRules = JANMA_RASI_TRANSIT_RULES[String(planet || "").trim()];
+    var houseNumber = Number(house);
+    if (!planetRules || !Number.isInteger(houseNumber) ||
+        houseNumber < 1 || houseNumber > 12 || !planetRules[houseNumber]) return null;
+    return Object.assign({ planet: String(planet), house: houseNumber }, planetRules[houseNumber]);
+  }
+
+  // Calculate source-defined snapshots for existing Transit Timeline rows.
+  // Rows are expected to expose { planet, fromMoon }.
+  function calculateJanmaRasiTransit(rows) {
+    var results = {};
+    if (!Array.isArray(rows)) return results;
+    rows.forEach(function (row) {
+      if (!row || !row.planet) return;
+      var house = getHouseFromJanmaRashi(row);
+      var result = getJanmaRasiTransitResult(row.planet, house);
+      if (result) results[result.planet] = result;
+    });
+    return results;
+  }
+
   // Rasi Gochara Vedha: auspicious transit house -> corresponding Vedha house.
   // Houses are counted from Janma Rashi (natal Moon). The source table supplies
   // rules for the seven classical planets only; Rahu/Ketu are not inferred.
@@ -1306,6 +1433,9 @@
     calculateLatta: calculateLatta,
     calculateLattaTarget: calculateLattaTarget,
     lattaRules: LATTA_RULES,
+    janmaRasiTransitRules: JANMA_RASI_TRANSIT_RULES,
+    getJanmaRasiTransitResult: getJanmaRasiTransitResult,
+    calculateJanmaRasiTransit: calculateJanmaRasiTransit,
     shortcut: isApplePlatform() ? "⌘ + Option + T" : "Ctrl + Shift + X"
   };
 })();
