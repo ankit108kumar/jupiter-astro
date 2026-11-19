@@ -4612,3 +4612,9 @@ body.ja-font-scale-enabled [data-ja-font-scale-target] {
   cursor: help;
   white-space: nowrap;
 }
+
+
+/* Keep Nav Tara Chakra Latta superscripts thin, matching the table markers. */
+.ja-navtara-latta {
+  font-weight: 400 !important;
+}
