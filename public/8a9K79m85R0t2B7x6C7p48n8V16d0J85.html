@@ -4028,8 +4028,7 @@ const RenderTabs = {
       <div class="two">
         <article class="card kchart">
           <header style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>D1 · Rashi Chart</h3>
-            <p class="varga-description">Existence at the physical level</p>
+            <h3 class="ja-varga-tooltip" data-varga-tooltip="Existence at the physical level">D1 · Rashi Chart</h3>
             <div style="display:flex; align-items:center; gap:6px;">
               <button type="button" class="deg-toggle-btn ${window.jaShowDeg ? 'active' : ''}" id="${prefix}-degToggleBtn" title="Toggle Planetary Degrees">D</button>
               <button type="button" class="sav-toggle-btn ${window.jaShowSavD1 ? 'active' : ''}" id="${prefix}-savToggleBtn" title="Toggle Sarvashtakavarga (SAV)">SV</button>
@@ -4046,8 +4045,7 @@ const RenderTabs = {
         </article>
         <article class="card kchart">
           <header style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-            <h3 title="${secChart.description || ''}">${secChart.title}</h3>
-            ${secChart.description ? `<p class="varga-description">${secChart.description}</p>` : ''}
+            <h3 class="ja-varga-tooltip" data-varga-tooltip="${secChart.description || ''}">${secChart.title}</h3>
             <div style="display:flex; align-items:center; gap:6px;">
               
 <div class="chart-dd" id="${prefix}-secChartSelect">
@@ -4653,8 +4651,7 @@ dasha(k, prefix, evalMs = Date.now()) {
         <!-- LEFT: NATAL DIVISIONAL CHART WITH SELECTOR -->
         <article class="card kchart">
           <header style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-            <h3 title="${currentVargaDescription}">D${selectedVarga} · Natal ${currentVargaTitle}</h3>
-            <p class="varga-description">${currentVargaDescription}</p>
+            <h3 class="ja-varga-tooltip" data-varga-tooltip="${currentVargaDescription}">D${selectedVarga} · Natal ${currentVargaTitle}</h3>
             <div style="display:flex; align-items:center; gap:6px;">
               <label for="${prefix}-vargaSelect" style="font-size:0.72rem; color:var(--muted); font-weight:600;">SELECT:</label>
               <select id="${prefix}-vargaSelect" style="font-size:0.8rem; font-weight:600; padding:3px 8px; border-radius:6px; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); cursor:pointer;">
@@ -4671,8 +4668,7 @@ dasha(k, prefix, evalMs = Date.now()) {
         <!-- RIGHT: TRANSIT IN DIVISIONAL CHART -->
         <article class="card kchart">
           <header style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 title="${currentVargaDescription}">D${selectedVarga} · Gochar (${currentVargaTitle})</h3>
-            <p class="varga-description">${currentVargaDescription}</p>
+            <h3 class="ja-varga-tooltip" data-varga-tooltip="${currentVargaDescription}">D${selectedVarga} · Gochar (${currentVargaTitle})</h3>
             <span style="font-size:0.82rem; color:var(--muted);">
               From Natal D${selectedVarga} Lagna
             </span>
