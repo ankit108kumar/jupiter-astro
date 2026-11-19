@@ -706,7 +706,7 @@
     var timeInput = windowEl.querySelector('[data-jtt-field="time"]');
     if (!dateInput || !timeInput || !dateInput.value || !timeInput.value) return null;
 
-    var dateMatch = dateInput.value.trim().match(/^(\\d{2})\\/(\\d{2})\\/(\\d{4})$/);
+    var dateMatch = dateInput.value.trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
     var timeParts = timeInput.value.split(":").map(Number);
     if (!dateMatch || timeParts.length < 2) return null;
 
