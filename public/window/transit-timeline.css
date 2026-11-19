@@ -2087,3 +2087,19 @@
     justify-self: start;
   }
 }
+
+
+/* Rasi Gochara Vedha indicators. */
+#ja-transit-timeline-window .jtt-vedha-cell {
+  white-space: nowrap;
+  vertical-align: middle;
+}
+#ja-transit-timeline-window .jtt-vedha-mark {
+  color: #DC2626;
+  font-weight: 700;
+}
+#ja-transit-timeline-window .jtt-vedha-planets {
+  color: var(--jtt-muted);
+  font-size: .9em;
+  font-weight: 400;
+}
