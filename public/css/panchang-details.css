@@ -45,3 +45,73 @@
 .ja-panchang-slots tbody tr>td:last-child{font-size:11px;white-space:nowrap}
 .ja-panchang-now{font-style:normal;font-size:9px;color:#98641b;background:rgba(224,160,75,.18);padding:3px 6px;border-radius:20px;margin-left:6px}
 .ja-panchang-week-nav.is-day-nav{grid-template-columns:1fr auto 1fr}
+
+
+/* Apple-style Panchang floating window and compact content layouts */
+.ja-panchang-modal{padding:18px}
+.ja-panchang-dialog{width:max-content;min-width:min(620px,94vw);max-width:96vw;max-height:90vh;border-radius:22px;box-shadow:0 28px 90px rgba(15,23,42,.28)}
+.ja-panchang-titlebar{height:46px;min-height:46px;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;padding:0 16px;border-bottom:1px solid var(--line,rgba(100,110,130,.18));background:var(--surface,#fff);cursor:grab;user-select:none}
+.ja-panchang-window-controls,.ja-panchang-title-tools{display:flex;align-items:center;gap:8px}
+.ja-panchang-window-title{text-align:center;font-size:11px;font-weight:700;color:var(--muted,#738098);white-space:nowrap}
+.ja-panchang-title-tools{justify-content:flex-end}
+.ja-panchang-dot{width:12px;height:12px;padding:0;border:0;border-radius:50%;cursor:pointer}
+.ja-panchang-dot.close{background:#ff5f57}.ja-panchang-dot.minimize{background:#febc2e}.ja-panchang-dot.maximize{background:#28c840}
+.ja-panchang-theme-toggle,.ja-panchang-close{width:30px;height:30px;border:1px solid var(--line,rgba(100,110,130,.2));border-radius:50%;background:var(--surface,#fff);color:var(--ink,#1c2434);cursor:pointer;font-size:16px}
+.ja-panchang-heading{padding:12px 22px 11px;border-bottom:1px solid var(--line,rgba(100,110,130,.15));background:var(--surface,#fff)}
+.ja-panchang-heading .ja-panchang-kicker{font-size:9px;letter-spacing:1.3px}
+.ja-panchang-heading h2{font-size:19px;margin:3px 0}
+.ja-panchang-heading p{font-size:11px}
+.ja-panchang-week-nav{padding:9px 16px;gap:10px;background:var(--surface,#fff)}
+.ja-panchang-dialog-body{padding:12px 16px;min-height:0;width:max-content;max-width:calc(96vw - 34px)}
+.ja-panchang-dialog-footer{padding:9px 16px;background:var(--surface,#fff)}
+.ja-panchang-dialog.is-maximized{width:96vw;max-width:96vw;height:90vh;max-height:90vh}
+.ja-panchang-dialog.is-minimized{height:auto;max-height:46px;overflow:hidden}
+.ja-panchang-dialog.is-minimized>*:not(.ja-panchang-titlebar){display:none}
+.ja-panchang-single-line{width:max-content;min-width:0;border-spacing:0 4px}
+.ja-panchang-single-line thead th{padding:0 10px 5px}
+.ja-panchang-single-line tbody tr>th{width:104px;min-width:104px;padding:8px 10px}
+.ja-panchang-single-line tbody tr>td{padding:5px 8px}
+.ja-panchang-single-line .ja-panchang-event{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0;padding:6px 10px}
+.ja-panchang-single-line .ja-panchang-event strong{min-width:130px}
+.ja-panchang-single-line .ja-panchang-duration{margin:0;white-space:nowrap}
+.ja-panchang-single-line .ja-panchang-meta-grid{margin:0;gap:4px 12px}
+.ja-panchang-meta{color:var(--muted,#738098);font-size:10px}
+.ja-panchang-meta b{color:var(--muted,#738098);font-weight:600}
+.ja-panchang-meta span{color:var(--ink,#1c2434);font-weight:600}
+.ja-panchang-dual-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+.ja-panchang-lunar-grid{min-width:min(900px,90vw)}
+.ja-panchang-half{min-width:0;margin:0}
+.ja-panchang-half h3{font-size:13px;padding:0 0 7px;border-bottom:1px solid var(--line,rgba(100,110,130,.15))}
+.ja-panchang-half .ja-panchang-week-table{font-size:11px}
+.ja-panchang-half .ja-panchang-week-table tbody tr>th{width:76px;min-width:76px;padding:7px}
+.ja-panchang-half .ja-panchang-week-table tbody tr>td{padding:5px}
+.ja-panchang-half .ja-panchang-event{padding:6px 8px;margin:2px 0}
+.ja-panchang-half .ja-panchang-event strong{font-size:11px}
+.ja-panchang-dual-grid>.ja-panchang-section{min-width:0}
+.ja-panchang-inauspicious-table{width:100%;min-width:760px}
+.ja-panchang-inauspicious-table tbody tr>th{width:100px;min-width:100px}
+.ja-panchang-inauspicious-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ja-panchang-inauspicious-grid .ja-panchang-event{margin:0;padding:9px}
+.ja-panchang-inauspicious-grid .ja-panchang-event-head{font-size:11px}
+.ja-panchang-event{margin:3px 0}
+.ja-panchang-day-range{padding:9px 12px;margin-bottom:10px;gap:3px}
+.ja-panchang-week-table{border-spacing:0 4px}
+.ja-panchang-lagna-wrap{max-width:calc(96vw - 34px);overflow:auto}
+.ja-panchang-lagna-table{width:max-content;min-width:100%;table-layout:auto;font-size:11px}
+.ja-panchang-lagna-table thead th{white-space:nowrap;padding:0 9px 7px}
+.ja-panchang-lagna-table tbody tr>td,.ja-panchang-lagna-table tbody tr>th{white-space:nowrap;padding:8px 10px;border:1px solid var(--line,rgba(100,110,130,.16));border-radius:8px;background:var(--surface,#fff)}
+.ja-panchang-lagna-table tbody tr>th{min-width:95px}
+.ja-panchang-lagna-table tbody tr>th small{font-size:9px;margin-top:2px}
+.ja-panchang-lagna-table tbody tr.is-today>td,.ja-panchang-lagna-table tbody tr.is-today>th{background:rgba(224,160,75,.09)}
+.ja-panchang-lagna-table .ja-panchang-duration{margin:0;white-space:nowrap}
+.ja-panchang-modal .ja-panchang-empty{color:var(--muted,#738098)}
+/* Explicit Apple Light appearance; website mode inherits the site's theme variables. */
+.ja-panchang-dialog[data-ja-panchang-theme="apple"]{--ink:#1d1d1f;--muted:#737780;--surface:#fff;--line:rgba(60,60,67,.16);background:#fff;color:#1d1d1f;border-color:rgba(60,60,67,.16);box-shadow:0 28px 90px rgba(0,0,0,.25)}
+.ja-panchang-dialog[data-ja-panchang-theme="apple"] .ja-panchang-titlebar{background:linear-gradient(180deg,#fbfbfd,#f2f2f7)}
+.ja-panchang-dialog[data-ja-panchang-theme="apple"] .ja-panchang-heading{background:linear-gradient(115deg,#f5f3ff,#fff7f0)}
+.ja-panchang-dialog[data-ja-panchang-theme="apple"] .ja-panchang-week-nav,.ja-panchang-dialog[data-ja-panchang-theme="apple"] .ja-panchang-dialog-footer{background:#fbfbfd}
+.ja-panchang-dialog[data-ja-panchang-theme="apple"] .ja-panchang-event{background:#f5f5f7;border:1px solid rgba(60,60,67,.06)}
+.ja-panchang-dialog[data-ja-panchang-theme="apple"] .ja-panchang-event.is-active{background:#fff4df;box-shadow:inset 3px 0 #d69a36}
+.ja-panchang-dialog[data-ja-panchang-theme="apple"] .ja-panchang-week-table tbody tr>th,.ja-panchang-dialog[data-ja-panchang-theme="apple"] .ja-panchang-week-table tbody tr>td{border-color:rgba(60,60,67,.13)}
+.ja-panchang-dialog[data-ja-panchang-theme="apple"] .ja-panchang-theme-toggle{background:#fff}
+@media(max-width:760px){.ja-panchang-dialog{width:96vw;min-width:0}.ja-panchang-dialog-body{width:auto;max-width:none}.ja-panchang-dual-grid{grid-template-columns:1fr}.ja-panchang-lunar-grid{min-width:0}.ja-panchang-inauspicious-grid{grid-template-columns:1fr}.ja-panchang-single-line{width:100%}.ja-panchang-single-line .ja-panchang-event{align-items:flex-start;gap:6px}.ja-panchang-single-line .ja-panchang-meta-grid{flex-basis:100%}}
