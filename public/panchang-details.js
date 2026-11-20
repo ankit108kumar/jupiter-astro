@@ -56,8 +56,8 @@ function renderWeek(k){
  for(var day=0;day<7;day++){
   var ds=w.start+day*DAY,de=ds+DAY,events='',today=nowLocal>=ds&&nowLocal<de;
   for(var j=0;j<cuts.length-1;j++){
-   var a=cuts[j],b=cuts[j+1],s=Math.max(ds,a.at),e=Math.min(de,b.at);if(e<=s)continue;
-   var active=today&&ctx.instant>=s&&ctx.instant<e,fields=meta(k,a.index),details='';
+   var a=cuts[j],b=cuts[j+1];if(b.at<=ds||a.at>=de)continue;
+   var s=a.at,e=b.at,active=today&&ctx.instant>=s&&ctx.instant<e,fields=meta(k,a.index),details='';
    fields.forEach(function(x){details+='<span class="ja-panchang-meta"><b>'+esc(x[0])+':</b> '+esc(x[1])+'</span>';});
    events+='<div class="ja-panchang-event'+(active?' is-active':'')+'"><div class="ja-panchang-event-head"><strong>'+esc(name(k,a.index))+'</strong>'+(active?'<em>Current</em>':'')+'</div><div class="ja-panchang-duration">'+fmt(s,ctx.tz)+' – '+fmt(e,ctx.tz)+'</div><div class="ja-panchang-meta-grid">'+details+'</div></div>';
   }
