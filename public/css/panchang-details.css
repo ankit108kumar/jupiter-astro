@@ -508,3 +508,26 @@
  .ja-panchang-dialog .ja-panchang-dialog-body{padding:12px!important}
  .ja-panchang-dialog .ja-panchang-week-table{min-width:max-content}
 }
+
+
+/* Panchang usability refinements */
+.ja-panchang-dialog .ja-panchang-dialog-body{overflow:auto;min-height:0;overscroll-behavior:contain}
+.ja-panchang-dialog .ja-panchang-table-wrap{max-height:min(62vh,620px);overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;position:relative}
+.ja-panchang-dialog .ja-panchang-week-table{border-collapse:separate;border-spacing:0!important}
+.ja-panchang-dialog .ja-panchang-week-table thead{position:sticky;top:0;z-index:12}
+.ja-panchang-dialog .ja-panchang-week-table thead th{position:sticky;top:0;z-index:13;background:#f5f4f8!important;box-shadow:0 1px 0 rgba(80,72,100,.16)!important}
+.ja-panchang-dialog .ja-panchang-week-table tbody tr{transition:background-color .15s ease,box-shadow .15s ease}
+.ja-panchang-dialog .ja-panchang-week-table tbody tr:hover>th,.ja-panchang-dialog .ja-panchang-week-table tbody tr:hover>td{background:#f1eff7!important}
+.ja-panchang-dialog .ja-panchang-week-table tbody tr.is-today:hover>th,.ja-panchang-dialog .ja-panchang-week-table tbody tr.is-today:hover>td{background:#fff5df!important}
+.ja-panchang-dialog .ja-panchang-week-nav{display:grid!important;grid-template-columns:minmax(118px,1fr) auto minmax(118px,1fr)!important;align-items:center!important}
+.ja-panchang-dialog .ja-panchang-week-nav button{width:124px!important;min-width:124px!important;min-height:35px!important;justify-self:start!important;white-space:nowrap!important;text-align:center!important}
+.ja-panchang-dialog .ja-panchang-week-nav button:last-child{justify-self:end!important}
+.ja-panchang-dialog .ja-panchang-half h3,.ja-panchang-dialog .ja-panchang-period-section h3{display:none!important}
+.ja-panchang-dialog .ja-panchang-half .ja-panchang-week-table thead th,.ja-panchang-dialog .ja-panchang-period-section .ja-panchang-week-table thead th{font-size:10px!important;font-weight:650!important;letter-spacing:.55px!important}
+.ja-panchang-dialog .ja-panchang-slot-main{display:inline-block;font-weight:600;color:#353241}
+.ja-panchang-dialog .ja-panchang-slot-meta{display:inline-block;margin-left:7px;color:#9a95a4;font-size:9px;font-weight:500;letter-spacing:.55px}
+.ja-panchang-dialog .ja-panchang-slots tbody tr>td:first-child{font-weight:500!important}
+.ja-panchang-dialog .ja-panchang-planet-name{color:var(--ja-planet-color)!important;font-weight:650!important}
+.ja-panchang-dialog .ja-panchang-lagna-table tbody tr:hover>td,.ja-panchang-dialog .ja-panchang-lagna-table tbody tr:hover>th{background:#f1eff7!important}
+.ja-panchang-dialog .ja-panchang-lagna-table tbody tr.is-today:hover>td,.ja-panchang-dialog .ja-panchang-lagna-table tbody tr.is-today:hover>th{background:#fff5df!important}
+@media(max-width:700px){.ja-panchang-dialog .ja-panchang-week-nav{grid-template-columns:1fr 1fr!important}.ja-panchang-dialog .ja-panchang-week-nav button{width:100%!important;min-width:0!important}.ja-panchang-dialog .ja-panchang-table-wrap{max-height:64vh}}
