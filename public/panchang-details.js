@@ -157,13 +157,52 @@ function renderInauspiciousWeek(){
  }
  bodyNode.innerHTML='<div class="ja-panchang-table-wrap"><table class="ja-panchang-week-table"><thead><tr><th>Day</th><th>Inauspicious periods · Sunrise-based</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
 }
+function transitHouseAt(ms){
+ var local=new Date(ms+ctx.tz*3600000),chart=computeChart({y:local.getUTCFullYear(),m:local.getUTCMonth()+1,d:local.getUTCDate(),hh:local.getUTCHours(),mm:local.getUTCMinutes(),ss:local.getUTCSeconds(),tz:ctx.tz,lat:ctx.lat,lon:ctx.lon});
+ var jup=chart.planets.Jupiter&&chart.planets.Jupiter.lon;
+ if(!Number.isFinite(jup)||!Number.isFinite(chart.asc))return null;
+ return ((Math.floor(jup/30)-Math.floor(chart.asc/30)+12)%12)+1;
+}
+function transitHouseIntervals(start,end,wanted){
+ var step=10*60000,items=[],a=start,ha=transitHouseAt(a);
+ for(var b=Math.min(a+step,end);;b=Math.min(b+step,end)){
+  var hb=transitHouseAt(b);
+  if(hb!==ha){
+   var lo=a,hi=b;
+   while(hi-lo>1000){var mid=Math.floor((lo+hi)/2);if(transitHouseAt(mid)===ha)lo=mid;else hi=mid;}
+   if(wanted.indexOf(ha)>=0)items.push({house:ha,start:items._open||a,end:hi});
+   items._open=null;
+   if(wanted.indexOf(hb)>=0)items._open=hi;
+   ha=hb;
+  }
+  if(b===end)break;a=b;
+ }
+ if(wanted.indexOf(ha)>=0)items.push({house:ha,start:items._open||a,end:end});
+ return items;
+}
+function renderAuspiciousWeek(){
+ var w=bounds(),wanted=[1,5,7,9],rows='';
+ weekLabel.textContent=dayFmt(w.start,ctx.tz)+' – '+dayFmt(w.end-DAY,ctx.tz);
+ var nowLocal=ctx.instant+ctx.tz*3600000,firstLocal=new Date(w.start+ctx.tz*3600000),firstMid=Date.UTC(firstLocal.getUTCFullYear(),firstLocal.getUTCMonth(),firstLocal.getUTCDate());
+ for(var day=0;day<7;day++){
+  var localMid=firstMid+day*DAY,weekday=new Date(localMid).getUTCDay(),rise=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,true),set=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,false),nextRise=sunEventForLocalDay(localMid+DAY,ctx.lat,ctx.lon,true),today=nowLocal>=localMid&&nowLocal<localMid+DAY;
+  var events='';
+  if(Number.isFinite(rise)&&Number.isFinite(set)&&Number.isFinite(nextRise)&&rise<set&&set<nextRise){
+   var dayDur=set-rise,nightDur=nextRise-set,dayStart=rise+7*dayDur/15,dayEnd=rise+8*dayDur/15,nightStart=set+7*nightDur/15,nightEnd=set+8*nightDur/15;
+   function addMuh(name,start,end){var active=ctx.instant>=start&&ctx.instant<end;events+='<div class="ja-panchang-event'+(active?' is-active':'')+'"><div class="ja-panchang-event-head"><strong>'+name+'</strong>'+(active?'<em>Current</em>':'')+'</div><div class="ja-panchang-duration">'+fmt(start,ctx.tz)+' – '+fmt(end,ctx.tz)+'</div></div>';}
+   addMuh('Day Abhijit Muhurta',dayStart,dayEnd);
+   addMuh('Night Abhijit Muhurta',nightStart,nightEnd);
+   var intervals=transitHouseIntervals(localMid,localMid+DAY,wanted);
+   intervals.forEach(function(x){var active=ctx.instant>=x.start&&ctx.instant<x.end;events+='<div class="ja-panchang-event'+(active?' is-active':'')+'"><div class="ja-panchang-event-head"><strong>Jupiter in '+({1:'Lagna (1st)',5:'5th',7:'7th',9:'9th'}[x.house])+' House</strong>'+(active?'<em>Current</em>':'')+'</div><div class="ja-panchang-duration">'+fmt(x.start,ctx.tz)+' – '+fmt(x.end,ctx.tz)+'</div></div>';});
+   if(!intervals.length)events+='<div class="ja-panchang-empty">Jupiter is not in the selected houses during this date</div>';
+  }else events='<span class="ja-panchang-empty">Sunrise / sunset unavailable for this date</span>';
+  var dd=new Date(localMid);rows+='<tr class="'+(today?'is-today':'')+'"><th><span>'+DAYS[weekday]+'</span><small>'+pad(dd.getUTCDate())+'/'+pad(dd.getUTCMonth()+1)+'/'+dd.getUTCFullYear()+'</small></th><td>'+events+'</td></tr>';
+ }
+ bodyNode.innerHTML='<h3 class="ja-panchang-main-heading">Auspicious Muhurta</h3><div class="ja-panchang-table-wrap"><table class="ja-panchang-week-table"><thead><tr><th>Day</th><th>Auspicious Muhurta and Jupiter Transit Duration</th></tr></thead><tbody>'+rows+'</tbody></table></div><p class="ja-panchang-note">Night Abhijit is shown as the 8th equal Muhurta of the night (sunset to next sunrise). Jupiter house periods are calculated from the sidereal transit chart ascendant at the selected location; intervals are split at house changes.</p>';
+}
 function renderOther(k){
  if(k==='inauspicious'){renderInauspiciousWeek();return;}
- var w=bounds();weekLabel.textContent=dayFmt(w.start,ctx.tz)+' – '+dayFmt(w.end-DAY,ctx.tz);
- var ids={abhijit:['pAbhijit','pAbhijitDuration']};
- var vals=(ids[k]||[]).map(function(id){return (document.getElementById(id)||{}).textContent||'—';}).join(' · ');
- var labels={abhijit:'Abhijit Muhurta'};
- bodyNode.innerHTML='<div class="ja-panchang-current-summary"><span>'+esc(labels[k]||'Panchang details')+'</span><strong>'+esc(vals)+'</strong></div>';
+ if(k==='abhijit'){renderAuspiciousWeek();return;}
 }
 function panelTabs(items){return '<div class="ja-panchang-panel-tabs">'+items.map(function(x){var label=x.charAt(0).toUpperCase()+x.slice(1);return '<button type="button" data-panel="'+x+'" class="'+(activePanel===x?'is-active':'')+'">'+label+'</button>';}).join('')+'</div>';}
 function render(){if(kind==='tithi'||kind==='nak')renderWeek(kind);else if(kind==='yogaGroup')renderLunarWeek(activePanel);else if(kind==='chaughadiyaGroup')renderChaughadiyaHora(activePanel);else renderOther(kind);}
