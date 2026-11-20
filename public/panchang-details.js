@@ -134,8 +134,9 @@ function renderInauspiciousWeek(){
  var w=bounds(),rahus=[8,2,7,5,6,4,3],guliks=[6,5,4,3,2,1,0],yamas=[4,3,2,1,0,6,5];
  weekLabel.textContent=dayFmt(w.start,ctx.tz)+' – '+dayFmt(w.end-DAY,ctx.tz);
  var nowLocal=ctx.instant+ctx.tz*3600000,rows='';
+ var weekLocalDate=new Date(w.start+ctx.tz*3600000),firstLocalMid=Date.UTC(weekLocalDate.getUTCFullYear(),weekLocalDate.getUTCMonth(),weekLocalDate.getUTCDate());
  for(var day=0;day<7;day++){
-  var localMid=w.start+day*DAY,weekday=new Date(localMid).getUTCDay();
+  var localMid=firstLocalMid+day*DAY,weekday=new Date(localMid).getUTCDay();
   var rise=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,true),set=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,false);
   var valid=Number.isFinite(rise)&&Number.isFinite(set)&&rise>0&&set>rise;
   var today=nowLocal>=localMid&&nowLocal<localMid+DAY,events='';
@@ -144,7 +145,7 @@ function renderInauspiciousWeek(){
    var entries=[
     ['Rahu Kaal',rahus[weekday]-1],
     ['Gulika Kaal',guliks[weekday]],
-    ['Yamaganda',yamas[weekday]]
+    ['Yamghanta (Yamaganda)',yamas[weekday]]
    ];
    entries.forEach(function(item){
     var start=rise+item[1]*eighth,end=start+eighth,active=ctx.instant>=start&&ctx.instant<end;
