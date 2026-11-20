@@ -1744,9 +1744,23 @@ function getTransitTimelineTableData(k, evalMs) {
     };
   });
 
+  const chartInput = k.input || {};
+  let birthMs = null;
+  if ([chartInput.y, chartInput.m, chartInput.d, chartInput.hh, chartInput.mm].every(value => Number.isFinite(Number(value))) &&
+      Number.isFinite(Number(chartInput.tz))) {
+    birthMs = jdToMs(julianDay(
+      Number(chartInput.y), Number(chartInput.m), Number(chartInput.d),
+      Number(chartInput.hh) + Number(chartInput.mm) / 60 + Number(chartInput.ss || 0) / 3600 - Number(chartInput.tz)
+    ));
+  }
+  const chartTitle = chartInput.name || 'Research Kundali';
   const data = {
     evalMs: cacheKey,
-    chartTitle: k.input && k.input.name ? k.input.name : 'Research Kundali',
+    birthMs,
+    isPrashnaChart: /prashna/i.test(String(chartTitle)),
+    referenceMoonNakshatra: NAK[natalMoonNak][0],
+    moonTransitCount: rows.find(row => row.planet === 'Moon')?.countFromJanmaNakshatra || null,
+    chartTitle,
     rows
   };
 
