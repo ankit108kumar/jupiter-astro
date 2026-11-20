@@ -192,7 +192,8 @@ function renderAuspiciousWeek(){
    function addMuh(name,start,end){var active=ctx.instant>=start&&ctx.instant<end;events+='<div class="ja-panchang-event'+(active?' is-active':'')+'"><div class="ja-panchang-event-head"><strong>'+name+'</strong>'+(active?'<em>Current</em>':'')+'</div><div class="ja-panchang-duration">'+fmt(start,ctx.tz)+' – '+fmt(end,ctx.tz)+'</div></div>';}
    addMuh('Day Abhijit Muhurta',dayStart,dayEnd);
    addMuh('Night Abhijit Muhurta',nightStart,nightEnd);
-   var utcDayStart=localMid-ctx.tz*3600000;\n   var intervals=transitHouseIntervals(utcDayStart,utcDayStart+DAY,wanted);
+   var utcDayStart=localMid-ctx.tz*3600000;
+   var intervals=transitHouseIntervals(utcDayStart,utcDayStart+DAY,wanted);
    intervals.forEach(function(x){var active=ctx.instant>=x.start&&ctx.instant<x.end;events+='<div class="ja-panchang-event'+(active?' is-active':'')+'"><div class="ja-panchang-event-head"><strong>Jupiter in '+({1:'Lagna (1st)',5:'5th',7:'7th',9:'9th'}[x.house])+' House</strong>'+(active?'<em>Current</em>':'')+'</div><div class="ja-panchang-duration">'+fmt(x.start,ctx.tz)+' – '+fmt(x.end,ctx.tz)+'</div></div>';});
    if(!intervals.length)events+='<div class="ja-panchang-empty">Jupiter is not in the selected houses during this date</div>';
   }else events='<span class="ja-panchang-empty">Sunrise / sunset unavailable for this date</span>';
