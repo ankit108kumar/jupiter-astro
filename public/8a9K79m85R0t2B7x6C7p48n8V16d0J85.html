@@ -56,6 +56,7 @@
 .ja-special-more-btn{margin-right:auto}
 @media(max-width:620px){.ja-special-points-overlay{padding:10px}.ja-special-points-modal{width:100%;max-height:88vh;padding:14px;border-radius:13px}}
 </style>
+<style id="ja-misc-sensitive-styles">.ja-misc-sensitive-card{margin:0 0 14px;min-width:0}.ja-misc-sensitive-card header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.ja-misc-sensitive-card h3{margin:0}.ja-misc-sensitive-card .sub{margin:4px 0 0}.ja-misc-reference-label{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.82rem;font-weight:600}.ja-misc-reference-label select{min-width:145px;padding:7px 10px;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);color:var(--text)}.ja-misc-sensitive-card table{width:100%;border-collapse:collapse}.ja-misc-sensitive-card th,.ja-misc-sensitive-card td{padding:9px 11px;text-align:left;border-bottom:1px solid var(--line)}.ja-misc-sensitive-card th{font-size:.76rem;color:var(--muted);font-weight:650}.ja-misc-sensitive-card td{font-size:.86rem;font-weight:400}.ja-misc-sensitive-card td small{display:block;color:var(--muted);font-size:.73rem;margin-top:3px}.ja-misc-sensitive-card .num{font-variant-numeric:tabular-nums;white-space:nowrap}.ja-misc-formula{font-size:.76rem;line-height:1.55;margin:10px 2px 0}.ja-misc-accuracy{margin:12px 0;padding:10px 12px;border-radius:9px;background:#fff8e9;color:#916d31;font-size:.8rem;line-height:1.5}</style>
 </head>
 </html>
 
@@ -4088,6 +4089,36 @@ return `
 	
 
 /* ================= COMPOSITE TAB RENDERERS ================= */
+
+/* ===== Misc: Yogi / Avayogi and Khara points ===== */
+function jaYogiAndKhara(k,reference){
+ const refLon=reference==='Ascendant'?k.ch.asc:k.ch.planets[reference].lon;
+ const sun=rev(k.ch.planets.Sun.lon),moon=rev(k.ch.planets.Moon.lon);
+ const yogiPoint=rev(sun+moon+93+20/60),avayogiPoint=rev(yogiPoint+186+40/60);
+ const pointInfo=lon=>{const x=rev(lon),ni=Math.min(26,Math.floor(x/(40/3))),n=NAK[ni];return{longitude:dms(x),sign:SIGNS[signOf(x)][0],nakshatra:n[0],lord:n[1]};};
+ const yogi=pointInfo(yogiPoint),avayogi=pointInfo(avayogiPoint),sign=signOf(refLon),deg=refLon%30;
+ const dPart=Math.min(3,Math.floor(deg/10)+1),dIndex=(3*sign+dPart-1+21)%36,dSign=Math.floor(dIndex/3),dNum=dIndex%3+1;
+ const nPart=Math.min(9,Math.floor(deg/(10/3))+1),nIndex=(9*sign+nPart-1+63)%108,nSign=Math.floor(nIndex/9),nNum=nIndex%9+1;
+ const dmsRange=(a,b)=>dms(a,false)+' – '+dms(b,false);
+ return{reference,refSign:SIGNS[sign][0],refDegree:dms(deg),yogi,avayogi,
+  drekkana:{sign:SIGNS[dSign][0],part:dNum,range:dmsRange((dNum-1)*10,dNum*10)},
+  navamsa:{sign:SIGNS[nSign][0],part:nNum,range:dmsRange((nNum-1)*(10/3),nNum*(10/3))}};
+}
+function jaKharaResultMarkup(d){
+ return '<div class="scroll"><table><thead><tr><th>Reference</th><th>Sign</th><th>Degree</th><th>22nd Drekkana</th><th>64th Navamsa</th></tr></thead><tbody><tr><td>'+d.reference+'</td><td>'+d.refSign+'</td><td class="num">'+d.refDegree+'</td><td>'+d.drekkana.sign+' · D'+d.drekkana.part+'<small> ('+d.drekkana.range+')</small></td><td>'+d.navamsa.sign+' · N'+d.navamsa.part+'<small> ('+d.navamsa.range+')</small></td></tr></tbody></table></div>';
+}
+function jaMiscTabMarkup(k,prefix){
+ const d=jaYogiAndKhara(k,'Moon'),choices=['Moon','Ascendant','Sun','Mars','Mercury','Jupiter','Venus','Saturn','Rahu','Ketu'];
+ return '<section class="card ja-misc-sensitive-card"><header><div><h3>Yogi &amp; Avayogi</h3><p class="sub">Based on sidereal Sun and Moon longitudes</p></div></header><div class="scroll"><table><thead><tr><th>Point</th><th>Longitude / Result</th><th>Sign</th><th>Nakshatra</th><th>Vimshottari Lord</th></tr></thead><tbody>'+
+ '<tr><td>Yogi Point</td><td class="num">'+dms(rev(k.ch.planets.Sun.lon+k.ch.planets.Moon.lon+93+20/60))+'</td><td>'+d.yogi.sign+'</td><td>'+d.yogi.nakshatra+'</td><td>'+d.yogi.lord+'</td></tr>'+
+ '<tr><td>Yogi Planet</td><td>'+d.yogi.lord+'</td><td colspan="3">Vimshottari lord of Yogi Nakshatra</td></tr>'+
+ '<tr><td>Avayogi Point</td><td class="num">'+dms(rev(rev(k.ch.planets.Sun.lon+k.ch.planets.Moon.lon+93+20/60)+186+40/60))+'</td><td>'+d.avayogi.sign+'</td><td>'+d.avayogi.nakshatra+'</td><td>'+d.avayogi.lord+'</td></tr>'+
+ '<tr><td>Avayogi Planet</td><td>'+d.avayogi.lord+'</td><td colspan="3">Vimshottari lord of Avayogi Nakshatra</td></tr></tbody></table></div>'+
+ '<p class="sub ja-misc-formula">Yogi = (Sidereal Sun + Sidereal Moon + 93°20′) mod 360°. Avayogi = (Yogi + 186°40′) mod 360°.</p></section>'+
+ '<section class="card ja-misc-sensitive-card"><header><div><h3>22nd Drekkana &amp; 64th Navamsa</h3><p class="sub">Select a reference body; Moon is the default</p></div><label class="ja-misc-reference-label">Calculate from <select id="'+prefix+'-kharaReference">'+choices.map(x=>'<option value="'+x+'" '+(x==='Moon'?'selected':'')+'>'+x+'</option>').join('')+'</select></label></header><div id="'+prefix+'-kharaResults">'+jaKharaResultMarkup(d)+'</div><p class="sub ja-misc-formula">Count the 22nd Drekkana and 64th Navamsa inclusively from the selected reference division. Both fall in the eighth sign from the reference sign.</p></section>'+
+ '<p class="ja-misc-accuracy"><strong>ⓘ Accuracy notice:</strong> Formula-based implementation; results are yet to be independently verified against authoritative classical editions and reference charts.</p>';
+}
+
 const RenderTabs = {
   overview(k, prefix) {
     const d1 = getVargaItems(k, 1);
@@ -4862,7 +4893,9 @@ dasha(k, prefix, evalMs = Date.now()) {
   },
 
 /* ================= LAL KITAB VARSHPHAL TAB ================= */
-lalkitab(k, prefix) {
+misc(k,prefix){ return jaMiscTabMarkup(k,prefix); },
+
+  lalkitab(k, prefix) {
     const pad = n => String(n).padStart(2, '0');
     
     // 1. Calculate Running Year from Native's Date of Birth
@@ -5348,6 +5381,7 @@ function renderKundaliComponent(
     id="lalKitabVarshphalBtn"
     class="lal-kitab-varshphal-btn"
   >Lal Kitab / Varshphal</button>
+  <button role="tab" class="tab-btn" data-v="misc" aria-selected="false">Misc.</button>
 </nav>
 </div>
 <div class="tab-body" style="padding-top:16px;"></div>
@@ -5381,6 +5415,11 @@ function renderKundaliComponent(
       window.JupiterTransitTimeline.syncFromContext();
     }
 
+    if(tabKey==='misc'){
+      const selector=document.getElementById(`${prefix}-kharaReference`);
+      const result=document.getElementById(`${prefix}-kharaResults`);
+      if(selector&&result)selector.addEventListener('change',()=>{result.innerHTML=jaKharaResultMarkup(jaYogiAndKhara(kData,selector.value));});
+    }
     if (tabKey === 'overview') {
       const d1 = getVargaItems(kData, 1);
       const secKey = window.overviewSecChartKey && window.overviewSecChartKey[prefix] ? window.overviewSecChartKey[prefix] : 'D9';
