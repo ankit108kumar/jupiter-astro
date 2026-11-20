@@ -313,3 +313,30 @@
 .ja-panchang-event.is-active{background:rgba(224,160,75,.10)!important}
 .ja-panchang-current-summary{border:0!important}
 .ja-panchang-day-range{border:0!important}
+
+
+/* Refined compact Panchang chrome and readable, light-weight typography. */
+.ja-panchang-heading h2{display:none!important}
+.ja-panchang-window-title{font-size:13px!important;font-weight:500!important;letter-spacing:0!important}
+.ja-panchang-heading{padding-top:10px!important;padding-bottom:10px!important}
+.ja-panchang-heading-row{align-items:center!important;min-height:38px}
+.ja-panchang-heading-row>div:first-child{min-width:0}
+.ja-panchang-heading p{font-size:13px!important;font-weight:400!important;line-height:1.45!important;margin:0!important}
+.ja-panchang-dialog{border-radius:14px!important;overflow:hidden}
+.ja-panchang-dialog-header,.ja-panchang-titlebar{border-radius:inherit}
+.ja-panchang-dialog-body{font-size:13px!important;font-weight:400!important;line-height:1.5}
+.ja-panchang-week-table th,.ja-panchang-week-table td{font-size:13px!important;font-weight:400!important;line-height:1.45}
+.ja-panchang-week-table tbody tr>td:nth-child(2){font-weight:500!important}
+.ja-panchang-week-table tbody tr>th span{font-weight:500!important}
+.ja-panchang-week-table tbody tr>th small{font-weight:400!important}
+.ja-panchang-lagna-table tbody tr>td:first-child strong{font-weight:500!important}
+.ja-panchang-event strong,.ja-panchang-current-summary strong{font-weight:500!important}
+.ja-panchang-week-nav button,.ja-panchang-title-tools button{background:transparent!important;box-shadow:none!important;border:1px solid var(--line,rgba(100,110,130,.2))!important;border-radius:8px!important;font-weight:500!important}
+.ja-panchang-event,.ja-panchang-current-summary,.ja-panchang-day-range,
+.ja-panchang-slots td,.ja-panchang-lunar-detail-table td,
+.ja-panchang-dual-grid .ja-panchang-event{background:transparent!important;box-shadow:none!important}
+.ja-panchang-event{border-radius:7px!important}
+.ja-panchang-current-summary,.ja-panchang-day-range{border-radius:8px!important}
+.ja-panchang-week-table tbody tr>th,.ja-panchang-week-table tbody tr>td{padding-top:10px!important;padding-bottom:10px!important}
+.ja-panchang-week-table thead th{font-weight:500!important}
+.ja-panchang-now{font-weight:500!important}
