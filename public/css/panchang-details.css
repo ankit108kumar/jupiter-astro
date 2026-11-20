@@ -253,3 +253,22 @@
 .ja-panchang-title-tools{grid-column:3;grid-row:1;justify-self:end}
 .ja-panchang-heading .ja-panchang-kicker{display:none!important}
 @media(max-width:520px){.ja-panchang-window-title{font-size:11px}.ja-panchang-titlebar{padding:0 10px}}
+
+
+/* Panchang tables: clean horizontal row separators and persistent headers. */
+.ja-panchang-dialog-body{overflow:auto;min-height:0}
+.ja-panchang-week-table{border-collapse:separate;border-spacing:0;width:100%;border:0!important}
+.ja-panchang-week-table thead{position:sticky;top:0;z-index:5}
+.ja-panchang-week-table thead th{position:sticky;top:0;z-index:6;background:var(--surface,#f7f7fa)!important;background-clip:padding-box;border:0!important;border-bottom:1px solid var(--line,rgba(100,110,130,.25))!important;border-radius:0!important;box-shadow:none!important}
+.ja-panchang-week-table tbody tr>th,
+.ja-panchang-week-table tbody tr>td,
+.ja-panchang-lagna-table tbody tr>td,
+.ja-panchang-lagna-table tbody tr>th{border:0!important;border-bottom:1px solid var(--line,rgba(100,110,130,.24))!important;border-radius:0!important;box-shadow:none!important;background:transparent!important}
+.ja-panchang-week-table tbody tr:last-child>th,
+.ja-panchang-week-table tbody tr:last-child>td{border-bottom:0!important}
+.ja-panchang-week-table tbody tr>td:first-child,
+.ja-panchang-week-table tbody tr>th:first-child{border-left:0!important}
+.ja-panchang-event,.ja-panchang-current-summary,.ja-panchang-day-range{border-radius:0!important;box-shadow:none!important}
+.ja-panchang-event{border:0!important;border-bottom:1px solid var(--line,rgba(100,110,130,.2))!important;margin:0!important;background:transparent!important}
+.ja-panchang-event.is-active{border-left:0!important;border-bottom-color:rgba(197,139,54,.55)!important;background:rgba(224,160,75,.09)!important}
+.ja-panchang-week-table .ja-panchang-event:last-child{border-bottom:0!important}
