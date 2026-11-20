@@ -224,3 +224,23 @@
  .ja-panchang-dialog-body{width:auto;max-width:none}
  .ja-panchang-table-wrap{max-width:calc(98vw - 28px)}
 }
+
+
+/* Parameter-first table layouts for Panchang weekly period summaries. */
+.ja-panchang-inauspicious-table{width:max-content;min-width:100%;table-layout:auto}
+.ja-panchang-inauspicious-table thead th:first-child{min-width:105px}
+.ja-panchang-inauspicious-table thead th:not(:first-child){min-width:190px}
+.ja-panchang-inauspicious-table tbody tr>td{vertical-align:middle}
+.ja-panchang-inauspicious-table .ja-panchang-event{min-width:0;margin:0;padding:8px 10px}
+.ja-panchang-inauspicious-table .ja-panchang-duration{white-space:nowrap}
+.ja-panchang-auspicious-table{width:max-content;min-width:100%;table-layout:auto}
+.ja-panchang-auspicious-table thead th:first-child{min-width:105px}
+.ja-panchang-auspicious-table thead th:not(:first-child){min-width:210px}
+.ja-panchang-auspicious-table tbody td{vertical-align:top}
+.ja-panchang-auspicious-table tbody td .ja-panchang-event{margin:2px 0;padding:8px 10px}
+.ja-panchang-auspicious-table tbody td .ja-panchang-event strong{font-size:11px}
+.ja-panchang-auspicious-table .ja-panchang-duration{white-space:nowrap}
+@media(max-width:760px){
+ .ja-panchang-inauspicious-table thead th:not(:first-child){min-width:165px}
+ .ja-panchang-auspicious-table thead th:not(:first-child){min-width:180px}
+}
