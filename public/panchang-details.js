@@ -192,7 +192,7 @@ function renderAuspiciousWeek(){
    function addMuh(name,start,end){var active=ctx.instant>=start&&ctx.instant<end;events+='<div class="ja-panchang-event'+(active?' is-active':'')+'"><div class="ja-panchang-event-head"><strong>'+name+'</strong>'+(active?'<em>Current</em>':'')+'</div><div class="ja-panchang-duration">'+fmt(start,ctx.tz)+' – '+fmt(end,ctx.tz)+'</div></div>';}
    addMuh('Day Abhijit Muhurta',dayStart,dayEnd);
    addMuh('Night Abhijit Muhurta',nightStart,nightEnd);
-   var intervals=transitHouseIntervals(localMid,localMid+DAY,wanted);
+   var utcDayStart=localMid-ctx.tz*3600000;\n   var intervals=transitHouseIntervals(utcDayStart,utcDayStart+DAY,wanted);
    intervals.forEach(function(x){var active=ctx.instant>=x.start&&ctx.instant<x.end;events+='<div class="ja-panchang-event'+(active?' is-active':'')+'"><div class="ja-panchang-event-head"><strong>Jupiter in '+({1:'Lagna (1st)',5:'5th',7:'7th',9:'9th'}[x.house])+' House</strong>'+(active?'<em>Current</em>':'')+'</div><div class="ja-panchang-duration">'+fmt(x.start,ctx.tz)+' – '+fmt(x.end,ctx.tz)+'</div></div>';});
    if(!intervals.length)events+='<div class="ja-panchang-empty">Jupiter is not in the selected houses during this date</div>';
   }else events='<span class="ja-panchang-empty">Sunrise / sunset unavailable for this date</span>';
@@ -243,7 +243,7 @@ function renderSunriseLagnaDay(){
    planetNames.forEach(function(p){
     if(p===lord)return;
     var pl=allPositions[p],plSign=Number.isFinite(pl&&pl.lon)?Math.floor(pl.lon/30):-1;
-    if(plSign===row.sign)conjunctions.push(p);
+    if(plSign===lordSign)conjunctions.push(p);
     if(plSign<0)return;
     var sourceHouse=((lordSign-plSign+12)%12)+1;
     var offsets=({Sun:[7],Moon:[7],Mars:[4,7,8],Mercury:[7],Jupiter:[5,7,9],Venus:[7],Saturn:[3,7,10],Rahu:[5,7,9],Ketu:[5,7,9]})[p]||[7];
