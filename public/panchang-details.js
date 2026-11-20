@@ -203,9 +203,10 @@ function renderAuspiciousWeek(){
 var LAGNA_LORDS=['Mars','Venus','Mercury','Moon','Sun','Mercury','Venus','Mars','Jupiter','Saturn','Saturn','Jupiter'];
 var LAGNA_TYPES=['Movable','Fixed','Dual','Movable','Fixed','Dual','Movable','Fixed','Dual','Movable','Fixed','Dual'];
 function ascSignAt(ms){
- var d=new Date(ms+ctx.tz*3600000);
- var chart=computeChart({y:d.getUTCFullYear(),m:d.getUTCMonth()+1,d:d.getUTCDate(),hh:d.getUTCHours(),mm:d.getUTCMinutes(),ss:d.getUTCSeconds(),tz:ctx.tz,lat:ctx.lat,lon:ctx.lon});
- return {sign:Math.floor(chart.asc/30),chart:chart};
+ var d=new Date(ms+ctx.tz*3600000),hours=d.getUTCHours()+d.getUTCMinutes()/60+d.getUTCSeconds()/3600;
+ var jd=julianDay(d.getUTCFullYear(),d.getUTCMonth()+1,d.getUTCDate(),hours-ctx.tz);
+ var asc=rev(ascendant(jd,ctx.lat,ctx.lon)-lahiri(jd));
+ return {sign:Math.floor(asc/30),asc:asc,jd:jd};
 }
 function renderSunriseLagnaDay(){
  var localMid=localDayStart(ctx.instant,ctx.tz),probe=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,true);
@@ -232,7 +233,7 @@ function renderSunriseLagnaDay(){
  weekLabel.textContent=dateLabel;
  var bodyRows='';
  rows.forEach(function(row){
-  var mid=Math.floor((row.start+row.end)/2),info=ascSignAt(mid),lord=LAGNA_LORDS[row.sign],lordLon=info.chart.planets[lord]&&info.chart.planets[lord].lon;
+  var mid=Math.floor((row.start+row.end)/2),d=new Date(mid+ctx.tz*3600000),hours=d.getUTCHours()+d.getUTCMinutes()/60+d.getUTCSeconds()/3600,jd=julianDay(d.getUTCFullYear(),d.getUTCMonth()+1,d.getUTCDate(),hours-ctx.tz),lord=LAGNA_LORDS[row.sign],lordLon=siderealAt(jd).planets[lord]&&siderealAt(jd).planets[lord].lon;
   var house=Number.isFinite(lordLon)?((Math.floor(lordLon/30)-row.sign+12)%12)+1:null;
   var houseText=house?(house===1?'1st house':house+'th house'):'—';
   if(house===2)houseText='2nd house';if(house===3)houseText='3rd house';
