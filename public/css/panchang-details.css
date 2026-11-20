@@ -14,7 +14,7 @@
 .ja-panchang-close{width:36px;height:36px;border:1px solid var(--line,rgba(100,110,130,.2));border-radius:50%;background:var(--surface,#fff);color:var(--ink,#1c2434);font-size:25px;line-height:1;cursor:pointer}
 .ja-panchang-week-nav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:13px 24px;border-bottom:1px solid var(--line,rgba(100,110,130,.16))}
 .ja-panchang-week-nav strong{text-align:center;font-size:12px;color:var(--ink,#1c2434);font-variant-numeric:tabular-nums}
-.ja-panchang-week-nav button,.ja-panchang-dialog-footer button{border:1px solid var(--line,rgba(100,110,130,.2));border-radius:9px;padding:8px 12px;background:var(--surface,#fff);color:var(--ink,#1c2434);font:600 12px/1.2 inherit;cursor:pointer}
+.ja-panchang-week-nav button,.ja-panchang-dialog-footer button{border:1px solid var(--line,rgba(100,110,130,.2));border-radius:9px;padding:8px 12px;background:var(--surface,#fff);color:var(--ink,#1c2434);font-family:inherit;font-size:12px;font-weight:600;line-height:1.2;cursor:pointer}
 .ja-panchang-week-nav button:first-child{justify-self:start}.ja-panchang-week-nav button:last-child{justify-self:end}
 .ja-panchang-dialog-body{padding:16px 22px;overflow:auto;min-height:160px}.ja-panchang-table-wrap{overflow-x:auto}
 .ja-panchang-week-table{width:100%;border-collapse:separate;border-spacing:0 7px;font-size:12px}
