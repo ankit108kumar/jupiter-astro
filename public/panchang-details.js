@@ -58,7 +58,7 @@ function renderWeek(k){
  var nowLocal=ctx.instant+ctx.tz*3600000,rows='',sample=meta(k,0),label=k==='tithi'?'Tithi':'Nakshatra';
  var headings=sample.map(function(x){return '<th>'+esc(x[0])+'</th>';}).join('');
  for(var day=0;day<7;day++){var ds=w.start+day*DAY,de=ds+DAY,today=nowLocal>=ds&&nowLocal<de,dd=new Date(ds+ctx.tz*3600000),dayLabel='<span>'+DAYS[dd.getUTCDay()]+'</span><small>'+pad(dd.getUTCDate())+'/'+pad(dd.getUTCMonth()+1)+'/'+dd.getUTCFullYear()+'</small>',dayRows=[];
-  for(var j=0;j<cuts.length-1;j++){var a=cuts[j],b=cuts[j+1];if(b.at<=ds||a.at>=de)continue;var active=today&&ctx.instant>=a.at&&ctx.instant<b.at,fields=meta(k,a.index),cells=fields.map(function(x){return '<td>'+esc(x[1])+'</td>';}).join('');
+  for(var j=0;j<cuts.length-1;j++){var a=cuts[j],b=cuts[j+1];if(b.at<=ds||a.at>=de)continue;var active=today&&ctx.instant>=a.at&&ctx.instant<b.at,fields=meta(k,a.index),cells=fields.map(function(x){var value=(x[0]==='Ruling Planet'||x[0]==='Tithi Lord')?planetMarkup(x[1]):esc(x[1]);return '<td>'+value+'</td>';}).join('');
    dayRows.push('<tr class="'+(active?'is-today':'')+'"><th>'+dayLabel+'</th><td><strong>'+esc(name(k,a.index))+'</strong>'+(active?' <em class="ja-panchang-now">Current</em>':'')+'</td><td class="ja-panchang-duration">'+fmt(a.at,ctx.tz)+' – '+fmt(b.at,ctx.tz)+'</td>'+cells+'</tr>');
   }
   if(!dayRows.length)dayRows.push('<tr class="'+(today?'is-today':'')+'"><th>'+dayLabel+'</th><td colspan="'+(2+sample.length)+'">—</td></tr>');
