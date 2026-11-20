@@ -206,7 +206,13 @@ function renderOther(k){
  if(k==='abhijit'){renderAuspiciousWeek();return;}
 }
 function panelTabs(items){return '<div class="ja-panchang-panel-tabs">'+items.map(function(x){var label=x.charAt(0).toUpperCase()+x.slice(1);return '<button type="button" data-panel="'+x+'" class="'+(activePanel===x?'is-active':'')+'">'+label+'</button>';}).join('')+'</div>';}
-function render(){if(kind==='sun')renderSunriseLagnaDay();else if(kind==='tithi'||kind==='nak')renderWeek(kind);else if(kind==='yogaGroup')renderLunarWeek();else if(kind==='chaughadiyaGroup')renderChaughadiyaHora('chaughadiya');else renderOther(kind);}
+var renderCache=Object.create(null),renderCacheOrder=[];
+function render(){
+ var cacheKey=ctx?JSON.stringify([kind,ctx.instant,ctx.lat,ctx.lon,ctx.tz,offset,dayOffset]):'';
+ if(cacheKey&&Object.prototype.hasOwnProperty.call(renderCache,cacheKey)){var cached=renderCache[cacheKey];bodyNode.innerHTML=cached.html;weekLabel.textContent=cached.label;return;}
+ if(kind==='sun')renderSunriseLagnaDay();else if(kind==='tithi'||kind==='nak')renderWeek(kind);else if(kind==='yogaGroup')renderLunarWeek();else if(kind==='chaughadiyaGroup')renderChaughadiyaHora('chaughadiya');else renderOther(kind);
+ if(cacheKey){renderCache[cacheKey]={html:bodyNode.innerHTML,label:weekLabel.textContent};renderCacheOrder.push(cacheKey);if(renderCacheOrder.length>24){delete renderCache[renderCacheOrder.shift()];}}
+}
 function close(){modal.hidden=true;document.body.classList.remove('ja-panchang-modal-open');windowMinimized=false;modal.querySelector('.ja-panchang-dialog').classList.remove('is-minimized','is-maximized');}
 async function open(k){
  var authUser=window.jaAuthUser||(window.firebaseAuth&&window.firebaseAuth.currentUser)||null;
@@ -235,5 +241,6 @@ function init(){
  Array.prototype.forEach.call(cards,function(card,i){if(i===0)return;var k=kinds[i];card.classList.add('ja-panchang-clickable');card.setAttribute('role','button');card.setAttribute('tabindex','0');card.setAttribute('aria-haspopup','dialog');card.addEventListener('click',function(){open(k);});card.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();open(k);}});});
 
 }
+document.addEventListener('ja-panchang-open',function(e){var k=e&&e.detail&&e.detail.kind;if(k)open(k);});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
