@@ -37,12 +37,24 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@5.0.2/dist/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
+
 <style id="ja-special-points-styles">
-.ja-special-points-card{margin:14px 0;min-width:0}.ja-special-points-table{width:100%;border-collapse:separate;border-spacing:0;min-width:620px}
-.ja-special-points-table th{position:sticky;top:0;z-index:2;background:var(--surface,#fff);text-align:left;font-size:.76rem;letter-spacing:.035em;color:var(--muted,#777);font-weight:650;padding:10px 12px;border-bottom:1px solid var(--line-strong,#ddd)}
-.ja-special-points-table td{padding:9px 12px;border-bottom:1px solid var(--line,#eee);font-size:.88rem;font-weight:400}
-.ja-special-points-table tbody tr:nth-child(even){background:rgba(140,130,155,.055)}.ja-special-points-table tbody tr:hover{background:rgba(224,122,31,.09)}
-.ja-special-points-table .num{font-variant-numeric:tabular-nums;white-space:nowrap}.ja-special-points-scroll{max-width:100%;overflow:auto}.ja-special-points-note{font-size:.75rem;margin:9px 2px 0;line-height:1.5}
+.ja-special-points-overlay[hidden]{display:none!important}
+.ja-special-points-overlay{position:fixed;inset:0;z-index:100500;background:rgba(31,28,39,.32);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:20px}
+.ja-special-points-modal{width:min(900px,94vw);max-height:min(82vh,760px);overflow:auto;background:rgba(255,255,255,.97);border:1px solid rgba(255,255,255,.8);border-radius:16px;box-shadow:0 18px 60px rgba(37,30,52,.2);padding:20px;color:#272536}
+.ja-special-points-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
+.ja-special-points-modal-head h3{margin:0;font-size:18px;font-weight:650}.ja-special-points-modal-head p{margin:5px 0 0;color:#858091;font-size:12px}
+.ja-special-points-close{border:0;background:#f1eff5;color:#777184;border-radius:9px;width:34px;height:34px;font-size:22px;line-height:1;cursor:pointer}
+.ja-special-points-scroll{max-width:100%;overflow:auto;border:1px solid #eeebf1;border-radius:10px}
+.ja-special-points-table{width:100%;border-collapse:separate;border-spacing:0;min-width:620px}
+.ja-special-points-table th{position:sticky;top:0;z-index:2;background:#f7f5f9;text-align:left;font-size:11px;letter-spacing:.04em;color:#777184;font-weight:650;padding:11px 13px;border-bottom:1px solid #e8e4ed}
+.ja-special-points-table td{padding:10px 13px;border-bottom:1px solid #f0edf3;font-size:13px;font-weight:400}
+.ja-special-points-table tbody tr:nth-child(even){background:rgba(140,130,155,.055)}.ja-special-points-table tbody tr:hover{background:rgba(224,122,31,.08)}
+.ja-special-points-table .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.ja-special-points-warning{display:flex;align-items:center;gap:8px;margin:13px 2px 0;padding:9px 11px;border-radius:9px;background:#fff8e9;color:#916d31;font-size:12px;line-height:1.45}
+.ja-special-points-warning span{font-size:16px}
+.ja-special-more-btn{margin-right:auto}
+@media(max-width:620px){.ja-special-points-overlay{padding:10px}.ja-special-points-modal{width:100%;max-height:88vh;padding:14px;border-radius:13px}}
 </style>
 </head>
 </html>
@@ -4159,18 +4171,6 @@ const RenderTabs = {
         </article>
       </div>
       
-      <article class="card ja-special-points-card">
-        <header style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-          <div><h3>Upagrahas &amp; Special Lagnas</h3><p class="sub">Classical reference points · Sidereal Lahiri</p></div>
-        </header>
-        <div class="scroll ja-special-points-scroll">
-          <table class="ja-special-points-table">
-            <thead><tr><th>Name</th><th>Degree</th><th>Sign</th><th>Nakshatra</th><th>Navamsa</th></tr></thead>
-            <tbody>${jaSpecialPointRows(k).map(p=>`<tr title="${esc(p.source)}"><td>${esc(p.name)}</td><td class="num">${esc(p.degree)}</td><td>${esc(p.sign)}</td><td>${esc(p.nakshatra)}</td><td>${esc(p.navamsa)}</td></tr>`).join('')}</tbody>
-          </table>
-        </div>
-        <p class="sub ja-special-points-note">Vighati Lagna is left blank because BPHS does not define it as a separate longitude. Varnada and Indu are sign-only in their cited methods; 0° is used as the sign anchor. Hover over a row for its calculation source.</p>
-      </article>
 <div class="three">
         <article class="card">
           <header><h3>Avkahada Chakra</h3></header>
@@ -4241,8 +4241,9 @@ const RenderTabs = {
       <!-- Planetary table toggle buttons -->
 <div
   id="${prefix}-planetTableControls"
-  style="display:flex; justify-content:flex-end; align-items:center; gap:6px; margin-top:10px;"
+  style="display:flex; justify-content:flex-start; align-items:center; gap:6px; margin-top:10px;"
 >
+  <button type="button" class="deg-toggle-btn ja-special-more-btn" id="${prefix}-specialMoreBtn" title="Open Upagrahas and Special Lagnas">More..</button>
   <button
     type="button"
     class="deg-toggle-btn"
@@ -4279,6 +4280,24 @@ ${createCopyExportButton({
   options: ['copy', 'png', 'pdf', 'csv', 'tsv'],
   initiallyHidden: true
 })}
+</div>
+
+
+<!-- Upagrahas & Special Lagnas popup -->
+<div class="ja-special-points-overlay" id="${prefix}-specialPointsOverlay" hidden>
+ <section class="ja-special-points-modal" role="dialog" aria-modal="true" aria-labelledby="${prefix}-specialPointsTitle">
+  <header class="ja-special-points-modal-head">
+   <div><h3 id="${prefix}-specialPointsTitle">Upagrahas &amp; Special Lagnas</h3><p>Classical reference points · Sidereal Lahiri</p></div>
+   <button type="button" class="ja-special-points-close" data-special-points-close aria-label="Close">×</button>
+  </header>
+  <div class="ja-special-points-scroll">
+   <table class="ja-special-points-table">
+    <thead><tr><th>Name</th><th>Degree</th><th>Sign</th><th>Nakshatra</th><th>Navamsa</th></tr></thead>
+    <tbody>${jaSpecialPointRows(k).map(p=>`<tr title="${esc(p.source)}"><td>${esc(p.name)}</td><td class="num">${esc(p.degree)}</td><td>${esc(p.sign)}</td><td>${esc(p.nakshatra)}</td><td>${esc(p.navamsa)}</td></tr>`).join('')}</tbody>
+   </table>
+  </div>
+  <p class="ja-special-points-warning"><span aria-hidden="true">ⓘ</span> Calculations yet to be verified for accuracy. Treat results as provisional.</p>
+ </section>
 </div>
 
 <!-- Hidden planetary table -->
@@ -5416,7 +5435,18 @@ if (secSelect) {
           openTab('overview');
         });
       }
-            const planetTableBtn =
+            const specialMoreBtn=document.getElementById(`${prefix}-specialMoreBtn`);
+const specialPointsOverlay=document.getElementById(`${prefix}-specialPointsOverlay`);
+if(specialMoreBtn&&specialPointsOverlay){
+ const closeSpecialPoints=()=>{specialPointsOverlay.hidden=true;specialMoreBtn.focus();};
+ specialMoreBtn.addEventListener('click',()=>{specialPointsOverlay.hidden=false;const closeBtn=specialPointsOverlay.querySelector('[data-special-points-close]');if(closeBtn)closeBtn.focus();});
+ specialPointsOverlay.querySelectorAll('[data-special-points-close]').forEach(btn=>btn.addEventListener('click',closeSpecialPoints));
+ specialPointsOverlay.addEventListener('click',e=>{if(e.target===specialPointsOverlay)closeSpecialPoints();});
+ const specialKeyHandler=e=>{if(e.key==='Escape'&&!specialPointsOverlay.hidden)closeSpecialPoints();};
+ specialPointsOverlay.addEventListener('keydown',specialKeyHandler);
+}
+
+const planetTableBtn =
         document.getElementById(`${prefix}-planetTableToggleBtn`);
 
       const planetTable =
