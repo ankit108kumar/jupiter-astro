@@ -531,3 +531,10 @@
 .ja-panchang-dialog .ja-panchang-lagna-table tbody tr:hover>td,.ja-panchang-dialog .ja-panchang-lagna-table tbody tr:hover>th{background:#f1eff7!important}
 .ja-panchang-dialog .ja-panchang-lagna-table tbody tr.is-today:hover>td,.ja-panchang-dialog .ja-panchang-lagna-table tbody tr.is-today:hover>th{background:#fff5df!important}
 @media(max-width:700px){.ja-panchang-dialog .ja-panchang-week-nav{grid-template-columns:1fr 1fr!important}.ja-panchang-dialog .ja-panchang-week-nav button{width:100%!important;min-width:0!important}.ja-panchang-dialog .ja-panchang-table-wrap{max-height:64vh}}
+
+/* Planet names use the existing SVG palette with light, readable typography. */
+.ja-panchang-dialog .ja-panchang-planet-name{
+ font-weight:400!important;
+ letter-spacing:.08px;
+ text-decoration:none;
+}
