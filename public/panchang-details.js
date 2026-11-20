@@ -4,10 +4,8 @@
 var DAY=86400000, DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 var TN=['Pratipada','Dwitiya','Tritiya','Chaturthi','Panchami','Shashthi','Saptami','Ashtami','Navami','Dashami','Ekadashi','Dwadashi','Trayodashi','Chaturdashi','Purnima'];
 var CAT=['Nanda','Bhadra','Jaya','Rikta','Purna'], LORD={Nanda:'Venus',Bhadra:'Mercury',Jaya:'Mars',Rikta:'Saturn',Purna:'Jupiter'};
-var TDEITY=['Agni','Brahma','Gauri','Ganesha','Naga','Kartikeya','Surya','Shiva','Durga','Yama','Vishnu','Vayu','Kamadeva','Shiva','Chandra / Pitru'];
-var NDEITY=['Ashwini Kumaras','Yama','Agni','Brahma','Soma','Rudra','Aditi','Brihaspati','Nagas','Pitris','Bhaga','Aryaman','Savitar','Tvashtar','Vayu','Indra-Agni','Mitra','Indra','Nirriti','Apah','Vishvadevas','Vishnu','Ashta Vasus','Varuna','Aja Ekapada','Ahirbudhnya','Pushan'];
-var NMETA=[
-['Horse head','Deva','Shami','Horse'],['Yoni','Manushya','Amla','Female reproductive organ'],['Flame / blade','Rakshasa','Fig','Fire / knife'],['Ox cart','Manushya','Jamun','Cart'],['Deer head','Deva','Khair','Deer'],['Teardrop','Manushya','Arjuna','Human head'],['Bow','Deva','Bamboo','Bow / quiver'],['Udder / lotus','Deva','Peepal','Cow udder'],['Serpent','Rakshasa','Nagkesar','Serpent'],['Royal throne','Rakshasa','Banyan','Throne'],['Hammock','Manushya','Palash','Hammock'],['Bed','Manushya','Payari','Bed'],['Hand / palm','Deva','Jasmine','Hand'],['Pearl / bright jewel','Rakshasa','Bilva','Pearl'],['Coral / young shoot','Deva','Arjuna','Coral'],['Triumphal arch','Rakshasa','Nagkesar','Archway'],['Lotus','Deva','Bakula','Lotus'],['Earring','Rakshasa','Santoshi','Earring'],['Roots tied together','Rakshasa','Sal','Root bundle'],['Elephant tusk / fan','Manushya','Ashoka','Elephant tusk'],['Elephant tusk / small bed','Manushya','Jackfruit','Elephant tusk'],['Ear','Deva','Akshaya Vata','Ear'],['Drum','Rakshasa','Shami','Drum'],['Empty circle','Rakshasa','Kadamba','Empty circle'],['Two front legs of a cot','Manushya','Mango','Twin-faced man'],['Back legs of a cot','Manushya','Neem','Twin-faced man'],['Fish','Deva','Mahua','Fish']];
+var PANCHANG_REFERENCE=null,REFERENCE_PROMISE=null;
+function loadPanchangReference(){if(PANCHANG_REFERENCE)return Promise.resolve(PANCHANG_REFERENCE);if(!REFERENCE_PROMISE)REFERENCE_PROMISE=fetch('/data/panchang-reference.json',{cache:'force-cache'}).then(function(r){if(!r.ok)throw new Error('Panchang reference data unavailable ('+r.status+')');return r.json();}).then(function(data){PANCHANG_REFERENCE=data;window.JA_PANCHANG_REFERENCE=data;return data;}).catch(function(err){REFERENCE_PROMISE=null;throw err;});return REFERENCE_PROMISE;}
 var modal,titleNode,subtitleNode,bodyNode,weekLabel,kind='tithi',activePanel='yoga',offset=0,dayOffset=0,ctx,windowMinimized=false;
 var THEME_KEY='ja-transit-timeline-theme-mode',themeMode=(function(){try{return localStorage.getItem(THEME_KEY)==='apple'?'apple':'website';}catch(e){return 'website';}})();
 function themeIconMarkup(mode){return mode==='apple'?'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.6"></circle><path d="M12 2v2.1M12 19.9V22M4.93 4.93l1.48 1.48m11.18 11.18 1.48 1.48M2 12h2.1m15.8 0H22M4.93 19.07l1.48-1.48M17.59 6.41l1.48-1.48"></path></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"></rect><path d="M3 8h18M7 6h.01M10 6h.01M7 12h10M7 15.5h7"></path></svg>';}
@@ -34,11 +32,12 @@ function longitudes(ms){
  return {sun:rev(sun.lon-aya),moon:rev(moon-aya)};
 }
 function indices(ms){var p=longitudes(ms);return {tithi:Math.min(29,Math.floor(rev(p.moon-p.sun)/12)),nak:Math.min(26,Math.floor(p.moon/(40/3)))};}
-function name(k,i){if(k==='nak')return NAK[i][0];var n=i%15;return (i<15?'Shukla ':'Krishna ')+(n===14?(i<15?'Purnima':'Amavasya'):TN[n]);}
+function name(k,i){if(k==='nak')return PANCHANG_REFERENCE.nakshatras[i].name;var n=i%15;return (i<15?'Shukla ':'Krishna ')+(n===14?(i<15?'Purnima':'Amavasya'):TN[n]);}
 function meta(k,i){
- if(k==='nak'){var m=NMETA[i]||[],n=NAK[i]||['—','—'];return [['Nakshatra Lord',n[1]],['Nakshatra Deity',NDEITY[i]],['Symbol',m[0]],['Quality / Gana',m[1]],['Associated Tree',m[2]],['Associated Object',m[3]]];}
- var c=CAT[(i%15)%5],deity=(i%15)===14?(i<15?'Chandra':'Pitru'):TDEITY[i%15];
- return [['Tithi Category',c],['Tithi Lord',LORD[c]],['Tithi Deity',deity]];
+ if(k==='nak'){var n=PANCHANG_REFERENCE.nakshatras[i];return [['Nakshatra Lord',n.lord],['Nakshatra Deity',n.deity],['Cat.',n.category],['Letter',n.letters.join(' · ')],['Tree',n.tree],['Flower',n.flower]];}
+ var n=i%15,ref=PANCHANG_REFERENCE.tithis[n],planet=PANCHANG_REFERENCE.planets.find(function(p){return p.planet===ref.lord;});
+ var category=CAT[n%5];
+ return [['Tithi Category',category],['Tithi Lord',ref.lord],['Tithi Deity',ref.deity],['Planet Deity',planet?planet.deity:'—'],['Planet Nature',planet?planet.nature:'—']];
 }
 function bounds(){
  var local=new Date(ctx.instant+ctx.tz*3600000),wd=local.getUTCDay(),mid=Date.UTC(local.getUTCFullYear(),local.getUTCMonth(),local.getUTCDate())-wd*DAY-ctx.tz*3600000+offset*7*DAY;
@@ -218,12 +217,13 @@ function render(){
  if(cacheKey){renderCache[cacheKey]={html:bodyNode.innerHTML,label:weekLabel.textContent};renderCacheOrder.push(cacheKey);if(renderCacheOrder.length>24){delete renderCache[renderCacheOrder.shift()];}}
 }
 function close(){modal.hidden=true;document.body.classList.remove('ja-panchang-modal-open');windowMinimized=false;modal.querySelector('.ja-panchang-dialog').classList.remove('is-minimized','is-maximized');}
-async function open(k){
+async async function open(k){
  var authUser=window.jaAuthUser||(window.firebaseAuth&&window.firebaseAuth.currentUser)||null;
  if(!authUser&&window.jaAuthReady&&typeof window.jaAuthReady.then==='function'){
   try{authUser=await window.jaAuthReady;}catch(_){authUser=null;}
  }
  if(!authUser)return;
+ try{await loadPanchangReference();}catch(err){console.error('Panchang reference data could not be loaded:',err);return;}
  ctx=context();kind=k;offset=0;dayOffset=0;modal.setAttribute('data-ja-panchang-kind',k);modal.querySelector('.ja-panchang-dialog').classList.remove('is-minimized','is-maximized');
  var titles={sun:'Sunrise / Sunset — Daily Lagna Details',tithi:'Tithi — Weekly Details',nak:'Nakshatra — Weekly Details',yogaGroup:'Yoga & Karana — Weekly Details',chaughadiyaGroup:'Chaughadiya & Hora — Panchang Day',inauspicious:'Inauspicious Periods',abhijit:'Abhijit Muhurta'};
  titleNode.textContent=titles[k]||'Panchang Details';modal.querySelector('.ja-panchang-dialog').dataset.kind=k;modal.querySelector('.ja-panchang-dialog').classList.remove('is-minimized','is-maximized');windowMinimized=false;activePanel=k==='chaughadiyaGroup'?'chaughadiya':k==='yogaGroup'?'yoga':activePanel;subtitleNode.textContent=(k==='chaughadiyaGroup'||k==='sun')?'Sunrise to next sunrise · Local time at the selected chart location':'Sunday to Saturday · Local time at the selected chart location';
