@@ -130,12 +130,39 @@ function renderChaughadiyaHora(which){
  addPeriod(sunrise,sunset,true);addPeriod(sunset,nextSunrise,false);
  var selected=which==='chaughadiya'?table('Chaughadiya',chSlots):table('Hora',horaSlots);bodyNode.innerHTML=panelTabs(['chaughadiya','hora'])+'<div class="ja-panchang-day-range"><span>Panchang day</span><strong>'+fmt(sunrise,ctx.tz)+' – '+fmt(nextSunrise,ctx.tz)+'</strong><small>Sunrise to immediately before the next sunrise · local chart time</small></div>'+selected;
 }
+function renderInauspiciousWeek(){
+ var w=bounds(),rahus=[8,2,7,5,6,4,3],guliks=[6,5,4,3,2,1,0],yamas=[4,3,2,1,0,6,5];
+ weekLabel.textContent=dayFmt(w.start,ctx.tz)+' – '+dayFmt(w.end-DAY,ctx.tz);
+ var nowLocal=ctx.instant+ctx.tz*3600000,rows='';
+ for(var day=0;day<7;day++){
+  var localMid=w.start+day*DAY,weekday=new Date(localMid).getUTCDay();
+  var rise=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,true),set=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,false);
+  var valid=Number.isFinite(rise)&&Number.isFinite(set)&&rise>0&&set>rise;
+  var today=nowLocal>=localMid&&nowLocal<localMid+DAY,events='';
+  if(valid){
+   var eighth=(set-rise)/8;
+   var entries=[
+    ['Rahu Kaal',rahus[weekday]-1],
+    ['Gulika Kaal',guliks[weekday]],
+    ['Yamaganda',yamas[weekday]]
+   ];
+   entries.forEach(function(item){
+    var start=rise+item[1]*eighth,end=start+eighth,active=ctx.instant>=start&&ctx.instant<end;
+    events+='<div class="ja-panchang-event'+(active?' is-active':'')+'"><div class="ja-panchang-event-head"><strong>'+item[0]+'</strong>'+(active?'<em>Current</em>':'')+'</div><div class="ja-panchang-duration">'+fmt(start,ctx.tz)+' – '+fmt(end,ctx.tz)+'</div></div>';
+   });
+  }else events='<span class="ja-panchang-empty">Sunrise / sunset unavailable for this date</span>';
+  var dd=new Date(localMid);
+  rows+='<tr class="'+(today?'is-today':'')+'"><th><span>'+DAYS[weekday]+'</span><small>'+pad(dd.getUTCDate())+'/'+pad(dd.getUTCMonth()+1)+'/'+dd.getUTCFullYear()+'</small></th><td>'+events+'</td></tr>';
+ }
+ bodyNode.innerHTML='<div class="ja-panchang-table-wrap"><table class="ja-panchang-week-table"><thead><tr><th>Day</th><th>Inauspicious periods · Sunrise-based</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+}
 function renderOther(k){
+ if(k==='inauspicious'){renderInauspiciousWeek();return;}
  var w=bounds();weekLabel.textContent=dayFmt(w.start,ctx.tz)+' – '+dayFmt(w.end-DAY,ctx.tz);
- var ids={inauspicious:['pRahuKaal','pGulikKaal'],abhijit:['pAbhijit','pAbhijitDuration']};
+ var ids={abhijit:['pAbhijit','pAbhijitDuration']};
  var vals=(ids[k]||[]).map(function(id){return (document.getElementById(id)||{}).textContent||'—';}).join(' · ');
- var labels={inauspicious:'Inauspicious Periods',abhijit:'Abhijit Muhurta'};
- bodyNode.innerHTML='<div class="ja-panchang-current-summary"><span>'+esc(labels[k])+'</span><strong>'+esc(vals)+'</strong></div>';
+ var labels={abhijit:'Abhijit Muhurta'};
+ bodyNode.innerHTML='<div class="ja-panchang-current-summary"><span>'+esc(labels[k]||'Panchang details')+'</span><strong>'+esc(vals)+'</strong></div>';
 }
 function panelTabs(items){return '<div class="ja-panchang-panel-tabs">'+items.map(function(x){var label=x.charAt(0).toUpperCase()+x.slice(1);return '<button type="button" data-panel="'+x+'" class="'+(activePanel===x?'is-active':'')+'">'+label+'</button>';}).join('')+'</div>';}
 function render(){if(kind==='tithi'||kind==='nak')renderWeek(kind);else if(kind==='yogaGroup')renderLunarWeek(activePanel);else if(kind==='chaughadiyaGroup')renderChaughadiyaHora(activePanel);else renderOther(kind);}
