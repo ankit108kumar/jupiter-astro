@@ -208,6 +208,7 @@ function panelTabs(items){return '<div class="ja-panchang-panel-tabs">'+items.ma
 function render(){if(kind==='tithi'||kind==='nak')renderWeek(kind);else if(kind==='yogaGroup')renderLunarWeek(activePanel);else if(kind==='chaughadiyaGroup')renderChaughadiyaHora(activePanel);else renderOther(kind);}
 function close(){modal.hidden=true;document.body.classList.remove('ja-panchang-modal-open');}
 function open(k){
+ if(!(window.firebaseAuth&&window.firebaseAuth.currentUser)&&!window.jaAuthUser)return;
  ctx=context();kind=k;offset=0;dayOffset=0;
  var titles={tithi:'Tithi — Weekly Details',nak:'Nakshatra — Weekly Details',yogaGroup:'Yoga & Karana — Weekly Details',chaughadiyaGroup:'Chaughadiya & Hora — Panchang Day',inauspicious:'Inauspicious Periods',abhijit:'Abhijit Muhurta'};
  titleNode.textContent=titles[k]||'Panchang Details';activePanel=k==='chaughadiyaGroup'?'chaughadiya':k==='yogaGroup'?'yoga':activePanel;subtitleNode.textContent=k==='chaughadiyaGroup'?'Sunrise to next sunrise · Local time at the selected chart location':'Sunday to Saturday · Local time at the selected chart location';
