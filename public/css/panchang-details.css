@@ -340,3 +340,42 @@
 .ja-panchang-week-table tbody tr>th,.ja-panchang-week-table tbody tr>td{padding-top:10px!important;padding-bottom:10px!important}
 .ja-panchang-week-table thead th{font-weight:500!important}
 .ja-panchang-now{font-weight:500!important}
+
+/* Celestial Glass Premium — Inauspicious Periods only */
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"]{background:linear-gradient(145deg,rgba(249,248,255,.97),rgba(255,252,247,.96))!important;border:1px solid rgba(255,255,255,.88)!important;box-shadow:0 24px 72px rgba(65,57,91,.18),inset 0 1px rgba(255,255,255,.9)!important}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-titlebar{background:rgba(255,255,255,.68)!important;border-bottom:1px solid rgba(130,119,157,.15)!important}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-window-title{display:block!important;font-size:12px!important;font-weight:600!important;color:#514766!important}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-window-title:before{content:"✧";color:#b78330;margin-right:8px;font-size:15px}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-heading{background:linear-gradient(110deg,rgba(239,233,252,.78),rgba(255,246,235,.74))!important;padding:14px 22px!important}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-heading h2{display:block!important;font-size:17px!important;font-weight:650!important;color:#38334a!important;margin:0 0 3px!important}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-heading p{font-size:11px!important;color:#817990!important}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-week-nav button{background:rgba(255,253,248,.9)!important;border:1px solid rgba(151,135,177,.24)!important;border-radius:9px!important;transition:all .18s!important}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-week-nav button:hover{background:#fff!important;border-color:rgba(183,131,48,.5)!important;box-shadow:0 3px 10px rgba(65,57,91,.08)!important}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-dialog-body{width:100%!important;max-width:none!important;padding:14px 20px 16px!important;background:rgba(246,244,251,.38)}
+.ja-inauspicious-week-range{display:flex;justify-content:space-between;gap:12px;padding:0 2px 11px;color:#777087}
+.ja-inauspicious-week-range span{font-size:9px;letter-spacing:1.1px;font-weight:700;text-transform:uppercase}
+.ja-inauspicious-week-range strong{font-size:11px;font-weight:600;color:#514a61;font-variant-numeric:tabular-nums}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-inauspicious-scroll{width:100%;max-width:100%;overflow-x:auto}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-inauspicious-table{width:100%;min-width:760px;border-spacing:0 5px!important}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-inauspicious-table thead th{background:transparent!important;color:#777087!important;font-size:9px!important;letter-spacing:.8px!important;padding:8px 10px!important}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-inauspicious-table thead th:nth-child(2){color:#bd6260!important}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-inauspicious-table thead th:nth-child(3){color:#8064b1!important}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-inauspicious-table thead th:nth-child(4){color:#b78330!important}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-inauspicious-table tbody tr>th{width:112px;min-width:112px;padding:10px 12px!important;background:rgba(237,234,245,.58)!important;border:1px solid rgba(137,126,160,.12)!important;border-radius:10px!important;vertical-align:middle}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-inauspicious-table tbody tr>th span{font-size:10px;letter-spacing:.5px;font-weight:650;text-transform:uppercase;color:#514a61}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-inauspicious-table tbody tr>th small{font-size:10px;color:#8b8498;margin-top:3px}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-inauspicious-table tbody tr>td{padding:3px 5px!important;background:transparent!important;border:0!important}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-inauspicious-period{padding:11px 12px!important;border-radius:11px!important;border:1px solid transparent!important;transition:background .18s,border-color .18s,box-shadow .18s!important}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-inauspicious-period:hover{box-shadow:0 4px 12px rgba(63,53,83,.08)!important}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .period-0{background:#fff3f1!important;border-color:rgba(189,98,96,.15)!important}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .period-1{background:#f6f1ff!important;border-color:rgba(128,100,177,.15)!important}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .period-2{background:#fff7e8!important;border-color:rgba(183,131,48,.16)!important}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-duration{margin:0!important;font-size:11px!important;font-weight:600!important;color:#514b5e!important;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-inauspicious-period .ja-panchang-now{display:inline-block;margin:6px 0 0!important;background:rgba(183,131,48,.14)!important;color:#93671f!important;font-size:8px!important;letter-spacing:.6px}
+.ja-inauspicious-progress{height:3px;margin-top:5px;border-radius:9px;background:rgba(105,91,119,.12);overflow:hidden}
+.ja-inauspicious-progress span{display:block;height:100%;border-radius:9px;background:#b78330}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-inauspicious-table tr.is-today>th{background:#fff8e9!important;border:1px solid rgba(183,131,48,.3)!important;box-shadow:inset 3px 0 #c58b36!important}
+.ja-inauspicious-today{display:inline-block;margin-left:5px;padding:2px 4px;border-radius:4px;background:rgba(183,131,48,.13);color:#946b2c;font-size:7px;font-style:normal;letter-spacing:.5px}
+.ja-inauspicious-info{display:grid;gap:4px;margin-top:12px;padding:10px 12px;border-top:1px solid rgba(137,126,160,.16);color:#837c90;font-size:10px}
+.ja-inauspicious-info strong{font-weight:650;color:#5f566f}
+@media(max-width:760px){.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-dialog-body{padding:12px!important}.ja-inauspicious-week-range{flex-direction:column;gap:3px}.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-panchang-inauspicious-table{min-width:730px}}
