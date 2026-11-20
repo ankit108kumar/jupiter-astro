@@ -56,18 +56,14 @@ function renderWeek(k){
  var w=bounds(),changes=transitions(w.start-2*DAY,w.end+2*DAY,k),cuts=[{at:w.start-2*DAY,index:indices(w.start-2*DAY)[k]}].concat(changes,[{at:w.end+2*DAY,index:indices(w.end+2*DAY)[k]}]);
  weekLabel.textContent=dayFmt(w.start,ctx.tz)+' – '+dayFmt(w.end-DAY,ctx.tz);
  var nowLocal=ctx.instant+ctx.tz*3600000,rows='';
- for(var day=0;day<7;day++){
-  var ds=w.start+day*DAY,de=ds+DAY,events='',today=nowLocal>=ds&&nowLocal<de;
-  for(var j=0;j<cuts.length-1;j++){
-   var a=cuts[j],b=cuts[j+1];if(b.at<=ds||a.at>=de)continue;
-   var s=a.at,e=b.at,active=today&&ctx.instant>=s&&ctx.instant<e,fields=meta(k,a.index),details='';
+ for(var day=0;day<7;day++){var ds=w.start+day*DAY,de=ds+DAY,events='',today=nowLocal>=ds&&nowLocal<de,dd=new Date(ds+ctx.tz*3600000);
+  for(var j=0;j<cuts.length-1;j++){var a=cuts[j],b=cuts[j+1];if(b.at<=ds||a.at>=de)continue;var active=today&&ctx.instant>=a.at&&ctx.instant<b.at,fields=meta(k,a.index),details='';
    fields.forEach(function(x){details+='<span class="ja-panchang-meta"><b>'+esc(x[0])+':</b> <span>'+esc(x[1])+'</span></span>';});
-   events+='<div class="ja-panchang-event'+(active?' is-active':'')+'"><div class="ja-panchang-event-head"><strong>'+esc(name(k,a.index))+'</strong>'+(active?'<em>Current</em>':'')+'</div><div class="ja-panchang-duration">'+fmt(s,ctx.tz)+' – '+fmt(e,ctx.tz)+'</div><div class="ja-panchang-meta-grid">'+details+'</div></div>';
+   events+='<div class="ja-panchang-event'+(active?' is-active':'')+'"><strong>'+esc(name(k,a.index))+'</strong><span class="ja-panchang-duration">'+fmt(a.at,ctx.tz)+' – '+fmt(b.at,ctx.tz)+'</span><div class="ja-panchang-meta-grid">'+details+'</div>'+(active?'<em class="ja-panchang-now">Current</em>':'')+'</div>';
   }
-  var dd=new Date(ds+ctx.tz*3600000);
   rows+='<tr class="'+(today?'is-today':'')+'"><th><span>'+DAYS[dd.getUTCDay()]+'</span><small>'+pad(dd.getUTCDate())+'/'+pad(dd.getUTCMonth()+1)+'/'+dd.getUTCFullYear()+'</small></th><td>'+(events||'—')+'</td></tr>';
  }
- bodyNode.innerHTML='<div class="ja-panchang-table-wrap"><table class="ja-panchang-week-table"><thead><tr><th>Day</th><th>'+(k==='tithi'?'Tithi and duration':'Nakshatra and duration')+'</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+ bodyNode.innerHTML='<div class="ja-panchang-table-wrap"><table class="ja-panchang-week-table ja-panchang-single-line"><thead><tr><th>Day</th><th>'+(k==='tithi'?'Tithi and duration':'Nakshatra and duration')+'</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
 }
 function yogaKaranaIndex(ms,which){
  var p=longitudes(ms),sum=rev(p.sun+p.moon),diff=rev(p.moon-p.sun);
@@ -76,28 +72,21 @@ function yogaKaranaIndex(ms,which){
 var YOGA_NAMES=['Vishkambha','Priti','Ayushman','Saubhagya','Shobhana','Atiganda','Sukarma','Dhriti','Shula','Ganda','Vriddhi','Dhruva','Vyaghata','Harshana','Vajra','Siddhi','Vyatipata','Variyana','Parigha','Shiva','Siddha','Sadhya','Shubha','Shukla','Brahma','Indra','Vaidhriti'];
 var KARANA_NAMES=['Kimstughna','Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti','Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti','Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti','Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti','Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti','Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti','Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti','Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti','Shakuni','Chatushpada','Naga'];
 function eventName(which,i){return which==='yoga'?YOGA_NAMES[i]:KARANA_NAMES[i];}
-function renderLunarWeek(which){
- var w=bounds(),start=w.start-2*DAY,end=w.end+2*DAY,step=2*3600000,changes=[],a=start,ia=yogaKaranaIndex(a,which);
+function renderLunarWeek(){
+ var w=bounds(),start=w.start-2*DAY,end=w.end+2*DAY,step=2*3600000,changes={yoga:[],karana:[]},current={yoga:yogaKaranaIndex(start,'yoga'),karana:yogaKaranaIndex(start,'karana')},a=start;
  for(var b=Math.min(a+step,end);;b=Math.min(b+step,end)){
-  var ib=yogaKaranaIndex(b,which);
-  if(ib!==ia){var lo=a,hi=b;while(hi-lo>1000){var mid=Math.floor((lo+hi)/2);if(yogaKaranaIndex(mid,which)===ia)lo=mid;else hi=mid;}changes.push({at:hi,index:ib});ia=ib;}
+  ['yoga','karana'].forEach(function(which){var ib=yogaKaranaIndex(b,which);if(ib!==current[which]){var lo=a,hi=b;while(hi-lo>1000){var mid=Math.floor((lo+hi)/2);if(yogaKaranaIndex(mid,which)===current[which])lo=mid;else hi=mid;}changes[which].push({at:hi,index:ib});current[which]=ib;}});
   if(b===end)break;a=b;
  }
- var cuts=[{at:start,index:yogaKaranaIndex(start,which)}].concat(changes,[{at:end,index:yogaKaranaIndex(end,which)}]);
  weekLabel.textContent=dayFmt(w.start,ctx.tz)+' – '+dayFmt(w.end-DAY,ctx.tz);
- var now=ctx.instant,nowLocal=now+ctx.tz*3600000,rows='';
- for(var day=0;day<7;day++){
-  var ds=w.start+day*DAY,de=ds+DAY,today=nowLocal>=ds&&nowLocal<de,events='';
-  for(var j=0;j<cuts.length-1;j++){
-   var a=cuts[j],b=cuts[j+1];if(b.at<=ds||a.at>=de)continue;
-   var active=today&&now>=a.at&&now<b.at;
-   events+='<div class="ja-panchang-event'+(active?' is-active':'')+'"><div class="ja-panchang-event-head"><strong>'+esc(eventName(which,a.index))+'</strong>'+(active?'<em>Current</em>':'')+'</div><div class="ja-panchang-duration">'+fmt(a.at,ctx.tz)+' – '+fmt(b.at,ctx.tz)+'</div></div>';
+ function part(which){var cuts=[{at:start,index:yogaKaranaIndex(start,which)}].concat(changes[which],[{at:end,index:yogaKaranaIndex(end,which)}]),rows='',nowLocal=ctx.instant+ctx.tz*3600000;
+  for(var day=0;day<7;day++){var ds=w.start+day*DAY,de=ds+DAY,today=nowLocal>=ds&&nowLocal<de,events='';
+   for(var j=0;j<cuts.length-1;j++){var x=cuts[j],y=cuts[j+1];if(y.at<=ds||x.at>=de)continue;var active=today&&ctx.instant>=x.at&&ctx.instant<y.at;events+='<div class="ja-panchang-event'+(active?' is-active':'')+'"><strong>'+esc(eventName(which,x.index))+'</strong><span class="ja-panchang-duration">'+fmt(x.at,ctx.tz)+' – '+fmt(y.at,ctx.tz)+'</span>'+(active?'<em class="ja-panchang-now">Current</em>':'')+'</div>';}
+   var dd=new Date(ds+ctx.tz*3600000);rows+='<tr class="'+(today?'is-today':'')+'"><th><span>'+DAYS[dd.getUTCDay()]+'</span><small>'+pad(dd.getUTCDate())+'/'+pad(dd.getUTCMonth()+1)+'</small></th><td>'+(events||'—')+'</td></tr>';
   }
-  var dd=new Date(ds+ctx.tz*3600000);
-  rows+='<tr class="'+(today?'is-today':'')+'"><th><span>'+DAYS[dd.getUTCDay()]+'</span><small>'+pad(dd.getUTCDate())+'/'+pad(dd.getUTCMonth()+1)+'/'+dd.getUTCFullYear()+'</small></th><td>'+(events||'—')+'</td></tr>';
+  var heading=which==='yoga'?'Yoga':'Karana';return '<section class="ja-panchang-section ja-panchang-half"><h3>'+heading+'</h3><div class="ja-panchang-table-wrap"><table class="ja-panchang-week-table"><thead><tr><th>Day</th><th>'+heading+' · Duration</th></tr></thead><tbody>'+rows+'</tbody></table></div></section>';
  }
- var heading=which==='yoga'?'Yoga':'Karana';
- bodyNode.innerHTML='<div class="ja-panchang-section"><h3>'+heading+'</h3><div class="ja-panchang-table-wrap"><table class="ja-panchang-week-table"><thead><tr><th>Day</th><th>'+heading+' and duration</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
+ bodyNode.innerHTML='<div class="ja-panchang-dual-grid ja-panchang-lunar-grid">'+part('yoga')+part('karana')+'</div>';
 }
 function localDayStart(ms,tz){var d=new Date(ms+tz*3600000);return Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate());}
 function sunEventForLocalDay(localMidnight,lat,lon,isRise){
@@ -136,29 +125,14 @@ function renderChaughadiyaHora(which){
 function renderInauspiciousWeek(){
  var w=bounds(),rahus=[8,2,7,5,6,4,3],guliks=[6,5,4,3,2,1,0],yamas=[4,3,2,1,0,6,5];
  weekLabel.textContent=dayFmt(w.start,ctx.tz)+' – '+dayFmt(w.end-DAY,ctx.tz);
- var nowLocal=ctx.instant+ctx.tz*3600000,rows='';
- var weekLocalDate=new Date(w.start+ctx.tz*3600000),firstLocalMid=Date.UTC(weekLocalDate.getUTCFullYear(),weekLocalDate.getUTCMonth(),weekLocalDate.getUTCDate());
- for(var day=0;day<7;day++){
-  var localMid=firstLocalMid+day*DAY,weekday=new Date(localMid).getUTCDay();
-  var rise=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,true),set=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,false);
-  var valid=Number.isFinite(rise)&&Number.isFinite(set)&&rise>0&&set>rise;
-  var today=nowLocal>=localMid&&nowLocal<localMid+DAY,events='';
-  if(valid){
-   var eighth=(set-rise)/8;
-   var entries=[
-    ['Rahu Kaal',rahus[weekday]-1],
-    ['Gulika Kaal',guliks[weekday]],
-    ['Yamghanta (Yamaganda)',yamas[weekday]]
-   ];
-   entries.forEach(function(item){
-    var start=rise+item[1]*eighth,end=start+eighth,active=ctx.instant>=start&&ctx.instant<end;
-    events+='<div class="ja-panchang-event'+(active?' is-active':'')+'"><div class="ja-panchang-event-head"><strong>'+item[0]+'</strong>'+(active?'<em>Current</em>':'')+'</div><div class="ja-panchang-duration">'+fmt(start,ctx.tz)+' – '+fmt(end,ctx.tz)+'</div></div>';
-   });
-  }else events='<span class="ja-panchang-empty">Sunrise / sunset unavailable for this date</span>';
-  var dd=new Date(localMid);
-  rows+='<tr class="'+(today?'is-today':'')+'"><th><span>'+DAYS[weekday]+'</span><small>'+pad(dd.getUTCDate())+'/'+pad(dd.getUTCMonth()+1)+'/'+dd.getUTCFullYear()+'</small></th><td>'+events+'</td></tr>';
+ var nowLocal=ctx.instant+ctx.tz*3600000,rows='',weekDate=new Date(w.start+ctx.tz*3600000),firstMid=Date.UTC(weekDate.getUTCFullYear(),weekDate.getUTCMonth(),weekDate.getUTCDate());
+ for(var day=0;day<7;day++){var localMid=firstMid+day*DAY,weekday=new Date(localMid).getUTCDay(),rise=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,true),set=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,false),valid=Number.isFinite(rise)&&Number.isFinite(set)&&rise>0&&set>rise,today=nowLocal>=localMid&&nowLocal<localMid+DAY,events='';
+  if(valid){var eighth=(set-rise)/8,entries=[['Rahu Kaal',rahus[weekday]-1],['Gulika Kaal',guliks[weekday]],['Yamghanta (Yamaganda)',yamas[weekday]]];
+   events='<div class="ja-panchang-inauspicious-grid">'+entries.map(function(item){var st=rise+item[1]*eighth,en=st+eighth,active=ctx.instant>=st&&ctx.instant<en;return '<div class="ja-panchang-event'+(active?' is-active':'')+'"><div class="ja-panchang-event-head"><strong>'+item[0]+'</strong>'+(active?'<em>Current</em>':'')+'</div><div class="ja-panchang-duration">'+fmt(st,ctx.tz)+' – '+fmt(en,ctx.tz)+'</div></div>';}).join('')+'</div>';
+  }else events='<span class="ja-panchang-empty">Sunrise / sunset unavailable</span>';
+  var dd=new Date(localMid);rows+='<tr class="'+(today?'is-today':'')+'"><th><span>'+DAYS[weekday]+'</span><small>'+pad(dd.getUTCDate())+'/'+pad(dd.getUTCMonth()+1)+'/'+dd.getUTCFullYear()+'</small></th><td>'+events+'</td></tr>';
  }
- bodyNode.innerHTML='<div class="ja-panchang-table-wrap"><table class="ja-panchang-week-table"><thead><tr><th>Day</th><th>Inauspicious periods · Sunrise-based</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+ bodyNode.innerHTML='<div class="ja-panchang-table-wrap"><table class="ja-panchang-week-table ja-panchang-inauspicious-table"><thead><tr><th>Day</th><th>Rahu Kaal · Gulika Kaal · Yamghanta</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
 }
 function transitHouseAt(ms){
  var local=new Date(ms+ctx.tz*3600000),chart=computeChart({y:local.getUTCFullYear(),m:local.getUTCMonth()+1,d:local.getUTCDate(),hh:local.getUTCHours(),mm:local.getUTCMinutes(),ss:local.getUTCSeconds(),tz:ctx.tz,lat:ctx.lat,lon:ctx.lon});
@@ -213,54 +187,18 @@ function ascSignAt(ms){
  return {sign:Math.floor(asc/30),asc:asc,jd:jd};
 }
 function renderSunriseLagnaDay(){
- var localMid=localDayStart(ctx.instant,ctx.tz),probe=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,true);
- if(ctx.instant<probe)localMid-=DAY;
- localMid+=dayOffset*DAY;
+ var localMid=localDayStart(ctx.instant,ctx.tz),probe=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,true);if(ctx.instant<probe)localMid-=DAY;localMid+=dayOffset*DAY;
  var sunrise=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,true),nextSunrise=sunEventForLocalDay(localMid+DAY,ctx.lat,ctx.lon,true);
- if(!Number.isFinite(sunrise)||!Number.isFinite(nextSunrise)||sunrise>=nextSunrise){
-  weekLabel.textContent='Sunrise data unavailable';
-  bodyNode.innerHTML='<div class="ja-panchang-current-summary"><strong>Unable to calculate the rising Lagna table.</strong><small>Check the selected location and date.</small></div>';return;
- }
- var startInfo=ascSignAt(sunrise),currentSign=startInfo.sign,segmentStart=sunrise,rows=[],step=5*60000;
- for(var t=sunrise+step;t<=nextSunrise;t+=step){
-  var checkTime=Math.min(t,nextSunrise),nextSign=ascSignAt(checkTime).sign;
-  if(nextSign!==currentSign){
-   var lo=segmentStart,hi=checkTime;
-   while(hi-lo>1000){var mid=Math.floor((lo+hi)/2);if(ascSignAt(mid).sign===currentSign)lo=mid;else hi=mid;}
-   rows.push({sign:currentSign,start:segmentStart,end:hi});
-   segmentStart=hi;currentSign=nextSign;
-  }
-  if(checkTime===nextSunrise)break;
- }
- if(segmentStart<nextSunrise)rows.push({sign:currentSign,start:segmentStart,end:nextSunrise});
- var dateLabel=dayFmt(sunrise,ctx.tz);
- weekLabel.textContent=dateLabel;
- var bodyRows='';
- rows.forEach(function(row){
-  var mid=Math.floor((row.start+row.end)/2),d=new Date(mid+ctx.tz*3600000),hours=d.getUTCHours()+d.getUTCMinutes()/60+d.getUTCSeconds()/3600,jd=julianDay(d.getUTCFullYear(),d.getUTCMonth()+1,d.getUTCDate(),hours-ctx.tz),lord=LAGNA_LORDS[row.sign],lordLon=siderealAt(jd).planets[lord]&&siderealAt(jd).planets[lord].lon;
-  var house=Number.isFinite(lordLon)?((Math.floor(lordLon/30)-row.sign+12)%12)+1:null;
-  var houseText=house?(house===1?'1st house':house===2?'2nd house':house===3?'3rd house':house+'th house'):'—';
-  var planetNames=['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn','Rahu','Ketu'];
-  var conjunctions=[],aspectedBy=[],planetsInLagna=[],aspectingLagna=[];
-  var allPositions=siderealAt(jd).planets;
-  var lordSign=Number.isFinite(lordLon)?Math.floor(lordLon/30):-1;
-  var aspectOffsets={Sun:[7],Moon:[7],Mars:[4,7,8],Mercury:[7],Jupiter:[5,7,9],Venus:[7],Saturn:[3,7,10],Rahu:[5,7,9],Ketu:[5,7,9]};
-  planetNames.forEach(function(p){
-   var pl=allPositions[p],plSign=Number.isFinite(pl&&pl.lon)?Math.floor(pl.lon/30):-1;
-   if(plSign<0)return;
-   if(plSign===row.sign)planetsInLagna.push(p);
-   var offsets=aspectOffsets[p]||[7];
-   var lagnaHouseFromPlanet=((row.sign-plSign+12)%12)+1;
-   if(offsets.indexOf(lagnaHouseFromPlanet)>=0)aspectingLagna.push(p);
-   if(p===lord||lordSign<0)return;
-   if(plSign===lordSign)conjunctions.push(p);
-   var lordHouseFromPlanet=((lordSign-plSign+12)%12)+1;
-   if(offsets.indexOf(lordHouseFromPlanet)>=0)aspectedBy.push(p);
-  });
-  var active=ctx.instant>=row.start&&ctx.instant<row.end;
-  bodyRows+='<tr class="'+(active?'is-today':'')+'"><td><strong>'+SIGNS[row.sign][0]+'</strong><small>'+SIGNS[row.sign][1]+'</small></td><td>'+LAGNA_TYPES[row.sign]+'</td><td>'+lord+'</td><td>'+houseText+'</td><td>'+ (conjunctions.length?conjunctions.join(', '):'—') +'</td><td>'+ (aspectedBy.length?aspectedBy.join(', '):'—') +'</td><td>'+ (planetsInLagna.length?planetsInLagna.join(', '):'—') +'</td><td>'+ (aspectingLagna.length?aspectingLagna.join(', '):'—') +'</td><td class="ja-panchang-duration">'+fmtClock(row.start,ctx.tz)+' – '+fmtClock(row.end,ctx.tz)+(active?' <em class="ja-panchang-now">Now</em>':'')+'</td></tr>';
+ if(!Number.isFinite(sunrise)||!Number.isFinite(nextSunrise)||sunrise>=nextSunrise){weekLabel.textContent='Sunrise data unavailable';bodyNode.innerHTML='<div class="ja-panchang-current-summary"><strong>Unable to calculate the rising Lagna table.</strong><small>Check the selected location and date.</small></div>';return;}
+ var currentSign=ascSignAt(sunrise).sign,segmentStart=sunrise,rows=[],step=5*60000;
+ for(var t=sunrise+step;t<=nextSunrise;t+=step){var checkTime=Math.min(t,nextSunrise),nextSign=ascSignAt(checkTime).sign;if(nextSign!==currentSign){var lo=segmentStart,hi=checkTime;while(hi-lo>1000){var mid=Math.floor((lo+hi)/2);if(ascSignAt(mid).sign===currentSign)lo=mid;else hi=mid;}rows.push({sign:currentSign,start:segmentStart,end:hi});segmentStart=hi;currentSign=nextSign;}if(checkTime===nextSunrise)break;}
+ if(segmentStart<nextSunrise)rows.push({sign:currentSign,start:segmentStart,end:nextSunrise});weekLabel.textContent=dayFmt(sunrise,ctx.tz);
+ var bodyRows='',offsets={Sun:[7],Moon:[7],Mars:[4,7,8],Mercury:[7],Jupiter:[5,7,9],Venus:[7],Saturn:[3,7,10],Rahu:[5,7,9],Ketu:[5,7,9]},names=['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn','Rahu','Ketu'];
+ rows.forEach(function(row){var mid=Math.floor((row.start+row.end)/2),d=new Date(mid+ctx.tz*3600000),hours=d.getUTCHours()+d.getUTCMinutes()/60+d.getUTCSeconds()/3600,jd=julianDay(d.getUTCFullYear(),d.getUTCMonth()+1,d.getUTCDate(),hours-ctx.tz),lord=LAGNA_LORDS[row.sign],positions=siderealAt(jd).planets,lordLon=positions[lord]&&positions[lord].lon,lordSign=Number.isFinite(lordLon)?Math.floor(lordLon/30):-1,house=lordSign>=0?((lordSign-row.sign+12)%12)+1:null,houseText=house?(house===1?'1st':house===2?'2nd':house===3?'3rd':house+'th')+' house':'—',conjunctions=[],aspectedBy=[],inLagna=[],aspecting=[];
+  names.forEach(function(p){var pl=positions[p],sign=Number.isFinite(pl&&pl.lon)?Math.floor(pl.lon/30):-1;if(sign<0)return;if(sign===row.sign)inLagna.push(p);var asp=offsets[p]||[7],houseFrom=((row.sign-sign+12)%12)+1;if(asp.indexOf(houseFrom)>=0)aspecting.push(p);if(p===lord||lordSign<0)return;if(sign===lordSign)conjunctions.push(p);var lordHouse=((lordSign-sign+12)%12)+1;if(asp.indexOf(lordHouse)>=0)aspectedBy.push(p);});
+  var active=ctx.instant>=row.start&&ctx.instant<row.end;bodyRows+='<tr class="'+(active?'is-today':'')+'"><td><strong>'+SIGNS[row.sign][0]+'</strong><small>'+SIGNS[row.sign][1]+'</small></td><td class="ja-panchang-duration">'+fmtClock(row.start,ctx.tz)+' – '+fmtClock(row.end,ctx.tz)+(active?' <em class="ja-panchang-now">Now</em>':'')+'</td><td>'+LAGNA_TYPES[row.sign]+'</td><td>'+lord+'</td><td>'+houseText+'</td><td>'+ (conjunctions.length?conjunctions.join(', '):'—') +'</td><td>'+ (aspectedBy.length?aspectedBy.join(', '):'—') +'</td><td>'+ (inLagna.length?inLagna.join(', '):'—') +'</td><td>'+ (aspecting.length?aspecting.join(', '):'—') +'</td></tr>';
  });
- bodyNode.innerHTML='<h3 class="ja-panchang-main-heading">Rising Lagna</h3><div class="ja-panchang-day-range"><span>Panchang day</span><strong>'+fmtClock(sunrise,ctx.tz)+' – '+fmtClock(nextSunrise,ctx.tz)+'</strong><small>12 successive rising signs · Sunrise to next sunrise</small></div><div class="ja-panchang-table-wrap"><table class="ja-panchang-week-table ja-panchang-lagna-table"><thead><tr><th>Sign</th><th>Category</th><th>Lagna Lord</th><th>Lord Placement</th><th>Conjunction Planets (Lagna Lord)</th><th>Aspected by</th><th>Planets in Lagna</th><th>Planets Aspecting Lagna</th><th>Duration (HH:MM)</th></tr></thead><tbody>'+bodyRows+'</tbody></table></div>';
+ bodyNode.innerHTML='<div class="ja-panchang-table-wrap ja-panchang-lagna-wrap"><table class="ja-panchang-week-table ja-panchang-lagna-table"><thead><tr><th>Sign</th><th>Duration</th><th>Category</th><th>Lagna Lord</th><th>Lord Placement</th><th>Conjunction with Lord</th><th>Aspected by</th><th>Planets in Lagna</th><th>Planets Aspecting Lagna</th></tr></thead><tbody>'+bodyRows+'</tbody></table></div>';
 }
 function fmtClock(ms,tz){var d=new Date(ms+tz*3600000);return pad(d.getUTCHours())+':'+pad(d.getUTCMinutes());}
 function renderOther(k){
