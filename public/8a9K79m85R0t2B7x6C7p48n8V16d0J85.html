@@ -37,6 +37,13 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@5.0.2/dist/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
+<style id="ja-special-points-styles">
+.ja-special-points-card{margin:14px 0;min-width:0}.ja-special-points-table{width:100%;border-collapse:separate;border-spacing:0;min-width:620px}
+.ja-special-points-table th{position:sticky;top:0;z-index:2;background:var(--surface,#fff);text-align:left;font-size:.76rem;letter-spacing:.035em;color:var(--muted,#777);font-weight:650;padding:10px 12px;border-bottom:1px solid var(--line-strong,#ddd)}
+.ja-special-points-table td{padding:9px 12px;border-bottom:1px solid var(--line,#eee);font-size:.88rem;font-weight:400}
+.ja-special-points-table tbody tr:nth-child(even){background:rgba(140,130,155,.055)}.ja-special-points-table tbody tr:hover{background:rgba(224,122,31,.09)}
+.ja-special-points-table .num{font-variant-numeric:tabular-nums;white-space:nowrap}.ja-special-points-scroll{max-width:100%;overflow:auto}.ja-special-points-note{font-size:.75rem;margin:9px 2px 0;line-height:1.5}
+</style>
 </head>
 </html>
 
@@ -3693,6 +3700,58 @@ function showProfileReviewConfirm(mode, currentData, newData) {
 
 
 /* ================= COMPREHENSIVE KUNDALI BUNDLE ================= */
+
+/* ===== Classical Upagrahas & Special Lagnas (sidereal Lahiri) ===== */
+const JA_WEEKDAY_LORDS=['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn'];
+const JA_INDU_KALA={Sun:30,Moon:16,Mars:6,Mercury:8,Jupiter:10,Venus:12,Saturn:1};
+function jaLocalMidnightMs(input,shift=0){return Date.UTC(input.y,input.m-1,input.d+shift)-Number(input.tz)*3600000;}
+function jaSunriseSunset(input,shift=0){const ms=jaLocalMidnightMs(input,shift);return{sunrise:calculateSunEventUTC(ms,input.lat,input.lon,true),sunset:calculateSunEventUTC(ms,input.lat,input.lon,false)};}
+function jaAscSiderealAtMs(ms,input){const jd=ms/86400000+2440587.5;return rev(ascendant(jd,input.lat,input.lon)-lahiri(jd));}
+function jaSunSiderealAtMs(ms){return siderealAt(ms/86400000+2440587.5).planets.Sun.lon;}
+function jaBirthSunriseContext(input){
+ const birthMs=jdToMs(julianDay(input.y,input.m,input.d,input.hh+input.mm/60+(input.ss||0)/3600-input.tz));
+ let shift=0,ev=jaSunriseSunset(input,0);
+ if(!Number.isFinite(ev.sunrise)||!Number.isFinite(ev.sunset))throw new Error('Sunrise/sunset unavailable for this location and date.');
+ if(birthMs<ev.sunrise){shift=-1;ev=jaSunriseSunset(input,-1);}
+ const next=jaSunriseSunset(input,shift+1),nextSunrise=Number.isFinite(next.sunrise)?next.sunrise:ev.sunrise+86400000;
+ const isDay=birthMs>=ev.sunrise&&birthMs<ev.sunset, start=isDay?ev.sunrise:ev.sunset,end=isDay?ev.sunset:nextSunrise;
+ const weekday=new Date(jaLocalMidnightMs(input,shift)).getUTCDay(),first=JA_WEEKDAY_LORDS[isDay?weekday:(weekday+4)%7];
+ const startIndex=JA_WEEKDAY_LORDS.indexOf(first);
+ return{birthMs,sunrise:ev.sunrise,sunset:ev.sunset,isDay,start,end,order:Array.from({length:8},(_,i)=>JA_WEEKDAY_LORDS[(startIndex+i)%7])};
+}
+function jaVarnadaCount(s){return s%2===0?s+1:12-s;}
+function jaVarnadaSign(a,h){const x=jaVarnadaCount(a),y=jaVarnadaCount(h),n=x%2===y%2?x+y:Math.abs(x-y);if(!n)return 11;return n%2?(n-1)%12:(12-(n%12))%12;}
+function jaSpecialPointRows(k){
+ const input=k.input,ch=k.ch,ctx=jaBirthSunriseContext(input),elapsedGhati=(ctx.birthMs-ctx.sunrise)/86400000*60;
+ const sunriseSun=jaSunSiderealAtMs(ctx.sunrise),sun=ch.planets.Sun.lon,points=[];
+ const add=(name,lon,source)=>points.push({name,lon:rev(lon),source});
+ // BPHS ch.5: 6°, 12°, 30° per elapsed ghati from sunrise.
+ add('Bhava Lagna',sunriseSun+elapsedGhati*6,'BPHS ch.5 vv.2–3');
+ const hora=rev(sunriseSun+elapsedGhati*12);add('Hora Lagna',hora,'BPHS ch.5 vv.4–5');
+ add('Ghati Lagna',sunriseSun+elapsedGhati*30,'BPHS ch.5 vv.6–8');
+ points.push({name:'Vighati Lagna',lon:null,source:'Not separately defined in BPHS ch.5'});
+ // BPHS ch.3 vv.61–64: solar Upagraha chain.
+ const dhooma=rev(sun+133+20/60),vyatipata=rev(360-dhooma),parivesha=rev(vyatipata+180),indra=rev(360-parivesha),upaketu=rev(indra+16+40/60);
+ add('Dhooma',dhooma,'BPHS ch.3 vv.61–64');add('Vyatipata',vyatipata,'BPHS ch.3 vv.61–64');
+ add('Parivesha',parivesha,'BPHS ch.3 vv.61–64');add('Indra Chapa',indra,'BPHS ch.3 vv.61–64');add('Upaketu',upaketu,'BPHS ch.3 vv.61–64');
+ // BPHS ch.3 vv.66–70: ascendant at the start of the weekday-ordered eighth.
+ const duration=(ctx.end-ctx.start)/8,atPart=lord=>{const i=ctx.order.indexOf(lord);return i<0||i>6?null:jaAscSiderealAtMs(ctx.start+i*duration,input);};
+ const gulika=atPart('Saturn');add('Gulika',gulika,'BPHS ch.3 vv.66–70; ascendant at Saturn portion start');add('Mandi',gulika,'Same BPHS Gulika point; alternate name');add('Kaala',atPart('Sun'),'BPHS ch.3 vv.66–70; ascendant at Sun portion start');
+ // BPHS ch.3 vv.71–74: elapsed vighatis / 15, converted to signs/degrees.
+ const vighatis=(ctx.birthMs-ctx.sunrise)/24000,ppAdvance=(vighatis/15)*30,sunSign=signOf(sun),modality=sunSign%3,offset=modality===1?240:modality===2?120:0;
+ add('Pranapada Lagna',sun+ppAdvance+offset,'BPHS ch.3 vv.71–74');
+ // BPHS ch.5 vv.10–13: Varnada is sign-only.
+ add('Varnada Lagna',jaVarnadaSign(k.ascSign,signOf(hora))*30,'BPHS ch.5 vv.10–13; sign-only');
+ // Supplementary classical methods, explicitly distinguished from BPHS.
+ const ninthAsc=(k.ascSign+8)%12,ninthMoon=(k.moonSign+8)%12,lord=s=>SIGN_LORD[s];
+ const count=((JA_INDU_KALA[lord(ninthAsc)]||0)+(JA_INDU_KALA[lord(ninthMoon)]||0))%12||12;
+ add('Indu Lagna',((k.moonSign+count-1)%12)*30,'Uttara Kalamrita; sign-only');
+ const nk=nakOf(ch.planets.Moon.lon);add('Sree Lagna',ch.asc+nk.frac*360,'Classical Sree Lagna: nakshatra fraction × 360°, added to natal Lagna');
+ add('Bhrigu Bindu',ch.planets.Rahu.lon+signedLongitudeDelta(ch.planets.Rahu.lon,ch.planets.Moon.lon)/2,'Traditional midpoint of shortest Rahu–Moon arc');
+ const order=['Mandi','Gulika','Bhava Lagna','Hora Lagna','Ghati Lagna','Vighati Lagna','Varnada Lagna','Sree Lagna','Pranapada Lagna','Indu Lagna','Bhrigu Bindu','Dhooma','Vyatipata','Parivesha','Indra Chapa','Upaketu','Kaala'];
+ return order.map(name=>{const p=points.find(x=>x.name===name);if(!p||!Number.isFinite(p.lon))return{name,degree:'—',sign:'—',nakshatra:'—',navamsa:'—',source:p?.source||'Not calculated'};const lon=rev(p.lon),sg=signOf(lon),nk=nakOf(lon);return{...p,degree:dms(lon%30),sign:SIGNS[sg][0],nakshatra:NAK[nk.i][0],navamsa:SIGNS[navamsaOf(lon)][0]};});
+}
+
 function buildCompleteKundali(input, offsetDays = 0) {
   const ch = computeChart(input);
   const ascSign = signOf(ch.asc);
@@ -4099,7 +4158,20 @@ const RenderTabs = {
           <p class="aspect-note" id="${prefix}-ov-sec-asp">Hover over any planet to inspect aspects.</p>
         </article>
       </div>
-      <div class="three">
+      
+      <article class="card ja-special-points-card">
+        <header style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+          <div><h3>Upagrahas &amp; Special Lagnas</h3><p class="sub">Classical reference points · Sidereal Lahiri</p></div>
+        </header>
+        <div class="scroll ja-special-points-scroll">
+          <table class="ja-special-points-table">
+            <thead><tr><th>Name</th><th>Degree</th><th>Sign</th><th>Nakshatra</th><th>Navamsa</th></tr></thead>
+            <tbody>${jaSpecialPointRows(k).map(p=>`<tr title="${esc(p.source)}"><td>${esc(p.name)}</td><td class="num">${esc(p.degree)}</td><td>${esc(p.sign)}</td><td>${esc(p.nakshatra)}</td><td>${esc(p.navamsa)}</td></tr>`).join('')}</tbody>
+          </table>
+        </div>
+        <p class="sub ja-special-points-note">Vighati Lagna is left blank because BPHS does not define it as a separate longitude. Varnada and Indu are sign-only in their cited methods; 0° is used as the sign anchor. Hover over a row for its calculation source.</p>
+      </article>
+<div class="three">
         <article class="card">
           <header><h3>Avkahada Chakra</h3></header>
           <dl class="kv">
