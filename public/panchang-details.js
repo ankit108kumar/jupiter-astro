@@ -217,7 +217,7 @@ function render(){
  if(cacheKey){renderCache[cacheKey]={html:bodyNode.innerHTML,label:weekLabel.textContent};renderCacheOrder.push(cacheKey);if(renderCacheOrder.length>24){delete renderCache[renderCacheOrder.shift()];}}
 }
 function close(){modal.hidden=true;document.body.classList.remove('ja-panchang-modal-open');windowMinimized=false;modal.querySelector('.ja-panchang-dialog').classList.remove('is-minimized','is-maximized');}
-async async function open(k){
+async function open(k){
  var authUser=window.jaAuthUser||(window.firebaseAuth&&window.firebaseAuth.currentUser)||null;
  if(!authUser&&window.jaAuthReady&&typeof window.jaAuthReady.then==='function'){
   try{authUser=await window.jaAuthReady;}catch(_){authUser=null;}
