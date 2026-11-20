@@ -94,7 +94,7 @@ function renderLunarWeek(which){
   rows+='<tr class="'+(today?'is-today':'')+'"><th><span>'+DAYS[dd.getUTCDay()]+'</span><small>'+pad(dd.getUTCDate())+'/'+pad(dd.getUTCMonth()+1)+'/'+dd.getUTCFullYear()+'</small></th><td>'+(events||'—')+'</td></tr>';
  }
  var heading=which==='yoga'?'Yoga':'Karana';
- bodyNode.innerHTML='<div class="ja-panchang-section"><h3>'+heading+'</h3><div class="ja-panchang-table-wrap"><table class="ja-panchang-week-table"><thead><tr><th>Day</th><th>'+heading+' and duration</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
+ bodyNode.innerHTML=panelTabs(['yoga','karana'])+'<div class="ja-panchang-section"><h3>'+heading+'</h3><div class="ja-panchang-table-wrap"><table class="ja-panchang-week-table"><thead><tr><th>Day</th><th>'+heading+' and duration</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
 }
 function localDayStart(ms,tz){var d=new Date(ms+tz*3600000);return Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate());}
 function sunEventForLocalDay(localMidnight,lat,lon,isRise){
