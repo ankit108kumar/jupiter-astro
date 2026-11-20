@@ -96,7 +96,7 @@ function renderLunarWeek(which){
  var heading=which==='yoga'?'Yoga':'Karana';
  bodyNode.innerHTML='<div class="ja-panchang-section"><h3>'+heading+'</h3><div class="ja-panchang-table-wrap"><table class="ja-panchang-week-table"><thead><tr><th>Day</th><th>'+heading+' and duration</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
 }
-function localDayStart(ms,tz){var d=new Date(ms+tz*3600000);return Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate())-tz*3600000;}
+function localDayStart(ms,tz){var d=new Date(ms+tz*3600000);return Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate());}
 function sunEventForLocalDay(localMidnight,lat,lon,isRise){
  var utcDate=new Date(localMidnight),utcMidnight=Date.UTC(utcDate.getUTCFullYear(),utcDate.getUTCMonth(),utcDate.getUTCDate());
  if(typeof sunCross==='function'&&typeof RAD!=='undefined'){
