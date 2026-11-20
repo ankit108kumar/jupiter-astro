@@ -138,7 +138,7 @@ function renderOther(k){
  bodyNode.innerHTML='<div class="ja-panchang-current-summary"><span>'+esc(labels[k])+'</span><strong>'+esc(vals)+'</strong></div>';
 }
 function panelTabs(items){return '<div class="ja-panchang-panel-tabs">'+items.map(function(x){var label=x.charAt(0).toUpperCase()+x.slice(1);return '<button type="button" data-panel="'+x+'" class="'+(activePanel===x?'is-active':'')+'">'+label+'</button>';}).join('')+'</div>';}
-function render(){if(kind==='tithi'||kind==='nak')renderWeek(kind);else if(kind==='yogaGroup')bodyNode.innerHTML=panelTabs(['yoga','karana'])+(function(){renderLunarWeek(activePanel);return bodyNode.innerHTML;})();else if(kind==='chaughadiyaGroup')renderChaughadiyaHora(activePanel);else renderOther(kind);}
+function render(){if(kind==='tithi'||kind==='nak')renderWeek(kind);else if(kind==='yogaGroup')renderLunarWeek(activePanel);else if(kind==='chaughadiyaGroup')renderChaughadiyaHora(activePanel);else renderOther(kind);}
 function close(){modal.hidden=true;document.body.classList.remove('ja-panchang-modal-open');}
 function open(k){
  if(!(window.firebaseAuth&&window.firebaseAuth.currentUser)&&!window.jaAuthUser){var b=document.getElementById('accountOpenBtn');if(b)b.click();return;}
