@@ -21,10 +21,52 @@
   var dragState = null;
   var themeMode = "website";
   var authPrompt = null;
+  var moonTransitMatrix = null;
+  var moonTransitMatrixPromise = null;
+  var moonTransitMatrixLoadFailed = false;
 
   try {
     themeMode = localStorage.getItem(THEME_KEY) === "apple" ? "apple" : "website";
   } catch (error) {}
+
+  function loadMoonTransitMatrix() {
+    if (moonTransitMatrix) return Promise.resolve(moonTransitMatrix);
+    if (moonTransitMatrixPromise) return moonTransitMatrixPromise;
+    if (moonTransitMatrixLoadFailed) return Promise.resolve(null);
+    moonTransitMatrixPromise = fetch("/data/moon_nakshatra_transit_matrix.json", {
+      credentials: "same-origin",
+      cache: "force-cache"
+    }).then(function (response) {
+      if (!response.ok) throw new Error("Moon transit matrix HTTP " + response.status);
+      return response.json();
+    }).then(function (matrix) {
+      if (!matrix || !Array.isArray(matrix.nakshatras) || !matrix.results) {
+        throw new Error("Moon transit matrix has an invalid structure.");
+      }
+      moonTransitMatrix = matrix;
+      return matrix;
+    }).catch(function (error) {
+      moonTransitMatrixLoadFailed = true;
+      console.warn("Moon transit result matrix could not be loaded.", error);
+      return null;
+    });
+    return moonTransitMatrixPromise;
+  }
+
+  function moonTransitMatrixResult(data) {
+    if (!moonTransitMatrix || !data) return "";
+    var count = Number(data.moonTransitCount);
+    var referenceNakshatra = String(data.referenceMoonNakshatra || "");
+    if (!Number.isInteger(count) || count < 1 || count > 27 || !referenceNakshatra) return "";
+    var row = moonTransitMatrix.results[String(count)];
+    return row && typeof row[referenceNakshatra] === "string" ? row[referenceNakshatra] : "";
+  }
+
+  function isSameMinute(firstMs, secondMs) {
+    var first = Number(firstMs), second = Number(secondMs);
+    return Number.isFinite(first) && Number.isFinite(second) &&
+      Math.floor(first / 60000) === Math.floor(second / 60000);
+  }
 
   function isApplePlatform() {
     var platform = "";
@@ -706,8 +748,11 @@
         : '';
       var nakshatraHtml = escapeTableText(row.nakshatra) + lattaMarker +
         (nakshatraLord ? ' <span class="jtt-nak-lord">(' + nakshatraLord + ')</span>' : '');
-      var murti = row.planet === "Moon" ? "" : escapeTableText(row.murti || "");
-      var murtiTone = row.planet === "Moon" ? "" :
+      var murti = escapeTableText(row.murti || "");
+      var murtiTone = row.murti === "Excellent" ? " jtt-murti-excellent" :
+        row.murti === "Satisfactory" ? " jtt-murti-satisfactory" :
+        row.murti === "Bad" ? " jtt-murti-bad" :
+        row.murti === "Very Bad" ? " jtt-murti-very-bad" :
         row.murti === "Gold" ? " jtt-murti-gold" :
         row.murti === "Silver" ? " jtt-murti-silver" :
         row.murti === "Copper" ? " jtt-murti-copper" :
@@ -1407,7 +1452,21 @@
 
     try {
       removeDurationTooltip();
-      host.innerHTML = renderTransitTable(context.getTransitTableData());
+      var transitData = context.getTransitTableData();
+      var moonRow = transitData && Array.isArray(transitData.rows)
+        ? transitData.rows.find(function (row) { return row && row.planet === "Moon"; })
+        : null;
+      if (moonRow) {
+        var suppressPrashnaResult = transitData.isPrashnaChart === true &&
+          isSameMinute(transitData.birthMs, transitData.evalMs);
+        moonRow.murti = suppressPrashnaResult ? "" : moonTransitMatrixResult(transitData);
+      }
+      host.innerHTML = renderTransitTable(transitData);
+      if (!moonTransitMatrix && !moonTransitMatrixLoadFailed) {
+        loadMoonTransitMatrix().then(function (matrix) {
+          if (matrix && windowEl && windowEl.classList.contains("jtt-open")) renderTransitTableFromContext();
+        });
+      }
       bindDurationTooltips(host);
       bindHouseResultTooltips(host);
       bindPlanetSignificationHover(host);
