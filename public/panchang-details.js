@@ -241,10 +241,11 @@ function init(){
  function stopPanchangDrag(){dragState=null;}
  dragHandle.addEventListener('pointerup',stopPanchangDrag);dragHandle.addEventListener('pointercancel',stopPanchangDrag);
  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!modal.hidden)close();});
- var cards=document.querySelectorAll('#panchangCardBlock .panchang-item'),kinds=['date','sun','tithi','nak','yogaGroup','chaughadiyaGroup','inauspicious','abhijit'];
- Array.prototype.forEach.call(cards,function(card,i){if(i===0)return;var k=kinds[i];card.classList.add('ja-panchang-clickable');card.setAttribute('role','button');card.setAttribute('tabindex','0');card.setAttribute('aria-haspopup','dialog');card.addEventListener('click',function(){open(k);});card.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();open(k);}});});
-
+ // Card clicks are delegated by the page's lazy-loader. Do not attach a second
+ // card handler here; doing so caused duplicate opens and timing conflicts.
 }
 document.addEventListener('ja-panchang-open',function(e){var k=e&&e.detail&&e.detail.kind;if(k)open(k);});
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+// This file is injected only after a user clicks a card. Initialise immediately:
+// waiting for DOMContentLoaded can leave the first open event with null modal nodes.
+init();
 })();
