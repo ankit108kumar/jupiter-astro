@@ -1273,7 +1273,7 @@
     }
 
     var expression = new RegExp("(" + terms.map(function (term) {
-      return term.replace(/[.*+?^${}()|[\]\\]/g, "\\  function renderTransitTableFromContext() {");
+      return term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     }).join("|") + ")", "gi");
     var cursor = 0;
     var match;
