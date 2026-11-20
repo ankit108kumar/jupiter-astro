@@ -34,7 +34,7 @@ function longitudes(ms){
 function indices(ms){var p=longitudes(ms);return {tithi:Math.min(29,Math.floor(rev(p.moon-p.sun)/12)),nak:Math.min(26,Math.floor(p.moon/(40/3)))};}
 function name(k,i){if(k==='nak')return PANCHANG_REFERENCE.nakshatras[i].name;var n=i%15;return (i<15?'Shukla ':'Krishna ')+(n===14?(i<15?'Purnima':'Amavasya'):TN[n]);}
 function meta(k,i){
- if(k==='nak'){var n=PANCHANG_REFERENCE.nakshatras[i];return [['Nakshatra Lord',n.lord],['Nakshatra Deity',n.deity],['Cat.',n.category],['Letter',n.letters.join(' · ')],['Tree',n.tree],['Flower',n.flower]];}
+ if(k==='nak'){var n=PANCHANG_REFERENCE.nakshatras[i];return [['Ruling Planet',n.lord],['Nakshatra Deity',n.deity],['Symbol',n.symbol],['Shape',n.shape],['Color',n.color],['Animals',n.animal],['Birds',n.bird],['Body Parts',n.bodyPart],['Nature',n.nature],['Object',n.object],['Category',n.category],['Naming Letters',n.letters.join(' · ')],['Associated Tree',n.tree],['Associated Flower',n.flower]];}
  var n=i%15,ref=PANCHANG_REFERENCE.tithis[n],planet=PANCHANG_REFERENCE.planets.find(function(p){return p.planet===ref.lord;});
  var category=CAT[n%5];
  return [['Tithi Category',category],['Tithi Lord',ref.lord],['Tithi Deity',ref.deity],['Planet Deity',planet?planet.deity:'—'],['Planet Nature',planet?planet.nature:'—']];
