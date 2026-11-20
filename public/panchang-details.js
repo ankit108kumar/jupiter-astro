@@ -217,7 +217,7 @@ function renderSunriseLagnaDay(){
   weekLabel.textContent='Sunrise data unavailable';
   bodyNode.innerHTML='<div class="ja-panchang-current-summary"><strong>Unable to calculate the rising Lagna table.</strong><small>Check the selected location and date.</small></div>';return;
  }
- var startInfo=ascSignAt(sunrise),currentSign=startInfo.sign,segmentStart=sunrise,rows=[],step=60000;
+ var startInfo=ascSignAt(sunrise),currentSign=startInfo.sign,segmentStart=sunrise,rows=[],step=5*60000;
  for(var t=sunrise+step;t<=nextSunrise;t+=step){
   var checkTime=Math.min(t,nextSunrise),nextSign=ascSignAt(checkTime).sign;
   if(nextSign!==currentSign){
