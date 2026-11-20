@@ -538,3 +538,31 @@
  letter-spacing:.08px;
  text-decoration:none;
 }
+
+
+/* Global quiet scrollbar treatment: functional, thin and low-contrast. */
+html,body,*{scrollbar-width:thin;scrollbar-color:#c9c6d0 transparent}
+*::-webkit-scrollbar{width:5px;height:5px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:rgba(151,146,163,.38);border:0;border-radius:999px}
+*::-webkit-scrollbar-thumb:hover{background:rgba(130,125,143,.52)}
+*::-webkit-scrollbar-corner{background:transparent}
+
+/* Stable Panchang window geometry: table columns adapt inside the window. */
+.ja-panchang-dialog{width:min(1120px,96vw)!important;min-width:0!important;max-width:96vw!important}
+.ja-panchang-dialog .ja-panchang-heading-row{min-width:0}
+.ja-panchang-dialog .ja-panchang-heading-row>div:first-child{flex:1 1 auto;min-width:0}
+.ja-panchang-dialog .ja-panchang-week-nav{display:flex!important;flex:0 0 auto!important;justify-content:flex-end!important;align-items:center!important;gap:8px!important;min-width:0!important}
+.ja-panchang-dialog .ja-panchang-week-nav button{width:116px!important;min-width:116px!important;max-width:116px!important;min-height:35px!important;flex:0 0 116px!important;white-space:nowrap!important}
+.ja-panchang-dialog .ja-panchang-week-nav button[data-now]{width:72px!important;min-width:72px!important;max-width:72px!important;flex-basis:72px!important}
+.ja-panchang-dialog .ja-panchang-dialog-body{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important}
+.ja-panchang-dialog .ja-panchang-table-wrap{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important}
+.ja-panchang-dialog .ja-panchang-week-table{width:100%;table-layout:auto}
+.ja-panchang-dialog[data-ja-panchang-kind="inauspicious"] .ja-inauspicious-week-range{display:none!important}
+@media(max-width:760px){
+ .ja-panchang-dialog{width:96vw!important;max-width:96vw!important}
+ .ja-panchang-dialog .ja-panchang-heading-row{align-items:flex-start!important;flex-direction:column!important}
+ .ja-panchang-dialog .ja-panchang-week-nav{width:100%!important;justify-content:flex-end!important}
+ .ja-panchang-dialog .ja-panchang-week-nav button{width:auto!important;min-width:0!important;max-width:none!important;flex:1 1 0!important}
+ .ja-panchang-dialog .ja-panchang-week-nav button[data-now]{flex:0 0 64px!important}
+}
