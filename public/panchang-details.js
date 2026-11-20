@@ -126,7 +126,7 @@ function renderChaughadiyaHora(which){
 }
 function renderInauspiciousWeek(){
  var w=bounds(),rahus=[8,2,7,5,6,4,3],guliks=[6,5,4,3,2,1,0],yamas=[4,3,2,1,0,6,5];
- weekLabel.textContent=dayFmt(w.start,ctx.tz)+' – '+dayFmt(w.end-DAY,ctx.tz);
+ weekLabel.textContent='';
  var nowLocal=ctx.instant+ctx.tz*3600000,rows='',weekDate=new Date(w.start+ctx.tz*3600000),firstMid=Date.UTC(weekDate.getUTCFullYear(),weekDate.getUTCMonth(),weekDate.getUTCDate());
  for(var day=0;day<7;day++){var localMid=firstMid+day*DAY,weekday=new Date(localMid).getUTCDay(),rise=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,true),set=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,false),valid=Number.isFinite(rise)&&Number.isFinite(set)&&rise>0&&set>rise,today=nowLocal>=localMid&&nowLocal<localMid+DAY,events='';
   if(valid){var eighth=(set-rise)/8,entries=[['Rahu Kaal',rahus[weekday]-1],['Gulika Kaal',guliks[weekday]],['Yamghanta (Yamaganda)',yamas[weekday]]];
@@ -161,7 +161,7 @@ function transitHouseIntervals(start,end,wanted){
 }
 function renderAuspiciousWeek(){
  var w=bounds(),wanted=[1,5,7,9],rows='';
- weekLabel.textContent=dayFmt(w.start,ctx.tz)+' – '+dayFmt(w.end-DAY,ctx.tz);
+ weekLabel.textContent='';
  var nowLocal=ctx.instant+ctx.tz*3600000,firstLocal=new Date(w.start+ctx.tz*3600000),firstMid=Date.UTC(firstLocal.getUTCFullYear(),firstLocal.getUTCMonth(),firstLocal.getUTCDate());
  for(var day=0;day<7;day++){
   var localMid=firstMid+day*DAY,weekday=new Date(localMid).getUTCDay(),rise=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,true),set=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,false),nextRise=sunEventForLocalDay(localMid+DAY,ctx.lat,ctx.lon,true),today=nowLocal>=localMid&&nowLocal<localMid+DAY;
