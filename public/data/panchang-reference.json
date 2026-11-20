@@ -1,0 +1,511 @@
+{
+  "planets": [
+    {
+      "planet": "Sun",
+      "deity": "Surya (Sun God)",
+      "nature": "Authoritative, Energetic"
+    },
+    {
+      "planet": "Moon",
+      "deity": "Chandra, Parvati",
+      "nature": "Emotional, Nurturing"
+    },
+    {
+      "planet": "Mars",
+      "deity": "Kartikeya, Bhairava",
+      "nature": "Aggressive, Courageous"
+    },
+    {
+      "planet": "Mercury",
+      "deity": "Vishnu, Saraswati",
+      "nature": "Intelligent, Witty"
+    },
+    {
+      "planet": "Jupiter",
+      "deity": "Indra, Brihaspati",
+      "nature": "Wise, Expansive"
+    },
+    {
+      "planet": "Venus",
+      "deity": "Lakshmi, Shukracharya",
+      "nature": "Luxurious, Artistic"
+    },
+    {
+      "planet": "Saturn",
+      "deity": "Yama, Hanuman",
+      "nature": "Disciplined, Karmic"
+    },
+    {
+      "planet": "Rahu",
+      "deity": "Durga",
+      "nature": "Deceptive, Revolutionary"
+    },
+    {
+      "planet": "Ketu",
+      "deity": "Ganesha",
+      "nature": "Spiritual, Detached"
+    }
+  ],
+  "tithis": [
+    {
+      "tithi": "Pratipada (1)",
+      "lord": "Sun",
+      "deity": "Agni"
+    },
+    {
+      "tithi": "Dwitiya (2)",
+      "lord": "Moon",
+      "deity": "Brahma"
+    },
+    {
+      "tithi": "Tritiya (3)",
+      "lord": "Mars",
+      "deity": "Gauri (Parvati)"
+    },
+    {
+      "tithi": "Chaturthi (4)",
+      "lord": "Mercury",
+      "deity": "Ganapati"
+    },
+    {
+      "tithi": "Panchami (5)",
+      "lord": "Jupiter",
+      "deity": "Naga"
+    },
+    {
+      "tithi": "Shashthi (6)",
+      "lord": "Venus",
+      "deity": "Kartikeya"
+    },
+    {
+      "tithi": "Saptami (7)",
+      "lord": "Saturn",
+      "deity": "Surya Narayan"
+    },
+    {
+      "tithi": "Ashtami (8)",
+      "lord": "Rahu",
+      "deity": "Durga"
+    },
+    {
+      "tithi": "Navami (9)",
+      "lord": "Sun",
+      "deity": "Ambika"
+    },
+    {
+      "tithi": "Dashami (10)",
+      "lord": "Moon",
+      "deity": "Yama"
+    },
+    {
+      "tithi": "Ekadashi (11)",
+      "lord": "Mars",
+      "deity": "Vishwadeva"
+    },
+    {
+      "tithi": "Dwadashi (12)",
+      "lord": "Mercury",
+      "deity": "Vishnu"
+    },
+    {
+      "tithi": "Trayodashi (13)",
+      "lord": "Jupiter",
+      "deity": "Kamadeva"
+    },
+    {
+      "tithi": "Chaturdashi (14)",
+      "lord": "Venus",
+      "deity": "Rudra / Shiva"
+    },
+    {
+      "tithi": "Purnima (15)",
+      "lord": "Saturn",
+      "deity": "Chandra"
+    },
+    {
+      "tithi": "Amavasya (15)",
+      "lord": "Saturn",
+      "deity": "Pitru"
+    }
+  ],
+  "nakshatras": [
+    {
+      "name": "Ashwini",
+      "category": "S",
+      "lord": "Ketu",
+      "deity": "Ashwini Kumaras (Divine Physicians)",
+      "letters": [
+        "चू (Chu)",
+        "चे (Che)",
+        "चो (Cho)",
+        "ला (La)"
+      ],
+      "tree": "Strychnine tree",
+      "flower": "Champaka"
+    },
+    {
+      "name": "Bharani",
+      "category": "D",
+      "lord": "Venus",
+      "deity": "Yama (God of Death)",
+      "letters": [
+        "ली (Li)",
+        "लू (Lu)",
+        "ले (Le)",
+        "लो (Lo)"
+      ],
+      "tree": "Amla",
+      "flower": "Red hibiscus"
+    },
+    {
+      "name": "Krittika",
+      "category": "D",
+      "lord": "Sun",
+      "deity": "Agni (Fire)",
+      "letters": [
+        "अ (A)",
+        "ई (I)",
+        "उ (U)",
+        "ए (E)"
+      ],
+      "tree": "Cluster fig",
+      "flower": "Flame-of-the-forest"
+    },
+    {
+      "name": "Rohini",
+      "category": "U",
+      "lord": "Moon",
+      "deity": "Brahma/Prajapati",
+      "letters": [
+        "ओ (O)",
+        "वा (Va)",
+        "वी (Vi)",
+        "वु (Vu)"
+      ],
+      "tree": "Jamun",
+      "flower": "White lotus"
+    },
+    {
+      "name": "Mrigashira",
+      "category": "S",
+      "lord": "Mars",
+      "deity": "Soma (Moon God)",
+      "letters": [
+        "वे (Ve)",
+        "वो (Vo)",
+        "का (Ka)",
+        "की (Ki)"
+      ],
+      "tree": "Khair",
+      "flower": "Kadamba"
+    },
+    {
+      "name": "Ardra",
+      "category": "U",
+      "lord": "Rahu",
+      "deity": "Rudra (Destructive form of Shiva)",
+      "letters": [
+        "कु (Ku)",
+        "घ (Gha)",
+        "ङ (Ng)",
+        "छ (Chha)"
+      ],
+      "tree": "Castor oil plant",
+      "flower": "Datura"
+    },
+    {
+      "name": "Punarvasu",
+      "category": "S",
+      "lord": "Jupiter",
+      "deity": "Aditi (Mother of Gods)",
+      "letters": [
+        "के (Ke)",
+        "को (Ko)",
+        "हा (Ha)",
+        "ही (Hi)"
+      ],
+      "tree": "Bamboo",
+      "flower": "White chrysanthemum"
+    },
+    {
+      "name": "Pushya",
+      "category": "U",
+      "lord": "Saturn",
+      "deity": "Brihaspati (Jupiter, Guru of Gods)",
+      "letters": [
+        "हु (Hu)",
+        "हे (He)",
+        "हो (Ho)",
+        "ड (Da)"
+      ],
+      "tree": "Peepal",
+      "flower": "Blue lotus"
+    },
+    {
+      "name": "Ashlesha",
+      "category": "D",
+      "lord": "Mercury",
+      "deity": "Sarpas or Nagas (Serpent Gods)",
+      "letters": [
+        "डी (Di)",
+        "डू (Du)",
+        "डे (De)",
+        "डो (Do)"
+      ],
+      "tree": "Nagkesar",
+      "flower": "Snake jasmine"
+    },
+    {
+      "name": "Magha",
+      "category": "D",
+      "lord": "Ketu",
+      "deity": "Pitris (Forefathers / Ancestors)",
+      "letters": [
+        "मा (Ma)",
+        "मी (Mi)",
+        "मू (Mu)",
+        "मे (Me)"
+      ],
+      "tree": "Banyan",
+      "flower": "Red hibiscus"
+    },
+    {
+      "name": "Purva Phalguni",
+      "category": "D",
+      "lord": "Venus",
+      "deity": "Bhaga (God of Prosperity)",
+      "letters": [
+        "मो (Mo)",
+        "टा (Ta)",
+        "टी (Ti)",
+        "टू (Tu)"
+      ],
+      "tree": "Flame-of-the-forest",
+      "flower": "Red rose"
+    },
+    {
+      "name": "Uttara Phalguni",
+      "category": "U",
+      "lord": "Sun",
+      "deity": "Aryaman (God of Patronage)",
+      "letters": [
+        "टे (Te)",
+        "टो (To)",
+        "पा (Pa)",
+        "पी (Pi)"
+      ],
+      "tree": "Udumbara",
+      "flower": "Blue lotus"
+    },
+    {
+      "name": "Hasta",
+      "category": "S",
+      "lord": "Moon",
+      "deity": "Savitri/Surya (Sun God, Creator of Energy)",
+      "letters": [
+        "पू (Pu)",
+        "ष (Sha)",
+        "ण (Na)",
+        "ठ (Tha)"
+      ],
+      "tree": "Pomegranate",
+      "flower": "Jasmine"
+    },
+    {
+      "name": "Chitra",
+      "category": "S",
+      "lord": "Mars",
+      "deity": "Tvastar/Vishwakarma (Divine Architect)",
+      "letters": [
+        "पे (Pe)",
+        "पो (Po)",
+        "रा (Ra)",
+        "री (Ri)"
+      ],
+      "tree": "Amaltas",
+      "flower": "Orchid"
+    },
+    {
+      "name": "Swati",
+      "category": "S",
+      "lord": "Rahu",
+      "deity": "Vayu (Wind God)",
+      "letters": [
+        "रू (Ru)",
+        "रे (Re)",
+        "रो (Ro)",
+        "ता (Ta)"
+      ],
+      "tree": "Arjun",
+      "flower": "White jasmine"
+    },
+    {
+      "name": "Vishakha",
+      "category": "D",
+      "lord": "Jupiter",
+      "deity": "Indra & Agni",
+      "letters": [
+        "ती (Ti)",
+        "तू (Tu)",
+        "ते (Te)",
+        "तो (To)"
+      ],
+      "tree": "Wood apple",
+      "flower": "Golden shower"
+    },
+    {
+      "name": "Anuradha",
+      "category": "S",
+      "lord": "Saturn",
+      "deity": "Mitra",
+      "letters": [
+        "ना (Na)",
+        "नी (Ni)",
+        "नू (Nu)",
+        "ने (Ne)"
+      ],
+      "tree": "Bullet wood",
+      "flower": "Pink lotus"
+    },
+    {
+      "name": "Jyeshtha",
+      "category": "S",
+      "lord": "Mercury",
+      "deity": "Indra",
+      "letters": [
+        "नो (No)",
+        "या (Ya)",
+        "यी (Yi)",
+        "यू (Yu)"
+      ],
+      "tree": "Bodhi",
+      "flower": "White champak"
+    },
+    {
+      "name": "Mula",
+      "category": "D",
+      "lord": "Ketu",
+      "deity": "Nirriti (Goddess of Dissolution)",
+      "letters": [
+        "ये (Ye)",
+        "यो (Yo)",
+        "भा (Bha)",
+        "भी (Bhi)"
+      ],
+      "tree": "Sarsparilla",
+      "flower": "Thorny flowers"
+    },
+    {
+      "name": "Purva Ashadha",
+      "category": "D",
+      "lord": "Venus",
+      "deity": "Apah (Cosmic Waters)",
+      "letters": [
+        "भू (Bhu)",
+        "धा (Dha)",
+        "फा (Pha)",
+        "ढा (Dha)"
+      ],
+      "tree": "Jackfruit",
+      "flower": "Water lily"
+    },
+    {
+      "name": "Uttara Ashadha",
+      "category": "U",
+      "lord": "Sun",
+      "deity": "Vishvedevas (Universal Gods)",
+      "letters": [
+        "भे (Bhe)",
+        "भो (Bho)",
+        "जा (Ja)",
+        "जी (Ji)"
+      ],
+      "tree": "Ashoka",
+      "flower": "Red hibiscus"
+    },
+    {
+      "name": "Shravana",
+      "category": "U",
+      "lord": "Moon",
+      "deity": "Vishnu",
+      "letters": [
+        "खी (Khi)",
+        "खू (Khu)",
+        "खे (Khe)",
+        "खो (Kho)"
+      ],
+      "tree": "Mango",
+      "flower": "Blue lotus"
+    },
+    {
+      "name": "Dhanishtha",
+      "category": "U",
+      "lord": "Mars",
+      "deity": "Eight Vasus (Gods of Material Wealth)",
+      "letters": [
+        "गा (Ga)",
+        "गी (Gi)",
+        "गु (Gu)",
+        "गे (Ge)"
+      ],
+      "tree": "Indian blackberry",
+      "flower": "Night jasmine"
+    },
+    {
+      "name": "Shatabhisha",
+      "category": "U",
+      "lord": "Rahu",
+      "deity": "Varuna (God of Cosmic Waters)",
+      "letters": [
+        "गो (Go)",
+        "सा (Sa)",
+        "सी (Si)",
+        "सू (Su)"
+      ],
+      "tree": "Kadamba",
+      "flower": "Bluebell"
+    },
+    {
+      "name": "Purva Bhadrapada",
+      "category": "D",
+      "lord": "Jupiter",
+      "deity": "Aja Ekapada (One-footed Goat/Dragon)",
+      "letters": [
+        "से (Se)",
+        "सो (So)",
+        "दा (Da)",
+        "दी (Di)"
+      ],
+      "tree": "Neem",
+      "flower": "Thorn apple"
+    },
+    {
+      "name": "Uttara Bhadrapada",
+      "category": "U",
+      "lord": "Saturn",
+      "deity": "Ahir Budhyana (Water Serpent)",
+      "letters": [
+        "दू (Du)",
+        "थ (Tha)",
+        "झ (Jha)",
+        "ञ (Tra)"
+      ],
+      "tree": "Indian almond",
+      "flower": "Water lily"
+    },
+    {
+      "name": "Revati",
+      "category": "T",
+      "lord": "Mercury",
+      "deity": "Pushan (The Nourisher)",
+      "letters": [
+        "दे (De)",
+        "दो (Do)",
+        "च (Cha)",
+        "ची (Chi)"
+      ],
+      "tree": "Mahua",
+      "flower": "Water hyacinth"
+    }
+  ]
+}
