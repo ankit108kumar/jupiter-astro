@@ -566,3 +566,16 @@ html,body,*{scrollbar-width:thin;scrollbar-color:#c9c6d0 transparent}
  .ja-panchang-dialog .ja-panchang-week-nav button{width:auto!important;min-width:0!important;max-width:none!important;flex:1 1 0!important}
  .ja-panchang-dialog .ja-panchang-week-nav button[data-now]{flex:0 0 64px!important}
 }
+
+
+/* Remove the separate white panel behind the weekly navigation controls.
+   The navigation now sits directly on the same frosted heading surface. */
+.ja-panchang-dialog[data-ja-panchang-theme="apple"] .ja-panchang-heading-row .ja-panchang-week-nav,
+.ja-panchang-dialog .ja-panchang-heading-row .ja-panchang-week-nav{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  padding:0!important;
+  margin:0!important;
+  border-radius:0!important;
+}
