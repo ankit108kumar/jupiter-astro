@@ -272,3 +272,44 @@
 .ja-panchang-event{border:0!important;border-bottom:1px solid var(--line,rgba(100,110,130,.2))!important;margin:0!important;background:transparent!important}
 .ja-panchang-event.is-active{border-left:0!important;border-bottom-color:rgba(197,139,54,.55)!important;background:rgba(224,160,75,.09)!important}
 .ja-panchang-week-table .ja-panchang-event:last-child{border-bottom:0!important}
+
+
+/* Full-screen maximized mode: let every Panchang view use the viewport. */
+.ja-panchang-dialog.is-maximized{
+ position:fixed!important;inset:0!important;
+ width:100vw!important;min-width:0!important;max-width:100vw!important;
+ height:100vh!important;height:100dvh!important;
+ max-height:100vh!important;max-height:100dvh!important;
+ margin:0!important;border-radius:0!important;
+ display:flex!important;flex-direction:column!important;overflow:hidden!important
+}
+.ja-panchang-dialog.is-maximized .ja-panchang-dialog-body{
+ flex:1 1 auto!important;min-height:0!important;
+ width:100%!important;max-width:none!important;
+ overflow:auto!important;box-sizing:border-box!important
+}
+.ja-panchang-dialog.is-maximized .ja-panchang-table-wrap{
+ width:100%!important;max-width:none!important;overflow:auto!important
+}
+.ja-panchang-dialog.is-maximized .ja-panchang-week-table{
+ width:100%!important;min-width:max-content;table-layout:auto
+}
+/* Give sticky table headings comfortable vertical and horizontal breathing room. */
+.ja-panchang-week-table thead th{
+ padding:12px 14px!important;min-height:40px;
+ vertical-align:middle!important;line-height:1.35
+}
+.ja-panchang-lagna-table thead th{padding:12px 13px!important}
+/* Data rows stay glass-transparent: remove opaque white event/card fills. */
+.ja-panchang-event,
+.ja-panchang-current-summary,
+.ja-panchang-day-range,
+.ja-panchang-dialog[data-ja-panchang-theme="apple"] .ja-panchang-event,
+.ja-panchang-dialog[data-ja-panchang-theme="apple"] .ja-panchang-event.is-active{
+ background:transparent!important;
+ box-shadow:none!important
+}
+.ja-panchang-event{border:0!important;border-bottom:1px solid var(--line,rgba(100,110,130,.2))!important}
+.ja-panchang-event.is-active{background:rgba(224,160,75,.10)!important}
+.ja-panchang-current-summary{border:0!important}
+.ja-panchang-day-range{border:0!important}
