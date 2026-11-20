@@ -115,3 +115,61 @@
 .ja-panchang-dialog[data-ja-panchang-theme="apple"] .ja-panchang-week-table tbody tr>th,.ja-panchang-dialog[data-ja-panchang-theme="apple"] .ja-panchang-week-table tbody tr>td{border-color:rgba(60,60,67,.13)}
 .ja-panchang-dialog[data-ja-panchang-theme="apple"] .ja-panchang-theme-toggle{background:#fff}
 @media(max-width:760px){.ja-panchang-dialog{width:96vw;min-width:0}.ja-panchang-dialog-body{width:auto;max-width:none}.ja-panchang-dual-grid{grid-template-columns:1fr}.ja-panchang-lunar-grid{min-width:0}.ja-panchang-inauspicious-grid{grid-template-columns:1fr}.ja-panchang-single-line{width:100%}.ja-panchang-single-line .ja-panchang-event{align-items:flex-start;gap:6px}.ja-panchang-single-line .ja-panchang-meta-grid{flex-basis:100%}}
+
+
+/* Universal translucent glass treatment for every Panchang popup and theme mode */
+.ja-panchang-backdrop{background:rgba(25,31,45,.28);backdrop-filter:blur(18px) saturate(155%);-webkit-backdrop-filter:blur(18px) saturate(155%)}
+.ja-panchang-dialog{
+ background:rgba(250,251,255,.68)!important;
+ border:1px solid rgba(255,255,255,.62)!important;
+ box-shadow:0 26px 90px rgba(25,35,60,.22),inset 0 1px 0 rgba(255,255,255,.78)!important;
+ -webkit-backdrop-filter:blur(30px) saturate(175%);
+ backdrop-filter:blur(30px) saturate(175%);
+}
+.ja-panchang-titlebar,.ja-panchang-heading,.ja-panchang-week-nav,.ja-panchang-dialog-footer{
+ background:rgba(255,255,255,.34)!important;
+ border-color:rgba(255,255,255,.48)!important;
+ -webkit-backdrop-filter:blur(22px) saturate(160%);
+ backdrop-filter:blur(22px) saturate(160%);
+}
+.ja-panchang-heading{background:linear-gradient(115deg,rgba(238,231,255,.48),rgba(255,238,222,.40))!important}
+.ja-panchang-week-table tbody tr>th,.ja-panchang-week-table tbody tr>td,
+.ja-panchang-lagna-table tbody tr>td,.ja-panchang-lagna-table tbody tr>th{
+ background:rgba(255,255,255,.30)!important;
+ border-color:rgba(255,255,255,.58)!important;
+}
+.ja-panchang-event,.ja-panchang-current-summary,.ja-panchang-day-range{
+ background:rgba(255,255,255,.38)!important;
+ border:1px solid rgba(255,255,255,.52);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 3px 12px rgba(45,55,80,.035);
+ -webkit-backdrop-filter:blur(14px) saturate(150%);
+ backdrop-filter:blur(14px) saturate(150%);
+}
+.ja-panchang-event.is-active,.ja-panchang-week-table tr.is-today>th,.ja-panchang-week-table tr.is-today>td,
+.ja-panchang-lagna-table tbody tr.is-today>td,.ja-panchang-lagna-table tbody tr.is-today>th{
+ background:rgba(255,224,177,.43)!important;
+ border-color:rgba(219,163,83,.40)!important;
+}
+.ja-panchang-theme-toggle,.ja-panchang-close,.ja-panchang-week-nav button,.ja-panchang-dialog-footer button{
+ background:rgba(255,255,255,.48)!important;
+ border-color:rgba(255,255,255,.68)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 2px 8px rgba(40,50,75,.06);
+ -webkit-backdrop-filter:blur(12px);
+ backdrop-filter:blur(12px);
+}
+.ja-panchang-panel-tabs button{background:rgba(255,255,255,.34)}
+.ja-panchang-panel-tabs button.is-active{background:rgba(255,224,177,.48)}
+.ja-panchang-dialog[data-ja-panchang-theme="apple"]{
+ --ink:#1d1d1f;--muted:#737780;
+ background:rgba(250,251,255,.68)!important;
+}
+.ja-panchang-dialog[data-ja-panchang-theme="apple"] .ja-panchang-titlebar,
+.ja-panchang-dialog[data-ja-panchang-theme="apple"] .ja-panchang-heading,
+.ja-panchang-dialog[data-ja-panchang-theme="apple"] .ja-panchang-week-nav,
+.ja-panchang-dialog[data-ja-panchang-theme="apple"] .ja-panchang-dialog-footer{background:rgba(255,255,255,.34)!important}
+.ja-panchang-dialog[data-ja-panchang-theme="apple"] .ja-panchang-event{background:rgba(255,255,255,.38)!important}
+.ja-panchang-dialog[data-ja-panchang-theme="apple"] .ja-panchang-event.is-active{background:rgba(255,224,177,.43)!important}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+ .ja-panchang-dialog{background:rgba(250,251,255,.94)!important}
+ .ja-panchang-event,.ja-panchang-current-summary,.ja-panchang-day-range{background:rgba(255,255,255,.9)!important}
+}
