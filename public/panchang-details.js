@@ -200,29 +200,71 @@ function renderAuspiciousWeek(){
  }
  bodyNode.innerHTML='<h3 class="ja-panchang-main-heading">Auspicious Muhurta</h3><div class="ja-panchang-table-wrap"><table class="ja-panchang-week-table"><thead><tr><th>Day</th><th>Auspicious Muhurta and Jupiter Transit Duration</th></tr></thead><tbody>'+rows+'</tbody></table></div><p class="ja-panchang-note">Night Abhijit is shown as the 8th equal Muhurta of the night (sunset to next sunrise). Jupiter house periods are calculated from the sidereal transit chart ascendant at the selected location; intervals are split at house changes.</p>';
 }
+var LAGNA_LORDS=['Mars','Venus','Mercury','Moon','Sun','Mercury','Venus','Mars','Jupiter','Saturn','Saturn','Jupiter'];
+var LAGNA_TYPES=['Movable','Fixed','Dual','Movable','Fixed','Dual','Movable','Fixed','Dual','Movable','Fixed','Dual'];
+function ascSignAt(ms){
+ var d=new Date(ms+ctx.tz*3600000);
+ var chart=computeChart({y:d.getUTCFullYear(),m:d.getUTCMonth()+1,d:d.getUTCDate(),hh:d.getUTCHours(),mm:d.getUTCMinutes(),ss:d.getUTCSeconds(),tz:ctx.tz,lat:ctx.lat,lon:ctx.lon});
+ return {sign:Math.floor(chart.asc/30),chart:chart};
+}
+function renderSunriseLagnaDay(){
+ var localMid=localDayStart(ctx.instant,ctx.tz),probe=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,true);
+ if(ctx.instant<probe)localMid-=DAY;
+ localMid+=dayOffset*DAY;
+ var sunrise=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,true),nextSunrise=sunEventForLocalDay(localMid+DAY,ctx.lat,ctx.lon,true);
+ if(!Number.isFinite(sunrise)||!Number.isFinite(nextSunrise)||sunrise>=nextSunrise){
+  weekLabel.textContent='Sunrise data unavailable';
+  bodyNode.innerHTML='<div class="ja-panchang-current-summary"><strong>Unable to calculate the rising Lagna table.</strong><small>Check the selected location and date.</small></div>';return;
+ }
+ var startInfo=ascSignAt(sunrise),currentSign=startInfo.sign,segmentStart=sunrise,rows=[],step=60000;
+ for(var t=sunrise+step;t<=nextSunrise;t+=step){
+  var checkTime=Math.min(t,nextSunrise),nextSign=ascSignAt(checkTime).sign;
+  if(nextSign!==currentSign){
+   var lo=segmentStart,hi=checkTime;
+   while(hi-lo>1000){var mid=Math.floor((lo+hi)/2);if(ascSignAt(mid).sign===currentSign)lo=mid;else hi=mid;}
+   rows.push({sign:currentSign,start:segmentStart,end:hi});
+   segmentStart=hi;currentSign=nextSign;
+  }
+  if(checkTime===nextSunrise)break;
+ }
+ if(segmentStart<nextSunrise)rows.push({sign:currentSign,start:segmentStart,end:nextSunrise});
+ var dateLabel=dayFmt(sunrise,ctx.tz);
+ weekLabel.textContent=dateLabel;
+ var bodyRows='';
+ rows.forEach(function(row){
+  var mid=Math.floor((row.start+row.end)/2),info=ascSignAt(mid),lord=LAGNA_LORDS[row.sign],lordLon=info.chart.planets[lord]&&info.chart.planets[lord].lon;
+  var house=Number.isFinite(lordLon)?((Math.floor(lordLon/30)-row.sign+12)%12)+1:null;
+  var houseText=house?(house===1?'1st house':house+'th house'):'—';
+  if(house===2)houseText='2nd house';if(house===3)houseText='3rd house';
+  var active=ctx.instant>=row.start&&ctx.instant<row.end;
+  bodyRows+='<tr class="'+(active?'is-today':'')+'"><td><strong>'+SIGNS[row.sign][0]+'</strong><small>'+SIGNS[row.sign][1]+'</small></td><td>'+LAGNA_TYPES[row.sign]+'</td><td>'+lord+'</td><td>'+houseText+'</td><td class="ja-panchang-duration">'+fmtClock(row.start,ctx.tz)+' – '+fmtClock(row.end,ctx.tz)+(active?' <em class="ja-panchang-now">Now</em>':'')+'</td></tr>';
+ });
+ bodyNode.innerHTML='<h3 class="ja-panchang-main-heading">Rising Lagna</h3><div class="ja-panchang-day-range"><span>Panchang day</span><strong>'+fmtClock(sunrise,ctx.tz)+' – '+fmtClock(nextSunrise,ctx.tz)+'</strong><small>12 successive rising signs · Sunrise to next sunrise</small></div><div class="ja-panchang-table-wrap"><table class="ja-panchang-week-table ja-panchang-lagna-table"><thead><tr><th>Sign</th><th>Category</th><th>Lagna Lord</th><th>Lord Placement</th><th>Duration (HH:MM)</th></tr></thead><tbody>'+bodyRows+'</tbody></table></div>';
+}
+function fmtClock(ms,tz){var d=new Date(ms+tz*3600000);return pad(d.getUTCHours())+':'+pad(d.getUTCMinutes());}
 function renderOther(k){
  if(k==='inauspicious'){renderInauspiciousWeek();return;}
  if(k==='abhijit'){renderAuspiciousWeek();return;}
 }
 function panelTabs(items){return '<div class="ja-panchang-panel-tabs">'+items.map(function(x){var label=x.charAt(0).toUpperCase()+x.slice(1);return '<button type="button" data-panel="'+x+'" class="'+(activePanel===x?'is-active':'')+'">'+label+'</button>';}).join('')+'</div>';}
-function render(){if(kind==='tithi'||kind==='nak')renderWeek(kind);else if(kind==='yogaGroup')renderLunarWeek(activePanel);else if(kind==='chaughadiyaGroup')renderChaughadiyaHora(activePanel);else renderOther(kind);}
+function render(){if(kind==='sun')renderSunriseLagnaDay();else if(kind==='tithi'||kind==='nak')renderWeek(kind);else if(kind==='yogaGroup')renderLunarWeek(activePanel);else if(kind==='chaughadiyaGroup')renderChaughadiyaHora(activePanel);else renderOther(kind);}
 function close(){modal.hidden=true;document.body.classList.remove('ja-panchang-modal-open');}
 function open(k){
  if(!(window.firebaseAuth&&window.firebaseAuth.currentUser)&&!window.jaAuthUser)return;
  ctx=context();kind=k;offset=0;dayOffset=0;
- var titles={tithi:'Tithi — Weekly Details',nak:'Nakshatra — Weekly Details',yogaGroup:'Yoga & Karana — Weekly Details',chaughadiyaGroup:'Chaughadiya & Hora — Panchang Day',inauspicious:'Inauspicious Periods',abhijit:'Abhijit Muhurta'};
- titleNode.textContent=titles[k]||'Panchang Details';activePanel=k==='chaughadiyaGroup'?'chaughadiya':k==='yogaGroup'?'yoga':activePanel;subtitleNode.textContent=k==='chaughadiyaGroup'?'Sunrise to next sunrise · Local time at the selected chart location':'Sunday to Saturday · Local time at the selected chart location';
- var nav=modal.querySelector('.ja-panchang-week-nav');nav.classList.toggle('is-day-nav',k==='chaughadiyaGroup');nav.querySelector('[data-week="-1"]').innerHTML=k==='chaughadiyaGroup'?'← <span>Previous Day</span>':'← <span>Previous Week</span>';nav.querySelector('[data-week="1"]').innerHTML=k==='chaughadiyaGroup'?'<span>Next Day</span> →':'<span>Next Week</span> →';
+ var titles={sun:'Sunrise / Sunset — Daily Lagna Details',tithi:'Tithi — Weekly Details',nak:'Nakshatra — Weekly Details',yogaGroup:'Yoga & Karana — Weekly Details',chaughadiyaGroup:'Chaughadiya & Hora — Panchang Day',inauspicious:'Inauspicious Periods',abhijit:'Abhijit Muhurta'};
+ titleNode.textContent=titles[k]||'Panchang Details';activePanel=k==='chaughadiyaGroup'?'chaughadiya':k==='yogaGroup'?'yoga':activePanel;subtitleNode.textContent=(k==='chaughadiyaGroup'||k==='sun')?'Sunrise to next sunrise · Local time at the selected chart location':'Sunday to Saturday · Local time at the selected chart location';
+ var nav=modal.querySelector('.ja-panchang-week-nav');nav.classList.toggle('is-day-nav',k==='chaughadiyaGroup'||k==='sun');nav.querySelector('[data-week="-1"]').innerHTML=(k==='chaughadiyaGroup'||k==='sun')?'← <span>Previous Day</span>':'← <span>Previous Week</span>';nav.querySelector('[data-week="1"]').innerHTML=(k==='chaughadiyaGroup'||k==='sun')?'<span>Next Day</span> →':'<span>Next Week</span> →';
  render();modal.hidden=false;document.body.classList.add('ja-panchang-modal-open');modal.querySelector('.ja-panchang-close').focus();
 }
 function init(){
  modal=document.createElement('div');modal.id='jaPanchangDetailsModal';modal.className='ja-panchang-modal';modal.hidden=true;
  modal.innerHTML='<div class="ja-panchang-backdrop" data-close="1"></div><section class="ja-panchang-dialog" role="dialog" aria-modal="true" aria-labelledby="jaPanchangTitle"><header class="ja-panchang-dialog-header"><div class="ja-panchang-heading"><span class="ja-panchang-kicker">JUPITER ASTROLOGY · PANCHANG</span><h2 id="jaPanchangTitle"></h2><p id="jaPanchangSubtitle"></p></div><button type="button" class="ja-panchang-close" aria-label="Close popup">×</button></header><div class="ja-panchang-week-nav"><button type="button" data-week="-1">← <span>Previous Week</span></button><strong id="jaPanchangWeekLabel"></strong><button type="button" data-week="1"><span>Next Week</span> →</button></div><div class="ja-panchang-dialog-body" id="jaPanchangDialogBody"></div><footer class="ja-panchang-dialog-footer"><span>Local chart time · 24-hour clock</span><button type="button" data-close="1">Close</button></footer></section>';
  document.body.appendChild(modal);titleNode=modal.querySelector('#jaPanchangTitle');subtitleNode=modal.querySelector('#jaPanchangSubtitle');bodyNode=modal.querySelector('#jaPanchangDialogBody');weekLabel=modal.querySelector('#jaPanchangWeekLabel');
- modal.addEventListener('click',function(e){var c=e.target.closest('[data-close]'),n=e.target.closest('[data-week]');if(c)close();else if(n){if(kind==='chaughadiyaGroup')dayOffset+=Number(n.dataset.week);else offset+=Number(n.dataset.week);render();}else{var p=e.target.closest('[data-panel]');if(p){activePanel=p.dataset.panel;render();}}});
+ modal.addEventListener('click',function(e){var c=e.target.closest('[data-close]'),n=e.target.closest('[data-week]');if(c)close();else if(n){if(kind==='chaughadiyaGroup'||kind==='sun')dayOffset+=Number(n.dataset.week);else offset+=Number(n.dataset.week);render();}else{var p=e.target.closest('[data-panel]');if(p){activePanel=p.dataset.panel;render();}}});
  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!modal.hidden)close();});
  var cards=document.querySelectorAll('#panchangCardBlock .panchang-item'),kinds=['date','sun','tithi','nak','yogaGroup','chaughadiyaGroup','inauspicious','abhijit'];
- Array.prototype.forEach.call(cards,function(card,i){if(i<2)return;var k=kinds[i];card.classList.add('ja-panchang-clickable');card.setAttribute('role','button');card.setAttribute('tabindex','0');card.setAttribute('aria-haspopup','dialog');card.addEventListener('click',function(){open(k);});card.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();open(k);}});});
+ Array.prototype.forEach.call(cards,function(card,i){if(i===0)return;var k=kinds[i];card.classList.add('ja-panchang-clickable');card.setAttribute('role','button');card.setAttribute('tabindex','0');card.setAttribute('aria-haspopup','dialog');card.addEventListener('click',function(){open(k);});card.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();open(k);}});});
 
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
