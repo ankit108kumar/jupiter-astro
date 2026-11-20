@@ -2,7 +2,6 @@
 .panchang-item.ja-panchang-clickable{cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
 .panchang-item.ja-panchang-clickable:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(70,80,110,.13);border-color:var(--accent,#c58b36)!important}
 .panchang-item.ja-panchang-clickable:focus-visible{outline:2px solid var(--accent,#c58b36)!important;outline-offset:3px}
-.panchang-item.ja-panchang-locked:after{content:"Sign in to view details";font-size:.64rem;color:var(--muted);opacity:.8;margin-top:3px}
 .ja-panchang-modal[hidden]{display:none!important}.ja-panchang-modal{position:fixed;inset:0;z-index:100500;display:grid;place-items:center;padding:22px;font-family:inherit;color:var(--ink,#1c2434)}
 .ja-panchang-backdrop{position:absolute;inset:0;background:rgba(22,27,40,.48);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
 .ja-panchang-dialog{position:relative;z-index:1;width:min(1120px,96vw);max-height:min(88vh,900px);display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--line,rgba(100,110,130,.2));border-radius:20px;background:var(--surface,#fff);box-shadow:0 24px 80px rgba(20,28,45,.25);animation:jaPanchangIn .2s ease-out}
