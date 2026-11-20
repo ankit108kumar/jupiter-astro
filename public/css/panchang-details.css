@@ -173,3 +173,54 @@
  .ja-panchang-dialog{background:rgba(250,251,255,.94)!important}
  .ja-panchang-event,.ja-panchang-current-summary,.ja-panchang-day-range{background:rgba(255,255,255,.9)!important}
 }
+
+
+/* Panchang window: compact unified header and Transit Timeline-style controls */
+.ja-panchang-dialog{width:max-content;min-width:min(760px,96vw);max-width:98vw}
+.ja-panchang-titlebar{display:flex;justify-content:space-between;align-items:center;gap:16px;cursor:grab}
+.ja-panchang-window-controls{flex:0 0 auto}
+.ja-panchang-title-tools{margin-left:auto}
+.ja-panchang-window-title{display:none!important}
+.ja-panchang-titlebar .ja-panchang-close{display:none!important}
+.ja-panchang-heading{padding:16px 22px}
+.ja-panchang-heading-row{display:flex;align-items:center;justify-content:space-between;gap:22px}
+.ja-panchang-heading-row>div:first-child{min-width:0}
+.ja-panchang-heading-row .ja-panchang-week-nav{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex:0 0 auto;padding:0;border:0;background:transparent}
+.ja-panchang-week-nav button{white-space:nowrap;min-width:0}
+.ja-panchang-week-nav button:first-child,.ja-panchang-week-nav button:last-child{justify-self:auto}
+.ja-panchang-week-nav #jaPanchangWeekLabel{display:none!important}
+.ja-panchang-dialog-footer{display:none!important}
+.ja-panchang-theme-toggle{width:42px;height:42px;display:grid;place-items:center;border-radius:50%;padding:10px;border:1px solid rgba(255,255,255,.72);background:rgba(255,255,255,.48);color:#343044;box-shadow:inset 0 1px 0 rgba(255,255,255,.72),0 3px 10px rgba(35,45,70,.055);cursor:pointer}
+.ja-panchang-theme-toggle svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ja-panchang-dot{width:16px;height:16px;box-shadow:inset 0 1px 1px rgba(255,255,255,.28),0 1px 3px rgba(25,30,45,.12)}
+.ja-panchang-dot.close{background:#ff5f57}
+.ja-panchang-dot.minimize{background:#febc2e}
+.ja-panchang-dot.maximize{background:#28c840}
+.ja-panchang-dialog.is-maximized{position:fixed!important;inset:10px!important;width:auto!important;max-width:none!important;height:auto!important;max-height:none!important;margin:0!important;border-radius:22px}
+.ja-panchang-dialog.is-minimized{width:min(420px,94vw)!important;min-width:0!important;max-height:46px!important;height:46px!important;overflow:hidden!important}
+.ja-panchang-dialog.is-minimized>.ja-panchang-titlebar{height:46px!important;min-height:46px!important}
+.ja-panchang-dialog-body{width:max-content;max-width:calc(98vw - 34px);overflow:auto}
+.ja-panchang-table-wrap{max-width:calc(98vw - 34px);overflow:auto}
+.ja-panchang-week-table{width:max-content;min-width:100%;table-layout:auto}
+.ja-panchang-week-table th,.ja-panchang-week-table td{white-space:nowrap}
+.ja-panchang-week-table thead th{white-space:nowrap}
+.ja-panchang-week-table tbody tr>th{width:auto;min-width:110px}
+.ja-panchang-single-line{width:max-content;min-width:100%}
+.ja-panchang-lunar-detail-table{width:max-content;min-width:100%}
+.ja-panchang-lunar-detail-table tbody tr>th{min-width:110px}
+.ja-panchang-lunar-detail-table tbody tr>td{padding:8px 12px}
+.ja-panchang-lunar-detail-table tbody tr>td:nth-child(2){font-weight:650}
+.ja-panchang-lunar-detail-table tbody tr>td:nth-child(n+4){color:var(--muted,#737780);font-size:11px}
+.ja-panchang-lunar-detail-table tbody tr>td:nth-child(n+4){font-weight:500}
+.ja-panchang-week-table .ja-panchang-meta-grid{display:none}
+.ja-panchang-week-nav{grid-template-columns:auto auto;justify-content:space-between}
+.ja-panchang-week-nav strong{display:none}
+.ja-panchang-heading-row .ja-panchang-week-nav{grid-template-columns:none}
+.ja-panchang-dialog[data-jtt-theme="apple"] .ja-panchang-theme-toggle{background:rgba(255,255,255,.72)}
+@media(max-width:760px){
+ .ja-panchang-dialog{width:98vw;min-width:0}
+ .ja-panchang-heading-row{align-items:flex-start;flex-direction:column;gap:12px}
+ .ja-panchang-heading-row .ja-panchang-week-nav{width:100%;justify-content:space-between}
+ .ja-panchang-dialog-body{width:auto;max-width:none}
+ .ja-panchang-table-wrap{max-width:calc(98vw - 28px)}
+}
