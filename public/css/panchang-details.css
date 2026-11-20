@@ -1,0 +1,34 @@
+/* Weekly Panchang detail dialogs — theme adaptive */
+.panchang-item.ja-panchang-clickable{cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.panchang-item.ja-panchang-clickable:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(70,80,110,.13);border-color:var(--accent,#c58b36)!important}
+.panchang-item.ja-panchang-clickable:focus-visible{outline:2px solid var(--accent,#c58b36)!important;outline-offset:3px}
+.panchang-item.ja-panchang-locked:after{content:"Sign in to view details";font-size:.64rem;color:var(--muted);opacity:.8;margin-top:3px}
+.ja-panchang-modal[hidden]{display:none!important}.ja-panchang-modal{position:fixed;inset:0;z-index:100500;display:grid;place-items:center;padding:22px;font-family:inherit;color:var(--ink,#1c2434)}
+.ja-panchang-backdrop{position:absolute;inset:0;background:rgba(22,27,40,.48);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+.ja-panchang-dialog{position:relative;z-index:1;width:min(1120px,96vw);max-height:min(88vh,900px);display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--line,rgba(100,110,130,.2));border-radius:20px;background:var(--surface,#fff);box-shadow:0 24px 80px rgba(20,28,45,.25);animation:jaPanchangIn .2s ease-out}
+@keyframes jaPanchangIn{from{opacity:0;transform:translateY(10px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
+.ja-panchang-dialog-header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:22px 26px 16px;border-bottom:1px solid var(--line,rgba(100,110,130,.18));background:linear-gradient(120deg,rgba(239,226,250,.45),rgba(255,235,220,.34))}
+.ja-panchang-kicker{font-size:10px;letter-spacing:1.5px;font-weight:800;color:var(--muted,#738098)}
+.ja-panchang-heading h2{font-size:clamp(19px,2vw,25px);line-height:1.2;margin:5px 0 4px;color:var(--ink,#1c2434);font-weight:800}
+.ja-panchang-heading p{font-size:12px;margin:0;color:var(--muted,#738098)}
+.ja-panchang-close{width:36px;height:36px;border:1px solid var(--line,rgba(100,110,130,.2));border-radius:50%;background:var(--surface,#fff);color:var(--ink,#1c2434);font-size:25px;line-height:1;cursor:pointer}
+.ja-panchang-week-nav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:13px 24px;border-bottom:1px solid var(--line,rgba(100,110,130,.16))}
+.ja-panchang-week-nav strong{text-align:center;font-size:12px;color:var(--ink,#1c2434);font-variant-numeric:tabular-nums}
+.ja-panchang-week-nav button,.ja-panchang-dialog-footer button{border:1px solid var(--line,rgba(100,110,130,.2));border-radius:9px;padding:8px 12px;background:var(--surface,#fff);color:var(--ink,#1c2434);font:600 12px/1.2 inherit;cursor:pointer}
+.ja-panchang-week-nav button:first-child{justify-self:start}.ja-panchang-week-nav button:last-child{justify-self:end}
+.ja-panchang-dialog-body{padding:16px 22px;overflow:auto;min-height:160px}.ja-panchang-table-wrap{overflow-x:auto}
+.ja-panchang-week-table{width:100%;border-collapse:separate;border-spacing:0 7px;font-size:12px}
+.ja-panchang-week-table thead th{padding:0 12px 7px;color:var(--muted,#738098);font-size:10px;text-align:left;text-transform:uppercase;letter-spacing:.7px}
+.ja-panchang-week-table tbody tr>th{width:145px;min-width:125px;padding:12px 14px;vertical-align:top;border:1px solid var(--line,rgba(100,110,130,.16));border-right:0;border-radius:10px 0 0 10px;background:rgba(120,130,150,.045);text-align:left}
+.ja-panchang-week-table tbody tr>th span,.ja-panchang-week-table tbody tr>th small{display:block}.ja-panchang-week-table tbody tr>th small{margin-top:4px;color:var(--muted,#738098);font-size:10px;font-weight:500}
+.ja-panchang-week-table tbody tr>td{padding:7px 10px;border:1px solid var(--line,rgba(100,110,130,.16));border-left:0;border-radius:0 10px 10px 0;background:var(--surface,#fff)}
+.ja-panchang-week-table tr.is-today>th,.ja-panchang-week-table tr.is-today>td{background:rgba(224,160,75,.09);border-color:rgba(190,135,55,.38)}
+.ja-panchang-event{padding:9px 11px;border-radius:8px;background:rgba(120,130,150,.055);margin:3px 0}.ja-panchang-event.is-active{background:rgba(224,160,75,.12);box-shadow:inset 3px 0 #c58b36}
+.ja-panchang-event-head{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:13px;color:var(--ink,#1c2434)}
+.ja-panchang-event-head em{font-style:normal;font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#9a671c;background:rgba(224,160,75,.18);padding:3px 7px;border-radius:20px}
+.ja-panchang-duration{margin-top:4px;font:500 11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--muted,#738098);font-variant-numeric:tabular-nums}
+.ja-panchang-meta-grid{display:flex;flex-wrap:wrap;gap:5px 14px;margin-top:6px}.ja-panchang-meta{font-size:10px;color:var(--muted,#738098)}.ja-panchang-meta b{color:var(--ink,#1c2434);font-weight:700}
+.ja-panchang-dialog-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 24px;border-top:1px solid var(--line,rgba(100,110,130,.16));color:var(--muted,#738098);font-size:10px}
+.ja-panchang-current-summary{padding:22px;border:1px solid var(--line,rgba(100,110,130,.2));border-radius:13px;background:rgba(120,130,150,.045);display:grid;gap:10px}
+.ja-panchang-current-summary span{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}.ja-panchang-current-summary strong{font-size:18px;color:var(--ink)}.ja-panchang-current-summary small{font-size:11px;line-height:1.5;color:var(--muted)}
+@media(max-width:700px){.ja-panchang-modal{padding:8px}.ja-panchang-dialog{width:100%;max-height:94vh;border-radius:15px}.ja-panchang-dialog-header{padding:17px 16px 13px}.ja-panchang-week-nav{padding:10px 12px;gap:6px}.ja-panchang-week-nav button{padding:7px 8px;font-size:10px}.ja-panchang-week-nav button span{display:none}.ja-panchang-dialog-body{padding:10px}.ja-panchang-week-table tbody tr>th{width:88px;min-width:78px;padding:9px 8px}.ja-panchang-week-table tbody tr>td{padding:6px}.ja-panchang-event{padding:8px}.ja-panchang-dialog-footer{padding:10px 13px}}
