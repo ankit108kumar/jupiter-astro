@@ -8437,31 +8437,49 @@ const result = section === 'planets'
 (function(){
  'use strict';
  var kinds=['date','sun','tithi','nak','yogaGroup','chaughadiyaGroup','inauspicious','abhijit'];
- var loading=null,loaded=false,pendingKind=null;
- function loadPanchang(kind){
-  if(loaded){if(kind)document.dispatchEvent(new CustomEvent('ja-panchang-open',{detail:{kind:kind}}));return;}
-  pendingKind=kind||pendingKind;
+ var loading=null,loaded=!!document.getElementById('jaPanchangDetailsModal'),pendingKind=null;
+ // Hover feedback is available immediately; the heavier popup code remains lazy-loaded.
+ if(!document.getElementById('jaPanchangCardInteractionStyle')){
+  var style=document.createElement('style');style.id='jaPanchangCardInteractionStyle';
+  style.textContent='#panchangCardBlock .panchang-item:not(:first-child){cursor:pointer;transition:transform .18s ease,background-color .18s ease,box-shadow .18s ease,border-color .18s ease}#panchangCardBlock .panchang-item:not(:first-child):hover{transform:translateY(-2px);background-color:rgba(255,255,255,.10);box-shadow:0 7px 20px rgba(55,65,90,.13);border-color:var(--accent,#c58b36)!important}#panchangCardBlock .panchang-item:not(:first-child):focus-visible{outline:2px solid var(--accent,#c58b36);outline-offset:3px}';
+  document.head.appendChild(style);
+ }
+ function openCard(kind){
+  if(!kind)return;
+  if(loaded){document.dispatchEvent(new CustomEvent('ja-panchang-open',{detail:{kind:kind}}));return;}
+  pendingKind=kind;
   if(loading)return;
   loading=new Promise(function(resolve,reject){
    var css=document.createElement('link');css.rel='stylesheet';css.href='/css/panchang-details.css';
-   css.onload=function(){var script=document.createElement('script');script.src='/panchang-details.js';script.onload=function(){loaded=true;resolve();if(pendingKind){var k=pendingKind;pendingKind=null;document.dispatchEvent(new CustomEvent('ja-panchang-open',{detail:{kind:k}}));}};script.onerror=reject;document.body.appendChild(script);};
-   css.onerror=reject;document.head.appendChild(css);
+   css.onload=function(){
+    var script=document.createElement('script');script.src='/panchang-details.js';
+    script.onload=function(){
+     loaded=true;resolve();
+     if(pendingKind){var k=pendingKind;pendingKind=null;document.dispatchEvent(new CustomEvent('ja-panchang-open',{detail:{kind:k}}));}
+    };
+    script.onerror=function(){script.remove();reject(new Error('Unable to load Panchang popup script'));};
+    document.body.appendChild(script);
+   };
+   css.onerror=function(){css.remove();reject(new Error('Unable to load Panchang popup styles'));};
+   document.head.appendChild(css);
   }).catch(function(err){loading=null;console.error('Panchang popup failed to load:',err);});
  }
- document.addEventListener('click',function(e){
-  var card=e.target.closest('#panchangCardBlock .panchang-item');
-  if(!card)return;
+ function cardKind(card){
   var cards=Array.prototype.slice.call(document.querySelectorAll('#panchangCardBlock .panchang-item'));
-  var index=cards.indexOf(card);if(index<=0||!kinds[index])return;
-  if(!loaded){e.preventDefault();loadPanchang(kinds[index]);}
+  var index=cards.indexOf(card);return index>0?kinds[index]:null;
+ }
+ document.addEventListener('click',function(e){
+  var card=e.target.closest&&e.target.closest('#panchangCardBlock .panchang-item');
+  if(!card)return;
+  var kind=cardKind(card);if(!kind)return;
+  e.preventDefault();openCard(kind);
  },true);
  document.addEventListener('keydown',function(e){
   if(e.key!=='Enter'&&e.key!==' ')return;
   var card=e.target.closest&&e.target.closest('#panchangCardBlock .panchang-item');
   if(!card)return;
-  var cards=Array.prototype.slice.call(document.querySelectorAll('#panchangCardBlock .panchang-item'));
-  var index=cards.indexOf(card);if(index<=0||!kinds[index])return;
-  if(!loaded){e.preventDefault();loadPanchang(kinds[index]);}
+  var kind=cardKind(card);if(!kind)return;
+  e.preventDefault();openCard(kind);
  },true);
 })();
 </script>
