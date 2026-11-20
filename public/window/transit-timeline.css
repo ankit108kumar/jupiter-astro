@@ -2387,3 +2387,15 @@
   #ja-transit-timeline-window .jtt-unified-panel,
   #ja-transit-timeline-window .jtt-table-panel{background:rgba(255,255,255,.92)!important}
 }
+
+
+/* Keep subtle horizontal row separators visible through the glass table surface. */
+#ja-transit-timeline-window .jtt-planetary-table tbody td{
+  border-bottom:1px solid rgba(100,116,139,.22)!important;
+}
+#ja-transit-timeline-window .jtt-planetary-table tbody tr:last-child td{
+  border-bottom:0!important;
+}
+#ja-transit-timeline-window .jtt-planetary-table thead th{
+  border-bottom:1px solid rgba(100,116,139,.28)!important;
+}
