@@ -3422,7 +3422,7 @@ if (!placed) {
   function clearPending() { if (pending && pending.timer) clearTimeout(pending.timer); pending = null; }
   function untrack(key) { stack = stack.filter(function (item) { return item.key !== key; }); }
   function track(key, close) {
-    untrack(key);
+    stack = stack.filter(function (item) { return item.key !== key; });
     stack.push({ key: key, close: close, order: ++serial });
   }
   function closeActive(immediate) {
