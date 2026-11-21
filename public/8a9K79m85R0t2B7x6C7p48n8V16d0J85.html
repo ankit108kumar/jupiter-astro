@@ -3426,6 +3426,7 @@ if (!placed) {
   document.body.appendChild(card);
 
   let activeSign = null;
+  let zodiacOpenTimer = null, zodiacCloseTimer = null;
 
   function positionCard(x, y) {
     const margin = 12;
@@ -3503,7 +3504,8 @@ if (!placed) {
 
     const sign = Number(target.dataset.sign);
     if (sign >= 1 && sign <= 12) {
-      showCard(sign, e.clientX, e.clientY);
+      clearTimeout(zodiacCloseTimer); clearTimeout(zodiacOpenTimer);
+      zodiacOpenTimer = setTimeout(() => { if (target.isConnected) showCard(sign, e.clientX, e.clientY); }, 300);
     }
   });
 
@@ -3520,10 +3522,11 @@ if (!placed) {
     const next = e.relatedTarget;
     if (next && next.closest && next.closest('.sign-number')) return;
 
-    hideCard();
+    clearTimeout(zodiacOpenTimer);
+    zodiacCloseTimer = setTimeout(hideCard, 500);
   });
 
-  window.addEventListener('scroll', hideCard, true);
+  window.addEventListener('scroll', () => { clearTimeout(zodiacOpenTimer); clearTimeout(zodiacCloseTimer); hideCard(); }, true);
   window.addEventListener('blur', hideCard);
 })();
 
@@ -3540,6 +3543,7 @@ if (!placed) {
   let reference = null;
   let activeTarget = null;
   let referencePromise = null;
+  let nakOpenTimer = null, nakCloseTimer = null;
 
   const escapeHtml = value => String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -3615,7 +3619,8 @@ if (!placed) {
     const target = event.target.closest('.ja-nakshatra-hover');
     if (!target) return;
     if (target === activeTarget && !card.hidden) return;
-    showCard(target, event.clientX, event.clientY);
+    clearTimeout(nakCloseTimer); clearTimeout(nakOpenTimer);
+    nakOpenTimer = setTimeout(() => { if (target.isConnected) showCard(target, event.clientX, event.clientY); }, 300);
   });
   document.addEventListener('pointermove', event => {
     if (activeTarget && !card.hidden) positionCard(event.clientX, event.clientY);
@@ -3625,9 +3630,10 @@ if (!placed) {
     if (!target || target !== activeTarget) return;
     const next = event.relatedTarget;
     if (next && next.closest && next.closest('.ja-nakshatra-hover')) return;
-    hideCard();
+    clearTimeout(nakOpenTimer);
+    nakCloseTimer = setTimeout(hideCard, 500);
   });
-  window.addEventListener('scroll', hideCard, true);
+  window.addEventListener('scroll', () => { clearTimeout(nakOpenTimer); clearTimeout(nakCloseTimer); hideCard(); }, true);
   window.addEventListener('blur', hideCard);
 })();
 /* ================================================================ */
