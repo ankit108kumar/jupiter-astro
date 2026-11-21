@@ -816,6 +816,7 @@
   }
   function removeDurationTooltip() {
     clearDurationHideTimer();
+    if (window.JAHoverManager) window.JAHoverManager.untrack("transit-duration");
     if (activeDurationTooltip && activeDurationTooltip.parentNode) activeDurationTooltip.remove();
     activeDurationTooltip = null;
     activeDurationWrapper = null;
@@ -985,6 +986,7 @@
     });
 
     activeDurationTooltip = tooltip;
+    if (window.JAHoverManager) window.JAHoverManager.track("transit-duration", removeDurationTooltip);
     positionDurationTooltip(wrapper, tooltip);
     setTimeout(function () {
       if (activeDurationTooltip === tooltip) tooltip.classList.add("is-open");
@@ -1207,7 +1209,7 @@
     clearNakshatraStoryTimer();
     activePlanetSignification = "nakshatra:" + requestedName;
     activeNakshatraStory = requestedName;
-    nakshatraStoryRemaining = 20000;
+    nakshatraStoryRemaining = 10000;
     nakshatraStoryPaused = false;
 
     var panel = ensurePlanetSignificationPanel();
@@ -1268,17 +1270,30 @@
       console.error("Jupiter Astro: Unable to load Nakshatra deity stories.", error);
     });
 
-    scheduleNakshatraStoryExpiry();
+    // The shared hover manager starts the 10-second closing delay only after
+    // the pointer/focus leaves both the trigger and the story panel.
   }
 
   function bindNakshatraStoryPanel(panel) {
     if (!panel || panel.dataset.nakshatraStoryEvents === "true") return;
     panel.dataset.nakshatraStoryEvents = "true";
-    panel.addEventListener("pointerenter", pauseNakshatraStoryExpiry);
-    panel.addEventListener("pointerleave", resumeNakshatraStoryExpiry);
-    panel.addEventListener("focusin", pauseNakshatraStoryExpiry);
+    panel.addEventListener("pointerenter", function () {
+      if (window.JAHoverManager) window.JAHoverManager.keepOpen("nakshatra-story");
+      pauseNakshatraStoryExpiry();
+    });
+    panel.addEventListener("pointerleave", function () {
+      resumeNakshatraStoryExpiry();
+      if (window.JAHoverManager) window.JAHoverManager.leave("nakshatra-story", 10000);
+    });
+    panel.addEventListener("focusin", function () {
+      if (window.JAHoverManager) window.JAHoverManager.keepOpen("nakshatra-story");
+      pauseNakshatraStoryExpiry();
+    });
     panel.addEventListener("focusout", function (event) {
-      if (!panel.contains(event.relatedTarget)) resumeNakshatraStoryExpiry();
+      if (!panel.contains(event.relatedTarget)) {
+        resumeNakshatraStoryExpiry();
+        if (window.JAHoverManager) window.JAHoverManager.leave("nakshatra-story", 10000);
+      }
     });
   }
 
@@ -1294,20 +1309,46 @@
         ? event.target.closest(".jtt-nakshatra-story-trigger") : null;
       if (!trigger || !host.contains(trigger)) return;
       if (event.relatedTarget && trigger.contains(event.relatedTarget)) return;
-      clearTimeout(nakStoryOpenTimer);
-      nakStoryOpenTimer = setTimeout(function(){ if(trigger.isConnected) showNakshatraStory(trigger.getAttribute("data-jtt-nakshatra-story")); },300);
+      if (window.JAHoverManager) {
+        window.JAHoverManager.activate("nakshatra-story", function () {
+          if (trigger.isConnected) showNakshatraStory(trigger.getAttribute("data-jtt-nakshatra-story"));
+        }, function () { hideNakshatraStory(true); }, 300);
+      } else {
+        clearTimeout(nakStoryOpenTimer);
+        nakStoryOpenTimer = setTimeout(function () { if (trigger.isConnected) showNakshatraStory(trigger.getAttribute("data-jtt-nakshatra-story")); }, 300);
+      }
     });
-
-    host.addEventListener("pointerout", function(event){ if(event.target.closest && event.target.closest(".jtt-nakshatra-story-trigger")) clearTimeout(nakStoryOpenTimer); });
-
-    // Retain keyboard access without requiring a mouse click.
+    host.addEventListener("pointerout", function (event) {
+      var trigger = event.target && event.target.closest
+        ? event.target.closest(".jtt-nakshatra-story-trigger") : null;
+      if (!trigger || !host.contains(trigger) || event.relatedTarget && (trigger.contains(event.relatedTarget) || event.relatedTarget.closest && event.relatedTarget.closest(".jtt-planet-signification-panel"))) return;
+      clearTimeout(nakStoryOpenTimer);
+      if (window.JAHoverManager) window.JAHoverManager.leave("nakshatra-story", 10000);
+    });
+    host.addEventListener("focusin", function (event) {
+      var trigger = event.target && event.target.closest
+        ? event.target.closest(".jtt-nakshatra-story-trigger") : null;
+      if (!trigger || !host.contains(trigger)) return;
+      if (window.JAHoverManager) window.JAHoverManager.activate("nakshatra-story", function () {
+        showNakshatraStory(trigger.getAttribute("data-jtt-nakshatra-story"));
+      }, function () { hideNakshatraStory(true); }, 0);
+      else showNakshatraStory(trigger.getAttribute("data-jtt-nakshatra-story"));
+    });
+    host.addEventListener("focusout", function (event) {
+      if (event.target.closest && event.target.closest(".jtt-nakshatra-story-trigger") &&
+          !(event.relatedTarget && event.relatedTarget.closest && event.relatedTarget.closest(".jtt-planet-signification-panel")) &&
+          window.JAHoverManager) window.JAHoverManager.leave("nakshatra-story", 10000);
+    });
     host.addEventListener("keydown", function (event) {
       if (event.key !== "Enter" && event.key !== " ") return;
       var trigger = event.target && event.target.closest
         ? event.target.closest(".jtt-nakshatra-story-trigger") : null;
       if (!trigger || !host.contains(trigger)) return;
       event.preventDefault();
-      showNakshatraStory(trigger.getAttribute("data-jtt-nakshatra-story"));
+      if (window.JAHoverManager) window.JAHoverManager.activate("nakshatra-story", function () {
+        showNakshatraStory(trigger.getAttribute("data-jtt-nakshatra-story"));
+      }, function () { hideNakshatraStory(true); }, 0);
+      else showNakshatraStory(trigger.getAttribute("data-jtt-nakshatra-story"));
     });
   }
 
@@ -1404,6 +1445,7 @@
   var transitBasicTooltipHideTimer = null;
 
   function removeTransitBasicTooltip() {
+    if (window.JAHoverManager) window.JAHoverManager.untrack("transit-basic");
     if (transitBasicTooltipHideTimer) {
       clearTimeout(transitBasicTooltipHideTimer);
       transitBasicTooltipHideTimer = null;
@@ -1472,6 +1514,7 @@
     tooltip.style.left = Math.round(left) + "px";
     tooltip.style.top = Math.round(top) + "px";
     tooltip.style.visibility = "visible";
+    if (window.JAHoverManager) window.JAHoverManager.track("transit-basic", removeTransitBasicTooltip);
   }
 
   var houseResultOpenTimer = null;
@@ -1486,18 +1529,23 @@
       if (event.relatedTarget && target.contains(event.relatedTarget)) return;
       var houseNumber = Number(target.getAttribute("data-result-house"));
       if (!Number.isInteger(houseNumber) || houseNumber < 1 || houseNumber > 12) return;
-      clearTimeout(houseResultOpenTimer);
-      houseResultOpenTimer = setTimeout(function(){ if(target.isConnected){showHouseSignification(houseNumber);showTransitBasicTooltip(target);} },300);
+      if (window.JAHoverManager) window.JAHoverManager.activate("transit-signification", function () {
+        if (target.isConnected) { showHouseSignification(houseNumber); showTransitBasicTooltip(target); }
+      }, hidePlanetSignificationNow, 300);
+      else {
+        clearTimeout(houseResultOpenTimer);
+        houseResultOpenTimer = setTimeout(function () { if (target.isConnected) { showHouseSignification(houseNumber); showTransitBasicTooltip(target); } }, 300);
+      }
     });
-
     host.addEventListener("pointerout", function (event) {
       var target = event.target && event.target.closest
         ? event.target.closest(".jtt-house-result-trigger") : null;
       if (!target || !host.contains(target)) return;
-      if (event.relatedTarget && target.contains(event.relatedTarget)) return;
+      if (event.relatedTarget && (target.contains(event.relatedTarget) ||
+          event.relatedTarget.closest && event.relatedTarget.closest(".jtt-planet-signification-panel"))) return;
       clearTimeout(houseResultOpenTimer);
-      hidePlanetSignification();
-      scheduleTransitBasicTooltipHide();
+      if (window.JAHoverManager) window.JAHoverManager.leave("transit-signification", 5000);
+      else { hidePlanetSignification(); scheduleTransitBasicTooltipHide(); }
     });
 
     host.addEventListener("focusin", function (event) {
@@ -1506,16 +1554,20 @@
       if (!target || !host.contains(target)) return;
       var houseNumber = Number(target.getAttribute("data-result-house"));
       if (!Number.isInteger(houseNumber) || houseNumber < 1 || houseNumber > 12) return;
-      showHouseSignification(houseNumber);
-      showTransitBasicTooltip(target);
+      if (window.JAHoverManager) window.JAHoverManager.activate("transit-signification", function () {
+        showHouseSignification(houseNumber); showTransitBasicTooltip(target);
+      }, hidePlanetSignificationNow, 0);
+      else { showHouseSignification(houseNumber); showTransitBasicTooltip(target); }
     });
 
     host.addEventListener("focusout", function (event) {
       var target = event.target && event.target.closest
         ? event.target.closest(".jtt-house-result-trigger") : null;
       if (!target || !host.contains(target)) return;
-      hidePlanetSignification();
-      scheduleTransitBasicTooltipHide();
+      if (event.relatedTarget && event.relatedTarget.closest &&
+          event.relatedTarget.closest(".jtt-planet-signification-panel")) return;
+      if (window.JAHoverManager) window.JAHoverManager.leave("transit-signification", 5000);
+      else { hidePlanetSignification(); scheduleTransitBasicTooltipHide(); }
     });
   }
 
@@ -1572,6 +1624,22 @@
     panel.appendChild(title);
     panel.appendChild(body);
     tablePanel.insertAdjacentElement("afterend", panel);
+    panel.addEventListener("pointerenter", function () {
+      if (window.JAHoverManager) window.JAHoverManager.keepOpen(panel.classList.contains("is-nakshatra-story") ? "nakshatra-story" : "transit-signification");
+    });
+    panel.addEventListener("pointerleave", function () {
+      if (!window.JAHoverManager) return;
+      if (panel.classList.contains("is-nakshatra-story")) window.JAHoverManager.leave("nakshatra-story", 10000);
+      else window.JAHoverManager.leave("transit-signification", 5000);
+    });
+    panel.addEventListener("focusin", function () {
+      if (window.JAHoverManager) window.JAHoverManager.keepOpen(panel.classList.contains("is-nakshatra-story") ? "nakshatra-story" : "transit-signification");
+    });
+    panel.addEventListener("focusout", function (event) {
+      if (panel.contains(event.relatedTarget) || !window.JAHoverManager) return;
+      if (panel.classList.contains("is-nakshatra-story")) window.JAHoverManager.leave("nakshatra-story", 10000);
+      else window.JAHoverManager.leave("transit-signification", 5000);
+    });
     bindNakshatraStoryPanel(panel);
     return panel;
   }
@@ -1674,6 +1742,14 @@
     });
   }
 
+  function hidePlanetSignificationNow() {
+    clearPlanetSignificationTimers();
+    activePlanetSignification = null;
+    var panel = windowEl && windowEl.querySelector(".jtt-planet-signification-panel");
+    if (panel) { panel.classList.remove("is-visible"); panel.hidden = true; }
+    removeTransitBasicTooltip();
+  }
+
   function hidePlanetSignification() {
     clearPlanetSignificationTimers();
     if (!activePlanetSignification) return;
@@ -1703,16 +1779,34 @@
       var cell = name.closest(".jtt-planet-cell");
       if (!cell) return;
       var planet = name.textContent.trim();
-      if (planet) { clearTimeout(planetSignificationHoverTimer); planetSignificationHoverTimer = setTimeout(function(){showPlanetSignification(planet);},300); }
+      if (planet && window.JAHoverManager) window.JAHoverManager.activate("transit-signification", function () {
+        showPlanetSignification(planet);
+      }, hidePlanetSignificationNow, 300);
+      else if (planet) { clearTimeout(planetSignificationHoverTimer); planetSignificationHoverTimer = setTimeout(function () { showPlanetSignification(planet); }, 300); }
     });
-
     host.addEventListener("pointerout", function (event) {
       var name = event.target && event.target.closest
         ? event.target.closest(".jtt-planet-cell strong") : null;
       if (!name || !host.contains(name)) return;
-      if (event.relatedTarget && name.contains(event.relatedTarget)) return;
+      if (event.relatedTarget && (name.contains(event.relatedTarget) ||
+          event.relatedTarget.closest && event.relatedTarget.closest(".jtt-planet-signification-panel"))) return;
       clearTimeout(planetSignificationHoverTimer);
-      hidePlanetSignification();
+      if (window.JAHoverManager) window.JAHoverManager.leave("transit-signification", 5000);
+      else hidePlanetSignification();
+    });
+    host.addEventListener("focusin", function (event) {
+      var name = event.target && event.target.closest ? event.target.closest(".jtt-planet-cell strong") : null;
+      if (!name || !host.contains(name)) return;
+      var planet = name.textContent.trim();
+      if (planet && window.JAHoverManager) window.JAHoverManager.activate("transit-signification", function () {
+        showPlanetSignification(planet);
+      }, hidePlanetSignificationNow, 0);
+      else if (planet) showPlanetSignification(planet);
+    });
+    host.addEventListener("focusout", function (event) {
+      if (event.target.closest && event.target.closest(".jtt-planet-cell strong") &&
+          !(event.relatedTarget && event.relatedTarget.closest && event.relatedTarget.closest(".jtt-planet-signification-panel")) &&
+          window.JAHoverManager) window.JAHoverManager.leave("transit-signification", 5000);
     });
   }
 
