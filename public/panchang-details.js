@@ -75,7 +75,9 @@ function transitions(start,end,k){
  return out;
 }
 function renderWeek(k){
- var w=bounds(),changes=transitions(w.start-2*DAY,w.end+2*DAY,k),cuts=[{at:w.start-2*DAY,index:indices(w.start-2*DAY)[k]}].concat(changes,[{at:w.end+2*DAY,index:indices(w.end+2*DAY)[k]}]);
+ var w=bounds();
+ if(!w.days.length){bodyNode.innerHTML='<div class="ja-panchang-current-summary"><strong>Sunrise data unavailable.</strong><small>Check the selected location and date.</small></div>';return;}
+ var changes=transitions(w.start-2*DAY,w.end+2*DAY,k),cuts=[{at:w.start-2*DAY,index:indices(w.start-2*DAY)[k]}].concat(changes,[{at:w.end+2*DAY,index:indices(w.end+2*DAY)[k]}]);
  weekLabel.textContent='';
  var nowLocal=ctx.instant+ctx.tz*3600000,rows='',sample=meta(k,0),label=k==='tithi'?'Tithi':'Nakshatra';
  var headings=sample.map(function(x){return '<th>'+esc(x[0])+'</th>';}).join('');
@@ -98,7 +100,9 @@ var KARANA_NAMES=['Kimstughna','Bava','Balava','Kaulava','Taitila','Garaja','Van
 function eventName(which,i){return which==='yoga'?YOGA_NAMES[i]:KARANA_NAMES[i];}
 function planetMarkup(name){var palette=window.JA_PLANET_COLORS||{},color=palette[name];return color?'<span class="ja-panchang-planet-name" style="--ja-planet-color:'+color+'">'+esc(name)+'</span>':esc(name);}
 function renderLunarWeek(){
- var w=bounds(),start=w.start-2*DAY,end=w.end+2*DAY,step=2*3600000,changes={yoga:[],karana:[]},current={yoga:yogaKaranaIndex(start,'yoga'),karana:yogaKaranaIndex(start,'karana')},a=start;
+ var w=bounds();
+ if(!w.days.length){bodyNode.innerHTML='<div class="ja-panchang-current-summary"><strong>Sunrise data unavailable.</strong><small>Check the selected location and date.</small></div>';return;}
+ var start=w.start-2*DAY,end=w.end+2*DAY,step=2*3600000,changes={yoga:[],karana:[]},current={yoga:yogaKaranaIndex(start,'yoga'),karana:yogaKaranaIndex(start,'karana')},a=start;
  for(var b=Math.min(a+step,end);;b=Math.min(b+step,end)){
   ['yoga','karana'].forEach(function(which){var ib=yogaKaranaIndex(b,which);if(ib!==current[which]){var lo=a,hi=b;while(hi-lo>1000){var mid=Math.floor((lo+hi)/2);if(yogaKaranaIndex(mid,which)===current[which])lo=mid;else hi=mid;}changes[which].push({at:hi,index:ib});current[which]=ib;}});
   if(b===end)break;a=b;
@@ -149,9 +153,9 @@ function renderChaughadiyaHora(which){
  var selected=table('Chaughadiya',chSlots)+table('Hora',horaSlots);var dayDate=new Date(sunrise+ctx.tz*3600000);subtitleNode.textContent=pad(dayDate.getUTCDate())+'/'+pad(dayDate.getUTCMonth()+1)+'/'+dayDate.getUTCFullYear()+' · '+fmtClock(sunrise,ctx.tz)+' – '+fmtClock(nextSunrise,ctx.tz)+' local chart time';bodyNode.innerHTML='<div class="ja-panchang-dual-grid">'+selected+'</div>';
 }
 function renderInauspiciousWeek(){
- var w=bounds(),rahus=[8,2,7,5,6,4,3],guliks=[6,5,4,3,2,1,0],yamas=[4,3,2,1,0,6,5],rows='',weekDate=new Date(w.start+ctx.tz*3600000),lastDate=new Date(w.days[6].start+ctx.tz*3600000);
+ var w=bounds(),rahus=[8,2,7,5,6,4,3],guliks=[6,5,4,3,2,1,0],yamas=[4,3,2,1,0,6,5],rows='';
  if(!w.days.length){bodyNode.innerHTML='<div class="ja-panchang-current-summary"><strong>Sunrise data unavailable.</strong><small>Check the selected location and date.</small></div>';return;}
- var range=pad(weekDate.getUTCDate())+'/'+pad(weekDate.getUTCMonth()+1)+'/'+weekDate.getUTCFullYear()+' – '+pad(lastDate.getUTCDate())+'/'+pad(lastDate.getUTCMonth()+1)+'/'+lastDate.getUTCFullYear(),location=(document.getElementById('pob')||{}).value||'Selected chart location',tzLabel='UTC'+(ctx.tz>=0?'+':'')+String(ctx.tz),heads=['☾ &nbsp; Rahu Kaal','◉ &nbsp; Gulika Kaal','☼ &nbsp; Yamaghanta'];
+ var weekDate=new Date(w.start+ctx.tz*3600000),lastDate=new Date(w.days[6].start+ctx.tz*3600000),range=pad(weekDate.getUTCDate())+'/'+pad(weekDate.getUTCMonth()+1)+'/'+weekDate.getUTCFullYear()+' – '+pad(lastDate.getUTCDate())+'/'+pad(lastDate.getUTCMonth()+1)+'/'+lastDate.getUTCFullYear(),location=(document.getElementById('pob')||{}).value||'Selected chart location',tzLabel='UTC'+(ctx.tz>=0?'+':'')+String(ctx.tz),heads=['☾ &nbsp; Rahu Kaal','◉ &nbsp; Gulika Kaal','☼ &nbsp; Yamaghanta'];
  for(var day=0;day<7;day++){
   var dayInfo=w.days[day],localMid=dayInfo.localMid,weekday=dayInfo.weekday,rise=dayInfo.start,set=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,false),nextRise=dayInfo.end,valid=Number.isFinite(rise)&&Number.isFinite(set)&&rise>0&&set>rise&&set<nextRise,today=ctx.instant>=rise&&ctx.instant<nextRise,cols='';
   if(valid){var eighth=(set-rise)/8,entries=[rahus[weekday]-1,guliks[weekday],yamas[weekday]];
