@@ -746,7 +746,10 @@
       var lattaMarker = lattaSources.length
         ? ' <sup class="jtt-latta-marker" title="Latta caused by: ' + escapeTableText(lattaSources.join(", ")) + '">{L}</sup>'
         : '';
-      var nakshatraHtml = escapeTableText(row.nakshatra) + lattaMarker +
+      var nakshatraHtml = '<span class="jtt-nakshatra-story-trigger" data-jtt-nakshatra-story="' +
+        escapeTableText(row.nakshatra) + '" tabindex="0" role="button" aria-label="Click to read the deity story of ' +
+        escapeTableText(row.nakshatra) + '" title="Click to read Nakshatra deity story">' +
+        escapeTableText(row.nakshatra) + '</span>' + lattaMarker +
         (nakshatraLord ? ' <span class="jtt-nak-lord">(' + nakshatraLord + ')</span>' : '');
       var murti = escapeTableText(row.murti || "");
       var murtiTone = row.murti === "Excellent" ? " jtt-murti-excellent" :
@@ -1076,6 +1079,184 @@
     closeGlobalExportMenu();
   }
 
+  // Nakshatra deity stories: click a Nakshatra in the transit table to open
+  // the shared signification panel. The panel remains for 20 seconds, unless
+  // the pointer is over it; outside clicks dismiss it immediately.
+  var nakshatraStoriesPromise = null;
+  var activeNakshatraStory = null;
+  var nakshatraStoryTimer = null;
+  var nakshatraStoryDeadline = 0;
+  var nakshatraStoryRemaining = 20000;
+  var nakshatraStoryPaused = false;
+
+  function loadNakshatraStories() {
+    if (!nakshatraStoriesPromise) {
+      nakshatraStoriesPromise = fetch("/data/nakshatra-deity-stories.json", {
+        credentials: "same-origin",
+        cache: "force-cache"
+      }).then(function (response) {
+        if (!response.ok) throw new Error("Nakshatra deity stories returned HTTP " + response.status);
+        return response.json();
+      }).then(function (database) {
+        if (!database || !Array.isArray(database.nakshatras) || database.nakshatras.length !== 27) {
+          throw new Error("Nakshatra deity story database must contain all 27 Nakshatras.");
+        }
+        return database.nakshatras;
+      }).catch(function (error) {
+        nakshatraStoriesPromise = null;
+        throw error;
+      });
+    }
+    return nakshatraStoriesPromise;
+  }
+
+  function clearNakshatraStoryTimer() {
+    if (nakshatraStoryTimer) {
+      clearTimeout(nakshatraStoryTimer);
+      nakshatraStoryTimer = null;
+    }
+  }
+
+  function hideNakshatraStory(immediate) {
+    clearNakshatraStoryTimer();
+    nakshatraStoryDeadline = 0;
+    nakshatraStoryRemaining = 20000;
+    nakshatraStoryPaused = false;
+    activeNakshatraStory = null;
+    var panel = ensurePlanetSignificationPanel();
+    if (!panel) return;
+    var meta = panel.querySelector(".jtt-nakshatra-story-meta");
+    if (meta) meta.hidden = true;
+    panel.classList.remove("is-nakshatra-story");
+    if (immediate) {
+      panel.classList.remove("is-visible");
+      panel.hidden = true;
+    } else {
+      panel.classList.remove("is-visible");
+      setTimeout(function () {
+        if (!activeNakshatraStory && !panel.classList.contains("is-visible")) panel.hidden = true;
+      }, 260);
+    }
+  }
+
+  function scheduleNakshatraStoryExpiry() {
+    clearNakshatraStoryTimer();
+    if (!activeNakshatraStory || nakshatraStoryPaused) return;
+    nakshatraStoryDeadline = Date.now() + nakshatraStoryRemaining;
+    nakshatraStoryTimer = setTimeout(function () {
+      hideNakshatraStory(false);
+    }, Math.max(0, nakshatraStoryRemaining));
+  }
+
+  function pauseNakshatraStoryExpiry() {
+    if (!activeNakshatraStory || nakshatraStoryPaused) return;
+    if (nakshatraStoryTimer) {
+      nakshatraStoryRemaining = Math.max(0, nakshatraStoryDeadline - Date.now());
+      clearNakshatraStoryTimer();
+    }
+    nakshatraStoryPaused = true;
+  }
+
+  function resumeNakshatraStoryExpiry() {
+    if (!activeNakshatraStory || !nakshatraStoryPaused) return;
+    nakshatraStoryPaused = false;
+    if (nakshatraStoryRemaining <= 0) {
+      hideNakshatraStory(false);
+      return;
+    }
+    scheduleNakshatraStoryExpiry();
+  }
+
+  function showNakshatraStory(name) {
+    var requestedName = String(name || "").trim();
+    if (!requestedName) return;
+    clearPlanetSignificationTimers();
+    clearNakshatraStoryTimer();
+    activePlanetSignification = "nakshatra:" + requestedName;
+    activeNakshatraStory = requestedName;
+    nakshatraStoryRemaining = 20000;
+    nakshatraStoryPaused = false;
+
+    var panel = ensurePlanetSignificationPanel();
+    if (!panel) return;
+    var title = panel.querySelector(".jtt-planet-signification-title");
+    var body = panel.querySelector(".jtt-planet-signification-body");
+    var meta = panel.querySelector(".jtt-nakshatra-story-meta");
+    if (!meta) {
+      meta = document.createElement("div");
+      meta.className = "jtt-nakshatra-story-meta";
+      title.insertAdjacentElement("afterend", meta);
+    }
+
+    title.textContent = requestedName;
+    meta.hidden = false;
+    meta.textContent = "Loading deity details…";
+    body.textContent = "Loading Nakshatra deity story…";
+    panel.hidden = false;
+    panel.classList.add("is-nakshatra-story");
+    panel.classList.remove("is-visible");
+    void panel.offsetWidth;
+    panel.classList.add("is-visible");
+
+    loadNakshatraStories().then(function (entries) {
+      if (activeNakshatraStory !== requestedName || !panel.isConnected) return;
+      var entry = entries.find(function (item) {
+        return String(item.name || "").toLowerCase() === requestedName.toLowerCase();
+      });
+      if (!entry) {
+        meta.textContent = "Deity information unavailable";
+        body.textContent = "No story is available for this Nakshatra.";
+        return;
+      }
+      title.textContent = entry.name;
+      meta.textContent = "Lord: " + (entry.lord || "—") + "   ·   Deity: " + (entry.deity || "—");
+      body.textContent = entry.story || "No story is available for this Nakshatra.";
+      if (entry.textualBackground || entry.sourceNotes) {
+        var source = document.createElement("div");
+        source.className = "jtt-nakshatra-story-source";
+        if (entry.textualBackground) {
+          var background = document.createElement("div");
+          background.textContent = "Textual background: " + entry.textualBackground;
+          source.appendChild(background);
+        }
+        if (entry.sourceNotes) {
+          var note = document.createElement("div");
+          note.textContent = entry.sourceNotes;
+          source.appendChild(note);
+        }
+        body.appendChild(source);
+      }
+    }).catch(function (error) {
+      if (activeNakshatraStory !== requestedName || !panel.isConnected) return;
+      meta.textContent = "Story unavailable";
+      body.textContent = "Nakshatra deity story could not be loaded. Please try again.";
+      console.error("Jupiter Astro: Unable to load Nakshatra deity stories.", error);
+    });
+
+    scheduleNakshatraStoryExpiry();
+  }
+
+  function bindNakshatraStoryPanel(panel) {
+    if (!panel || panel.dataset.nakshatraStoryEvents === "true") return;
+    panel.dataset.nakshatraStoryEvents = "true";
+    panel.addEventListener("pointerenter", pauseNakshatraStoryExpiry);
+    panel.addEventListener("pointerleave", resumeNakshatraStoryExpiry);
+    panel.addEventListener("focusin", pauseNakshatraStoryExpiry);
+    panel.addEventListener("focusout", function (event) {
+      if (!panel.contains(event.relatedTarget)) resumeNakshatraStoryExpiry();
+    });
+  }
+
+  document.addEventListener("click", function (event) {
+    if (!activeNakshatraStory || !windowEl || !openState()) return;
+    var target = event.target;
+    if (target && target.closest && (
+      target.closest(".jtt-nakshatra-story-trigger") ||
+      target.closest(".jtt-planet-signification-panel")
+    )) return;
+    hideNakshatraStory(false);
+  }, true);
+
   var houseSignificationsPromise = null;
   var houseSignificationBoundHosts = new WeakSet();
 
@@ -1110,6 +1291,9 @@
 
     var title = panel.querySelector(".jtt-planet-signification-title");
     var body = panel.querySelector(".jtt-planet-signification-body");
+    var storyMeta = panel.querySelector(".jtt-nakshatra-story-meta");
+    if (storyMeta) storyMeta.hidden = true;
+    panel.classList.remove("is-nakshatra-story");
     title.textContent = "House " + houseNumber;
     body.textContent = "Loading house signification…";
     panel.hidden = false;
@@ -1283,7 +1467,10 @@
   function ensurePlanetSignificationPanel() {
     if (!windowEl) return null;
     var existing = windowEl.querySelector(".jtt-planet-signification-panel");
-    if (existing) return existing;
+    if (existing) {
+      bindNakshatraStoryPanel(existing);
+      return existing;
+    }
 
     var tablePanel = windowEl.querySelector("[data-jtt-transit-table]");
     if (!tablePanel || !tablePanel.parentNode) return null;
@@ -1301,6 +1488,7 @@
     panel.appendChild(title);
     panel.appendChild(body);
     tablePanel.insertAdjacentElement("afterend", panel);
+    bindNakshatraStoryPanel(panel);
     return panel;
   }
 
@@ -1374,6 +1562,9 @@
 
     var title = panel.querySelector(".jtt-planet-signification-title");
     var body = panel.querySelector(".jtt-planet-signification-body");
+    var storyMeta = panel.querySelector(".jtt-nakshatra-story-meta");
+    if (storyMeta) storyMeta.hidden = true;
+    panel.classList.remove("is-nakshatra-story");
     title.textContent = planet;
     body.textContent = "Loading planetary signification…";
     panel.hidden = false;
@@ -1759,6 +1950,7 @@
 
   function closeWindow() {
     if (!windowEl) return;
+    hideNakshatraStory(true);
     windowEl.classList.remove("jtt-open", "jtt-maximized");
     windowEl.setAttribute("aria-hidden", "true");
     launcher.classList.remove("visible");
@@ -1767,6 +1959,7 @@
 
   function minimizeWindow() {
     if (!openState()) return;
+    hideNakshatraStory(true);
     windowEl.classList.remove("jtt-open");
     launcher.classList.add("visible");
   }
@@ -1841,6 +2034,14 @@
   }
 
   function handleWindowClick(event) {
+    var nakshatraTrigger = event.target.closest(".jtt-nakshatra-story-trigger");
+    if (nakshatraTrigger) {
+      showNakshatraStory(nakshatraTrigger.getAttribute("data-jtt-nakshatra-story"));
+      return;
+    }
+    if (event.target.closest(".jtt-planet-signification-panel")) return;
+    if (activeNakshatraStory) hideNakshatraStory(false);
+
     var exportWrap = event.target.closest(".jtt-global-export-wrap");
     if (!exportWrap) closeGlobalExportMenu();
 
