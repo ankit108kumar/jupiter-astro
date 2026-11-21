@@ -898,12 +898,18 @@
     if (!start || !end) return escapeTableText(value);
 
     var showYear = start.year !== end.year;
+    var sameDate = start.day === end.day && start.month === end.month && start.year === end.year;
     var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     function renderEndpoint(date) {
       var monthName = monthNames[Number(date.month) - 1];
       if (!monthName) return escapeTableText(date.day + "/" + date.month + "/" + date.year);
-      var result = date.day + "-" + monthName + (showYear ? "-" + date.year : "");
-      if (date.time) result += ' <span class="jtt-duration-tooltip-time">' + escapeTableText(date.time) + '</span>';
+      var dateText = date.day + "-" + monthName + (showYear ? "-" + date.year : "");
+      var result = sameDate
+        ? '<span class="jtt-duration-tooltip-date-muted">' + dateText + '</span>'
+        : dateText;
+      if (date.time) {
+        result += ' <span class="jtt-duration-tooltip-time' + (sameDate ? ' jtt-duration-tooltip-time-primary' : '') + '">' + escapeTableText(date.time) + '</span>';
+      }
       return result;
     }
     return renderEndpoint(start) + ' <span class="jtt-duration-tooltip-separator">to</span> ' + renderEndpoint(end);
