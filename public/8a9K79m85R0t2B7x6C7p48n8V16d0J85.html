@@ -3345,7 +3345,112 @@ if (!placed) {
   window.addEventListener('scroll', hideCard, true);
   window.addEventListener('blur', hideCard);
 })();
+
+/* ================= NAKSHATRA HOVER INFORMATION CARD ================= */
+(function initNakshatraHoverCard() {
+  if (document.getElementById('nakshatraHoverCard')) return;
+
+  const card = document.createElement('div');
+  card.id = 'nakshatraHoverCard';
+  card.className = 'nakshatra-hover-card';
+  card.hidden = true;
+  document.body.appendChild(card);
+
+  let reference = null;
+  let activeTarget = null;
+  let referencePromise = null;
+
+  const escapeHtml = value => String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[ch]);
+
+  function loadReference() {
+    if (reference) return Promise.resolve(reference);
+    if (!referencePromise) {
+      referencePromise = fetch('/data/panchang-reference.json', { cache: 'force-cache' })
+        .then(response => {
+          if (!response.ok) throw new Error('Nakshatra reference could not be loaded');
+          return response.json();
+        })
+        .then(data => {
+          if (!data || !Array.isArray(data.nakshatras)) throw new Error('Invalid Nakshatra reference');
+          reference = data.nakshatras;
+          return reference;
+        })
+        .catch(error => {
+          referencePromise = null;
+          console.error('Nakshatra hover reference:', error);
+          return null;
+        });
+    }
+    return referencePromise;
+  }
+
+  function positionCard(x, y) {
+    const margin = 12, gap = 14, rect = card.getBoundingClientRect();
+    let left = x + gap, top = y + gap;
+    if (left + rect.width > window.innerWidth - margin) left = x - rect.width - gap;
+    if (top + rect.height > window.innerHeight - margin) top = y - rect.height - gap;
+    card.style.left = Math.max(margin, Math.min(left, window.innerWidth - rect.width - margin)) + 'px';
+    card.style.top = Math.max(margin, Math.min(top, window.innerHeight - rect.height - margin)) + 'px';
+  }
+
+  async function showCard(target, x, y) {
+    const name = target.dataset.nakshatraName;
+    if (!name) return;
+    activeTarget = target;
+    const list = await loadReference();
+    if (!list || activeTarget !== target || !target.isConnected) return;
+    const item = list.find(entry => entry.name === name);
+    if (!item) return;
+
+    const fields = [
+      ['Category', item.category],
+      ['Ruling planet', item.lord],
+      ['Deity', item.deity],
+      ['Nature', item.nature],
+      ['Syllables', Array.isArray(item.letters) ? item.letters.join(' · ') : item.letters],
+      ['Symbol', item.symbol],
+      ['Shape', item.shape],
+      ['Animal', item.animal],
+      ['Trees', item.tree],
+      ['Object', item.object]
+    ];
+    card.innerHTML = '<div class="nh-title">' + escapeHtml(item.name) + '</div>' +
+      '<div class="nh-grid">' + fields.map(([label, value]) =>
+        '<div class="nh-row"><span class="nh-label">' + escapeHtml(label) +
+        '</span><span class="nh-value">' + escapeHtml(value || '—') + '</span></div>'
+      ).join('') + '</div>';
+    card.hidden = false;
+    positionCard(x, y);
+  }
+
+  function hideCard() {
+    activeTarget = null;
+    card.hidden = true;
+  }
+
+  document.addEventListener('pointerover', event => {
+    const target = event.target.closest('.ja-nakshatra-hover');
+    if (!target) return;
+    if (target === activeTarget && !card.hidden) return;
+    showCard(target, event.clientX, event.clientY);
+  });
+  document.addEventListener('pointermove', event => {
+    if (activeTarget && !card.hidden) positionCard(event.clientX, event.clientY);
+  });
+  document.addEventListener('pointerout', event => {
+    const target = event.target.closest('.ja-nakshatra-hover');
+    if (!target || target !== activeTarget) return;
+    const next = event.relatedTarget;
+    if (next && next.closest && next.closest('.ja-nakshatra-hover')) return;
+    hideCard();
+  });
+  window.addEventListener('scroll', hideCard, true);
+  window.addEventListener('blur', hideCard);
+})();
 /* ================================================================ */
+
 
 let arrowSeq = 0;
 function bindAspectHooks(boxId, noteId, lagna, items) {
@@ -4597,7 +4702,7 @@ dasha(k, prefix, evalMs = Date.now()) {
           const lattaMarker = lattaSources.length
             ? `<sup class="ja-navtara-latta" title="Latta caused by: ${lattaSources.join(', ')}">{L}</sup>`
             : '';
-          return `<td>${nakshatraName}${lattaMarker}${occupantHtml ? ` <span class="ja-navtara-occupants">${occupantHtml}</span>` : ''}</td>`;
+          return `<td><span class="ja-nakshatra-hover" data-nakshatra-name="${nakshatraName}">${nakshatraName}</span>${lattaMarker}${occupantHtml ? ` <span class="ja-navtara-occupants">${occupantHtml}</span>` : ''}</td>`;
         }).join('');
 
         return `
