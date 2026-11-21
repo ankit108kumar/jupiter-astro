@@ -1806,6 +1806,11 @@ input:focus-visible { border-color: var(--saffron); }
   font-size: 10px;
 }
 
+.zodiac-hover-card .zh-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 16px;
+}
 .zodiac-hover-card .zh-row {
   display: grid;
   grid-template-columns: 78px minmax(0, 1fr);
@@ -4709,4 +4714,9 @@ body.ja-font-scale-enabled [data-ja-font-scale-target] {
 .ja-varga-tooltip[data-varga-tooltip=""]::after { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .ja-varga-tooltip::after { transition: none; }
+}
+
+@media (max-width: 520px) {
+  .zodiac-hover-card .zh-grid { grid-template-columns: 1fr; }
+  .zodiac-hover-card { width: min(340px, calc(100vw - 24px)); }
 }
