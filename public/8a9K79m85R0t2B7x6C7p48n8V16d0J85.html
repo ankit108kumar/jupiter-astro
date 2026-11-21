@@ -3415,229 +3415,244 @@ if (!placed) {
 })();
 
 
-/* ================= ZODIAC SIGN HOVER INTERACTION ================= */
+/* ================= SHARED HOVER INTENT MANAGER ================= */
+(function installJAHoverManager() {
+  if (window.JAHoverManager) return;
+  var active = null, pending = null, closeTimer = null, serial = 0, stack = [];
+  function clearPending() { if (pending && pending.timer) clearTimeout(pending.timer); pending = null; }
+  function untrack(key) { stack = stack.filter(function (item) { return item.key !== key; }); }
+  function track(key, close) {
+    untrack(key);
+    stack.push({ key: key, close: close, order: ++serial });
+  }
+  function closeActive(immediate) {
+    if (!active) return;
+    var item = active; active = null; untrack(item.key);
+    try { item.close(!!immediate); } catch (error) { console.error("Hover surface close failed:", error); }
+  }
+  function activate(key, open, close, openDelay) {
+    clearPending();
+    if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+    if (active && active.key === key) return;
+    var token = { key: key, timer: null };
+    pending = token;
+    token.timer = setTimeout(function () {
+      if (pending !== token) return;
+      pending = null;
+      closeActive(true);
+      open();
+      active = { key: key, close: close };
+      track(key, close);
+    }, Math.max(0, openDelay == null ? 300 : openDelay));
+  }
+  function leave(key, closeDelay) {
+    if (pending && pending.key === key) clearPending();
+    if (!active || active.key !== key) return;
+    if (closeTimer) clearTimeout(closeTimer);
+    closeTimer = setTimeout(function () {
+      closeTimer = null;
+      if (active && active.key === key) closeActive(false);
+    }, Math.max(0, closeDelay == null ? 500 : closeDelay));
+  }
+  function keepOpen(key) {
+    if (active && active.key === key && closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+  }
+  function dismiss(key, immediate) {
+    clearPending();
+    if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+    if (active && (!key || active.key === key)) closeActive(immediate !== false);
+    else if (key) untrack(key);
+  }
+  function dismissLast() {
+    clearPending();
+    if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+    var item = stack.pop();
+    if (!item) return false;
+    if (active && active.key === item.key) active = null;
+    try { item.close(true); } catch (error) { console.error("Hover surface dismissal failed:", error); }
+    return true;
+  }
+  document.addEventListener("keydown", function (event) {
+    if (event.key !== "Escape") return;
+    if (dismissLast()) { event.preventDefault(); event.stopImmediatePropagation(); }
+  }, true);
+  window.JAHoverManager = { activate: activate, leave: leave, keepOpen: keepOpen, dismiss: dismiss, track: track, untrack: untrack, dismissLast: dismissLast };
+})();
+
+/* ================= ZODIAC SIGN HOVER INFORMATION CARD ================= */
 (function initZodiacHoverCard() {
-  if (document.getElementById('zodiacHoverCard')) return;
-
-  const card = document.createElement('div');
-  card.id = 'zodiacHoverCard';
-  card.className = 'zodiac-hover-card';
+  if (document.getElementById("zodiacHoverCard")) return;
+  var card = document.createElement("div");
+  card.id = "zodiacHoverCard";
+  card.className = "zodiac-hover-card";
   card.hidden = true;
+  card.setAttribute("role", "tooltip");
   document.body.appendChild(card);
-
-  let activeSign = null;
-  let zodiacOpenTimer = null, zodiacCloseTimer = null;
-
-  function positionCard(x, y) {
-    const margin = 12;
-    const gap = 14;
-    const rect = card.getBoundingClientRect();
-
-    let left = x + gap;
-    let top = y + gap;
-
-    if (left + rect.width > window.innerWidth - margin) {
-      left = x - rect.width - gap;
-    }
-
-    if (top + rect.height > window.innerHeight - margin) {
-      top = y - rect.height - gap;
-    }
-
-    left = Math.max(margin, Math.min(left, window.innerWidth - rect.width - margin));
-    top = Math.max(margin, Math.min(top, window.innerHeight - rect.height - margin));
-
-    card.style.left = left + 'px';
-    card.style.top = top + 'px';
+  var activeTarget = null, activeSign = null;
+  var key = "zodiac-card";
+  function positionCard(target) {
+    var margin = 12;
+    var header = document.querySelector("header.brand");
+    var minTop = header ? Math.min(window.innerHeight - 80, header.getBoundingClientRect().bottom + 8) : 12;
+    var rect = target.getBoundingClientRect();
+    var cardRect = card.getBoundingClientRect();
+    var left = rect.left + rect.width / 2 - cardRect.width / 2;
+    left = Math.max(margin, Math.min(left, window.innerWidth - cardRect.width - margin));
+    var top = Math.max(minTop, rect.bottom + 10);
+    var available = Math.max(120, window.innerHeight - minTop - margin);
+    card.style.maxHeight = available + "px";
+    card.style.left = left + "px";
+    card.style.top = (top + cardRect.height > window.innerHeight - margin
+      ? Math.max(minTop, window.innerHeight - cardRect.height - margin) : top) + "px";
   }
-
-  function showCard(sign, x, y) {
-    const d = ZODIAC_HOVER_DATA[sign];
-    if (!d) return;
-
-    activeSign = sign;
-    const fields = [
-      ['Alphabets', d.alphabets],
-      ['Symbol', d.symbol],
-      ['Shape', d.shape],
-      ['Color', d.color],
-      ['Animals', d.animals],
-      ['Bird', d.bird],
-      ['Tree', d.tree],
-      ['Flower', d.flower],
-      ['Gemstone', d.gemstone],
-      ['Semi-precious', d.semiPrecious],
-      ['Temple', d.temple],
-      ['Object', d.object],
-      ['Deity', d.deity],
-      ['Nature', d.nature],
-      ['Life themes', d.themes],
-      ['Body', d.body],
-      ['Nakshatras', d.nakshatras]
+  function showCard(target, sign) {
+    var d = ZODIAC_HOVER_DATA[sign];
+    if (!d || !target || !target.isConnected) return;
+    activeTarget = target; activeSign = sign;
+    var fields = [
+      ["Alphabets", d.alphabets], ["Symbol", d.symbol], ["Shape", d.shape],
+      ["Color", d.color], ["Animals", d.animals], ["Bird", d.bird], ["Tree", d.tree],
+      ["Flower", d.flower], ["Gemstone", d.gemstone], ["Semi-precious", d.semiPrecious],
+      ["Temple", d.temple], ["Object", d.object], ["Deity", d.deity],
+      ["Nature", d.nature], ["Life themes", d.themes], ["Body", d.body], ["Nakshatras", d.nakshatras]
     ];
-
-    card.innerHTML = `
-      <div class="zh-title">${d.name}</div>
-      <div class="zh-subtitle">${d.sanskrit} · ${d.element} · ${d.polarity} · ${d.modality}</div>
-      <div class="zh-grid">
-        ${fields.map(([label, value]) => `
-          <div class="zh-row">
-            <span class="zh-label">${label}</span>
-            <span class="zh-value">${value || '—'}</span>
-          </div>
-        `).join('')}
-      </div>
-    `;
-
+    card.innerHTML = '<div class="zh-title">' + d.name + '</div>' +
+      '<div class="zh-subtitle">' + d.sanskrit + ' · ' + d.element + ' · ' + d.polarity + ' · ' + d.modality + '</div>' +
+      '<div class="zh-grid">' + fields.map(function (field) {
+        return '<div class="zh-row"><span class="zh-label">' + field[0] +
+          '</span><span class="zh-value">' + (field[1] || "—") + '</span></div>';
+      }).join("") + '</div>';
     card.hidden = false;
-    positionCard(x, y);
+    positionCard(target);
   }
-
-  function hideCard() {
-    activeSign = null;
-    card.hidden = true;
-  }
-
-  document.addEventListener('pointerover', function (e) {
-    const target = e.target.closest('.sign-number');
+  function hideCard() { activeTarget = null; activeSign = null; card.hidden = true; }
+  function enterCard() { window.JAHoverManager.keepOpen(key); }
+  card.addEventListener("pointerenter", enterCard);
+  card.addEventListener("pointerleave", function (event) {
+    if (activeTarget && event.relatedTarget === activeTarget) return;
+    window.JAHoverManager.leave(key, 500);
+  });
+  card.addEventListener("focusin", enterCard);
+  card.addEventListener("focusout", function (event) {
+    if (!card.contains(event.relatedTarget)) window.JAHoverManager.leave(key, 500);
+  });
+  document.addEventListener("pointerover", function (event) {
+    var target = event.target.closest && event.target.closest(".sign-number");
+    if (!target || card.contains(target)) return;
+    var sign = Number(target.dataset.sign);
+    if (sign < 1 || sign > 12) return;
+    activeTarget = target;
+    window.JAHoverManager.activate(key, function () { showCard(target, sign); }, hideCard, 300);
+  });
+  document.addEventListener("pointerout", function (event) {
+    var target = event.target.closest && event.target.closest(".sign-number");
+    if (!target || event.relatedTarget && (target.contains(event.relatedTarget) || card.contains(event.relatedTarget))) return;
+    window.JAHoverManager.leave(key, 500);
+  });
+  document.addEventListener("focusin", function (event) {
+    var target = event.target.closest && event.target.closest(".sign-number");
     if (!target) return;
-
-    const sign = Number(target.dataset.sign);
-    if (sign >= 1 && sign <= 12) {
-      clearTimeout(zodiacCloseTimer); clearTimeout(zodiacOpenTimer);
-      zodiacOpenTimer = setTimeout(() => { if (target.isConnected) showCard(sign, e.clientX, e.clientY); }, 300);
+    var sign = Number(target.dataset.sign);
+    if (sign < 1 || sign > 12) return;
+    window.JAHoverManager.activate(key, function () { showCard(target, sign); }, hideCard, 0);
+  });
+  document.addEventListener("focusout", function (event) {
+    if (event.target.closest && event.target.closest(".sign-number") && !card.contains(event.relatedTarget)) {
+      window.JAHoverManager.leave(key, 500);
     }
   });
-
-  document.addEventListener('pointermove', function (e) {
-    if (activeSign !== null && !card.hidden) {
-      positionCard(e.clientX, e.clientY);
-    }
-  });
-
-  document.addEventListener('pointerout', function (e) {
-    const target = e.target.closest('.sign-number');
-    if (!target) return;
-
-    const next = e.relatedTarget;
-    if (next && next.closest && next.closest('.sign-number')) return;
-
-    clearTimeout(zodiacOpenTimer);
-    zodiacCloseTimer = setTimeout(hideCard, 500);
-  });
-
-  window.addEventListener('scroll', () => { clearTimeout(zodiacOpenTimer); clearTimeout(zodiacCloseTimer); hideCard(); }, true);
-  window.addEventListener('blur', hideCard);
+  window.addEventListener("resize", function () { if (activeTarget && !card.hidden) positionCard(activeTarget); });
+  window.addEventListener("scroll", function () { if (activeTarget && !card.hidden) positionCard(activeTarget); }, true);
 })();
 
 /* ================= NAKSHATRA HOVER INFORMATION CARD ================= */
 (function initNakshatraHoverCard() {
-  if (document.getElementById('nakshatraHoverCard')) return;
-
-  const card = document.createElement('div');
-  card.id = 'nakshatraHoverCard';
-  card.className = 'nakshatra-hover-card';
+  if (document.getElementById("nakshatraHoverCard")) return;
+  var card = document.createElement("div");
+  card.id = "nakshatraHoverCard";
+  card.className = "nakshatra-hover-card";
   card.hidden = true;
+  card.setAttribute("role", "tooltip");
   document.body.appendChild(card);
-
-  let reference = null;
-  let activeTarget = null;
-  let referencePromise = null;
-  let nakOpenTimer = null, nakCloseTimer = null;
-
-  const escapeHtml = value => String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-  })[ch]);
-
+  var reference = null, referencePromise = null, activeTarget = null, key = "nakshatra-card";
+  function escapeHtml(value) {
+    return String(value == null ? "" : value).replace(/[&<>"']/g, function (ch) {
+      return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch];
+    });
+  }
   function loadReference() {
     if (reference) return Promise.resolve(reference);
-    if (!referencePromise) {
-      referencePromise = fetch('/data/panchang-reference.json', { cache: 'force-cache' })
-        .then(response => {
-          if (!response.ok) throw new Error('Nakshatra reference could not be loaded');
-          return response.json();
-        })
-        .then(data => {
-          if (!data || !Array.isArray(data.nakshatras)) throw new Error('Invalid Nakshatra reference');
-          reference = data.nakshatras;
-          return reference;
-        })
-        .catch(error => {
-          referencePromise = null;
-          console.error('Nakshatra hover reference:', error);
-          return null;
-        });
-    }
+    if (!referencePromise) referencePromise = fetch("/data/panchang-reference.json", { cache: "force-cache" })
+      .then(function (response) { if (!response.ok) throw new Error("Nakshatra reference could not be loaded"); return response.json(); })
+      .then(function (data) { if (!data || !Array.isArray(data.nakshatras)) throw new Error("Invalid Nakshatra reference"); reference = data.nakshatras; return reference; })
+      .catch(function (error) { referencePromise = null; console.error("Nakshatra hover reference:", error); return null; });
     return referencePromise;
   }
-
-  function positionCard(x, y) {
-    const margin = 12, gap = 14, rect = card.getBoundingClientRect();
-    let left = x + gap, top = y + gap;
-    if (left + rect.width > window.innerWidth - margin) left = x - rect.width - gap;
-    if (top + rect.height > window.innerHeight - margin) top = y - rect.height - gap;
-    card.style.left = Math.max(margin, Math.min(left, window.innerWidth - rect.width - margin)) + 'px';
-    card.style.top = Math.max(margin, Math.min(top, window.innerHeight - rect.height - margin)) + 'px';
+  function positionCard(target) {
+    var margin = 12, header = document.querySelector("header.brand");
+    var minTop = header ? Math.min(window.innerHeight - 80, header.getBoundingClientRect().bottom + 8) : 12;
+    var rect = target.getBoundingClientRect(), box = card.getBoundingClientRect();
+    var left = Math.max(margin, Math.min(rect.left + rect.width / 2 - box.width / 2, window.innerWidth - box.width - margin));
+    var top = Math.max(minTop, rect.bottom + 10);
+    var available = Math.max(120, window.innerHeight - minTop - margin);
+    card.style.maxHeight = available + "px";
+    card.style.left = left + "px";
+    card.style.top = (top + box.height > window.innerHeight - margin ? Math.max(minTop, window.innerHeight - box.height - margin) : top) + "px";
   }
-
-  async function showCard(target, x, y) {
-    const name = target.dataset.nakshatraName;
-    if (!name) return;
+  async function showCard(target) {
+    var name = target && target.dataset.nakshatraName;
+    if (!name || !target.isConnected) return;
     activeTarget = target;
-    const list = await loadReference();
+    var list = await loadReference();
     if (!list || activeTarget !== target || !target.isConnected) return;
-    const item = list.find(entry => entry.name === name);
+    var item = list.find(function (entry) { return entry.name === name; });
     if (!item) return;
-
-    const fields = [
-      ['Category', item.category],
-      ['Ruling planet', item.lord],
-      ['Deity', item.deity],
-      ['Nature', item.nature],
-      ['Syllables', Array.isArray(item.letters) ? item.letters.join(' · ') : item.letters],
-      ['Symbol', item.symbol],
-      ['Shape', item.shape],
-      ['Animal', item.animal],
-      ['Trees', item.tree],
-      ['Object', item.object]
+    var fields = [
+      ["Category", item.category], ["Ruling planet", item.lord], ["Deity", item.deity],
+      ["Nature", item.nature], ["Syllables", Array.isArray(item.letters) ? item.letters.join(" · ") : item.letters],
+      ["Symbol", item.symbol], ["Shape", item.shape], ["Animal", item.animal], ["Trees", item.tree], ["Object", item.object]
     ];
-    card.innerHTML = '<div class="nh-title">' + escapeHtml(item.name) + '</div>' +
-      '<div class="nh-grid">' + fields.map(([label, value]) =>
-        '<div class="nh-row"><span class="nh-label">' + escapeHtml(label) +
-        '</span><span class="nh-value">' + escapeHtml(value || '—') + '</span></div>'
-      ).join('') + '</div>';
+    card.innerHTML = '<div class="nh-title">' + escapeHtml(item.name) + '</div><div class="nh-grid">' +
+      fields.map(function (field) { return '<div class="nh-row"><span class="nh-label">' +
+        escapeHtml(field[0]) + '</span><span class="nh-value">' + escapeHtml(field[1] || "—") +
+        '</span></div>'; }).join("") + '</div>';
     card.hidden = false;
-    positionCard(x, y);
+    positionCard(target);
   }
-
-  function hideCard() {
-    activeTarget = null;
-    card.hidden = true;
-  }
-
-  document.addEventListener('pointerover', event => {
-    const target = event.target.closest('.ja-nakshatra-hover');
+  function hideCard() { activeTarget = null; card.hidden = true; }
+  card.addEventListener("pointerenter", function () { window.JAHoverManager.keepOpen(key); });
+  card.addEventListener("pointerleave", function (event) {
+    if (activeTarget && event.relatedTarget === activeTarget) return;
+    window.JAHoverManager.leave(key, 500);
+  });
+  card.addEventListener("focusin", function () { window.JAHoverManager.keepOpen(key); });
+  card.addEventListener("focusout", function (event) { if (!card.contains(event.relatedTarget)) window.JAHoverManager.leave(key, 500); });
+  document.addEventListener("pointerover", function (event) {
+    var target = event.target.closest && event.target.closest(".ja-nakshatra-hover");
+    if (!target || card.contains(target)) return;
+    if (event.relatedTarget && target.contains(event.relatedTarget)) return;
+    activeTarget = target;
+    window.JAHoverManager.activate(key, function () { showCard(target); }, hideCard, 300);
+  });
+  document.addEventListener("pointerout", function (event) {
+    var target = event.target.closest && event.target.closest(".ja-nakshatra-hover");
+    if (!target || event.relatedTarget && (target.contains(event.relatedTarget) || card.contains(event.relatedTarget))) return;
+    window.JAHoverManager.leave(key, 500);
+  });
+  document.addEventListener("focusin", function (event) {
+    var target = event.target.closest && event.target.closest(".ja-nakshatra-hover");
     if (!target) return;
-    if (target === activeTarget && !card.hidden) return;
-    clearTimeout(nakCloseTimer); clearTimeout(nakOpenTimer);
-    nakOpenTimer = setTimeout(() => { if (target.isConnected) showCard(target, event.clientX, event.clientY); }, 300);
+    activeTarget = target;
+    window.JAHoverManager.activate(key, function () { showCard(target); }, hideCard, 0);
   });
-  document.addEventListener('pointermove', event => {
-    if (activeTarget && !card.hidden) positionCard(event.clientX, event.clientY);
+  document.addEventListener("focusout", function (event) {
+    if (event.target.closest && event.target.closest(".ja-nakshatra-hover") && !card.contains(event.relatedTarget)) {
+      window.JAHoverManager.leave(key, 500);
+    }
   });
-  document.addEventListener('pointerout', event => {
-    const target = event.target.closest('.ja-nakshatra-hover');
-    if (!target || target !== activeTarget) return;
-    const next = event.relatedTarget;
-    if (next && next.closest && next.closest('.ja-nakshatra-hover')) return;
-    clearTimeout(nakOpenTimer);
-    nakCloseTimer = setTimeout(hideCard, 500);
-  });
-  window.addEventListener('scroll', () => { clearTimeout(nakOpenTimer); clearTimeout(nakCloseTimer); hideCard(); }, true);
-  window.addEventListener('blur', hideCard);
+  window.addEventListener("resize", function () { if (activeTarget && !card.hidden) positionCard(activeTarget); });
+  window.addEventListener("scroll", function () { if (activeTarget && !card.hidden) positionCard(activeTarget); }, true);
 })();
-/* ================================================================ */
-
 
 let arrowSeq = 0;
 function bindAspectHooks(boxId, noteId, lagna, items) {
