@@ -2029,6 +2029,7 @@
     dismissAuthPrompt();
     createWindow();
     windowEl.classList.add("jtt-open");
+    document.body.classList.add("jtt-window-open");
     windowEl.setAttribute("aria-hidden", "false");
     launcher.classList.remove("visible");
     syncFromContext();
@@ -2039,6 +2040,7 @@
     if (!windowEl) return;
     hideNakshatraStory(true);
     windowEl.classList.remove("jtt-open", "jtt-maximized");
+    document.body.classList.remove("jtt-window-open");
     windowEl.setAttribute("aria-hidden", "true");
     launcher.classList.remove("visible");
     maximized = false;
@@ -2048,6 +2050,7 @@
     if (!openState()) return;
     hideNakshatraStory(true);
     windowEl.classList.remove("jtt-open");
+    document.body.classList.remove("jtt-window-open");
     launcher.classList.add("visible");
   }
 
@@ -2060,6 +2063,7 @@
     }
     dismissAuthPrompt();
     windowEl.classList.add("jtt-open");
+    document.body.classList.add("jtt-window-open");
     windowEl.setAttribute("aria-hidden", "false");
     launcher.classList.remove("visible");
     syncFromContext();
