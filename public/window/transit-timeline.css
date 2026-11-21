@@ -2483,3 +2483,8 @@
 #ja-transit-timeline-window .jtt-murti-satisfactory{color:#9a741e;text-shadow:0 0 7px rgba(154,116,30,.12)}
 #ja-transit-timeline-window .jtt-murti-bad{color:#c46b32;text-shadow:0 0 7px rgba(196,107,50,.12)}
 #ja-transit-timeline-window .jtt-murti-very-bad{color:#bd6268;text-shadow:0 0 7px rgba(189,98,104,.14)}
+
+
+/* Keep the page stationary while the Transit Timeline is open; its own table remains scrollable. */
+body.jtt-window-open{overflow:hidden!important;overscroll-behavior:none!important}
+#ja-transit-timeline-window,.jtt-table-scroll,.jtt-window-body{overscroll-behavior:contain}
