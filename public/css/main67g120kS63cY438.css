@@ -4705,14 +4705,23 @@ body.ja-font-scale-enabled [data-ja-font-scale-target] {
   visibility: hidden;
   pointer-events: none;
   transform: translateY(-4px);
-  transition: opacity 160ms ease 300ms, transform 160ms ease 300ms, visibility 160ms ease 300ms;
+  transition: opacity 160ms ease 1000ms, transform 160ms ease 1000ms, visibility 160ms ease 1000ms;
 }
-.ja-varga-tooltip:hover::after,
+.ja-varga-tooltip:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition-delay: 300ms;
+}
 .ja-varga-tooltip:focus-visible::after {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
+  transition-delay: 0ms;
 }
+.ja-varga-tooltip:focus-visible{outline:2px solid var(--accent,#b78330);outline-offset:3px;border-radius:3px}
+.sign-number:focus{outline:none;filter:drop-shadow(0 0 2px var(--saffron))}
+.ja-nakshatra-hover:focus-visible{outline:2px solid var(--accent,#b78330);outline-offset:2px;border-radius:3px}
 .ja-varga-tooltip[data-varga-tooltip=""]::after { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .ja-varga-tooltip::after { transition: none; }
