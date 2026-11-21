@@ -3436,7 +3436,12 @@ if (!placed) {
     var item = active; active = null; untrack(item.key);
     try { item.close(!!immediate); } catch (error) { console.error("Hover surface close failed:", error); }
   }
-  function activate(key, open, close, openDelay) {
+  function defaultCloseDelay(key) {
+    if (key === "nakshatra-story") return 10000;
+    if (key === "transit-signification") return 5000;
+    return 500;
+  }
+  function activate(key, open, close, openDelay, closeDelay) {
     clearPending();
     if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
     var token = { key: key, timer: null };
@@ -3446,18 +3451,20 @@ if (!placed) {
       pending = null;
       closeActive(true);
       open();
-      active = { key: key, close: close };
+      active = { key: key, close: close, closeDelay: closeDelay == null ? defaultCloseDelay(key) : closeDelay };
       track(key, close);
     }, Math.max(0, openDelay == null ? 300 : openDelay));
   }
   function leave(key, closeDelay) {
-    if (pending && pending.key === key) clearPending();
-    if (!active || active.key !== key) return;
+    var canceledPending = !!(pending && pending.key === key);
+    if (canceledPending) clearPending();
+    if (!active || (active.key !== key && !canceledPending)) return;
     if (closeTimer) clearTimeout(closeTimer);
+    var delay = active.key === key && closeDelay != null ? closeDelay : active.closeDelay;
     closeTimer = setTimeout(function () {
       closeTimer = null;
-      if (active && active.key === key) closeActive(false);
-    }, Math.max(0, closeDelay == null ? 500 : closeDelay));
+      if (active) closeActive(false);
+    }, Math.max(0, delay == null ? defaultCloseDelay(active.key) : delay));
   }
   function keepOpen(key) {
     if (active && active.key === key && closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
