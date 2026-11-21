@@ -4722,3 +4722,32 @@ body.ja-font-scale-enabled [data-ja-font-scale-target] {
   .zodiac-hover-card .zh-grid { grid-template-columns: 1fr; }
   .zodiac-hover-card { width: min(340px, calc(100vw - 24px)); }
 }
+
+
+/* Zodiac hover-card accessibility and viewport positioning refinements */
+.zodiac-hover-card{
+  width:min(560px,calc(100vw - 24px))!important;
+  max-width:calc(100vw - 24px)!important;
+  max-height:calc(100vh - 88px)!important;
+  overflow:auto!important;
+  pointer-events:auto!important;
+  overscroll-behavior:contain;
+  z-index:10000;
+}
+.zodiac-hover-card .zh-grid{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:18px}
+.zodiac-hover-card .zh-row{grid-template-columns:108px minmax(0,1fr);min-width:0}
+.nakshatra-hover-card{
+  width:min(540px,calc(100vw - 24px))!important;
+  max-width:calc(100vw - 24px)!important;
+  max-height:calc(100vh - 88px)!important;
+  overflow:auto!important;
+  pointer-events:auto!important;
+  overscroll-behavior:contain;
+}
+.nakshatra-hover-card .nh-grid{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:20px}
+.nakshatra-hover-card .nh-row{grid-template-columns:104px minmax(0,1fr);min-width:0}
+@media(max-width:620px){
+ .zodiac-hover-card,.nakshatra-hover-card{width:min(460px,calc(100vw - 20px))!important;max-width:calc(100vw - 20px)!important}
+ .zodiac-hover-card .zh-grid,.nakshatra-hover-card .nh-grid{grid-template-columns:minmax(0,1fr)}
+ .zodiac-hover-card .zh-row,.nakshatra-hover-card .nh-row{grid-template-columns:100px minmax(0,1fr)}
+}
