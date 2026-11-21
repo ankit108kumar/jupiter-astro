@@ -4392,15 +4392,14 @@ return `
 
 /* ===== Misc: Yogi / Avayogi and Khara points ===== */
 function jaYogiAndKhara(k){
- const ascLon=rev(k.ch.asc),moonLon=rev(k.ch.planets.Moon.lon);
+ const moonLon=rev(k.ch.planets.Moon.lon);
  const sun=rev(k.ch.planets.Sun.lon),moon=moonLon;
  const yogiPoint=rev(sun+moon+93+20/60),avayogiPoint=rev(yogiPoint+186+40/60);
  const pointInfo=lon=>{const x=rev(lon),ni=Math.min(26,Math.floor(x/(40/3))),n=NAK[ni];return{longitude:dms(x),sign:SIGNS[signOf(x)][0],nakshatra:n[0],lord:n[1]};};
  const yogi=pointInfo(yogiPoint),avayogi=pointInfo(avayogiPoint);
 
- // Jataka Parijata method: 22nd Drekkana from the Ascendant division,
- // and 64th Navamsa from the Moon division. Count each starting division as 1.
- const dSign=signOf(ascLon),dDeg=ascLon%30;
+ // Count both Khara divisions inclusively from the natal Moon division.
+ const dSign=signOf(moonLon),dDeg=moonLon%30;
  const dPart=Math.min(3,Math.floor(dDeg/10)+1);
  const dIndex=(3*dSign+dPart-1+21)%36;
  const dDivisionSign=Math.floor(dIndex/3),dNum=dIndex%3+1;
@@ -4422,7 +4421,7 @@ function jaYogiAndKhara(k){
 }
 function jaKharaResultMarkup(d){
  return '<div class="scroll"><table><thead><tr><th>Indicator</th><th>Counted from</th><th>Corresponding divisional sign</th></tr></thead><tbody>'+
- '<tr><td>22nd Drekkana</td><td>Natal Ascendant</td><td><strong>'+d.drekkana.sign+'</strong> <small>(D3)</small></td></tr>'+
+ '<tr><td>22nd Drekkana</td><td>Natal Moon</td><td><strong>'+d.drekkana.sign+'</strong> <small>(D3)</small></td></tr>'+
  '<tr><td>64th Navamsa</td><td>Natal Moon</td><td><strong>'+d.navamsa.sign+'</strong> <small>(D9)</small></td></tr>'+
  '</tbody></table></div>';
 }
@@ -4434,7 +4433,7 @@ function jaMiscTabMarkup(k,prefix){
  '<tr><td>Avayogi Point</td><td class="num">'+dms(rev(rev(k.ch.planets.Sun.lon+k.ch.planets.Moon.lon+93+20/60)+186+40/60))+'</td><td>'+d.avayogi.sign+'</td><td>'+d.avayogi.nakshatra+'</td><td>'+d.avayogi.lord+'</td></tr>'+
  '<tr><td>Avayogi Planet</td><td>'+d.avayogi.lord+'</td><td colspan="3">Vimshottari lord of Avayogi Nakshatra</td></tr></tbody></table></div>'+
  '<p class="sub ja-misc-formula">Yogi = (Sidereal Sun + Sidereal Moon + 93°20′) mod 360°. Avayogi = (Yogi + 186°40′) mod 360°.</p></section>'+
- '<section class="card ja-misc-sensitive-card"><header><div><h3>22nd Drekkana &amp; 64th Navamsa</h3><p class="sub">Classical reference points: Ascendant for Drekkana; Moon for Navamsa</p></div></header><div id="'+prefix+'-kharaResults">'+jaKharaResultMarkup(d)+'</div><p class="sub ja-misc-formula">Both divisions are counted inclusively. Results show the corresponding D3 and D9 signs, respectively.</p></section>'+
+ '<section class="card ja-misc-sensitive-card"><header><div><h3>22nd Drekkana &amp; 64th Navamsa</h3><p class="sub">Reference point: natal Moon for both calculations</p></div></header><div id="'+prefix+'-kharaResults">'+jaKharaResultMarkup(d)+'</div><p class="sub ja-misc-formula">Both divisions are counted inclusively from the natal Moon. Results show the corresponding D3 and D9 signs, respectively.</p></section>'+
  '<p class="ja-misc-accuracy"><strong>ⓘ Accuracy notice:</strong> Formula-based implementation; results are yet to be independently verified against authoritative classical editions and reference charts.</p>';
 }
 
