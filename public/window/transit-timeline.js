@@ -297,11 +297,6 @@
   function renderDurationCell(interval, displayHtml, label, nakshatraStoryName) {
     var display = displayHtml || '<span class="jtt-cell-muted">—</span>';
     var isNakshatraStory = !!nakshatraStoryName;
-    var storyAttributes = isNakshatraStory
-      ? ' jtt-nakshatra-story-trigger" data-jtt-nakshatra-story="' +
-        escapeTableText(nakshatraStoryName) + '" aria-label="Click to read the deity story of ' +
-        escapeTableText(nakshatraStoryName)
-      : '';
     if (!interval || !interval.startText || !interval.endText) {
       return isNakshatraStory
         ? '<span class="jtt-nakshatra-story-trigger" data-jtt-nakshatra-story="' +
