@@ -2497,3 +2497,14 @@ body.jtt-window-open{overflow:hidden!important;overscroll-behavior:none!importan
 #ja-transit-timeline-window .jtt-planet-signification-panel[hidden]{pointer-events:none!important}
 #ja-transit-timeline-window .jtt-transit-result-tooltip,
 #ja-transit-timeline-window .jtt-duration-tooltip{pointer-events:auto}
+
+
+/* Keyboard focus indicator for planet-name signification triggers. */
+#ja-transit-timeline-window .jtt-planet-cell strong:focus-visible,
+#ja-transit-timeline-window .jtt-house-result-trigger:focus-visible,
+#ja-transit-timeline-window .jtt-duration-wrap:focus-visible,
+#ja-transit-timeline-window .jtt-nakshatra-story-trigger:focus-visible{
+ outline:2px solid rgba(183,131,48,.72);
+ outline-offset:3px;
+ border-radius:3px;
+}
