@@ -898,8 +898,11 @@
     if (!start || !end) return escapeTableText(value);
 
     var showYear = start.year !== end.year;
+    var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     function renderEndpoint(date) {
-      var result = date.day + "/" + date.month + (showYear ? "/" + date.year : "");
+      var monthName = monthNames[Number(date.month) - 1];
+      if (!monthName) return escapeTableText(date.day + "/" + date.month + "/" + date.year);
+      var result = date.day + "-" + monthName + (showYear ? "-" + date.year : "");
       if (date.time) result += ' <span class="jtt-duration-tooltip-time">' + escapeTableText(date.time) + '</span>';
       return result;
     }
