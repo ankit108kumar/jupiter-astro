@@ -3493,14 +3493,15 @@ if (!placed) {
   function positionCard(target) {
     var margin = 12;
     var header = document.querySelector("header.brand");
-    var minTop = header ? Math.min(window.innerHeight - 80, header.getBoundingClientRect().bottom + 8) : 12;
+    var headerBottom = header ? header.getBoundingClientRect().bottom : 0;
+    var minTop = headerBottom > 0 ? Math.max(12, Math.min(window.innerHeight - 80, headerBottom + 8)) : 12;
     var rect = target.getBoundingClientRect();
+    var available = Math.max(120, window.innerHeight - minTop - margin);
+    card.style.maxHeight = available + "px";
     var cardRect = card.getBoundingClientRect();
     var left = rect.left + rect.width / 2 - cardRect.width / 2;
     left = Math.max(margin, Math.min(left, window.innerWidth - cardRect.width - margin));
     var top = Math.max(minTop, rect.bottom + 10);
-    var available = Math.max(120, window.innerHeight - minTop - margin);
-    card.style.maxHeight = available + "px";
     card.style.left = left + "px";
     card.style.top = (top + cardRect.height > window.innerHeight - margin
       ? Math.max(minTop, window.innerHeight - cardRect.height - margin) : top) + "px";
