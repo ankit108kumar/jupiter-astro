@@ -1,0 +1,222 @@
+{
+  "version": 1,
+  "description": "Traditional deity stories for the 27 Nakshatras. Stories distinguish Vedic identities from later epic and Puranic narrative traditions; source notes flag textual variation.",
+  "nakshatras": [
+    {
+      "name": "Ashwini",
+      "lord": "Ketu",
+      "deity": "Ashwini Kumaras (Divine Physicians)",
+      "story": "The Ashwini Kumaras are divine twin horsemen, renowned as physicians of the gods. They travel swiftly between heaven and earth, restoring health, youth and vitality. In Vedic legends, they rescue the sage Chyavana and restore his youth, help the shipwrecked Bhujyu, and assist people in extraordinary circumstances. Their healing powers are not limited to physical illness: they represent the restoration of hope and the recovery of what appears lost. Their association with dawn also makes them symbols of beginnings, speed, vitality and the arrival of new possibilities.",
+      "textualBackground": "Vedic hymns and later epic-Puranic narratives",
+      "sourceNotes": "The Chyavana and Bhujyu episodes occur in different Vedic narrative traditions."
+    },
+    {
+      "name": "Bharani",
+      "lord": "Venus",
+      "deity": "Yama (God of Death)",
+      "story": "Yama is regarded as the first mortal to discover the path to the world beyond death. He becomes the ruler of the departed and the guardian of moral order. In the famous story of Savitri and Satyavan, Yama comes to take Satyavan's life, but Savitri follows him with extraordinary determination and wisdom. Impressed by her devotion and intelligence, Yama grants her several boons, ultimately allowing Satyavan to live. This story presents Yama not simply as a destroyer, but as a just authority who upholds Dharma. His mythology concerns mortality, responsibility, consequences and the boundary between life and death.",
+      "textualBackground": "Vedic tradition and Mahabharata",
+      "sourceNotes": "The Savitri-Satyavan episode is from the Mahabharata; Yama's Vedic role is older."
+    },
+    {
+      "name": "Krittika",
+      "lord": "Sun",
+      "deity": "Agni (Fire)",
+      "story": "Agni is the divine fire who carries offerings from human beings to the gods. He is the messenger between the earthly and heavenly worlds, the witness of sacred vows and the force that transforms whatever enters his flames. Vedic hymns describe Agni as having many forms: the fire of the altar, lightning in the atmosphere and the heat of the Sun. In traditions surrounding Kartikeya, Agni is involved in carrying the divine energy from which the warrior god is born and nurtured by the Krittikas. His story expresses purification, discipline, courage and transformation through intense energy.",
+      "textualBackground": "Rigveda and later Skanda traditions",
+      "sourceNotes": "The Kartikeya birth narrative has multiple versions; Agni's role varies among them."
+    },
+    {
+      "name": "Rohini",
+      "lord": "Moon",
+      "deity": "Brahma/Prajapati",
+      "story": "Prajapati is the Lord of Creatures, the creative principle responsible for the generation and expansion of life. In Vedic thought, he is associated with the emergence of living beings and the ordering of creation; later traditions frequently identify him with Brahma. A well-known lunar legend connects Rohini with Chandra: the Moon marries Daksha's 27 daughters, who represent the Nakshatras, but becomes especially attached to Rohini. His partiality causes the other wives to complain, and Daksha places a curse on him. This mythology links Rohini with fertility, beauty, growth and the creative power of attraction.",
+      "textualBackground": "Vedic creation hymns and later Puranic lunar legend",
+      "sourceNotes": "Prajapati and Brahma are related or identified in later traditions, but are not identical in every early text."
+    },
+    {
+      "name": "Mrigashira",
+      "lord": "Mars",
+      "deity": "Soma (Moon God)",
+      "story": "Soma is the sacred celestial drink of the Vedic gods and is also identified with the Moon. He represents nourishment, inspiration, delight and the life-giving essence of existence. In later mythology, Soma marries the 27 daughters of Daksha, but favours Rohini above the others. When Daksha curses him for neglecting his wives, the Moon begins to wane. The gods intervene, and the curse is modified so that Soma waxes and wanes in cycles. This story explains the changing phases of the Moon while illustrating attachment, desire, nourishment and the rhythms of renewal.",
+      "textualBackground": "Rigveda and later Puranic lunar legend",
+      "sourceNotes": "The lunar marriage and waning story appears in varying forms across Puranic sources."
+    },
+    {
+      "name": "Ardra",
+      "lord": "Rahu",
+      "deity": "Rudra (Destructive form of Shiva)",
+      "story": "Rudra is the fierce Vedic deity associated with storms, wild nature, disease and healing. He is feared for his destructive arrows, yet people also pray to him for protection and medicine. Later Hindu traditions identify Rudra closely with Shiva. One creation account describes Rudra emerging from Brahma's anger; crying, he receives names and domains from Brahma. Rudra's mythology is therefore not merely about destruction. He is the force that breaks what has become stagnant and also the healer who restores life. His storm-like nature expresses grief, intensity, change and purification.",
+      "textualBackground": "Rigveda and later Puranic traditions",
+      "sourceNotes": "Accounts of Rudra's origin differ across texts; the Brahma-origin account is a later narrative."
+    },
+    {
+      "name": "Punarvasu",
+      "lord": "Jupiter",
+      "deity": "Aditi (Mother of Gods)",
+      "story": "Aditi is the great mother of the Adityas, a group of solar and cosmic deities that includes Mitra, Varuna and Indra in various Vedic lists. Her name is commonly understood as suggesting boundlessness or freedom from limitation. In the Puranic story of Vamana, Aditi becomes distressed when her sons, the gods, lose their sovereignty to the asura king Bali. She performs austerities and receives Vishnu as her son in the form of Vamana, who eventually restores the gods' position. Aditi's mythology conveys protection, maternal compassion, restoration and the possibility of returning to one's rightful place.",
+      "textualBackground": "Rigveda and Bhagavata/Puranic Vamana tradition",
+      "sourceNotes": "The Vamana birth narrative is Puranic; Aditi's Vedic identity is primarily as mother of the Adityas."
+    },
+    {
+      "name": "Pushya",
+      "lord": "Saturn",
+      "deity": "Brihaspati (Jupiter, Guru of Gods)",
+      "story": "Brihaspati is the preceptor and spiritual guide of the Devas. He represents sacred knowledge, wisdom, counsel, prayer and the power of articulate speech. In the conflict between the gods and the asuras, Brihaspati guides the Devas through knowledge and spiritual discipline rather than physical strength alone. A famous lunar legend concerns his wife Tara, who is taken away by Soma. Their dispute leads to the birth of Budha, the planet Mercury. The story also raises questions about desire, marriage and responsibility. Brihaspati's central role is that of the teacher who sustains order through wisdom and sound judgement.",
+      "textualBackground": "Vedic hymns and later Puranic Tara-Soma narrative",
+      "sourceNotes": "The Tara-Soma-Budha story has several textual versions."
+    },
+    {
+      "name": "Ashlesha",
+      "lord": "Mercury",
+      "deity": "Sarpas or Nagas (Serpent Gods)",
+      "story": "The serpent deities are a powerful race in Hindu mythology, associated with hidden treasures, subterranean worlds, fertility, danger and esoteric knowledge. One major story concerns Kadru, the mother of the Nagas, and Vinata, the mother of Garuda. Through a dispute and deception involving the divine horse Uchchaihshravas, Vinata becomes enslaved to Kadru. Garuda eventually seeks Amrita, the nectar of immortality, to free his mother. This brings him into conflict with the Nagas and the gods. Serpent mythology thus combines bondage and liberation, concealed power, poison and the possibility of immortality.",
+      "textualBackground": "Mahabharata, Adi Parva",
+      "sourceNotes": "The Kadru-Vinata-Garuda cycle is narrated in the Mahabharata; serpent traditions are much older and broader."
+    },
+    {
+      "name": "Magha",
+      "lord": "Ketu",
+      "deity": "Pitris (Forefathers / Ancestors)",
+      "story": "The Pitris are ancestral beings who have departed from earthly life and occupy an honoured place in Hindu ritual tradition. They are not simply remembered relatives; they are regarded as part of the continuing lineage that connects past, present and future generations. In the Shraddha tradition, descendants offer food, water and prayers to honour them and seek their blessings. The concept of Pitri Loka represents a realm associated with departed ancestors. Their mythology is less about one dramatic adventure and more about the sacred relationship between generations. They represent heritage, lineage, memory, obligations and the continuity of family and tradition.",
+      "textualBackground": "Vedic ritual texts, Grihya traditions and Puranas",
+      "sourceNotes": "The Pitris are a class of ancestral beings, not one individual deity with a single biography."
+    },
+    {
+      "name": "Purva Phalguni",
+      "lord": "Venus",
+      "deity": "Bhaga (God of Prosperity)",
+      "story": "Bhaga is an Aditya associated with fortune, prosperity, enjoyment and the distribution of life's blessings. His name is connected with bhaga, meaning a share, portion or good fortune. One dramatic story involving him occurs during Daksha's sacrifice. When Shiva is insulted and excluded from the ritual, Virabhadra arrives with a fierce host and destroys the sacrifice. In this episode, Bhaga is among the deities who suffer injury; some versions describe his eyes being destroyed. The story shows that prosperity and enjoyment cannot remain secure when sacred respect and harmony are violated.",
+      "textualBackground": "Rigveda references and later Puranic Daksha-yajna narrative",
+      "sourceNotes": "Details of Bhaga's injury differ among Puranic retellings."
+    },
+    {
+      "name": "Uttara Phalguni",
+      "lord": "Sun",
+      "deity": "Aryaman (God of Patronage)",
+      "story": "Aryaman is an Aditya associated with honourable relationships, hospitality, social agreements and the bonds that unite people. In Vedic prayers, he is invoked alongside Mitra and Varuna as a guardian of proper conduct and social order. He is particularly connected with marriage, friendship, kinship and the responsibilities that accompany these relationships. Unlike deities whose stories centre on dramatic battles, Aryaman's importance is expressed through the rules and values that make society function. His mythology is therefore understood through the sacredness of promises, the dignity of guests, the obligations of marriage and the trust that sustains alliances.",
+      "textualBackground": "Rigveda and Vedic marriage hymns",
+      "sourceNotes": "Aryaman is principally characterised through hymns and ritual functions rather than a single extended legend."
+    },
+    {
+      "name": "Hasta",
+      "lord": "Moon",
+      "deity": "Savitri/Surya (Sun God, Creator of Energy)",
+      "story": "Savitr is the divine solar power that awakens, inspires and sets life into motion. The celebrated Gayatri Mantra, from the Rigveda, invokes the divine radiance of Savitr and asks that it illuminate human understanding. Vedic hymns describe Savitr as golden, radiant and active in setting beings and natural processes into their appointed paths. He is sometimes depicted with golden hands, through which he gives life and movement. His mythology is closely connected with dawn, awakening and the power of inspiration. Savitr represents the ability to take an idea and turn it into purposeful action through skill, effort and clarity.",
+      "textualBackground": "Rigveda, especially the Savitr hymns and Gayatri mantra",
+      "sourceNotes": "Savitr is a distinct Vedic solar deity, closely related to but not simply interchangeable with Surya."
+    },
+    {
+      "name": "Chitra",
+      "lord": "Mars",
+      "deity": "Tvastar/Vishwakarma (Divine Architect)",
+      "story": "Tvashtar is the divine craftsman and architect who shapes forms, creates instruments and gives structure to the universe. He is associated with craftsmanship, beauty, technical skill and the power to transform raw material into something refined. One of his most famous contributions is the creation of Indra's Vajra, the thunderbolt weapon used to defeat the demon Vritra. In a celebrated tradition, the weapon is fashioned from the bones of the sage Dadhichi, who willingly sacrifices his body for the welfare of the gods. Tvashtar's mythology combines artistry, engineering, sacrifice and the creation of powerful instruments that serve a greater purpose.",
+      "textualBackground": "Rigveda and later Puranic Dadhichi-Vajra narrative",
+      "sourceNotes": "The Vajra's making is attributed to Tvashtar in some accounts and to divine craftsmanship more broadly in others."
+    },
+    {
+      "name": "Swati",
+      "lord": "Rahu",
+      "deity": "Vayu (Wind God)",
+      "story": "Vayu is the god of wind and the vital breath that sustains living beings. He moves freely through the worlds and is associated with speed, independence and invisible power. In the Ramayana, Vayu is the divine father of Hanuman, whose extraordinary strength, speed and ability to cross the ocean reflect the power of the wind. In the Mahabharata, Vayu is also the father of Bhima, whose immense physical strength makes him one of the great warriors of the epic. Through these sons, Vayu's mythology expresses both disciplined service and tremendous force. He represents movement, freedom, breath and the power of unseen forces.",
+      "textualBackground": "Ramayana and Mahabharata",
+      "sourceNotes": "Vayu's paternity of Hanuman and Bhima is expressed through different epic traditions."
+    },
+    {
+      "name": "Vishakha",
+      "lord": "Jupiter",
+      "deity": "Indra & Agni",
+      "story": "Vishakha is governed by the combined power of Indra and Agni. Indra is the warrior king of the Devas, while Agni is the sacred fire and divine messenger. Their combined presence brings together force and illumination. Indra's most celebrated Vedic victory is his battle against Vritra, the serpent-like being who holds back the waters. With the Vajra, Indra breaks Vritra's obstruction and releases the life-giving rivers. Agni, meanwhile, carries offerings and sustains the connection between human beings and the gods. Together, the two deities symbolise determined effort, the overcoming of resistance, and the power to achieve a difficult objective.",
+      "textualBackground": "Rigveda, including hymns to Indra, Agni and Indragni",
+      "sourceNotes": "The paired deity Indragni is explicitly invoked in Vedic hymns."
+    },
+    {
+      "name": "Anuradha",
+      "lord": "Saturn",
+      "deity": "Mitra",
+      "story": "Mitra is a Vedic deity associated with friendship, agreement, harmony and the sacred obligations that bind individuals together. He is frequently mentioned alongside Varuna, with whom he helps maintain Rita, the cosmic order governing the universe. While Varuna is often associated with authority and the enforcement of moral law, Mitra represents the trust and cooperation through which that order is maintained. He protects agreements and the reliability of relationships. His mythology is less concerned with spectacular battles and more with the quiet power of keeping one's word. Mitra represents loyalty, partnership, mutual respect, social harmony and the preservation of trust.",
+      "textualBackground": "Rigveda, especially hymns to Mitra-Varuna",
+      "sourceNotes": "Mitra's Vedic character is chiefly conveyed through hymns, covenant and cosmic-order themes."
+    },
+    {
+      "name": "Jyeshtha",
+      "lord": "Mercury",
+      "deity": "Indra",
+      "story": "Indra is the king of the Devas and one of the most prominent gods of the Rigveda. His greatest victory is the defeat of Vritra, who has imprisoned the waters. Armed with the Vajra, Indra destroys the obstruction and releases the rivers, restoring fertility and life to the world. Yet Indra's mythology also contains stories of pride, insecurity and the consequences of abusing power. In the story of Nahusha, the temporary ruler who occupies Indra's throne becomes arrogant and eventually falls. Indra's stories therefore portray both the glory and vulnerability of leadership: power must be accompanied by courage, responsibility and restraint.",
+      "textualBackground": "Rigveda and Mahabharata",
+      "sourceNotes": "The Nahusha episode appears in the Mahabharata; Indra's Vritra victory is central to Vedic mythology."
+    },
+    {
+      "name": "Mula",
+      "lord": "Ketu",
+      "deity": "Nirriti (Goddess of Dissolution)",
+      "story": "Nirriti is a Vedic goddess associated with dissolution, misfortune, decay and the forces that undo established order. In early Vedic prayers, worshippers seek protection from her destructive influence and ask that she remain far away from their homes and families. She represents the unavoidable side of existence: things that are formed must eventually decline, and attachments cannot remain permanent. Unlike deities with elaborate heroic narratives, Nirriti is primarily known through her association with destruction and the removal of what has become corrupted. Her mythology can be understood as the power of endings, disintegration and the stripping away of false security.",
+      "textualBackground": "Rigveda and Vedic ritual texts",
+      "sourceNotes": "Nirriti is a Vedic goddess; later traditions vary in spelling, gendering and personification."
+    },
+    {
+      "name": "Purva Ashadha",
+      "lord": "Venus",
+      "deity": "Apah (Cosmic Waters)",
+      "story": "Apah is the collective divine principle of the waters. In Vedic hymns, the waters are praised as mothers, purifiers and sources of life. They are associated with nourishment, healing and the primordial conditions from which creation emerges. The Rigveda contains hymns addressed directly to the Waters, asking them to cleanse human beings and grant strength and well-being. In many creation traditions, cosmic waters exist before the ordered world takes shape. The waters are therefore not merely a physical element but a sacred life-giving force. Their mythology conveys purification, fertility, emotional depth, renewal and the capacity to overcome impurity.",
+      "textualBackground": "Rigveda, especially the hymn to the Waters (Apah)",
+      "sourceNotes": "Apah is a collective divine personification of waters, not a single deity with one biographical story."
+    },
+    {
+      "name": "Uttara Ashadha",
+      "lord": "Sun",
+      "deity": "Vishvedevas (Universal Gods)",
+      "story": "The Vishvadevas are a collective group of deities representing universal divine principles rather than one individual god. They are invoked together in Vedic ritual and ancestral offerings. Different texts give different lists of their members, but their collective identity expresses the many powers that sustain cosmic and social order. They represent virtues and responsibilities that must work together: truth, discipline, generosity, courage, patience and righteous conduct. Their mythology is not centred on one single hero or dramatic event. Instead, their significance lies in the cooperation of divine forces. They symbolise collective responsibility, universal values, righteous action and achievements that endure.",
+      "textualBackground": "Rigveda and Vedic ritual texts",
+      "sourceNotes": "The membership of the Vishvadevas varies by text and ritual context."
+    },
+    {
+      "name": "Shravana",
+      "lord": "Moon",
+      "deity": "Vishnu",
+      "story": "Vishnu is the preserver of cosmic order and is celebrated in the Vedic tradition for his three great strides, through which he measures or encompasses the worlds. This imagery becomes especially famous in the Puranic story of Vamana. Vishnu takes the form of a small Brahmin dwarf and approaches the generous king Bali, asking for land measured by three steps. Once the promise is granted, Vamana expands into a cosmic form and covers the earth and heavens in two strides. Bali offers his own head for the third. The story expresses humility, divine presence, cosmic order and the power of a promise.",
+      "textualBackground": "Rigveda and later Vamana-Purana traditions",
+      "sourceNotes": "The three strides are Vedic; the detailed Vamana-Bali narrative is developed in later Puranic texts."
+    },
+    {
+      "name": "Dhanishtha",
+      "lord": "Mars",
+      "deity": "Eight Vasus (Gods of Material Wealth)",
+      "story": "The Vasus are a group of eight elemental deities associated with natural and cosmic forces. Their most famous story appears in the Mahabharata. The Vasus visit the sage Vashishtha's hermitage, where one of them becomes involved in the theft of the sage's divine cow, Nandini. Vashishtha curses the Vasus to be born on earth as humans. They request the river goddess Ganga to become their mother and release them quickly from earthly life. Ganga drowns the first seven newborns, freeing them from the curse. The eighth, Dyu, survives as Devavrata, later known as Bhishma.",
+      "textualBackground": "Mahabharata, Adi Parva",
+      "sourceNotes": "The names and identities of the eight Vasus vary among textual lists."
+    },
+    {
+      "name": "Shatabhisha",
+      "lord": "Rahu",
+      "deity": "Varuna (God of Cosmic Waters)",
+      "story": "Varuna is one of the great Vedic guardians of cosmic order, known as the protector of Rita, the principle of truth and universal law. He watches over moral conduct, the movement of the heavens and the regulation of the waters. Vedic hymns describe him as possessing powerful bonds or nooses with which he can restrain those who violate the order of the universe. Yet Varuna is also compassionate: worshippers ask him to forgive their transgressions and release them from their bonds. His mythology combines authority with mercy. He represents hidden laws, accountability, purification, the depths of existence and restoration through truth.",
+      "textualBackground": "Rigveda, especially hymns to Varuna and Mitra-Varuna",
+      "sourceNotes": "Varuna's Vedic cosmic-law role predates later emphasis on his oceanic identity."
+    },
+    {
+      "name": "Purva Bhadrapada",
+      "lord": "Jupiter",
+      "deity": "Aja Ekapada (One-footed Goat/Dragon)",
+      "story": "Aja Ekapada is a mysterious Vedic deity whose name is commonly interpreted as the one-footed being, sometimes rendered as a one-footed goat. He is associated with powerful cosmic and atmospheric forces and is sometimes understood as a form connected with Rudra. Unlike Vishnu or Indra, Aja Ekapada does not have a widely developed independent Puranic biography. His identity is chiefly preserved through Vedic references and later iconographic traditions. The image of a one-footed being suggests an unusual, concentrated and powerful force. His mythology is best approached as an ancient symbol of cosmic energy, extraordinary stability and the mysterious forces underlying creation.",
+      "textualBackground": "Vedic hymns and later iconographic traditions",
+      "sourceNotes": "The meaning and iconography of Aja Ekapada are debated; translations of the name vary."
+    },
+    {
+      "name": "Uttara Bhadrapada",
+      "lord": "Saturn",
+      "deity": "Ahir Budhyana (Water Serpent)",
+      "story": "Ahirbudhnya is a deep and mysterious Vedic deity whose name is generally interpreted as the serpent of the depths or the serpent of the deep. He is associated with the hidden regions beneath the visible world and with powerful forces that exist below the surface of ordinary experience. He appears in Vedic invocations alongside other divine beings, but does not possess a large independent cycle of Puranic stories. Later interpretations connect him with Rudra-like and serpent symbolism. His mythology is therefore best understood through the image of a powerful guardian of the cosmic depths, representing hidden strength, profound knowledge and the unseen foundations of existence.",
+      "textualBackground": "Rigveda and later Vedic ritual traditions",
+      "sourceNotes": "The exact nature of Ahirbudhnya is debated; 'serpent of the deep' is a conventional interpretation of the name."
+    },
+    {
+      "name": "Revati",
+      "lord": "Mercury",
+      "deity": "Pushan (The Nourisher)",
+      "story": "Pushan is the Vedic protector of roads, travellers, cattle and those who need guidance. He helps people find their way, protects herds and leads the lost towards safety. Vedic hymns also describe him as a guide who knows the paths between worlds and can accompany departed souls on their journey. In a later myth connected with Daksha's sacrifice, Pushan suffers the loss of his teeth during the destruction of the ritual and is subsequently associated with eating soft food. His central character remains that of a benevolent guide and nourisher. Pushan represents safe journeys, protection, prosperity, guidance and the successful arrival at one's destination.",
+      "textualBackground": "Rigveda and later Puranic Daksha-yajna narrative",
+      "sourceNotes": "Pushan's tooth-loss episode appears in later retellings with variations."
+    }
+  ]
+}
