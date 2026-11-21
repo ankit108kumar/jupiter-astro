@@ -173,8 +173,8 @@ function transitHouseAt(ms){
  return ((Math.floor(jup/30)-Math.floor(chart.asc/30)+12)%12)+1;
 }
 function transitHouseIntervals(start,end,wanted){
+ if(!Number.isFinite(start)||!Number.isFinite(end)||end<=start)return [];
  var step=10*60000,items=[],a=start,ha=transitHouseAt(start),houseStart=start;
- if(!Number.isFinite(start)||!Number.isFinite(end)||end<=start)return items;
  for(var b=Math.min(a+step,end);;b=Math.min(b+step,end)){
   var hb=transitHouseAt(b);
   if(hb!==ha){
