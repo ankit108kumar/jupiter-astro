@@ -1743,6 +1743,20 @@
   opacity: .72;
 }
 
+.jtt-duration-tooltip-date-muted {
+  color: var(--jtt-muted, #6E6E73);
+  font-size: .88em;
+  font-weight: 400;
+  opacity: .72;
+}
+
+.jtt-duration-tooltip-time-primary {
+  color: var(--jtt-ink, #1E293B);
+  font-size: 1em;
+  font-weight: 600;
+  opacity: 1;
+}
+
 .jtt-duration-tooltip-separator {
   color: var(--jtt-muted, #6E6E73);
   font-weight: 400;
