@@ -625,7 +625,7 @@ html,body,*{scrollbar-width:thin;scrollbar-color:#c9c6d0 transparent}
 /* Precisely bounded launcher hit zones with a visible hover/focus pulse. */
 .ja-panchang-dialog .ja-panchang-dot{position:relative!important;isolation:isolate}
 .ja-panchang-dialog .ja-panchang-dot::before{
- content:"";position:absolute;inset:-4px;border-radius:50%;z-index:-1;
+ content:"";position:absolute;inset:-4px;border-radius:50%;z-index:0;
 }
 .ja-panchang-dialog .ja-panchang-dot::after{
  content:"";position:absolute;inset:-4px;border:1px solid currentColor;
