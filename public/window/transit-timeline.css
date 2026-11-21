@@ -2488,3 +2488,12 @@
 /* Keep the page stationary while the Transit Timeline is open; its own table remains scrollable. */
 body.jtt-window-open{overflow:hidden!important;overscroll-behavior:none!important}
 #ja-transit-timeline-window,.jtt-table-scroll,.jtt-window-body{overscroll-behavior:contain}
+
+
+/* Hover panels must accept the pointer so their close delay pauses while inspected. */
+#ja-transit-timeline-window .jtt-planet-signification-panel{
+ pointer-events:auto!important;
+}
+#ja-transit-timeline-window .jtt-planet-signification-panel[hidden]{pointer-events:none!important}
+#ja-transit-timeline-window .jtt-transit-result-tooltip,
+#ja-transit-timeline-window .jtt-duration-tooltip{pointer-events:auto}
