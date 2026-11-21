@@ -1772,8 +1772,10 @@ input:focus-visible { border-color: var(--saffron); }
 .zodiac-hover-card {
   position: fixed;
   z-index: 10000;
-  width: 260px;
+  width: min(430px, calc(100vw - 24px));
   max-width: calc(100vw - 24px);
+  max-height: min(72vh, 620px);
+  overflow: auto;
   padding: 12px 14px;
   background: color-mix(in srgb, var(--surface) 0%, transparent);
   color: var(--ink);
@@ -1813,7 +1815,7 @@ input:focus-visible { border-color: var(--saffron); }
 }
 .zodiac-hover-card .zh-row {
   display: grid;
-  grid-template-columns: 78px minmax(0, 1fr);
+  grid-template-columns: 96px minmax(0, 1fr);
   gap: 7px;
   padding: 3px 0;
   border-top: 1px solid var(--line);
@@ -4703,7 +4705,7 @@ body.ja-font-scale-enabled [data-ja-font-scale-target] {
   visibility: hidden;
   pointer-events: none;
   transform: translateY(-4px);
-  transition: opacity 160ms ease, transform 160ms ease, visibility 160ms ease;
+  transition: opacity 160ms ease 300ms, transform 160ms ease 300ms, visibility 160ms ease 300ms;
 }
 .ja-varga-tooltip:hover::after,
 .ja-varga-tooltip:focus-visible::after {
