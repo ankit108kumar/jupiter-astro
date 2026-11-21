@@ -620,3 +620,20 @@ html,body,*{scrollbar-width:thin;scrollbar-color:#c9c6d0 transparent}
 .ja-panchang-title-tools .ja-panchang-action svg{display:block!important;width:21px!important;height:21px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important}
 .ja-panchang-title-tools .ja-panchang-theme-toggle svg{width:22px!important;height:22px!important}
 .ja-panchang-title-tools .ja-panchang-info-wrap .ja-panchang-info-popover,.ja-panchang-title-tools .ja-panchang-export-wrap .ja-panchang-export-menu{flex:none}
+
+
+/* Precisely bounded launcher hit zones with a visible hover/focus pulse. */
+.ja-panchang-dialog .ja-panchang-dot{position:relative!important;isolation:isolate}
+.ja-panchang-dialog .ja-panchang-dot::before{
+ content:"";position:absolute;inset:-4px;border-radius:50%;z-index:-1;
+}
+.ja-panchang-dialog .ja-panchang-dot::after{
+ content:"";position:absolute;inset:-4px;border:1px solid currentColor;
+ border-radius:50%;opacity:0;transform:scale(.82);
+ transition:opacity .16s ease,transform .16s ease;pointer-events:none;
+}
+.ja-panchang-dialog .ja-panchang-dot:hover::after,
+.ja-panchang-dialog .ja-panchang-dot:focus-visible::after{
+ opacity:.55;transform:scale(1.12)
+}
+.ja-panchang-dialog .ja-panchang-dot:focus-visible{outline:2px solid rgba(183,131,48,.7);outline-offset:4px}
