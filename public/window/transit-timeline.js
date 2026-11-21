@@ -1253,9 +1253,21 @@
     });
   }
 
-  function bindNakshatraStoryKeyboard(host) {
-    if (!host || host.dataset.nakshatraStoryKeyboard === "true") return;
-    host.dataset.nakshatraStoryKeyboard = "true";
+  function bindNakshatraStoryHover(host) {
+    if (!host || host.dataset.nakshatraStoryHover === "true") return;
+    host.dataset.nakshatraStoryHover = "true";
+
+    // Hovering any Nakshatra value opens its story. Delegation keeps this
+    // working when the transit table is rebuilt from Google Sheet data.
+    host.addEventListener("pointerover", function (event) {
+      var trigger = event.target && event.target.closest
+        ? event.target.closest(".jtt-nakshatra-story-trigger") : null;
+      if (!trigger || !host.contains(trigger)) return;
+      if (event.relatedTarget && trigger.contains(event.relatedTarget)) return;
+      showNakshatraStory(trigger.getAttribute("data-jtt-nakshatra-story"));
+    });
+
+    // Retain keyboard access without requiring a mouse click.
     host.addEventListener("keydown", function (event) {
       if (event.key !== "Enter" && event.key !== " ") return;
       var trigger = event.target && event.target.closest
@@ -1698,7 +1710,7 @@
       bindDurationTooltips(host);
       bindHouseResultTooltips(host);
       bindPlanetSignificationHover(host);
-      bindNakshatraStoryKeyboard(host);
+      bindNakshatraStoryHover(host);
       ensurePlanetSignificationPanel();
     } catch (error) {
       console.error("Transit Timeline could not render the planetary table.", error);
@@ -2072,11 +2084,9 @@
   }
 
   function handleWindowClick(event) {
-    var nakshatraTrigger = event.target.closest(".jtt-nakshatra-story-trigger");
-    if (nakshatraTrigger) {
-      showNakshatraStory(nakshatraTrigger.getAttribute("data-jtt-nakshatra-story"));
-      return;
-    }
+    // Nakshatra stories are hover-driven; clicking a Nakshatra does not open
+    // or restart the story, and should not count as an outside-panel click.
+    if (event.target.closest(".jtt-nakshatra-story-trigger")) return;
     if (event.target.closest(".jtt-planet-signification-panel")) return;
     if (activeNakshatraStory) hideNakshatraStory(false);
 
