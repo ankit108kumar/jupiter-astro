@@ -767,7 +767,7 @@
       var navamsaNumber = Number.isFinite(Number(row.navamsaIndex)) ? Number(row.navamsaIndex) : '';
 
       return '<tr>' +
-        '<td class="jtt-planet-cell"><strong>' + escapeTableText(row.planet) + '</strong>' + markers + '</td>' +
+        '<td class="jtt-planet-cell"><strong tabindex="0" aria-label="View ' + escapeTableText(row.planet) + ' signification">' + escapeTableText(row.planet) + '</strong>' + markers + '</td>' +
         '<td class="jtt-sign-cell">' + renderDurationCell(row.signDuration, escapeTableText(row.sign), 'Sign duration') + '</td>' +
         '<td class="jtt-house-cell">' + houseScore(row.fromLagna, row.sav, 'sav', row.planet) + '</td>' +
         '<td class="jtt-house-cell">' + houseScore(row.fromMoon, row.bav, 'bav', row.planet) + '</td>' +
@@ -1154,6 +1154,7 @@
 
   function hideNakshatraStory(immediate) {
     clearNakshatraStoryTimer();
+    if (window.JAHoverManager) window.JAHoverManager.untrack("nakshatra-story");
     nakshatraStoryDeadline = 0;
     nakshatraStoryRemaining = 10000;
     nakshatraStoryPaused = false;
@@ -1279,20 +1280,16 @@
     panel.dataset.nakshatraStoryEvents = "true";
     panel.addEventListener("pointerenter", function () {
       if (window.JAHoverManager) window.JAHoverManager.keepOpen("nakshatra-story");
-      pauseNakshatraStoryExpiry();
     });
     panel.addEventListener("pointerleave", function () {
-      resumeNakshatraStoryExpiry();
       if (window.JAHoverManager) window.JAHoverManager.leave("nakshatra-story", 10000);
     });
     panel.addEventListener("focusin", function () {
       if (window.JAHoverManager) window.JAHoverManager.keepOpen("nakshatra-story");
-      pauseNakshatraStoryExpiry();
     });
     panel.addEventListener("focusout", function (event) {
-      if (!panel.contains(event.relatedTarget)) {
-        resumeNakshatraStoryExpiry();
-        if (window.JAHoverManager) window.JAHoverManager.leave("nakshatra-story", 10000);
+      if (!panel.contains(event.relatedTarget) && window.JAHoverManager) {
+        window.JAHoverManager.leave("nakshatra-story", 10000);
       }
     });
   }
@@ -1514,6 +1511,14 @@
     tooltip.style.left = Math.round(left) + "px";
     tooltip.style.top = Math.round(top) + "px";
     tooltip.style.visibility = "visible";
+    tooltip.addEventListener("pointerenter", function () {
+      if (window.JAHoverManager) window.JAHoverManager.keepOpen("transit-signification");
+      if (transitBasicTooltipHideTimer) clearTimeout(transitBasicTooltipHideTimer);
+    });
+    tooltip.addEventListener("pointerleave", function () {
+      if (window.JAHoverManager) window.JAHoverManager.leave("transit-signification", 5000);
+      scheduleTransitBasicTooltipHide();
+    });
     if (window.JAHoverManager) window.JAHoverManager.track("transit-basic", removeTransitBasicTooltip);
   }
 
