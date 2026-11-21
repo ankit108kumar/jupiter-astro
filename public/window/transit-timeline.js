@@ -700,7 +700,7 @@
   function renderVedhaCell(planets, titlePrefix, markClass) {
     if (!Array.isArray(planets) || !planets.length) return '<td class="jtt-vedha-cell"></td>';
     var names = planets.map(escapeTableText).join(", ");
-    return '<td class="jtt-vedha-cell" title="' + escapeTableText(titlePrefix + ": " + names) + '">' +
+    return '<td class="jtt-vedha-cell" title="' + escapeTableText(titlePrefix.replace(/\s*caused by\s*/i, "") + ": " + names) + '">' +
       '<span class="jtt-vedha-mark' + (markClass ? ' ' + markClass : '') + '">X</span> ' +
       '<span class="jtt-vedha-planets">(' + names + ')</span></td>';
   }
@@ -751,7 +751,7 @@
       var nakshatraName = normalizeLattaNakshatra(row.nakshatra);
       var lattaSources = nakshatraName ? (lattaHits[nakshatraName] || []) : [];
       var lattaMarker = lattaSources.length
-        ? ' <sup class="jtt-latta-marker" title="Latta caused by: ' + escapeTableText(lattaSources.join(", ")) + '">{L}</sup>'
+        ? ' <sup class="jtt-latta-marker" title="Latta: ' + escapeTableText(lattaSources.join(", ")) + '">{L}</sup>'
         : '';
       var nakshatraHtml = escapeTableText(row.nakshatra) + lattaMarker +
         (nakshatraLord ? ' <span class="jtt-nak-lord">(' + nakshatraLord + ')</span>' : '');
@@ -777,8 +777,8 @@
         '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInNakshatra) + '</td>' +
         '<td class="jtt-navamsa-cell">' + renderDurationCell(row.navamsaDuration, escapeTableText(row.navamsa || navamsaNumber), 'Navamsa duration') + '</td>' +
         '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInNavamsa) + '</td>' +
-        renderVedhaCell(vedhaResults[row.planet], "Vedha caused by") +
-        renderVedhaCell(reverseVedhaResults[row.planet], "Reverse Vedha caused by", "jtt-reverse-vedha-mark") +
+        renderVedhaCell(vedhaResults[row.planet], "Vedha") +
+        renderVedhaCell(reverseVedhaResults[row.planet], "Reverse Vedha", "jtt-reverse-vedha-mark") +
         '<td class="jtt-murti-cell' + murtiTone + '">' + murti + '</td>' +
       '</tr>';
     }).join("");
@@ -902,9 +902,6 @@
     var tooltip = document.createElement("div");
     tooltip.className = "jtt-duration-tooltip";
     tooltip.setAttribute("role", "tooltip");
-    var heading = document.createElement("span");
-    heading.className = "jtt-duration-tooltip-heading";
-    heading.textContent = label;
     var text = document.createElement("span");
     text.className = "jtt-duration-tooltip-text";
     text.textContent = duration;
@@ -915,7 +912,6 @@
     copyButton.setAttribute("aria-label", "Copy complete duration");
     copyButton.title = "Copy duration";
     copyButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path></svg>';
-    tooltip.appendChild(heading);
     tooltip.appendChild(text);
     tooltip.appendChild(copyButton);
 
@@ -1403,7 +1399,7 @@
 
     var heading = document.createElement("div");
     heading.className = "jtt-transit-result-heading";
-    heading.textContent = "Transit Result : Basic · " + (result.planet || planet) +
+    heading.textContent = "Basic · " + (result.planet || planet) +
       " · " + (result.house || houseNumber) + "H";
 
     var description = document.createElement("div");
