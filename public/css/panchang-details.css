@@ -532,6 +532,15 @@
 .ja-panchang-dialog .ja-panchang-lagna-table tbody tr.is-today:hover>td,.ja-panchang-dialog .ja-panchang-lagna-table tbody tr.is-today:hover>th{background:#fff5df!important}
 @media(max-width:700px){.ja-panchang-dialog .ja-panchang-week-nav{grid-template-columns:1fr 1fr!important}.ja-panchang-dialog .ja-panchang-week-nav button{width:100%!important;min-width:0!important}.ja-panchang-dialog .ja-panchang-table-wrap{max-height:64vh}}
 
+/* Shared Panchang Date–Time hierarchy.
+   Omit dates when the row/day context already identifies them.
+   Same-date intervals prioritise time; cross-date intervals prioritise date. */
+.ja-panchang-dialog .ja-panchang-date{display:inline-block;color:var(--jtt-ink,#1d1d1f);font-size:1em;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ja-panchang-dialog .ja-panchang-date-muted{color:var(--jtt-muted,#6e6e73);font-size:.88em;font-weight:400;opacity:.78}
+.ja-panchang-dialog .ja-panchang-time{display:inline-block;color:var(--jtt-ink,#1d1d1f);font-size:1em;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ja-panchang-dialog .ja-panchang-time-muted{color:var(--jtt-muted,#6e6e73);font-size:.88em;font-weight:400;opacity:.76}
+.ja-panchang-dialog .ja-panchang-range-separator{color:var(--jtt-muted,#6e6e73);font-size:.9em;font-weight:400;padding:0 2px}
+
 /* Planet names use the existing SVG palette with light, readable typography. */
 .ja-panchang-dialog .ja-panchang-planet-name{
  font-weight:400!important;
