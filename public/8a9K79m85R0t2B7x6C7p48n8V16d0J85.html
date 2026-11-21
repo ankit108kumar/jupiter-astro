@@ -3433,7 +3433,6 @@ if (!placed) {
   function activate(key, open, close, openDelay) {
     clearPending();
     if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
-    if (active && active.key === key) return;
     var token = { key: key, timer: null };
     pending = token;
     token.timer = setTimeout(function () {
@@ -3591,12 +3590,14 @@ if (!placed) {
   }
   function positionCard(target) {
     var margin = 12, header = document.querySelector("header.brand");
-    var minTop = header ? Math.min(window.innerHeight - 80, header.getBoundingClientRect().bottom + 8) : 12;
-    var rect = target.getBoundingClientRect(), box = card.getBoundingClientRect();
-    var left = Math.max(margin, Math.min(rect.left + rect.width / 2 - box.width / 2, window.innerWidth - box.width - margin));
-    var top = Math.max(minTop, rect.bottom + 10);
+    var headerBottom = header ? header.getBoundingClientRect().bottom : 0;
+    var minTop = headerBottom > 0 ? Math.max(12, Math.min(window.innerHeight - 80, headerBottom + 8)) : 12;
+    var rect = target.getBoundingClientRect();
     var available = Math.max(120, window.innerHeight - minTop - margin);
     card.style.maxHeight = available + "px";
+    var box = card.getBoundingClientRect();
+    var left = Math.max(margin, Math.min(rect.left + rect.width / 2 - box.width / 2, window.innerWidth - box.width - margin));
+    var top = Math.max(minTop, rect.bottom + 10);
     card.style.left = left + "px";
     card.style.top = (top + box.height > window.innerHeight - margin ? Math.max(minTop, window.innerHeight - box.height - margin) : top) + "px";
   }
