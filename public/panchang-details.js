@@ -173,20 +173,20 @@ function transitHouseAt(ms){
  return ((Math.floor(jup/30)-Math.floor(chart.asc/30)+12)%12)+1;
 }
 function transitHouseIntervals(start,end,wanted){
- var step=10*60000,items=[],a=start,ha=transitHouseAt(a);
+ var step=10*60000,items=[],a=start,ha=transitHouseAt(start),houseStart=start;
+ if(!Number.isFinite(start)||!Number.isFinite(end)||end<=start)return items;
  for(var b=Math.min(a+step,end);;b=Math.min(b+step,end)){
   var hb=transitHouseAt(b);
   if(hb!==ha){
    var lo=a,hi=b;
    while(hi-lo>1000){var mid=Math.floor((lo+hi)/2);if(transitHouseAt(mid)===ha)lo=mid;else hi=mid;}
-   if(wanted.indexOf(ha)>=0)items.push({house:ha,start:items._open||a,end:hi});
-   items._open=null;
-   if(wanted.indexOf(hb)>=0)items._open=hi;
+   if(Number.isFinite(ha)&&wanted.indexOf(ha)>=0&&hi>houseStart)items.push({house:ha,start:houseStart,end:hi});
+   houseStart=hi;
    ha=hb;
   }
   if(b===end)break;a=b;
  }
- if(wanted.indexOf(ha)>=0)items.push({house:ha,start:items._open||a,end:end});
+ if(Number.isFinite(ha)&&wanted.indexOf(ha)>=0&&end>houseStart)items.push({house:ha,start:houseStart,end:end});
  return items;
 }
 function renderAuspiciousWeek(){
@@ -195,16 +195,19 @@ function renderAuspiciousWeek(){
  if(!w.days.length){bodyNode.innerHTML='<div class="ja-panchang-current-summary"><strong>Sunrise data unavailable.</strong><small>Check the selected location and date.</small></div>';return;}
  for(var day=0;day<7;day++){
   var dayInfo=w.days[day],localMid=dayInfo.localMid,weekday=dayInfo.weekday,rise=dayInfo.start,set=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,false),nextRise=dayInfo.end,today=ctx.instant>=rise&&ctx.instant<nextRise,dayCell='',nightCell='',jupiterCell='';
-  if(Number.isFinite(rise)&&Number.isFinite(set)&&Number.isFinite(nextRise)&&rise<set&&set<nextRise){
+  var validSunset=Number.isFinite(rise)&&Number.isFinite(set)&&Number.isFinite(nextRise)&&rise>0&&rise<set&&set<nextRise;
+  if(validSunset){
    var dayDur=set-rise,nightDur=nextRise-set,dayStart=rise+7*dayDur/15,dayEnd=rise+8*dayDur/15,nightStart=set+7*nightDur/15,nightEnd=set+8*nightDur/15;
    function periodCell(start,end){var active=ctx.instant>=start&&ctx.instant<end;return '<div class="ja-panchang-event'+(active?' is-active':'')+'"><div class="ja-panchang-duration">'+formatPanchangInterval(start,end,ctx.tz,localMid)+'</div>'+(active?'<em class="ja-panchang-now">Current</em>':'')+'</div>';}
    dayCell=periodCell(dayStart,dayEnd);nightCell=periodCell(nightStart,nightEnd);
-   var intervals=transitHouseIntervals(rise,nextRise,wanted);
-   jupiterCell=intervals.map(function(x){var active=ctx.instant>=x.start&&ctx.instant<x.end;return '<div class="ja-panchang-event'+(active?' is-active':'')+'"><strong> '+({1:'Lagna (1st)',5:'5th',7:'7th',9:'9th'}[x.house])+' House</strong><div class="ja-panchang-duration">'+formatPanchangInterval(x.start,x.end,ctx.tz,localMid)+'</div>'+(active?'<em class="ja-panchang-now">Current</em>':'')+'</div>';}).join('')||'<span class="ja-panchang-empty">No selected-house transit</span>';
   }else{
    var unavailable='<span class="ja-panchang-empty">Sunrise / sunset unavailable</span>';
-   dayCell=nightCell=jupiterCell=unavailable;
+   dayCell=nightCell=unavailable;
   }
+  if(Number.isFinite(rise)&&Number.isFinite(nextRise)&&rise>0&&nextRise>rise){
+   var intervals=transitHouseIntervals(rise,nextRise,wanted);
+   jupiterCell=intervals.map(function(x){var active=ctx.instant>=x.start&&ctx.instant<x.end;return '<div class="ja-panchang-event ja-panchang-jupiter-period'+(active?' is-active':'')+'"><strong> '+({1:'Lagna (1st)',5:'5th',7:'7th',9:'9th'}[x.house])+' House</strong><div class="ja-panchang-duration">'+formatPanchangInterval(x.start,x.end,ctx.tz,localMid)+'</div>'+(active?'<em class="ja-panchang-now">Current</em>':'')+'</div>';}).join('')||'<span class="ja-panchang-empty">No selected-house transit</span>';
+  }else jupiterCell='<span class="ja-panchang-empty">Sunrise boundary unavailable</span>';
   var dd=new Date(rise+ctx.tz*3600000);
   rows+='<tr class="'+(today?'is-today':'')+'"><th><span>'+DAYS[weekday]+'</span><small>'+pad(dd.getUTCDate())+'/'+pad(dd.getUTCMonth()+1)+'/'+dd.getUTCFullYear()+'</small></th><td>'+dayCell+'</td><td>'+nightCell+'</td><td data-export-only style="display:none">'+jupiterCell+'</td></tr>';
  }
@@ -246,7 +249,13 @@ function render(){
  if(cacheKey){renderCache[cacheKey]={html:bodyNode.innerHTML,label:weekLabel.textContent};renderCacheOrder.push(cacheKey);if(renderCacheOrder.length>24){delete renderCache[renderCacheOrder.shift()];}}
 }
 function toggleInfo(button){var p=modal.querySelector('[data-info-popover]');if(!p)return;var open=p.hidden;p.hidden=!open;if(button)button.setAttribute('aria-expanded',open?'true':'false');}
-function getPanchangExportMatrix(){var tables=bodyNode.querySelectorAll('table');if(!tables.length)throw new Error('No Panchang table is currently displayed.');var matrix=[];tables.forEach(function(table,ti){if(ti)matrix.push(['']);Array.from(table.rows).forEach(function(row){var cells=Array.from(row.cells).filter(function(cell){return cell.hasAttribute('data-export-only')||getComputedStyle(cell).display!=='none';});matrix.push(cells.map(function(cell){return (cell.hasAttribute('data-export-only')?cell.textContent:cell.innerText).replace(/\s+/g,' ').trim();}));});});return matrix;}
+function panchangExportCellText(cell){
+ if(!cell.hasAttribute('data-export-only'))return (cell.innerText||cell.textContent||'').replace(/\s+/g,' ').trim();
+ var periods=Array.from(cell.querySelectorAll('.ja-panchang-jupiter-period'));
+ if(periods.length)return periods.map(function(period){var heading=period.querySelector('strong'),duration=period.querySelector('.ja-panchang-duration'),current=period.querySelector('.ja-panchang-now');return [heading&&heading.textContent,duration&&duration.textContent,current&&current.textContent].filter(Boolean).join(' — ').replace(/\s+/g,' ').trim();}).join(' | ');
+ return (cell.textContent||'').replace(/\s+/g,' ').trim();
+}
+function getPanchangExportMatrix(){var tables=bodyNode.querySelectorAll('table');if(!tables.length)throw new Error('No Panchang table is currently displayed.');var matrix=[];tables.forEach(function(table,ti){if(ti)matrix.push(['']);Array.from(table.rows).forEach(function(row){var cells=Array.from(row.cells).filter(function(cell){return cell.hasAttribute('data-export-only')||getComputedStyle(cell).display!=='none';});matrix.push(cells.map(panchangExportCellText));});});return matrix;}
  function panchangDelimited(matrix,delimiter){return matrix.map(function(row){return row.map(function(value){var v=String(value==null?'':value);return delimiter==='\\t'?v.replace(/\\t/g,' ').replace(/\\r?\\n/g,' '):'"'+v.replace(/"/g,'""')+'"';}).join(delimiter);}).join('\\r\\n');}
 function copyPlainText(value){function fallback(){var ta=document.createElement('textarea');ta.value=value;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}ta.remove();}return navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(value).catch(fallback):Promise.resolve(fallback());}
 function downloadPanchangFile(content,mime,ext){var blob=new Blob(['\\uFEFF',content],{type:mime+';charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='panchang-table.'+ext;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1000);}
