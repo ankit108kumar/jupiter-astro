@@ -1200,8 +1200,10 @@
 
     loadNakshatraStories().then(function (entries) {
       if (activeNakshatraStory !== requestedName || !panel.isConnected) return;
+      var canonicalName = normalizeLattaNakshatra(requestedName) || requestedName;
       var entry = entries.find(function (item) {
-        return String(item.name || "").toLowerCase() === requestedName.toLowerCase();
+        var storedName = normalizeLattaNakshatra(item.name) || item.name;
+        return String(storedName || "").toLowerCase() === canonicalName.toLowerCase();
       });
       if (!entry) {
         meta.textContent = "Deity information unavailable";
@@ -1297,6 +1299,9 @@
   function clearNakshatraStoryForOtherSignification() {
     clearNakshatraStoryTimer();
     activeNakshatraStory = null;
+    if (activePlanetSignification && String(activePlanetSignification).indexOf("nakshatra:") === 0) {
+      activePlanetSignification = null;
+    }
     nakshatraStoryDeadline = 0;
     nakshatraStoryRemaining = 20000;
     nakshatraStoryPaused = false;
