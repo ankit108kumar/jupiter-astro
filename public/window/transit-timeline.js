@@ -294,16 +294,28 @@
     return number + suffix + " House";
   }
 
-  function renderDurationCell(interval, displayHtml, label) {
+  function renderDurationCell(interval, displayHtml, label, nakshatraStoryName) {
     var display = displayHtml || '<span class="jtt-cell-muted">—</span>';
+    var isNakshatraStory = !!nakshatraStoryName;
+    var storyAttributes = isNakshatraStory
+      ? ' jtt-nakshatra-story-trigger" data-jtt-nakshatra-story="' +
+        escapeTableText(nakshatraStoryName) + '" aria-label="Click to read the deity story of ' +
+        escapeTableText(nakshatraStoryName)
+      : '';
     if (!interval || !interval.startText || !interval.endText) {
-      return '<span class="jtt-duration-value">' + display + '</span>';
+      return isNakshatraStory
+        ? '<span class="jtt-nakshatra-story-trigger" data-jtt-nakshatra-story="' +
+          escapeTableText(nakshatraStoryName) + '" tabindex="0" role="button" aria-label="Click to read the deity story of ' +
+          escapeTableText(nakshatraStoryName) + '">' + display + '</span>'
+        : '<span class="jtt-duration-value">' + display + '</span>';
     }
     var fullDuration = interval.startText + ' to ' + interval.endText;
-    return '<span class="jtt-duration-wrap" tabindex="0" role="button"' +
+    return '<span class="jtt-duration-wrap' + (isNakshatraStory ? ' jtt-nakshatra-story-trigger' : '') +
+      '" tabindex="0" role="button"' +
+      (isNakshatraStory ? ' data-jtt-nakshatra-story="' + escapeTableText(nakshatraStoryName) + '"' : '') +
       ' data-jtt-duration="' + escapeTableText(fullDuration) + '"' +
       ' data-jtt-duration-label="' + escapeTableText(label || 'Transit duration') + '"' +
-      ' aria-label="' + escapeTableText((label || 'Transit duration') + '. Hover or focus to view duration') + '">' +
+      ' aria-label="' + escapeTableText((label || 'Transit duration') + (isNakshatraStory ? '. Click to read Nakshatra deity story' : '. Hover or focus to view duration')) + '">' +
       '<span class="jtt-duration-value">' + display + '</span>' +
     '</span>';
   }
@@ -746,10 +758,7 @@
       var lattaMarker = lattaSources.length
         ? ' <sup class="jtt-latta-marker" title="Latta caused by: ' + escapeTableText(lattaSources.join(", ")) + '">{L}</sup>'
         : '';
-      var nakshatraHtml = '<span class="jtt-nakshatra-story-trigger" data-jtt-nakshatra-story="' +
-        escapeTableText(row.nakshatra) + '" tabindex="0" role="button" aria-label="Click to read the deity story of ' +
-        escapeTableText(row.nakshatra) + '" title="Click to read Nakshatra deity story">' +
-        escapeTableText(row.nakshatra) + '</span>' + lattaMarker +
+      var nakshatraHtml = escapeTableText(row.nakshatra) + lattaMarker +
         (nakshatraLord ? ' <span class="jtt-nak-lord">(' + nakshatraLord + ')</span>' : '');
       var murti = escapeTableText(row.murti || "");
       var murtiTone = row.murti === "Excellent" ? " jtt-murti-excellent" :
@@ -768,7 +777,7 @@
         '<td class="jtt-house-cell">' + houseScore(row.fromLagna, row.sav, 'sav', row.planet) + '</td>' +
         '<td class="jtt-house-cell">' + houseScore(row.fromMoon, row.bav, 'bav', row.planet) + '</td>' +
         '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInSign) + '</td>' +
-        '<td class="jtt-nakshatra-cell">' + renderDurationCell(row.nakshatraDuration, nakshatraHtml, 'Nakshatra duration') + '</td>' +
+        '<td class="jtt-nakshatra-cell">' + renderDurationCell(row.nakshatraDuration, nakshatraHtml, 'Nakshatra duration', row.nakshatra) + '</td>' +
         '<td class="jtt-count-cell">' + escapeTableText(row.countFromJanmaNakshatra) + '</td>' +
         '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInNakshatra) + '</td>' +
         '<td class="jtt-navamsa-cell">' + renderDurationCell(row.navamsaDuration, escapeTableText(row.navamsa || navamsaNumber), 'Navamsa duration') + '</td>' +
