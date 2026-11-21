@@ -403,7 +403,11 @@
  background:linear-gradient(#fff, #f5f5f8)!important;
  border-bottom:1px solid var(--jtt-line)!important;
 }
-.ja-panchang-dialog .ja-panchang-dot{width:12px!important;height:12px!important}
+.ja-panchang-dialog .ja-panchang-dot{width:12px!important;height:12px!important;position:relative!important;flex:0 0 12px!important}
+.ja-panchang-dialog .ja-panchang-window-controls{gap:8px!important}
+.ja-panchang-dialog .ja-panchang-dot::before{content:"";position:absolute;inset:-9px;border-radius:50%}
+body.ja-panchang-modal-open{overflow:hidden!important;overscroll-behavior:none!important}
+.ja-panchang-modal,.ja-panchang-dialog,.ja-panchang-dialog-body,.ja-panchang-table-wrap{overscroll-behavior:contain!important}
 .ja-panchang-dialog .ja-panchang-window-title{
  color:var(--jtt-ink)!important;font-size:13px!important;font-weight:650!important;
  letter-spacing:.12px!important
@@ -535,9 +539,9 @@
 /* Shared Panchang Date–Time hierarchy.
    Omit dates when the row/day context already identifies them.
    Same-date intervals prioritise time; cross-date intervals prioritise date. */
-.ja-panchang-dialog .ja-panchang-date{display:inline-block;color:var(--jtt-ink,#1d1d1f);font-size:1em;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ja-panchang-dialog .ja-panchang-date{display:inline-block;color:var(--jtt-muted,#6e6e73);font-size:1em;font-weight:400;white-space:nowrap;font-variant-numeric:tabular-nums}
 .ja-panchang-dialog .ja-panchang-date-muted{color:var(--jtt-muted,#6e6e73);font-size:.88em;font-weight:400;opacity:.78}
-.ja-panchang-dialog .ja-panchang-time{display:inline-block;color:var(--jtt-ink,#1d1d1f);font-size:1em;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ja-panchang-dialog .ja-panchang-time{display:inline-block;color:var(--jtt-muted,#6e6e73);font-size:1em;font-weight:400;white-space:nowrap;font-variant-numeric:tabular-nums}
 .ja-panchang-dialog .ja-panchang-time-muted{color:var(--jtt-muted,#6e6e73);font-size:.88em;font-weight:400;opacity:.76}
 .ja-panchang-dialog .ja-panchang-range-separator{color:var(--jtt-muted,#6e6e73);font-size:.9em;font-weight:400;padding:0 2px}
 
@@ -601,6 +605,8 @@ html,body,*{scrollbar-width:thin;scrollbar-color:#c9c6d0 transparent}
 .ja-panchang-info-popover[hidden]{display:none!important}
 .ja-panchang-info-popover strong,.ja-panchang-info-popover span{display:block;margin-bottom:4px}
 .ja-panchang-dialog.is-maximized{position:fixed!important;inset:10px!important;width:auto!important;height:auto!important;max-width:none!important;max-height:none!important;margin:0!important;border-radius:14px!important;transform:none!important}
+.ja-panchang-dialog.is-minimized{height:48px!important;min-height:48px!important;max-height:48px!important;overflow:hidden!important;align-self:end!important;margin-bottom:0!important}
+.ja-panchang-dialog.is-minimized .ja-panchang-heading,.ja-panchang-dialog.is-minimized .ja-panchang-dialog-body{display:none!important}
 .ja-panchang-dialog.is-maximized .ja-panchang-dialog-body{max-height:calc(100vh - 150px);overflow:auto}
 @media(max-width:600px){.ja-panchang-actions.ja-panchang-title-tools{gap:5px}.ja-panchang-actions .ja-panchang-action{width:34px;height:34px;min-width:34px}.ja-panchang-actions .ja-panchang-action svg{width:18px;height:18px}}
 
