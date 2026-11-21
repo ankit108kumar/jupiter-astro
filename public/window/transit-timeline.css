@@ -1736,6 +1736,19 @@
   font-variant-numeric: tabular-nums;
 }
 
+.jtt-duration-tooltip-time {
+  color: var(--jtt-muted, #6E6E73);
+  font-size: .88em;
+  font-weight: 400;
+  opacity: .72;
+}
+
+.jtt-duration-tooltip-separator {
+  color: var(--jtt-muted, #6E6E73);
+  font-weight: 400;
+  opacity: .7;
+}
+
 .jtt-duration-tooltip-copy {
   display: inline-flex;
   flex: 0 0 26px;
