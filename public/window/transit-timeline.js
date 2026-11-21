@@ -885,11 +885,11 @@
     tooltip.style.visibility = "visible";
   }
   function formatDurationTooltipHtml(value) {
-    var parts = String(value || "").split(/\\s+to\\s+/i);
+    var parts = String(value || "").split(/\s+to\s+/i);
     if (parts.length !== 2) return escapeTableText(value);
 
     function parseEndpoint(part) {
-      var match = part.trim().match(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})(?:\\s+(\\d{1,2}:\\d{2}))?$/);
+      var match = part.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}:\d{2}))?$/);
       return match ? { day: match[1].padStart(2, "0"), month: match[2].padStart(2, "0"), year: match[3], time: match[4] || "" } : null;
     }
 
