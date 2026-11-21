@@ -1121,7 +1121,7 @@
   var activeNakshatraStory = null;
   var nakshatraStoryTimer = null;
   var nakshatraStoryDeadline = 0;
-  var nakshatraStoryRemaining = 20000;
+  var nakshatraStoryRemaining = 10000;
   var nakshatraStoryPaused = false;
 
   function loadNakshatraStories() {
@@ -1390,7 +1390,7 @@
       activePlanetSignification = null;
     }
     nakshatraStoryDeadline = 0;
-    nakshatraStoryRemaining = 20000;
+    nakshatraStoryRemaining = 10000;
     nakshatraStoryPaused = false;
     var panel = windowEl && windowEl.querySelector(".jtt-planet-signification-panel");
     if (!panel) return;
