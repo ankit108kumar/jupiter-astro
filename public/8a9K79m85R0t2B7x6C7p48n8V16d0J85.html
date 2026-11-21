@@ -4489,7 +4489,7 @@ const RenderTabs = {
         </article>
         <article class="card kchart">
           <header style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-            <h3 class="ja-varga-tooltip" data-varga-tooltip="${secChart.description || ''}">${secChart.title}</h3>
+            <h3 class="ja-varga-tooltip" tabindex="0" data-varga-tooltip="${secChart.description || ''}">${secChart.title}</h3>
             <div style="display:flex; align-items:center; gap:6px;">
               
 <div class="chart-dd" id="${prefix}-secChartSelect">
@@ -4923,7 +4923,7 @@ dasha(k, prefix, evalMs = Date.now()) {
           const lattaMarker = lattaSources.length
             ? `<sup class="ja-navtara-latta" title="Latta caused by: ${lattaSources.join(', ')}">{L}</sup>`
             : '';
-          return `<td><span class="ja-nakshatra-hover" data-nakshatra-name="${nakshatraName}">${nakshatraName}</span>${lattaMarker}${occupantHtml ? ` <span class="ja-navtara-occupants">${occupantHtml}</span>` : ''}</td>`;
+          return `<td><span class="ja-nakshatra-hover" tabindex="0" aria-label="${nakshatraName} Nakshatra details" data-nakshatra-name="${nakshatraName}">${nakshatraName}</span>${lattaMarker}${occupantHtml ? ` <span class="ja-navtara-occupants">${occupantHtml}</span>` : ''}</td>`;
         }).join('');
 
         return `
@@ -5119,7 +5119,7 @@ dasha(k, prefix, evalMs = Date.now()) {
         <!-- LEFT: NATAL DIVISIONAL CHART WITH SELECTOR -->
         <article class="card kchart">
           <header style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-            <h3 class="ja-varga-tooltip" data-varga-tooltip="${currentVargaDescription}">D${selectedVarga} · Natal ${currentVargaTitle}</h3>
+            <h3 class="ja-varga-tooltip" tabindex="0" data-varga-tooltip="${currentVargaDescription}">D${selectedVarga} · Natal ${currentVargaTitle}</h3>
             <div style="display:flex; align-items:center; gap:6px;">
               <label for="${prefix}-vargaSelect" style="font-size:0.72rem; color:var(--muted); font-weight:600;">SELECT:</label>
               <select id="${prefix}-vargaSelect" style="font-size:0.8rem; font-weight:600; padding:3px 8px; border-radius:6px; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); cursor:pointer;">
@@ -5136,7 +5136,7 @@ dasha(k, prefix, evalMs = Date.now()) {
         <!-- RIGHT: TRANSIT IN DIVISIONAL CHART -->
         <article class="card kchart">
           <header style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 class="ja-varga-tooltip" data-varga-tooltip="${currentVargaDescription}">D${selectedVarga} · Gochar (${currentVargaTitle})</h3>
+            <h3 class="ja-varga-tooltip" tabindex="0" data-varga-tooltip="${currentVargaDescription}">D${selectedVarga} · Gochar (${currentVargaTitle})</h3>
             <span style="font-size:0.82rem; color:var(--muted);">
               From Natal D${selectedVarga} Lagna
             </span>
