@@ -14,7 +14,21 @@ function setTheme(mode){themeMode=mode==='apple'?'apple':'website';try{localStor
 function timelineThemeIcon(mode){return mode==='apple'?'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.6"></circle><path d="M12 2v2.1M12 19.9V22M4.93 4.93l1.48 1.48m11.18 11.18 1.48 1.48M2 12h2.1m15.8 0H22M4.93 19.07l1.48-1.48M17.59 6.41l1.48-1.48"></path></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"></rect><path d="M3 8h18M7 6h.01M10 6h.01M7 12h10M7 15.5h7"></path></svg>';}
 function pad(n){return String(n).padStart(2,'0');}
 function esc(s){return String(s==null?'—':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-function fmt(ms,tz){var d=new Date(ms+tz*3600000);return pad(d.getUTCDate())+'/'+pad(d.getUTCMonth()+1)+'/'+d.getUTCFullYear()+' '+pad(d.getUTCHours())+':'+pad(d.getUTCMinutes());}
+function localDateParts(ms,tz){var d=new Date(ms+tz*3600000);return {day:pad(d.getUTCDate()),month:d.getUTCMonth(),year:d.getUTCFullYear(),key:d.getUTCFullYear()+'-'+pad(d.getUTCMonth()+1)+'-'+pad(d.getUTCDate()),clock:pad(d.getUTCHours())+':'+pad(d.getUTCMinutes())};}
+var MONTH_SHORT=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function formatPanchangInterval(startMs,endMs,tz,anchorMs){
+ var start=localDateParts(startMs,tz),end=localDateParts(endMs,tz),anchor=Number.isFinite(anchorMs)?localDateParts(anchorMs,tz):null;
+ var sameDate=start.key===end.key,showDates=!sameDate||(anchor&&(start.key!==anchor.key||end.key!==anchor.key));
+ var showYear=start.year!==end.year;
+ function endpoint(part){
+  var dateText=part.day+'-'+MONTH_SHORT[part.month]+(showYear?'-'+part.year:'');
+  var dateHtml=showDates?'<span class="ja-panchang-date'+(sameDate?' ja-panchang-date-muted':'')+'">'+dateText+'</span> ':'';
+  var timeClass='ja-panchang-time'+(sameDate?'':' ja-panchang-time-muted');
+  return dateHtml+'<span class="'+timeClass+'">'+part.clock+'</span>';
+ }
+ return endpoint(start)+' <span class="ja-panchang-range-separator">–</span> '+endpoint(end);
+}
+function fmt(ms,tz){var p=localDateParts(ms,tz);return p.day+'/'+pad(p.month+1)+'/'+p.year+' '+p.clock;}
 function dayFmt(ms,tz){var d=new Date(ms+tz*3600000);return DAYS[d.getUTCDay()]+', '+pad(d.getUTCDate())+'/'+pad(d.getUTCMonth()+1)+'/'+d.getUTCFullYear();}
 function context(){
  var q=window.state&&window.state.last&&window.state.last.input,y,m,d,hh,mm,ss,lat,lon,tz;
@@ -60,7 +74,7 @@ function renderWeek(k){
  var headings=sample.map(function(x){return '<th>'+esc(x[0])+'</th>';}).join('');
  for(var day=0;day<7;day++){var ds=w.start+day*DAY,de=ds+DAY,today=nowLocal>=ds&&nowLocal<de,dd=new Date(ds+ctx.tz*3600000),dayLabel='<span>'+DAYS[dd.getUTCDay()]+'</span><small>'+pad(dd.getUTCDate())+'/'+pad(dd.getUTCMonth()+1)+'/'+dd.getUTCFullYear()+'</small>',dayRows=[];
   for(var j=0;j<cuts.length-1;j++){var a=cuts[j],b=cuts[j+1];if(b.at<=ds||a.at>=de)continue;var active=today&&ctx.instant>=a.at&&ctx.instant<b.at,fields=meta(k,a.index),cells=fields.map(function(x){var value=(x[0]==='Ruling Planet'||x[0]==='Tithi Lord')?planetMarkup(x[1]):esc(x[1]);return '<td>'+value+'</td>';}).join('');
-   var nakCell=k==='nak'?'<span class="ja-nakshatra-hover" data-nakshatra-name="'+esc(name(k,a.index))+'">'+esc(name(k,a.index))+'</span>': '<strong>'+esc(name(k,a.index))+'</strong>';dayRows.push('<tr class="'+(active?'is-today':'')+'"><th>'+dayLabel+'</th><td>'+nakCell+(active?' <em class="ja-panchang-now">Current</em>':'')+'</td><td class="ja-panchang-duration">'+fmt(a.at,ctx.tz)+' – '+fmt(b.at,ctx.tz)+'</td>'+cells+'</tr>');
+   var nakCell=k==='nak'?'<span class="ja-nakshatra-hover" data-nakshatra-name="'+esc(name(k,a.index))+'">'+esc(name(k,a.index))+'</span>': '<strong>'+esc(name(k,a.index))+'</strong>';dayRows.push('<tr class="'+(active?'is-today':'')+'"><th>'+dayLabel+'</th><td>'+nakCell+(active?' <em class="ja-panchang-now">Current</em>':'')+'</td><td class="ja-panchang-duration">'+formatPanchangInterval(a.at,b.at,ctx.tz,ds)+'</td>'+cells+'</tr>');
   }
   if(!dayRows.length)dayRows.push('<tr class="'+(today?'is-today':'')+'"><th>'+dayLabel+'</th><td colspan="'+(2+sample.length)+'">—</td></tr>');
   rows+=dayRows.join('');
@@ -84,7 +98,7 @@ function renderLunarWeek(){
  weekLabel.textContent='';
  function part(which){var cuts=[{at:start,index:yogaKaranaIndex(start,which)}].concat(changes[which],[{at:end,index:yogaKaranaIndex(end,which)}]),rows='',nowLocal=ctx.instant+ctx.tz*3600000;
   for(var day=0;day<7;day++){var ds=w.start+day*DAY,de=ds+DAY,today=nowLocal>=ds&&nowLocal<de,events='';
-   for(var j=0;j<cuts.length-1;j++){var x=cuts[j],y=cuts[j+1];if(y.at<=ds||x.at>=de)continue;var active=today&&ctx.instant>=x.at&&ctx.instant<y.at;events+='<div class="ja-panchang-event'+(active?' is-active':'')+'"><strong>'+esc(eventName(which,x.index))+'</strong><span class="ja-panchang-duration">'+fmt(x.at,ctx.tz)+' – '+fmt(y.at,ctx.tz)+'</span>'+(active?'<em class="ja-panchang-now">Current</em>':'')+'</div>';}
+   for(var j=0;j<cuts.length-1;j++){var x=cuts[j],y=cuts[j+1];if(y.at<=ds||x.at>=de)continue;var active=today&&ctx.instant>=x.at&&ctx.instant<y.at;events+='<div class="ja-panchang-event'+(active?' is-active':'')+'"><strong>'+esc(eventName(which,x.index))+'</strong><span class="ja-panchang-duration">'+formatPanchangInterval(x.at,y.at,ctx.tz,ds)+'</span>'+(active?'<em class="ja-panchang-now">Current</em>':'')+'</div>';}
    var dd=new Date(ds+ctx.tz*3600000);rows+='<tr class="'+(today?'is-today':'')+'"><th><span>'+DAYS[dd.getUTCDay()]+'</span><small>'+pad(dd.getUTCDate())+'/'+pad(dd.getUTCMonth()+1)+'</small></th><td>'+(events||'—')+'</td></tr>';
   }
   var heading=which==='yoga'?'Yoga':'Karana';return '<section class="ja-panchang-section ja-panchang-half"><div class="ja-panchang-table-wrap"><table class="ja-panchang-week-table"><thead><tr><th>Day</th><th>'+heading+' · Duration</th></tr></thead><tbody>'+rows+'</tbody></table></div></section>';
@@ -111,7 +125,7 @@ function renderChaughadiyaHora(which){
  var localDate=new Date(sunrise+ctx.tz*3600000),wd=localDate.getUTCDay();
  weekLabel.textContent='';
  function table(title,slots){
-  var rows=slots.map(function(x){var active=ctx.instant>=x.start&&ctx.instant<x.end,label=x.primary||x.label,meta=x.meta||'';return '<tr class="'+(active?'is-today':'')+'"><td><span class="ja-panchang-slot-main">'+label+'</span>'+(meta?'<small class="ja-panchang-slot-meta">'+meta+'</small>':'')+(active?' <em class="ja-panchang-now">Now</em>':'')+'</td><td class="ja-panchang-duration">'+fmtClock(x.start,ctx.tz)+' – '+fmtClock(x.end,ctx.tz)+'</td></tr>';}).join('');
+  var rows=slots.map(function(x){var active=ctx.instant>=x.start&&ctx.instant<x.end,label=x.primary||x.label,meta=x.meta||'';return '<tr class="'+(active?'is-today':'')+'"><td><span class="ja-panchang-slot-main">'+label+'</span>'+(meta?'<small class="ja-panchang-slot-meta">'+meta+'</small>':'')+(active?' <em class="ja-panchang-now">Now</em>':'')+'</td><td class="ja-panchang-duration">'+formatPanchangInterval(x.start,x.end,ctx.tz,sunrise)+'</td></tr>';}).join('');
   return '<section class="ja-panchang-section ja-panchang-period-section"><div class="ja-panchang-table-wrap"><table class="ja-panchang-week-table ja-panchang-slots"><thead><tr><th>'+title+'</th><th>Duration</th></tr></thead><tbody>'+rows+'</tbody></table></div></section>';
  }
  var cycle=['Udveg','Chal','Labh','Amrit','Kaal','Shubh','Rog'],dayStart=[0,3,6,2,5,1,4],lordStart={0:0,1:3,2:6,3:2,4:5,5:1,6:4},planets=['Sun','Venus','Mercury','Moon','Saturn','Jupiter','Mars'];
@@ -131,7 +145,7 @@ function renderInauspiciousWeek(){
  for(var day=0;day<7;day++){
   var localMid=firstMid+day*DAY,weekday=new Date(localMid).getUTCDay(),rise=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,true),set=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,false),valid=Number.isFinite(rise)&&Number.isFinite(set)&&rise>0&&set>rise,today=nowLocal>=localMid&&nowLocal<localMid+DAY,cols='';
   if(valid){var eighth=(set-rise)/8,entries=[rahus[weekday]-1,guliks[weekday],yamas[weekday]];
-   cols=entries.map(function(slot,i){var st=rise+slot*eighth,en=st+eighth,active=ctx.instant>=st&&ctx.instant<en,pct=active?Math.max(0,Math.min(100,(ctx.instant-st)/(en-st)*100)):0;return '<td><div class="ja-panchang-event ja-inauspicious-period period-'+i+(active?' is-active':'')+'"><div class="ja-panchang-duration">'+fmtClock(st,ctx.tz)+' – '+fmtClock(en,ctx.tz)+'</div>'+(active?'<em class="ja-panchang-now">LIVE</em><div class="ja-inauspicious-progress"><span style="width:'+pct.toFixed(1)+'%"></span></div>':'')+'</div></td>';}).join('');
+   cols=entries.map(function(slot,i){var st=rise+slot*eighth,en=st+eighth,active=ctx.instant>=st&&ctx.instant<en,pct=active?Math.max(0,Math.min(100,(ctx.instant-st)/(en-st)*100)):0;return '<td><div class="ja-panchang-event ja-inauspicious-period period-'+i+(active?' is-active':'')+'"><div class="ja-panchang-duration">'+formatPanchangInterval(st,en,ctx.tz,localMid)+'</div>'+(active?'<em class="ja-panchang-now">LIVE</em><div class="ja-inauspicious-progress"><span style="width:'+pct.toFixed(1)+'%"></span></div>':'')+'</div></td>';}).join('');
   }else cols='<td colspan="3"><span class="ja-panchang-empty">Sunrise / sunset unavailable</span></td>';
   var dd=new Date(localMid);rows+='<tr class="'+(today?'is-today':'')+'"><th><span>'+DAYS[weekday]+'</span>'+(today?'<em class="ja-inauspicious-today">TODAY</em>':'')+'<small>'+pad(dd.getUTCDate())+'/'+pad(dd.getUTCMonth()+1)+'/'+dd.getUTCFullYear()+'</small></th>'+cols+'</tr>';
  }
@@ -169,10 +183,10 @@ function renderAuspiciousWeek(){
   var localMid=firstMid+day*DAY,weekday=new Date(localMid).getUTCDay(),rise=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,true),set=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,false),nextRise=sunEventForLocalDay(localMid+DAY,ctx.lat,ctx.lon,true),today=nowLocal>=localMid&&nowLocal<localMid+DAY,dayCell='',nightCell='',jupiterCell='';
   if(Number.isFinite(rise)&&Number.isFinite(set)&&Number.isFinite(nextRise)&&rise<set&&set<nextRise){
    var dayDur=set-rise,nightDur=nextRise-set,dayStart=rise+7*dayDur/15,dayEnd=rise+8*dayDur/15,nightStart=set+7*nightDur/15,nightEnd=set+8*nightDur/15;
-   function periodCell(start,end){var active=ctx.instant>=start&&ctx.instant<end;return '<div class="ja-panchang-event'+(active?' is-active':'')+'"><div class="ja-panchang-duration">'+fmtClock(start,ctx.tz)+' – '+fmtClock(end,ctx.tz)+'</div>'+(active?'<em class="ja-panchang-now">Current</em>':'')+'</div>';}
+   function periodCell(start,end){var active=ctx.instant>=start&&ctx.instant<end;return '<div class="ja-panchang-event'+(active?' is-active':'')+'"><div class="ja-panchang-duration">'+formatPanchangInterval(start,end,ctx.tz,localMid)+'</div>'+(active?'<em class="ja-panchang-now">Current</em>':'')+'</div>';}
    dayCell=periodCell(dayStart,dayEnd);nightCell=periodCell(nightStart,nightEnd);
    var utcDayStart=localMid-ctx.tz*3600000,intervals=transitHouseIntervals(utcDayStart,utcDayStart+DAY,wanted);
-   jupiterCell=intervals.map(function(x){var active=ctx.instant>=x.start&&ctx.instant<x.end;return '<div class="ja-panchang-event'+(active?' is-active':'')+'"><strong> '+({1:'Lagna (1st)',5:'5th',7:'7th',9:'9th'}[x.house])+' House</strong><div class="ja-panchang-duration">'+fmt(x.start,ctx.tz)+' – '+fmt(x.end,ctx.tz)+'</div>'+(active?'<em class="ja-panchang-now">Current</em>':'')+'</div>';}).join('')||'<span class="ja-panchang-empty">No selected-house transit</span>';
+   jupiterCell=intervals.map(function(x){var active=ctx.instant>=x.start&&ctx.instant<x.end;return '<div class="ja-panchang-event'+(active?' is-active':'')+'"><strong> '+({1:'Lagna (1st)',5:'5th',7:'7th',9:'9th'}[x.house])+' House</strong><div class="ja-panchang-duration">'+formatPanchangInterval(x.start,x.end,ctx.tz,localMid)+'</div>'+(active?'<em class="ja-panchang-now">Current</em>':'')+'</div>';}).join('')||'<span class="ja-panchang-empty">No selected-house transit</span>';
   }else{
    var unavailable='<span class="ja-panchang-empty">Sunrise / sunset unavailable</span>';
    dayCell=nightCell=jupiterCell=unavailable;
@@ -200,7 +214,7 @@ function renderSunriseLagnaDay(){
  var bodyRows='',offsets={Sun:[7],Moon:[7],Mars:[4,7,8],Mercury:[7],Jupiter:[5,7,9],Venus:[7],Saturn:[3,7,10],Rahu:[5,7,9],Ketu:[5,7,9]},names=['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn','Rahu','Ketu'];
  rows.forEach(function(row){var mid=Math.floor((row.start+row.end)/2),d=new Date(mid+ctx.tz*3600000),hours=d.getUTCHours()+d.getUTCMinutes()/60+d.getUTCSeconds()/3600,jd=julianDay(d.getUTCFullYear(),d.getUTCMonth()+1,d.getUTCDate(),hours-ctx.tz),lord=LAGNA_LORDS[row.sign],positions=siderealAt(jd).planets,lordLon=positions[lord]&&positions[lord].lon,lordSign=Number.isFinite(lordLon)?Math.floor(lordLon/30):-1,house=lordSign>=0?((lordSign-row.sign+12)%12)+1:null,houseText=house?(house===1?'1st':house===2?'2nd':house===3?'3rd':house+'th')+' house':'—',conjunctions=[],aspectedBy=[],inLagna=[],aspecting=[];
   names.forEach(function(p){var pl=positions[p],sign=Number.isFinite(pl&&pl.lon)?Math.floor(pl.lon/30):-1;if(sign<0)return;if(sign===row.sign)inLagna.push(p);var asp=offsets[p]||[7],houseFrom=((row.sign-sign+12)%12)+1;if(asp.indexOf(houseFrom)>=0)aspecting.push(p);if(p===lord||lordSign<0)return;if(sign===lordSign)conjunctions.push(p);var lordHouse=((lordSign-sign+12)%12)+1;if(asp.indexOf(lordHouse)>=0)aspectedBy.push(p);});
-  var active=ctx.instant>=row.start&&ctx.instant<row.end;bodyRows+='<tr class="'+(active?'is-today':'')+'"><td><strong>'+SIGNS[row.sign][0]+'</strong></td><td class="ja-panchang-duration">'+fmtClock(row.start,ctx.tz)+' – '+fmtClock(row.end,ctx.tz)+(active?' <em class="ja-panchang-now">Now</em>':'')+'</td><td>'+LAGNA_TYPES[row.sign]+'</td><td>'+planetMarkup(lord)+'</td><td>'+houseText+'</td><td>'+ (conjunctions.length?conjunctions.map(planetMarkup).join(', '):'—') +'</td><td>'+ (aspectedBy.length?aspectedBy.map(planetMarkup).join(', '):'—') +'</td><td>'+ (inLagna.length?inLagna.map(planetMarkup).join(', '):'—') +'</td><td>'+ (aspecting.length?aspecting.map(planetMarkup).join(', '):'—') +'</td></tr>';
+  var active=ctx.instant>=row.start&&ctx.instant<row.end;bodyRows+='<tr class="'+(active?'is-today':'')+'"><td><strong>'+SIGNS[row.sign][0]+'</strong></td><td class="ja-panchang-duration">'+formatPanchangInterval(row.start,row.end,ctx.tz,sunrise)+(active?' <em class="ja-panchang-now">Now</em>':'')+'</td><td>'+LAGNA_TYPES[row.sign]+'</td><td>'+planetMarkup(lord)+'</td><td>'+houseText+'</td><td>'+ (conjunctions.length?conjunctions.map(planetMarkup).join(', '):'—') +'</td><td>'+ (aspectedBy.length?aspectedBy.map(planetMarkup).join(', '):'—') +'</td><td>'+ (inLagna.length?inLagna.map(planetMarkup).join(', '):'—') +'</td><td>'+ (aspecting.length?aspecting.map(planetMarkup).join(', '):'—') +'</td></tr>';
  });
  bodyNode.innerHTML='<div class="ja-panchang-table-wrap ja-panchang-lagna-wrap"><table class="ja-panchang-week-table ja-panchang-lagna-table"><thead><tr><th>Sign</th><th>Duration</th><th>Category</th><th>Lagna Lord</th><th>Lord Placement</th><th>Conjunction with Lord</th><th>Aspected by</th><th>Planets in Lagna</th><th>Planets Aspecting Lagna</th></tr></thead><tbody>'+bodyRows+'</tbody></table></div>';
 }
