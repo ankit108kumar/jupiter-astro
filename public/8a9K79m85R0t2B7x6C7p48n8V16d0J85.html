@@ -3160,7 +3160,7 @@ s += `<rect x="0" y="0" width="300" height="300"
 
   for (let h = 1; h <= 12; h++) {
     const g = NORTH[h], sign = (lagnaSign + h - 1) % 12;
-    s += `<text class="sign-number" data-sign="${sign + 1}" data-layout-house="${h}" data-layout-type="sign" x="${g.n[0]}" y="${g.n[1]}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="${C.muted}" style="cursor:help">${sign + 1}</text>`;
+    s += `<text class="sign-number" tabindex="0" role="img" aria-label="Sign ${sign + 1} information" data-sign="${sign + 1}" data-layout-house="${h}" data-layout-type="sign" x="${g.n[0]}" y="${g.n[1]}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="${C.muted}" style="cursor:help">${sign + 1}</text>`;
     if (savList && Array.isArray(savList) && g.sav) {
       const val = savList[sign];
       const col = val < 25 ? '#dc2626' : val > 29 ? '#16a34a' : '#2563eb';
@@ -4471,7 +4471,7 @@ const RenderTabs = {
       <div class="two">
         <article class="card kchart">
           <header style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 class="ja-varga-tooltip" data-varga-tooltip="Existence at the physical level">D1 · Rashi Chart</h3>
+            <h3 class="ja-varga-tooltip" tabindex="0" data-varga-tooltip="Existence at the physical level">D1 · Rashi Chart</h3>
             <div style="display:flex; align-items:center; gap:6px;">
               <button type="button" class="deg-toggle-btn ${window.jaShowDeg ? 'active' : ''}" id="${prefix}-degToggleBtn" title="Toggle Planetary Degrees">D</button>
               <button type="button" class="sav-toggle-btn ${window.jaShowSavD1 ? 'active' : ''}" id="${prefix}-savToggleBtn" title="Toggle Sarvashtakavarga (SAV)">SV</button>
