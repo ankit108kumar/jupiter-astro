@@ -25,7 +25,7 @@
 .ja-panchang-event{padding:9px 11px;border-radius:8px;background:rgba(120,130,150,.055);margin:3px 0}.ja-panchang-event.is-active{background:rgba(224,160,75,.12);box-shadow:inset 3px 0 #c58b36}
 .ja-panchang-event-head{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:13px;color:var(--ink,#1c2434)}
 .ja-panchang-event-head em{font-style:normal;font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#9a671c;background:rgba(224,160,75,.18);padding:3px 7px;border-radius:20px}
-.ja-panchang-duration{margin-top:4px;font:500 11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--muted,#738098);font-variant-numeric:tabular-nums}
+.ja-panchang-duration{margin-top:4px;font:500 11px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--muted,#738098);font-variant-numeric:tabular-nums}
 .ja-panchang-meta-grid{display:flex;flex-wrap:wrap;gap:5px 14px;margin-top:6px}.ja-panchang-meta{font-size:10px;color:var(--muted,#738098)}.ja-panchang-meta b{color:var(--ink,#1c2434);font-weight:700}
 .ja-panchang-dialog-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 24px;border-top:1px solid var(--line,rgba(100,110,130,.16));color:var(--muted,#738098);font-size:10px}
 .ja-panchang-current-summary{padding:22px;border:1px solid var(--line,rgba(100,110,130,.2));border-radius:13px;background:rgba(120,130,150,.045);display:grid;gap:10px}
@@ -80,6 +80,11 @@
 .ja-panchang-meta span{color:var(--ink,#1c2434);font-weight:600}
 .ja-panchang-dual-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
 .ja-panchang-lunar-grid{min-width:min(900px,90vw)}
+/* Yoga & Karana: keep the event name and duration on one clean, aligned line. */
+.ja-panchang-lunar-grid .ja-panchang-event{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:4px 12px}
+.ja-panchang-lunar-grid .ja-panchang-event strong{min-width:0;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-weight:600}
+.ja-panchang-lunar-grid .ja-panchang-duration{margin:0;text-align:right;white-space:nowrap;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-weight:500}
+.ja-panchang-lunar-grid .ja-panchang-event .ja-panchang-now{grid-column:1;justify-self:start}
 .ja-panchang-half{min-width:0;margin:0}
 .ja-panchang-half h3{font-size:13px;padding:0 0 7px;border-bottom:1px solid var(--line,rgba(100,110,130,.15))}
 .ja-panchang-half .ja-panchang-week-table{font-size:11px}
