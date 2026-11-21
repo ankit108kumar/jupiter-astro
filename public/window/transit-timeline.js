@@ -1750,6 +1750,7 @@
   function hidePlanetSignificationNow() {
     clearPlanetSignificationTimers();
     activePlanetSignification = null;
+    if (window.JAHoverManager) window.JAHoverManager.untrack("transit-signification");
     var panel = windowEl && windowEl.querySelector(".jtt-planet-signification-panel");
     if (panel) { panel.classList.remove("is-visible"); panel.hidden = true; }
     removeTransitBasicTooltip();
