@@ -1823,6 +1823,54 @@ input:focus-visible { border-color: var(--saffron); }
   color: var(--ink);
   overflow-wrap: anywhere;
 }
+
+/* Nakshatra hover card — used only in Nav Tara Chakra and Panchang details. */
+.nakshatra-hover-card {
+  position: fixed;
+  z-index: 10020;
+  width: min(470px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
+  padding: 13px 15px;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  border: 1px solid rgba(212, 160, 74, .28);
+  border-left: 2px solid rgba(212, 160, 74, .58);
+  border-radius: 11px;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .24);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  font-size: 11px;
+  line-height: 1.45;
+  pointer-events: none;
+}
+.nakshatra-hover-card[hidden] { display: none !important; }
+.nakshatra-hover-card .nh-title {
+  margin: 0 0 8px;
+  color: var(--saffron);
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+}
+.nakshatra-hover-card .nh-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 18px;
+}
+.nakshatra-hover-card .nh-row {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  gap: 7px;
+  padding: 5px 0;
+  border-top: 1px solid var(--line);
+  min-width: 0;
+}
+.nakshatra-hover-card .nh-label { color: var(--muted); font-weight: 650; }
+.nakshatra-hover-card .nh-value { color: var(--ink); overflow-wrap: anywhere; }
+.ja-nakshatra-hover { cursor: help; text-decoration: underline dotted rgba(180, 130, 55, .55); text-underline-offset: 3px; }
+@media (max-width: 520px) {
+  .nakshatra-hover-card .nh-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
 .aspect-note { font-size: .82rem; color: var(--muted); text-align: center; min-height: 2em; margin-top: 6px; }
 .aspect-note b { color: var(--al); }
 
