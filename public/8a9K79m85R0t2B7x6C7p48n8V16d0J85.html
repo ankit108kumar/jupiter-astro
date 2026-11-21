@@ -3445,16 +3445,21 @@ if (!placed) {
   function activate(key, open, close, openDelay, closeDelay) {
     clearPending();
     if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
-    var token = { key: key, timer: null };
-    pending = token;
-    token.timer = setTimeout(function () {
-      if (pending !== token) return;
+    var delay = Math.max(0, openDelay == null ? 300 : openDelay);
+    function commitOpen() {
       pending = null;
       closeActive(true);
       open();
       active = { key: key, close: close, closeDelay: closeDelay == null ? defaultCloseDelay(key) : closeDelay };
       track(key, close);
-    }, Math.max(0, openDelay == null ? 300 : openDelay));
+    }
+    if (delay === 0) { commitOpen(); return; }
+    var token = { key: key, timer: null };
+    pending = token;
+    token.timer = setTimeout(function () {
+      if (pending !== token) return;
+      commitOpen();
+    }, delay);
   }
   function leave(key, closeDelay) {
     var canceledPending = !!(pending && pending.key === key);
