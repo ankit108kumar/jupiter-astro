@@ -2230,7 +2230,6 @@
 }
 /* Clickable Nakshatra deity story panel and trigger. */
 #ja-transit-timeline-window .jtt-nakshatra-story-trigger {
-  display: inline;
   padding: 0;
   margin: 0;
   border: 0;
@@ -2243,6 +2242,9 @@
   text-decoration: underline dotted var(--jtt-accent);
   text-underline-offset: 3px;
   cursor: pointer;
+}
+#ja-transit-timeline-window .jtt-nakshatra-story-trigger:not(.jtt-duration-wrap) {
+  display: inline;
 }
 #ja-transit-timeline-window .jtt-nakshatra-story-trigger:hover {
   color: var(--jtt-accent);
