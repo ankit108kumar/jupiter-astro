@@ -3493,6 +3493,44 @@ if (!placed) {
   window.JAHoverManager = { activate: activate, leave: leave, keepOpen: keepOpen, dismiss: dismiss, track: track, untrack: untrack, dismissLast: dismissLast };
 })();
 
+/* Register CSS-driven divisional-chart tooltips in the shared Escape stack. */
+(function bindVargaTooltipDismissal() {
+  var nextId = 0;
+  function register(target) {
+    if (!target) return;
+    var key = target.dataset.jaVargaHoverKey;
+    if (!key) key = target.dataset.jaVargaHoverKey = "varga-tooltip-" + (++nextId);
+    target.classList.remove("ja-varga-dismissed");
+    window.JAHoverManager.track(key, function () { target.classList.add("ja-varga-dismissed"); });
+  }
+  function unregister(target) {
+    if (!target || !target.dataset.jaVargaHoverKey) return;
+    if (document.activeElement !== target) {
+      window.JAHoverManager.untrack(target.dataset.jaVargaHoverKey);
+      target.classList.remove("ja-varga-dismissed");
+    }
+  }
+  document.addEventListener("pointerover", function (event) {
+    var target = event.target.closest && event.target.closest(".ja-varga-tooltip");
+    if (target && !(event.relatedTarget && target.contains(event.relatedTarget))) register(target);
+  });
+  document.addEventListener("pointerout", function (event) {
+    var target = event.target.closest && event.target.closest(".ja-varga-tooltip");
+    if (target && !(event.relatedTarget && target.contains(event.relatedTarget))) unregister(target);
+  });
+  document.addEventListener("focusin", function (event) {
+    var target = event.target.closest && event.target.closest(".ja-varga-tooltip");
+    if (target) register(target);
+  });
+  document.addEventListener("focusout", function (event) {
+    var target = event.target.closest && event.target.closest(".ja-varga-tooltip");
+    if (target && !(event.relatedTarget && target.contains(event.relatedTarget))) {
+      window.JAHoverManager.untrack(target.dataset.jaVargaHoverKey);
+      target.classList.remove("ja-varga-dismissed");
+    }
+  });
+})();
+
 /* ================= ZODIAC SIGN HOVER INFORMATION CARD ================= */
 (function initZodiacHoverCard() {
   if (document.getElementById("zodiacHoverCard")) return;
