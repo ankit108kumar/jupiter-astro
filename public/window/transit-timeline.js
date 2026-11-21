@@ -827,7 +827,7 @@
       if (!activeDurationTooltip) return;
       activeDurationTooltip.classList.remove("is-open");
       durationRemoveTimer = setTimeout(removeDurationTooltip, 220);
-    }, 2000);
+    }, 1000);
   }
   function copyPlainText(value) {
     function fallbackCopy() {
@@ -992,8 +992,10 @@
   }
   function bindDurationTooltips(host) {
     host.querySelectorAll(".jtt-duration-wrap[data-jtt-duration]").forEach(function (wrapper) {
-      wrapper.addEventListener("pointerenter", function () { showDurationTooltip(wrapper); });
+      var durationOpenTimer = null;
+      wrapper.addEventListener("pointerenter", function () { clearTimeout(durationOpenTimer); durationOpenTimer = setTimeout(function(){ showDurationTooltip(wrapper); }, 300); });
       wrapper.addEventListener("pointerleave", function (event) {
+        clearTimeout(durationOpenTimer);
         if (activeDurationTooltip && activeDurationTooltip.contains(event.relatedTarget)) return;
         scheduleDurationTooltipHide();
       });
@@ -1151,7 +1153,7 @@
   function hideNakshatraStory(immediate) {
     clearNakshatraStoryTimer();
     nakshatraStoryDeadline = 0;
-    nakshatraStoryRemaining = 20000;
+    nakshatraStoryRemaining = 10000;
     nakshatraStoryPaused = false;
     activeNakshatraStory = null;
     var panel = ensurePlanetSignificationPanel();
@@ -1280,6 +1282,7 @@
     });
   }
 
+  var nakStoryOpenTimer = null;
   function bindNakshatraStoryHover(host) {
     if (!host || host.dataset.nakshatraStoryHover === "true") return;
     host.dataset.nakshatraStoryHover = "true";
@@ -1291,8 +1294,11 @@
         ? event.target.closest(".jtt-nakshatra-story-trigger") : null;
       if (!trigger || !host.contains(trigger)) return;
       if (event.relatedTarget && trigger.contains(event.relatedTarget)) return;
-      showNakshatraStory(trigger.getAttribute("data-jtt-nakshatra-story"));
+      clearTimeout(nakStoryOpenTimer);
+      nakStoryOpenTimer = setTimeout(function(){ if(trigger.isConnected) showNakshatraStory(trigger.getAttribute("data-jtt-nakshatra-story")); },300);
     });
+
+    host.addEventListener("pointerout", function(event){ if(event.target.closest && event.target.closest(".jtt-nakshatra-story-trigger")) clearTimeout(nakStoryOpenTimer); });
 
     // Retain keyboard access without requiring a mouse click.
     host.addEventListener("keydown", function (event) {
@@ -1408,7 +1414,7 @@
 
   function scheduleTransitBasicTooltipHide() {
     if (transitBasicTooltipHideTimer) clearTimeout(transitBasicTooltipHideTimer);
-    transitBasicTooltipHideTimer = setTimeout(removeTransitBasicTooltip, 500);
+    transitBasicTooltipHideTimer = setTimeout(removeTransitBasicTooltip, 1000);
   }
 
   function showTransitBasicTooltip(trigger) {
@@ -1468,6 +1474,7 @@
     tooltip.style.visibility = "visible";
   }
 
+  var houseResultOpenTimer = null;
   function bindHouseResultTooltips(host) {
     if (!host || houseSignificationBoundHosts.has(host)) return;
     houseSignificationBoundHosts.add(host);
@@ -1479,8 +1486,8 @@
       if (event.relatedTarget && target.contains(event.relatedTarget)) return;
       var houseNumber = Number(target.getAttribute("data-result-house"));
       if (!Number.isInteger(houseNumber) || houseNumber < 1 || houseNumber > 12) return;
-      showHouseSignification(houseNumber);
-      showTransitBasicTooltip(target);
+      clearTimeout(houseResultOpenTimer);
+      houseResultOpenTimer = setTimeout(function(){ if(target.isConnected){showHouseSignification(houseNumber);showTransitBasicTooltip(target);} },300);
     });
 
     host.addEventListener("pointerout", function (event) {
@@ -1488,6 +1495,7 @@
         ? event.target.closest(".jtt-house-result-trigger") : null;
       if (!target || !host.contains(target)) return;
       if (event.relatedTarget && target.contains(event.relatedTarget)) return;
+      clearTimeout(houseResultOpenTimer);
       hidePlanetSignification();
       scheduleTransitBasicTooltipHide();
     });
@@ -1517,6 +1525,7 @@
   var planetSignificationHideTimer = null;
   var planetSignificationRemoveTimer = null;
   var planetSignificationBoundHosts = new WeakSet();
+  var planetSignificationHoverTimer = null;
 
   function loadPlanetSignifications() {
     if (!planetSignificationsPromise) {
@@ -1679,7 +1688,7 @@
       planetSignificationRemoveTimer = setTimeout(function () {
         if (!activePlanetSignification) panel.hidden = true;
       }, 260);
-    }, 1000);
+    }, 5000);
   }
 
   function bindPlanetSignificationHover(host) {
@@ -1694,7 +1703,7 @@
       var cell = name.closest(".jtt-planet-cell");
       if (!cell) return;
       var planet = name.textContent.trim();
-      if (planet) showPlanetSignification(planet);
+      if (planet) { clearTimeout(planetSignificationHoverTimer); planetSignificationHoverTimer = setTimeout(function(){showPlanetSignification(planet);},300); }
     });
 
     host.addEventListener("pointerout", function (event) {
@@ -1702,6 +1711,7 @@
         ? event.target.closest(".jtt-planet-cell strong") : null;
       if (!name || !host.contains(name)) return;
       if (event.relatedTarget && name.contains(event.relatedTarget)) return;
+      clearTimeout(planetSignificationHoverTimer);
       hidePlanetSignification();
     });
   }
