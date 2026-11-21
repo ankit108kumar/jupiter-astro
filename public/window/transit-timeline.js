@@ -1247,6 +1247,19 @@
     });
   }
 
+  function bindNakshatraStoryKeyboard(host) {
+    if (!host || host.dataset.nakshatraStoryKeyboard === "true") return;
+    host.dataset.nakshatraStoryKeyboard = "true";
+    host.addEventListener("keydown", function (event) {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      var trigger = event.target && event.target.closest
+        ? event.target.closest(".jtt-nakshatra-story-trigger") : null;
+      if (!trigger || !host.contains(trigger)) return;
+      event.preventDefault();
+      showNakshatraStory(trigger.getAttribute("data-jtt-nakshatra-story"));
+    });
+  }
+
   document.addEventListener("click", function (event) {
     if (!activeNakshatraStory || !windowEl || !openState()) return;
     var target = event.target;
@@ -1281,7 +1294,21 @@
     return houseSignificationsPromise;
   }
 
+  function clearNakshatraStoryForOtherSignification() {
+    clearNakshatraStoryTimer();
+    activeNakshatraStory = null;
+    nakshatraStoryDeadline = 0;
+    nakshatraStoryRemaining = 20000;
+    nakshatraStoryPaused = false;
+    var panel = windowEl && windowEl.querySelector(".jtt-planet-signification-panel");
+    if (!panel) return;
+    var meta = panel.querySelector(".jtt-nakshatra-story-meta");
+    if (meta) meta.hidden = true;
+    panel.classList.remove("is-nakshatra-story");
+  }
+
   function showHouseSignification(houseNumber) {
+    clearNakshatraStoryForOtherSignification();
     var houseKey = "house:" + houseNumber;
     clearPlanetSignificationTimers();
     activePlanetSignification = houseKey;
@@ -1555,6 +1582,7 @@
   }
 
   function showPlanetSignification(planet) {
+    clearNakshatraStoryForOtherSignification();
     clearPlanetSignificationTimers();
     activePlanetSignification = planet;
     var panel = ensurePlanetSignificationPanel();
@@ -1661,6 +1689,7 @@
       bindDurationTooltips(host);
       bindHouseResultTooltips(host);
       bindPlanetSignificationHover(host);
+      bindNakshatraStoryKeyboard(host);
       ensurePlanetSignificationPanel();
     } catch (error) {
       console.error("Transit Timeline could not render the planetary table.", error);
