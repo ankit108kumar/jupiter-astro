@@ -3468,6 +3468,7 @@ if (!placed) {
     }, Math.max(0, delay == null ? defaultCloseDelay(active.key) : delay));
   }
   function keepOpen(key) {
+    if (pending && pending.key !== key) clearPending();
     if (active && active.key === key && closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
   }
   function dismiss(key, immediate) {
