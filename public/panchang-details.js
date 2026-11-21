@@ -149,7 +149,7 @@ function renderChaughadiyaHora(which){
  var selected=table('Chaughadiya',chSlots)+table('Hora',horaSlots);var dayDate=new Date(sunrise+ctx.tz*3600000);subtitleNode.textContent=pad(dayDate.getUTCDate())+'/'+pad(dayDate.getUTCMonth()+1)+'/'+dayDate.getUTCFullYear()+' · '+fmtClock(sunrise,ctx.tz)+' – '+fmtClock(nextSunrise,ctx.tz)+' local chart time';bodyNode.innerHTML='<div class="ja-panchang-dual-grid">'+selected+'</div>';
 }
 function renderInauspiciousWeek(){
- var w=bounds(),rahus=[8,2,7,5,6,4,3],guliks=[6,5,4,3,2,1,0],yamas=[4,3,2,1,0,6,5],rows='',weekDate=new Date(w.start+ctx.tz*3600000),lastDate=new Date(w.end-1+ctx.tz*3600000);
+ var w=bounds(),rahus=[8,2,7,5,6,4,3],guliks=[6,5,4,3,2,1,0],yamas=[4,3,2,1,0,6,5],rows='',weekDate=new Date(w.start+ctx.tz*3600000),lastDate=new Date(w.days[6].start+ctx.tz*3600000);
  if(!w.days.length){bodyNode.innerHTML='<div class="ja-panchang-current-summary"><strong>Sunrise data unavailable.</strong><small>Check the selected location and date.</small></div>';return;}
  var range=pad(weekDate.getUTCDate())+'/'+pad(weekDate.getUTCMonth()+1)+'/'+weekDate.getUTCFullYear()+' – '+pad(lastDate.getUTCDate())+'/'+pad(lastDate.getUTCMonth()+1)+'/'+lastDate.getUTCFullYear(),location=(document.getElementById('pob')||{}).value||'Selected chart location',tzLabel='UTC'+(ctx.tz>=0?'+':'')+String(ctx.tz),heads=['☾ &nbsp; Rahu Kaal','◉ &nbsp; Gulika Kaal','☼ &nbsp; Yamaghanta'];
  for(var day=0;day<7;day++){
@@ -202,7 +202,7 @@ function renderAuspiciousWeek(){
    dayCell=nightCell=jupiterCell=unavailable;
   }
   var dd=new Date(rise+ctx.tz*3600000);
-  rows+='<tr class="'+(today?'is-today':'')+'"><th><span>'+DAYS[weekday]+'</span><small>'+pad(dd.getUTCDate())+'/'+pad(dd.getUTCMonth()+1)+'/'+dd.getUTCFullYear()+'</small></th><td>'+dayCell+'</td><td>'+nightCell+'</td><th data-export-only style="display:none">Jupiter Transit (House Periods)</th><td>'+jupiterCell+'</td></tr>';
+  rows+='<tr class="'+(today?'is-today':'')+'"><th><span>'+DAYS[weekday]+'</span><small>'+pad(dd.getUTCDate())+'/'+pad(dd.getUTCMonth()+1)+'/'+dd.getUTCFullYear()+'</small></th><td>'+dayCell+'</td><td>'+nightCell+'</td><td data-export-only style="display:none">'+jupiterCell+'</td></tr>';
  }
  bodyNode.innerHTML='<div class="ja-panchang-table-wrap"><table class="ja-panchang-week-table ja-panchang-auspicious-table"><thead><tr><th>Day</th><th>Day Abhijit Muhurta</th><th>Night Abhijit Muhurta</th><th data-export-only style="display:none">Jupiter Transit (House Periods)</th></tr></thead><tbody>'+rows+'</tbody></table></div><p class="ja-panchang-note">Night Abhijit is shown as the 8th equal Muhurta of the night (sunset to next sunrise). Jupiter house periods are retained in copied and exported table data.</p>';
 }
