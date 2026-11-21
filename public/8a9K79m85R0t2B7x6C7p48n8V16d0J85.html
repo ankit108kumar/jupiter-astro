@@ -4391,31 +4391,50 @@ return `
 /* ================= COMPOSITE TAB RENDERERS ================= */
 
 /* ===== Misc: Yogi / Avayogi and Khara points ===== */
-function jaYogiAndKhara(k,reference){
- const refLon=reference==='Ascendant'?k.ch.asc:k.ch.planets[reference].lon;
- const sun=rev(k.ch.planets.Sun.lon),moon=rev(k.ch.planets.Moon.lon);
+function jaYogiAndKhara(k){
+ const ascLon=rev(k.ch.asc),moonLon=rev(k.ch.planets.Moon.lon);
+ const sun=rev(k.ch.planets.Sun.lon),moon=moonLon;
  const yogiPoint=rev(sun+moon+93+20/60),avayogiPoint=rev(yogiPoint+186+40/60);
  const pointInfo=lon=>{const x=rev(lon),ni=Math.min(26,Math.floor(x/(40/3))),n=NAK[ni];return{longitude:dms(x),sign:SIGNS[signOf(x)][0],nakshatra:n[0],lord:n[1]};};
- const yogi=pointInfo(yogiPoint),avayogi=pointInfo(avayogiPoint),sign=signOf(refLon),deg=refLon%30;
- const dPart=Math.min(3,Math.floor(deg/10)+1),dIndex=(3*sign+dPart-1+21)%36,dSign=Math.floor(dIndex/3),dNum=dIndex%3+1;
- const nPart=Math.min(9,Math.floor(deg/(10/3))+1),nIndex=(9*sign+nPart-1+63)%108,nSign=Math.floor(nIndex/9),nNum=nIndex%9+1;
- const dmsRange=(a,b)=>dms(a,false)+' – '+dms(b,false);
- return{reference,refSign:SIGNS[sign][0],refDegree:dms(deg),yogi,avayogi,
-  drekkana:{sign:SIGNS[dSign][0],part:dNum,range:dmsRange((dNum-1)*10,dNum*10)},
-  navamsa:{sign:SIGNS[nSign][0],part:nNum,range:dmsRange((nNum-1)*(10/3),nNum*(10/3))}};
+ const yogi=pointInfo(yogiPoint),avayogi=pointInfo(avayogiPoint);
+
+ // Jataka Parijata method: 22nd Drekkana from the Ascendant division,
+ // and 64th Navamsa from the Moon division. Count each starting division as 1.
+ const dSign=signOf(ascLon),dDeg=ascLon%30;
+ const dPart=Math.min(3,Math.floor(dDeg/10)+1);
+ const dIndex=(3*dSign+dPart-1+21)%36;
+ const dDivisionSign=Math.floor(dIndex/3),dNum=dIndex%3+1;
+ // Display the sign occupied by this division in D3, not its D1 zodiac sign.
+ const d3Sign=vargaSign(dDivisionSign*30+(dNum-0.5)*10,3);
+
+ const nSign=signOf(moonLon),nDeg=moonLon%30;
+ const nPart=Math.min(9,Math.floor(nDeg/(10/3))+1);
+ const nIndex=(9*nSign+nPart-1+63)%108;
+ const nDivisionSign=Math.floor(nIndex/9),nNum=nIndex%9+1;
+ // Display the sign occupied by this division in D9, not its D1 zodiac sign.
+ const d9Sign=vargaSign(nDivisionSign*30+(nNum-0.5)*(30/9),9);
+
+ return{
+  yogi,avayogi,
+  drekkana:{reference:'Ascendant',sign:SIGNS[d3Sign][0],part:dNum},
+  navamsa:{reference:'Moon',sign:SIGNS[d9Sign][0],part:nNum}
+ };
 }
 function jaKharaResultMarkup(d){
- return '<div class="scroll"><table><thead><tr><th>Reference</th><th>Sign</th><th>Degree</th><th>22nd Drekkana</th><th>64th Navamsa</th></tr></thead><tbody><tr><td>'+d.reference+'</td><td>'+d.refSign+'</td><td class="num">'+d.refDegree+'</td><td>'+d.drekkana.sign+' · D'+d.drekkana.part+'<small> ('+d.drekkana.range+')</small></td><td>'+d.navamsa.sign+' · N'+d.navamsa.part+'<small> ('+d.navamsa.range+')</small></td></tr></tbody></table></div>';
+ return '<div class="scroll"><table><thead><tr><th>Indicator</th><th>Counted from</th><th>Corresponding divisional sign</th></tr></thead><tbody>'+
+ '<tr><td>22nd Drekkana</td><td>Natal Ascendant</td><td><strong>'+d.drekkana.sign+'</strong> <small>(D3)</small></td></tr>'+
+ '<tr><td>64th Navamsa</td><td>Natal Moon</td><td><strong>'+d.navamsa.sign+'</strong> <small>(D9)</small></td></tr>'+
+ '</tbody></table></div>';
 }
 function jaMiscTabMarkup(k,prefix){
- const d=jaYogiAndKhara(k,'Moon'),choices=['Moon','Ascendant','Sun','Mars','Mercury','Jupiter','Venus','Saturn','Rahu','Ketu'];
+ const d=jaYogiAndKhara(k);
  return '<section class="card ja-misc-sensitive-card"><header><div><h3>Yogi &amp; Avayogi</h3><p class="sub">Based on sidereal Sun and Moon longitudes</p></div></header><div class="scroll"><table><thead><tr><th>Point</th><th>Longitude / Result</th><th>Sign</th><th>Nakshatra</th><th>Vimshottari Lord</th></tr></thead><tbody>'+
  '<tr><td>Yogi Point</td><td class="num">'+dms(rev(k.ch.planets.Sun.lon+k.ch.planets.Moon.lon+93+20/60))+'</td><td>'+d.yogi.sign+'</td><td>'+d.yogi.nakshatra+'</td><td>'+d.yogi.lord+'</td></tr>'+
  '<tr><td>Yogi Planet</td><td>'+d.yogi.lord+'</td><td colspan="3">Vimshottari lord of Yogi Nakshatra</td></tr>'+
  '<tr><td>Avayogi Point</td><td class="num">'+dms(rev(rev(k.ch.planets.Sun.lon+k.ch.planets.Moon.lon+93+20/60)+186+40/60))+'</td><td>'+d.avayogi.sign+'</td><td>'+d.avayogi.nakshatra+'</td><td>'+d.avayogi.lord+'</td></tr>'+
  '<tr><td>Avayogi Planet</td><td>'+d.avayogi.lord+'</td><td colspan="3">Vimshottari lord of Avayogi Nakshatra</td></tr></tbody></table></div>'+
  '<p class="sub ja-misc-formula">Yogi = (Sidereal Sun + Sidereal Moon + 93°20′) mod 360°. Avayogi = (Yogi + 186°40′) mod 360°.</p></section>'+
- '<section class="card ja-misc-sensitive-card"><header><div><h3>22nd Drekkana &amp; 64th Navamsa</h3><p class="sub">Select a reference body; Moon is the default</p></div><label class="ja-misc-reference-label">Calculate from <select id="'+prefix+'-kharaReference">'+choices.map(x=>'<option value="'+x+'" '+(x==='Moon'?'selected':'')+'>'+x+'</option>').join('')+'</select></label></header><div id="'+prefix+'-kharaResults">'+jaKharaResultMarkup(d)+'</div><p class="sub ja-misc-formula">Count the 22nd Drekkana and 64th Navamsa inclusively from the selected reference division. Both fall in the eighth sign from the reference sign.</p></section>'+
+ '<section class="card ja-misc-sensitive-card"><header><div><h3>22nd Drekkana &amp; 64th Navamsa</h3><p class="sub">Classical reference points: Ascendant for Drekkana; Moon for Navamsa</p></div></header><div id="'+prefix+'-kharaResults">'+jaKharaResultMarkup(d)+'</div><p class="sub ja-misc-formula">Both divisions are counted inclusively. Results show the corresponding D3 and D9 signs, respectively.</p></section>'+
  '<p class="ja-misc-accuracy"><strong>ⓘ Accuracy notice:</strong> Formula-based implementation; results are yet to be independently verified against authoritative classical editions and reference charts.</p>';
 }
 
@@ -4427,7 +4446,7 @@ const RenderTabs = {
     const avk = avkahada(k.ch.planets.Moon.lon);
     const pc = panchangAt(k.ch.planets.Sun.lon, k.ch.planets.Moon.lon);
     const nk = nakOf(k.ch.planets.Moon.lon);
-    const kharaFromMoon = jaYogiAndKhara(k, 'Moon');
+    const kharaResults = jaYogiAndKhara(k);
     return `
       <div class="two">
         <article class="card kchart">
@@ -4557,8 +4576,8 @@ const RenderTabs = {
             <dt>Darakaraka</dt><dd>${k.karakas[k.karakas.length - 1].planet}</dd>
             <dt>Arudha Lagna</dt><dd>${SIGNS[k.padas[0].sign][0]} <span class="sub">house ${houseFrom(k.padas[0].sign, k.ascSign)}</span></dd>
             <dt>Upapada</dt><dd>${SIGNS[k.padas[11].sign][0]} <span class="sub">house ${houseFrom(k.padas[11].sign, k.ascSign)}</span></dd>
-            <dt>22nd Drekkana</dt><dd>${kharaFromMoon.drekkana.sign} · D${kharaFromMoon.drekkana.part}</dd>
-            <dt>64th Navamsa</dt><dd>${kharaFromMoon.navamsa.sign} · N${kharaFromMoon.navamsa.part}</dd>
+            <dt>22nd Drekkana (D3)</dt><dd>${kharaResults.drekkana.sign}</dd>
+            <dt>64th Navamsa (D9)</dt><dd>${kharaResults.navamsa.sign}</dd>
             <dt>Dasha at birth</dt>
 <dd>
   ${(() => {
@@ -5720,11 +5739,7 @@ function renderKundaliComponent(
       window.JupiterTransitTimeline.syncFromContext();
     }
 
-    if(tabKey==='misc'){
-      const selector=document.getElementById(`${prefix}-kharaReference`);
-      const result=document.getElementById(`${prefix}-kharaResults`);
-      if(selector&&result)selector.addEventListener('change',()=>{result.innerHTML=jaKharaResultMarkup(jaYogiAndKhara(kData,selector.value));});
-    }
+
     if (tabKey === 'overview') {
       const d1 = getVargaItems(kData, 1);
       const secKey = window.overviewSecChartKey && window.overviewSecChartKey[prefix] ? window.overviewSecChartKey[prefix] : 'D9';
