@@ -666,3 +666,19 @@ html,body,*{scrollbar-width:thin;scrollbar-color:#c9c6d0 transparent}
   font-weight:400;
   font-style:normal;
 }
+
+
+/* Default typography increase for Panchang popup content.
+   Title bar and prominent popup heading are intentionally excluded. */
+.ja-panchang-dialog .ja-panchang-dialog-body{
+  font-size:110%!important;
+}
+.ja-panchang-dialog .ja-panchang-dialog-body table td,
+.ja-panchang-dialog .ja-panchang-dialog-body table td *,
+.ja-panchang-dialog .ja-panchang-dialog-body table tbody th,
+.ja-panchang-dialog .ja-panchang-dialog-body table tbody th *{
+  font-size:115%!important;
+}
+.ja-panchang-dialog .ja-panchang-dialog-body table thead th{
+  font-size:110%!important;
+}
