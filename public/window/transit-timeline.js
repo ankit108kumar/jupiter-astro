@@ -720,7 +720,7 @@
       return '<div class="jtt-table-empty">No planetary transit data is available for the selected Kundali.</div>';
     }
 
-    function houseScore(house, score, scoreType, planet) {
+    function houseScore(house, score, scoreType, planet, source) {
       var hasScore = score !== null && score !== undefined && score !== "" &&
         Number.isFinite(Number(score));
       var numericScore = hasScore ? Number(score) : null;
@@ -733,7 +733,7 @@
       var houseNumber = Number(house);
       var houseMarkup = Number.isInteger(houseNumber) && houseNumber >= 1 && houseNumber <= 12
         ? '<span class="jtt-house-result-trigger" data-result-planet="' + escapeTableText(planet) +
-          '" data-result-house="' + houseNumber + '" data-result-bav-score="' +
+          '" data-result-source="' + escapeTableText(source) + '" data-result-house="' + houseNumber + '" data-result-bav-score="' +
           (scoreType === "bav" && hasScore ? escapeTableText(score) : '') +
           '" tabindex="0" role="button" aria-label="' +
           escapeTableText(planet + ' transit result, ' + houseNumber + 'th house') + '">' +
@@ -787,8 +787,8 @@
       return '<tr>' +
         '<td class="jtt-planet-cell"><strong tabindex="0" aria-label="View ' + escapeTableText(row.planet) + ' signification">' + escapeTableText(row.planet) + '</strong>' + markers + '</td>' +
         '<td class="jtt-sign-cell">' + renderDurationCell(row.signDuration, escapeTableText(row.sign), 'Sign duration') + '</td>' +
-        '<td class="jtt-house-cell">' + houseScore(row.fromLagna, row.sav, 'sav', row.planet) + '</td>' +
-        '<td class="jtt-house-cell">' + houseScore(row.fromMoon, row.bav, 'bav', row.planet) + '</td>' +
+        '<td class="jtt-house-cell">' + houseScore(row.fromLagna, row.sav, 'sav', row.planet, 'lagna') + '</td>' +
+        '<td class="jtt-house-cell">' + houseScore(row.fromMoon, row.bav, 'bav', row.planet, 'moon') + '</td>' +
         '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInSign) + '</td>' +
         '<td class="jtt-nakshatra-cell">' + renderDurationCell(row.nakshatraDuration, nakshatraHtml, 'Nakshatra duration', row.nakshatra) + '</td>' +
         '<td class="jtt-count-cell">' + escapeTableText(row.countFromJanmaNakshatra) + '</td>' +
@@ -1485,9 +1485,9 @@
     });
   }
 
-  function showHouseSignification(houseNumber, planet) {
+  function showHouseSignification(houseNumber, planet, source, bavScore) {
     clearNakshatraStoryForOtherSignification();
-    var houseKey = "house:" + houseNumber + ":" + (planet || "");
+    var houseKey = "house:" + source + ":" + houseNumber + ":" + (planet || "");
     clearPlanetSignificationTimers();
     activePlanetSignification = houseKey;
 
@@ -1506,6 +1506,31 @@
     void panel.offsetWidth;
     panel.classList.add("is-visible");
     showTransitPlanetHouseResult(panel, planet, houseNumber);
+    var bavSection = ensureBavTransitResultSection(panel);
+    var bavDivider = panel.querySelector(".jtt-bav-result-divider");
+    if (source === "moon" && bavScore !== null && bavScore !== undefined && bavScore !== "") {
+      showBavTransitResult({
+        getAttribute: function (name) {
+          if (name === "data-bav-result-planet") return planet;
+          if (name === "data-bav-result-score") return String(bavScore);
+          if (name === "data-bav-result-house") return String(houseNumber);
+          return null;
+        }
+      }, true);
+    } else if (bavSection) {
+      bavSection.hidden = true;
+      if (bavDivider) bavDivider.hidden = true;
+      panel.classList.remove("has-bav-result");
+    }
+    if (bavSection) {
+      var planetHouseSection = ensureTransitPlanetHouseSection(panel);
+      var planetHouseDivider = panel.querySelector(".jtt-transit-planet-house-divider");
+      if (planetHouseDivider && planetHouseSection) {
+        bavDivider = panel.querySelector(".jtt-bav-result-divider");
+        if (bavDivider) planetHouseSection.insertAdjacentElement("afterend", bavDivider);
+        if (bavDivider) bavDivider.insertAdjacentElement("afterend", bavSection);
+      }
+    }
 
     loadHouseSignifications().then(function (houses) {
       if (activePlanetSignification !== houseKey || !panel.isConnected) return;
@@ -1612,18 +1637,9 @@
   var houseResultOpenTimer = null;
   function showTransitHouseDetails(target, houseNumber) {
     var planet = target.getAttribute("data-result-planet");
-    showHouseSignification(houseNumber, planet);
+    var source = target.getAttribute("data-result-source") || "lagna";
     var bavScore = target.getAttribute("data-result-bav-score");
-    if (bavScore !== null && bavScore !== "") {
-      showBavTransitResult({
-        getAttribute: function (name) {
-          if (name === "data-bav-result-planet") return planet;
-          if (name === "data-bav-result-score") return bavScore;
-          if (name === "data-bav-result-house") return String(houseNumber);
-          return null;
-        }
-      });
-    }
+    showHouseSignification(houseNumber, planet, source, bavScore);
   }
 
   function bindHouseResultTooltips(host) {
@@ -1968,7 +1984,7 @@
     return section;
   }
 
-  function showBavTransitResult(trigger) {
+  function showBavTransitResult(trigger, preserveHouseSelection) {
     var planet = trigger.getAttribute("data-bav-result-planet");
     var score = Number(trigger.getAttribute("data-bav-result-score"));
     var house = trigger.getAttribute("data-bav-result-house");
@@ -1981,9 +1997,11 @@
     var title = section.querySelector(".jtt-bav-result-heading strong");
     var content = section.querySelector(".jtt-bav-result-content");
     var requestKey = planet + ":" + score + ":" + house;
-    clearPlanetSignificationTimers();
-    activePlanetSignification = "bav:" + requestKey;
-    removeTransitBasicTooltip();
+    if (!preserveHouseSelection) {
+      clearPlanetSignificationTimers();
+      activePlanetSignification = "bav:" + requestKey;
+      removeTransitBasicTooltip();
+    }
     section.setAttribute("data-bav-request", requestKey);
     title.textContent = planet + " — BAV " + score + (house ? " · " + house + "H" : "");
     content.textContent = "Loading transit interpretation…";
