@@ -4500,3 +4500,12 @@ body.ja-font-scale-enabled [data-ja-font-scale-target] {
  .zodiac-hover-card .zh-grid,.nakshatra-hover-card .nh-grid{grid-template-columns:minmax(0,1fr)}
  .zodiac-hover-card .zh-row,.nakshatra-hover-card .nh-row{grid-template-columns:100px minmax(0,1fr)}
 }
+
+
+/* Stable scrollbar gutters for shared account and information popup panels. */
+.account-dialog,
+.zodiac-hover-card,
+.nakshatra-hover-card,
+.inline-error-popup {
+  scrollbar-gutter: stable;
+}
