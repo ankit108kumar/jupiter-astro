@@ -315,7 +315,7 @@
     '</span>';
   }
 
-  function renderNatalPlanetMatches(items) {
+  function renderNatalPlanetMatches(items, sourceKey) {
     if (!Array.isArray(items) || !items.length) {
       return '<span class="jtt-cell-muted">—</span>';
     }
@@ -327,8 +327,11 @@
       var markers = Array.isArray(item.markers) && item.markers.length
         ? '<sup class="jtt-planet-markers">[' + item.markers.map(escapeTableText).join("][") + ']</sup>'
         : '';
-      return '<span class="jtt-natal-match" style="color:' +
-        escapeTableText(item.color || "var(--jtt-ink)") + '" title="' +
+      var planet = String(item.name || "").trim();
+      return '<span class="jtt-natal-match jtt-transit-natal-trigger" tabindex="0" role="button" data-natal-source="' +
+        escapeTableText(sourceKey || "") + '" data-natal-planet="' + escapeTableText(planet) +
+        '" aria-label="View transit result over natal ' + escapeTableText(planet) +
+        '" style="color:' + escapeTableText(item.color || "var(--jtt-ink)") + '" title="' +
         escapeTableText(item.name) + '">' +
         escapeTableText(abbreviations[item.name] || item.name.slice(0, 2)) + markers + '</span>';
     }).join('<span class="jtt-match-separator">, </span>') + '</div>';
@@ -790,12 +793,12 @@
         '<td class="jtt-sign-cell">' + renderDurationCell(row.signDuration, escapeTableText(row.sign), 'Sign duration') + '</td>' +
         '<td class="jtt-house-cell">' + houseScore(row.fromLagna, row.sav, 'sav', row.planet, 'lagna') + '</td>' +
         '<td class="jtt-house-cell">' + houseScore(row.fromMoon, row.bav, 'bav', row.planet, 'moon') + '</td>' +
-        '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInSign) + '</td>' +
+        '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInSign, 'sign') + '</td>' +
         '<td class="jtt-nakshatra-cell">' + renderDurationCell(row.nakshatraDuration, nakshatraHtml, 'Nakshatra duration', row.nakshatra) + '</td>' +
         '<td class="jtt-count-cell">' + escapeTableText(row.countFromJanmaNakshatra) + '</td>' +
-        '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInNakshatra) + '</td>' +
+        '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInNakshatra, 'nakshatra') + '</td>' +
         '<td class="jtt-navamsa-cell">' + renderDurationCell(row.navamsaDuration, escapeTableText(row.navamsa || navamsaNumber), 'Navamsa duration') + '</td>' +
-        '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInNavamsa) + '</td>' +
+        '<td class="jtt-match-cell">' + renderNatalPlanetMatches(row.natalPlanetsInNavamsa, 'navamsa') + '</td>' +
         renderVedhaCell(vedhaResults[row.planet], "Vedha") +
         renderVedhaCell(reverseVedhaResults[row.planet], "Reverse Vedha", "jtt-reverse-vedha-mark") +
         '<td class="jtt-murti-cell' + murtiTone + '">' + murti + '</td>' +
@@ -1919,22 +1922,19 @@
     return transitOverNatalPlanetResultsPromise;
   }
 
-  function getNatalPlanetMatches(row) {
-    var columns = [
-      { key: "natalPlanetsInSign", label: "Natal (Sign)" },
-      { key: "natalPlanetsInNakshatra", label: "Natal (Nak.)" },
-      { key: "natalPlanetsInNavamsa", label: "Natal (D9)" }
-    ];
-    var matches = [];
-    columns.forEach(function (column) {
-      var items = row && Array.isArray(row[column.key]) ? row[column.key] : [];
-      items.forEach(function (item) {
-        var name = String(item && item.name || "").trim();
-        if (!name) return;
-        matches.push({ planet: name, source: column.label });
-      });
+  function getNatalPlanetMatch(row, sourceKey, natalPlanet) {
+    var columns = {
+      sign: { key: "natalPlanetsInSign", label: "Natal (Sign)" },
+      nakshatra: { key: "natalPlanetsInNakshatra", label: "Natal (Nak.)" },
+      navamsa: { key: "natalPlanetsInNavamsa", label: "Natal (D9)" }
+    };
+    var column = columns[sourceKey];
+    if (!row || !column) return null;
+    var items = Array.isArray(row[column.key]) ? row[column.key] : [];
+    var match = items.find(function (item) {
+      return String(item && item.name || "").trim() === natalPlanet;
     });
-    return matches;
+    return match ? { planet: natalPlanet, source: column.label } : null;
   }
 
   function hideHouseBasedSectionsForNatalResult(panel) {
@@ -1950,14 +1950,13 @@
     panel.classList.remove("has-bav-result");
   }
 
-  function showTransitOverNatalPlanetResult(transitPlanet, row) {
-    if (!transitPlanet) return;
+  function showTransitOverNatalPlanetResult(transitPlanet, row, sourceKey, natalPlanet) {
+    if (!transitPlanet || !natalPlanet) return;
+    var match = getNatalPlanetMatch(row, sourceKey, natalPlanet);
+    if (!match) return;
     clearNakshatraStoryForOtherSignification();
     clearPlanetSignificationTimers();
-    var matches = getNatalPlanetMatches(row);
-    var requestKey = "transit-natal:" + transitPlanet + ":" + matches.map(function (item) {
-      return item.source + ":" + item.planet;
-    }).join("|");
+    var requestKey = "transit-natal:" + transitPlanet + ":" + match.source + ":" + match.planet;
     activePlanetSignification = requestKey;
 
     var panel = ensurePlanetSignificationPanel();
@@ -1969,57 +1968,31 @@
     panel.classList.remove("is-nakshatra-story");
     hideHouseBasedSectionsForNatalResult(panel);
     body.replaceChildren();
-    title.textContent = matches.length === 1
-      ? "Transit of " + transitPlanet + " over Natal " + matches[0].planet
-      : "Transit of " + transitPlanet + " over Natal Planets";
+    title.textContent = "Transit of " + transitPlanet + " over Natal " + match.planet;
     panel.hidden = false;
     panel.classList.remove("is-visible");
     void panel.offsetWidth;
     panel.classList.add("is-visible");
 
-    if (!matches.length) {
-      body.textContent = "No natal planets are listed for this transit row.";
-      return;
-    }
+    var source = document.createElement("div");
+    source.className = "jtt-transit-natal-result-source";
+    source.textContent = match.source;
+    body.appendChild(source);
 
-    body.textContent = "Loading transit-over-natal interpretations…";
+    var description = document.createElement("div");
+    description.className = "jtt-transit-natal-result-description";
+    description.textContent = "Loading transit-over-natal interpretation…";
+    body.appendChild(description);
+
     loadTransitOverNatalPlanetResults().then(function (results) {
       if (activePlanetSignification !== requestKey || !panel.isConnected) return;
-      body.replaceChildren();
-      matches.forEach(function (match, index) {
-        var rowElement = document.createElement("div");
-        rowElement.className = "jtt-transit-natal-result-row";
-
-        var source = document.createElement("div");
-        source.className = "jtt-transit-natal-result-source";
-        source.textContent = match.source;
-
-        if (matches.length > 1) {
-          var heading = document.createElement("div");
-          heading.className = "jtt-transit-natal-result-heading";
-          heading.textContent = "Transit of " + transitPlanet + " over Natal " + match.planet;
-          rowElement.appendChild(heading);
-        }
-
-        var description = document.createElement("div");
-        description.className = "jtt-transit-natal-result-description";
-        var key = transitPlanet + match.planet;
-        description.textContent = typeof results[key] === "string" && results[key]
-          ? results[key]
-          : "No interpretation is available for this planet pair.";
-
-        rowElement.appendChild(source);
-        rowElement.appendChild(description);
-        if (index > 0) {
-          var divider = document.createElement("div");
-          divider.className = "jtt-transit-natal-result-divider";
-          body.appendChild(divider);
-        }
-        body.appendChild(rowElement);
-      });
+      var key = transitPlanet + match.planet;
+      description.textContent = typeof results[key] === "string" && results[key]
+        ? results[key]
+        : "No interpretation is available for this planet pair.";
     }).catch(function (error) {
       if (activePlanetSignification !== requestKey || !panel.isConnected) return;
-      body.textContent = "Transit-over-natal interpretations could not be loaded.";
+      description.textContent = "Transit-over-natal interpretation could not be loaded.";
       console.error("Jupiter Astro: Unable to load transit-over-natal-planet interpretations.", error);
     });
   }
@@ -2028,53 +2001,56 @@
     if (!host || planetSignificationBoundHosts.has(host)) return;
     planetSignificationBoundHosts.add(host);
 
-    function resolveTransitRow(name) {
-      var rowElement = name.closest("tr");
+    function resolveTransitRow(trigger) {
+      var rowElement = trigger.closest("tr");
       if (!rowElement) return null;
       var rowIndex = Array.prototype.indexOf.call(rowElement.parentNode.children, rowElement);
       var rows = window.__JA_TRANSIT_TIMELINE_CURRENT_ROWS;
       return Array.isArray(rows) ? rows[rowIndex] || null : null;
     }
 
-    host.addEventListener("pointerover", function (event) {
-      var name = event.target && event.target.closest
-        ? event.target.closest(".jtt-planet-cell strong") : null;
-      if (!name || !host.contains(name)) return;
-      if (event.relatedTarget && name.contains(event.relatedTarget)) return;
-      var row = resolveTransitRow(name);
-      var planet = name.textContent.trim();
-      if (planet && window.JAHoverManager) window.JAHoverManager.activate("transit-signification", function () {
-        showTransitOverNatalPlanetResult(planet, row);
-      }, hidePlanetSignificationNow, 300);
-      else if (planet) {
+    function activateNatalMatch(trigger, delay) {
+      var row = resolveTransitRow(trigger);
+      var transitPlanet = row && String(row.planet || "").trim();
+      var natalPlanet = trigger.getAttribute("data-natal-planet");
+      var sourceKey = trigger.getAttribute("data-natal-source");
+      if (!transitPlanet || !natalPlanet || !sourceKey) return;
+      var open = function () {
+        showTransitOverNatalPlanetResult(transitPlanet, row, sourceKey, natalPlanet);
+      };
+      if (window.JAHoverManager) {
+        window.JAHoverManager.activate("transit-signification", open, hidePlanetSignificationNow, delay);
+      } else {
         clearTimeout(planetSignificationHoverTimer);
-        planetSignificationHoverTimer = setTimeout(function () {
-          showTransitOverNatalPlanetResult(planet, row);
-        }, 300);
+        planetSignificationHoverTimer = setTimeout(open, delay);
       }
+    }
+
+    host.addEventListener("pointerover", function (event) {
+      var trigger = event.target && event.target.closest
+        ? event.target.closest(".jtt-transit-natal-trigger") : null;
+      if (!trigger || !host.contains(trigger)) return;
+      if (event.relatedTarget && trigger.contains(event.relatedTarget)) return;
+      activateNatalMatch(trigger, 300);
     });
     host.addEventListener("pointerout", function (event) {
-      var name = event.target && event.target.closest
-        ? event.target.closest(".jtt-planet-cell strong") : null;
-      if (!name || !host.contains(name)) return;
-      if (event.relatedTarget && (name.contains(event.relatedTarget) ||
+      var trigger = event.target && event.target.closest
+        ? event.target.closest(".jtt-transit-natal-trigger") : null;
+      if (!trigger || !host.contains(trigger)) return;
+      if (event.relatedTarget && (trigger.contains(event.relatedTarget) ||
           event.relatedTarget.closest && event.relatedTarget.closest(".jtt-planet-signification-panel"))) return;
       clearTimeout(planetSignificationHoverTimer);
       if (window.JAHoverManager) window.JAHoverManager.leave("transit-signification", 5000);
       else hidePlanetSignification();
     });
     host.addEventListener("focusin", function (event) {
-      var name = event.target && event.target.closest ? event.target.closest(".jtt-planet-cell strong") : null;
-      if (!name || !host.contains(name)) return;
-      var row = resolveTransitRow(name);
-      var planet = name.textContent.trim();
-      if (planet && window.JAHoverManager) window.JAHoverManager.activate("transit-signification", function () {
-        showTransitOverNatalPlanetResult(planet, row);
-      }, hidePlanetSignificationNow, 0);
-      else if (planet) showTransitOverNatalPlanetResult(planet, row);
+      var trigger = event.target && event.target.closest
+        ? event.target.closest(".jtt-transit-natal-trigger") : null;
+      if (!trigger || !host.contains(trigger)) return;
+      activateNatalMatch(trigger, 0);
     });
     host.addEventListener("focusout", function (event) {
-      if (event.target.closest && event.target.closest(".jtt-planet-cell strong") &&
+      if (event.target.closest && event.target.closest(".jtt-transit-natal-trigger") &&
           !(event.relatedTarget && event.relatedTarget.closest && event.relatedTarget.closest(".jtt-planet-signification-panel")) &&
           window.JAHoverManager) window.JAHoverManager.leave("transit-signification", 5000);
     });
