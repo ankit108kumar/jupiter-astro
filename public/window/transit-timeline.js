@@ -733,7 +733,9 @@
       var houseNumber = Number(house);
       var houseMarkup = Number.isInteger(houseNumber) && houseNumber >= 1 && houseNumber <= 12
         ? '<span class="jtt-house-result-trigger" data-result-planet="' + escapeTableText(planet) +
-          '" data-result-house="' + houseNumber + '" tabindex="0" role="button" aria-label="' +
+          '" data-result-house="' + houseNumber + '" data-result-bav-score="' +
+          (scoreType === "bav" && hasScore ? escapeTableText(score) : '') +
+          '" tabindex="0" role="button" aria-label="' +
           escapeTableText(planet + ' transit result, ' + houseNumber + 'th house') + '">' +
           houseNumber + 'H</span>'
         : escapeTableText(house) + 'H';
@@ -1608,6 +1610,22 @@
   }
 
   var houseResultOpenTimer = null;
+  function showTransitHouseDetails(target, houseNumber) {
+    var planet = target.getAttribute("data-result-planet");
+    showHouseSignification(houseNumber, planet);
+    var bavScore = target.getAttribute("data-result-bav-score");
+    if (bavScore !== null && bavScore !== "") {
+      showBavTransitResult({
+        getAttribute: function (name) {
+          if (name === "data-bav-result-planet") return planet;
+          if (name === "data-bav-result-score") return bavScore;
+          if (name === "data-bav-result-house") return String(houseNumber);
+          return null;
+        }
+      });
+    }
+  }
+
   function bindHouseResultTooltips(host) {
     if (!host || houseSignificationBoundHosts.has(host)) return;
     houseSignificationBoundHosts.add(host);
@@ -1620,11 +1638,11 @@
       var houseNumber = Number(target.getAttribute("data-result-house"));
       if (!Number.isInteger(houseNumber) || houseNumber < 1 || houseNumber > 12) return;
       if (window.JAHoverManager) window.JAHoverManager.activate("transit-signification", function () {
-        if (target.isConnected) { showHouseSignification(houseNumber, target.getAttribute("data-result-planet")); showTransitBasicTooltip(target); }
+        if (target.isConnected) { showTransitHouseDetails(target, houseNumber); showTransitBasicTooltip(target); }
       }, hidePlanetSignificationNow, 300);
       else {
         clearTimeout(houseResultOpenTimer);
-        houseResultOpenTimer = setTimeout(function () { if (target.isConnected) { showHouseSignification(houseNumber, target.getAttribute("data-result-planet")); showTransitBasicTooltip(target); } }, 300);
+        houseResultOpenTimer = setTimeout(function () { if (target.isConnected) { showTransitHouseDetails(target, houseNumber); showTransitBasicTooltip(target); } }, 300);
       }
     });
     host.addEventListener("pointerout", function (event) {
@@ -1645,9 +1663,9 @@
       var houseNumber = Number(target.getAttribute("data-result-house"));
       if (!Number.isInteger(houseNumber) || houseNumber < 1 || houseNumber > 12) return;
       if (window.JAHoverManager) window.JAHoverManager.activate("transit-signification", function () {
-        showHouseSignification(houseNumber, target.getAttribute("data-result-planet")); showTransitBasicTooltip(target);
+        showTransitHouseDetails(target, houseNumber); showTransitBasicTooltip(target);
       }, hidePlanetSignificationNow, 0);
-      else { showHouseSignification(houseNumber, target.getAttribute("data-result-planet")); showTransitBasicTooltip(target); }
+      else { showTransitHouseDetails(target, houseNumber); showTransitBasicTooltip(target); }
     });
 
     host.addEventListener("focusout", function (event) {
