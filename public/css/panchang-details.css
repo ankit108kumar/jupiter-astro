@@ -651,3 +651,24 @@ html,body,*{scrollbar-width:thin;scrollbar-color:#c9c6d0 transparent}
 .ja-panchang-lagna-wrap {
   scrollbar-gutter: stable;
 }
+
+
+/* Sun-Moon Yoga reference table — retained alongside live weekly Yoga/Karana details. */
+.ja-yoga-reference-section{margin-top:22px;padding-top:18px;border-top:1px solid var(--line,rgba(100,110,130,.22))}
+.ja-yoga-reference-section h3{margin:0 0 12px;color:var(--ink,#24212b);font-family:var(--font-body,inherit);font-size:16px;font-weight:650;text-align:center}
+.ja-yoga-reference-wrap{width:100%;max-width:100%;overflow:auto;scrollbar-gutter:stable}
+.ja-panchang-dialog .ja-yoga-reference-table{width:100%;min-width:560px;table-layout:fixed}
+.ja-panchang-dialog .ja-yoga-reference-table th,
+.ja-panchang-dialog .ja-yoga-reference-table td{padding:8px 12px!important;font-size:13px!important;line-height:1.4!important;white-space:normal!important;vertical-align:middle!important}
+.ja-panchang-dialog .ja-yoga-reference-table thead th{font-weight:650!important}
+.ja-panchang-dialog .ja-yoga-reference-table th:first-child,
+.ja-panchang-dialog .ja-yoga-reference-table td:first-child{width:76px;text-align:center}
+.ja-panchang-dialog .ja-yoga-reference-table th:nth-child(2),
+.ja-panchang-dialog .ja-yoga-reference-table td:nth-child(2){width:190px}
+.ja-panchang-dialog .ja-yoga-reference-table td:nth-child(2){font-weight:600!important}
+@media(max-width:600px){
+ .ja-yoga-reference-section{margin-top:16px;padding-top:14px}
+ .ja-panchang-dialog .ja-yoga-reference-table{min-width:500px}
+ .ja-panchang-dialog .ja-yoga-reference-table th,
+ .ja-panchang-dialog .ja-yoga-reference-table td{padding:8px 9px!important}
+}
