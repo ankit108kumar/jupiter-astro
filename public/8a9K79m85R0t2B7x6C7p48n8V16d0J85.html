@@ -3526,8 +3526,8 @@ if (!placed) {
       ["Temple", d.temple], ["Object", d.object], ["Deity", d.deity],
       ["Nature", d.nature], ["Life themes", d.themes], ["Body", d.body], ["Nakshatras", d.nakshatras]
     ];
-    card.innerHTML = '<div class="zh-title">' + d.name + '</div>' +
-      '<div class="zh-subtitle">' + d.sanskrit + ' · ' + d.element + ' · ' + d.polarity + ' · ' + d.modality + '</div>' +
+    card.innerHTML = '<div class="zh-header"><span class="zh-title">' + d.name + '</span>' +
+      '<span class="zh-subtitle">' + d.sanskrit + ' · ' + d.element + ' · ' + d.polarity + ' · ' + d.modality + '</span></div>' +
       '<div class="zh-grid">' + fields.map(function (field) {
         return '<div class="zh-row"><span class="zh-label">' + field[0] +
           '</span><span class="zh-value">' + (field[1] || "—") + '</span></div>';
@@ -3617,14 +3617,20 @@ if (!placed) {
     activeTarget = target;
     var list = await loadReference();
     if (!list || activeTarget !== target || !target.isConnected) return;
-    var item = list.find(function (entry) { return entry.name === name; });
+    function normalizeNakshatraName(value) {
+      return String(value || "").toLowerCase().replace(/h(?=t)/g, "");
+    }
+    var item = list.find(function (entry) {
+      return normalizeNakshatraName(entry.name) === normalizeNakshatraName(name);
+    });
     if (!item) return;
     var fields = [
-      ["Category", ({ D: "Downward", U: "Upward", S: "Straight", T: "Straight" })[String(item.category || "").trim().toUpperCase()] || item.category], ["Ruling planet", item.lord], ["Deity", item.deity],
+      ["Category", ({ D: "Downward", U: "Upward", S: "Straight", T: "Straight" })[String(item.category || "").trim().toUpperCase()] || item.category],
       ["Nature", item.nature], ["Syllables", Array.isArray(item.letters) ? item.letters.join(" · ") : item.letters],
       ["Symbol", item.symbol], ["Shape", item.shape], ["Animal", item.animal], ["Trees", item.tree], ["Object", item.object]
     ];
-    card.innerHTML = '<div class="nh-title">' + escapeHtml(item.name) + '</div><div class="nh-grid">' +
+    card.innerHTML = '<div class="nh-header"><span class="nh-title">' + escapeHtml(item.name) + '</span>' +
+      '<span class="nh-subtitle">' + escapeHtml(item.lord || "—") + ' · ' + escapeHtml(item.deity || "—") + '</span></div><div class="nh-grid">' +
       fields.map(function (field) { return '<div class="nh-row"><span class="nh-label">' +
         escapeHtml(field[0]) + '</span><span class="nh-value">' + escapeHtml(field[1] || "—") +
         '</span></div>'; }).join("") + '</div>';
