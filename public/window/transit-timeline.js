@@ -1870,7 +1870,7 @@
         var deity = document.createElement("div");
         deity.className = "jtt-planet-signification-deity";
         deity.textContent = "Deity: " + entry.deity;
-        body.appendChild(deity);
+        title.insertAdjacentElement("afterend", deity);
       }
       var sections = [
         { label: "Signification", value: entry.signification },
@@ -2003,7 +2003,7 @@
     var source = document.createElement("div");
     source.className = "jtt-transit-natal-result-source";
     source.textContent = match.source;
-    body.appendChild(source);
+    title.insertAdjacentElement("afterend", source);
 
     var description = document.createElement("div");
     description.className = "jtt-transit-natal-result-description";
