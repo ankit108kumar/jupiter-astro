@@ -3618,7 +3618,7 @@ if (!placed) {
     var list = await loadReference();
     if (!list || activeTarget !== target || !target.isConnected) return;
     function normalizeNakshatraName(value) {
-      return String(value || "").toLowerCase().replace(/h(?=t)/g, "");
+      return String(value || "").toLowerCase().replace(/th$/g, "t");
     }
     var item = list.find(function (entry) {
       return normalizeNakshatraName(entry.name) === normalizeNakshatraName(name);
