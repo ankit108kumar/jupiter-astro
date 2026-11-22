@@ -691,6 +691,6 @@ html,body,*{scrollbar-width:thin;scrollbar-color:#c9c6d0 transparent}
 
 /* Chaughadiya quality cues: restrained text colour and subtle matching duration tint. */
 .ja-panchang-dialog .ja-panchang-period-section tr.ja-panchang-period-inauspicious .ja-panchang-slot-main{color:#e53935!important;font-weight:650!important}
-.ja-panchang-dialog .ja-panchang-period-section tr.ja-panchang-period-inauspicious .ja-panchang-duration{color:#e53935!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;text-shadow:0 0 5px rgba(229,57,53,.28)!important}
+.ja-panchang-dialog .ja-panchang-period-section tr.ja-panchang-period-inauspicious .ja-panchang-duration{color:#e53935!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;text-shadow:none!important}
 .ja-panchang-dialog .ja-panchang-period-section tr.ja-panchang-period-auspicious .ja-panchang-slot-main{color:#16a34a!important;font-weight:650!important}
-.ja-panchang-dialog .ja-panchang-period-section tr.ja-panchang-period-auspicious .ja-panchang-duration{color:#16a34a!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;text-shadow:0 0 5px rgba(22,163,74,.28)!important}
+.ja-panchang-dialog .ja-panchang-period-section tr.ja-panchang-period-auspicious .ja-panchang-duration{color:#16a34a!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;text-shadow:none!important}
