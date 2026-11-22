@@ -1851,22 +1851,27 @@
     return bavTransitResultsPromise;
   }
 
-  function ensureBavTransitResultPanel() {
-    if (!windowEl) return null;
-    var panel = windowEl.querySelector(".jtt-bav-result-panel");
-    if (panel) return panel;
-    var tablePanel = windowEl.querySelector("[data-jtt-transit-table]");
-    if (!tablePanel || !tablePanel.parentNode) return null;
-    panel = document.createElement("section");
-    panel.className = "jtt-bav-result-panel";
-    panel.hidden = true;
-    panel.setAttribute("aria-live", "polite");
-    panel.innerHTML = '<div class="jtt-bav-result-heading"><strong></strong><button type="button" class="jtt-bav-result-close" aria-label="Close BAV result">×</button></div><div class="jtt-bav-result-content"></div>';
-    panel.querySelector(".jtt-bav-result-close").addEventListener("click", function () {
-      panel.hidden = true;
+  function ensureBavTransitResultSection(panel) {
+    if (!panel) return null;
+    var section = panel.querySelector(".jtt-bav-result-section");
+    if (section) return section;
+    var divider = document.createElement("div");
+    divider.className = "jtt-bav-result-divider";
+    divider.setAttribute("role", "separator");
+    var section = document.createElement("section");
+    section.className = "jtt-bav-result-section";
+    section.hidden = true;
+    section.setAttribute("aria-live", "polite");
+    section.innerHTML = '<div class="jtt-bav-result-heading"><strong></strong><button type="button" class="jtt-bav-result-close" aria-label="Hide BAV interpretation">×</button></div><div class="jtt-bav-result-content"></div>';
+    section.querySelector(".jtt-bav-result-close").addEventListener("click", function () {
+      section.hidden = true;
+      divider.hidden = true;
     });
-    tablePanel.insertAdjacentElement("afterend", panel);
-    return panel;
+    var body = panel.querySelector(".jtt-planet-signification-body");
+    if (!body) return null;
+    body.insertAdjacentElement("afterend", divider);
+    divider.insertAdjacentElement("afterend", section);
+    return section;
   }
 
   function showBavTransitResult(trigger) {
@@ -1874,15 +1879,25 @@
     var score = Number(trigger.getAttribute("data-bav-result-score"));
     var house = trigger.getAttribute("data-bav-result-house");
     if (!planet || !Number.isInteger(score) || score < 0 || score > 8) return;
-    var panel = ensureBavTransitResultPanel();
+    var panel = ensurePlanetSignificationPanel();
     if (!panel) return;
-    var title = panel.querySelector(".jtt-bav-result-heading strong");
-    var content = panel.querySelector(".jtt-bav-result-content");
+    var section = ensureBavTransitResultSection(panel);
+    if (!section) return;
+    var divider = panel.querySelector(".jtt-bav-result-divider");
+    var title = section.querySelector(".jtt-bav-result-heading strong");
+    var content = section.querySelector(".jtt-bav-result-content");
+    var requestKey = planet + ":" + score + ":" + house;
+    section.setAttribute("data-bav-request", requestKey);
     title.textContent = planet + " — BAV " + score + (house ? " · " + house + "H" : "");
     content.textContent = "Loading transit interpretation…";
+    divider.hidden = false;
+    section.hidden = false;
     panel.hidden = false;
+    panel.classList.remove("is-visible");
+    void panel.offsetWidth;
+    panel.classList.add("is-visible");
     loadBavTransitResults().then(function (results) {
-      if (!panel.isConnected || panel.hidden || title.textContent.indexOf(planet + " — BAV " + score) !== 0) return;
+      if (!section.isConnected || section.hidden || section.getAttribute("data-bav-request") !== requestKey) return;
       var interpretation = results[planet] && results[planet][String(score)];
       content.replaceChildren();
       if (!interpretation) {
@@ -1895,7 +1910,7 @@
         content.appendChild(p);
       });
     }).catch(function (error) {
-      if (!panel.isConnected) return;
+      if (!section.isConnected || section.getAttribute("data-bav-request") !== requestKey) return;
       content.textContent = "BAV transit interpretation could not be loaded.";
       console.error("Jupiter Astro: Unable to load BAV transit interpretations.", error);
     });
