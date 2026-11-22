@@ -674,9 +674,7 @@ html,body,*{scrollbar-width:thin;scrollbar-color:#c9c6d0 transparent}
   font-size:110%!important;
 }
 .ja-panchang-dialog .ja-panchang-dialog-body table td,
-.ja-panchang-dialog .ja-panchang-dialog-body table td *,
-.ja-panchang-dialog .ja-panchang-dialog-body table tbody th,
-.ja-panchang-dialog .ja-panchang-dialog-body table tbody th *{
+.ja-panchang-dialog .ja-panchang-dialog-body table tbody th{
   font-size:115%!important;
 }
 .ja-panchang-dialog .ja-panchang-dialog-body table thead th{
