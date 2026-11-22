@@ -642,3 +642,12 @@ html,body,*{scrollbar-width:thin;scrollbar-color:#c9c6d0 transparent}
  opacity:.55;transform:scale(1.12)
 }
 .ja-panchang-dialog .ja-panchang-dot:focus-visible{outline:2px solid rgba(183,131,48,.7);outline-offset:4px}
+
+
+/* Keep a permanent scrollbar gutter in every Panchang popup scroll region. */
+.ja-panchang-dialog-body,
+.ja-panchang-table-wrap,
+.ja-inauspicious-scroll,
+.ja-panchang-lagna-wrap {
+  scrollbar-gutter: stable;
+}
