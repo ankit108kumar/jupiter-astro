@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "title": "Nine-Planet Significations",
+  "source": "Transcribed from the user-provided Planet signification.pdf (9 pages).",
+  "planets": {
+    "Sun": {
+      "deity": "Agni",
+      "signification": "Father, Influence, Respect, Name, Fame, Health, Vitality, Success in Career, Government, Authority; Management, Leadership, Relation with Govt., Authority etc., Contacts in higher Social Circle; Success in Life, Ego, Discipline, Duty, Gold, Copper.",
+      "goodResult": "Self Respect, Ambition, Good relation with father, Getting fame, Eminence, Good immunity / health, At position of power, Favour from Govt. / authority, Benefit from Govt. scheme, Disciplined, Vision in life, Strong Heart etc.",
+      "badResult": "Indiscipline, failure, loss from Govt., fight with boss / father, infamous, weak immunity, cardiac health issues, struggle to father; Ego issues, humiliation, Theft etc."
+    },
+    "Moon": {
+      "deity": "Varuna",
+      "signification": "Comfort, Mood, Mind, Feelings, Emotion, Experiences, Happiness, Nurturing, Money, Currency, Cash in hand; Deity of Happiness; Childhood, Mother, Motherhood; Birthplace, Vehicle, House, Bank Balance, Health, Wealth, Peace of Mind, Overall Education in life, Water, Fluid, Hormones, Milk, Silver.",
+      "goodResult": "Peace in life, Compassion, Adaptability, Mind at ease, Balanced emotion, Good bank balance, Inflow of money, Good life of mother, Popularity, Fame, High moral courage, Clean waterbody near residence, Water conservation etc.",
+      "badResult": "Lesser bank balance, bad relation with mother, not living at birthplace, health issues (to self or mother), break in education, emotional disturbance, pain, sadness, gloomy, fake currency notes, Wastage of water, Dirty water-body nearby etc."
+    },
+    "Mars": {
+      "deity": "Kartikeya",
+      "signification": "Brother, Courage, Action, Career, Land, Property, Power, Energy, Aggression, Passion, Determination, Bravery, Fighting Spirit, Technical skills, Analytical ability, Athletics, Physical Strength, Boldness, Arms, Tools, Fire, Electricity, Motivation, Blood.",
+      "goodResult": "Good relation with brother, Energetic, Passionate, Determined, Brave, Technically skilled, Analyst, Sportsperson, Boldness in speech, Motivated, Win in fight / war, Gain of Land, Superiority etc.",
+      "badResult": "Anger, Impatience, Violence, Quarrelsome, Blood pressure problems, Blood nutrient deficiency, Cowardice, Land dispute, Problem to brother / Dispute with brother, Defeat in fight / war, Criminal Act, Lack of determination, Laziness, Weakness, Injury from tools / knife, Accident, Surgery, Blood loss, Fire accident, Burn, Inflammation, Electric shock etc."
+    },
+    "Mercury": {
+      "deity": "Vishnu",
+      "signification": "Brain / Mind, Thoughts, Decision, Profession (Impact), Communication (Speech, Written, e-mail etc.), Sweet Talk, Flattery / Sycophancy; Logic, Trade, Humor, Youthful, Sisters / Daughters of Family; Sister-in-law; School; Playground; Multiplier, Nervous system.",
+      "goodResult": "Good Speaker, Adaptable, Youthful, Sharp-minded, Clarity in thoughts, Witty, Clever, Good relation with sister(s) and daughter(s), Good writing skill, Well-read, Business skill, trade skill, sales/marketing skill, competitive spirit, qualifying competitive exam etc.",
+      "badResult": "Wrong decision / Indecisive, Confused, Career trouble, Miscommunication, Slip of tongue, Fast speech, Dispute with sister(s) / daughter(s), Speaking a lot, Stammering, Delayed speech, Loss of pen, Micro-management, Misplaced focus, Sophistry, Document loss / Problem due to document or paperwork; Glitch, Skin disease, Anxiety, Nervous disorder / disease, Addiction, Restlessness, Overthinking etc."
+    },
+    "Jupiter": {
+      "deity": "Indra",
+      "signification": "Knowledge, Wisdom, Teacher, Guru, Guidance, Philosophy, Faith, Religion, Morality, Law, Trust, Optimism, Joy, Grace, Luck, Fortune, Wealth, Money, Treasure, Expansion, Children, Father/Grand-Father, Elder sibling of father, Liver, Fat, Nose.",
+      "goodResult": "Fortunate, Knowledgeable, Right guidance, Faith, Religious, High morals, Trust, Optimist, Joy in life, Gracious, Composed, Blessed with child, Happiness from children, Lavish lifestyle, Support, Law abiding, Longevity to Grandfather, Strong Thighs, Chubby look etc.",
+      "badResult": "Over-trust, Over-optimism, No support, Liver disease, Nose deformity, Hearing loss / trouble, Problem to Grandfather, Lesser lucky, Progeny issues, Irreligious, Changing religion / faith, Fanaticism, Laziness, Inaction etc."
+    },
+    "Venus": {
+      "deity": "Lakshmi",
+      "signification": "Beauty, Attractive, Charm, Grace, Glamour, Artistic, Art, Music, Clothes, Well Dressed, Presentable, Organized, Luxury, Lavish, Material Comforts, Pleasures, Romance, Spouse/Partner, Relationship with Spouse (Natural attraction), Bed, Vehicle, Conveyance, Wealth, Prosperity, Flowers.",
+      "goodResult": "Attractive / Charming personality, Glamorous, Luxury in life, Good relationship, Luxurious vehicle, Wealth inflow, Beautiful interior, Precious stones (Gems), Ornaments, Getting value for money etc.",
+      "badResult": "Relationship issues, Multiple Affairs / Extra-Marital affairs, Lack of natural attraction, Torn/ Old Clothes, Unorganized, Vehicle theft / accident, Untidy bed etc."
+    },
+    "Saturn": {
+      "deity": "Brahma",
+      "signification": "Karma, Result of Karma, Hard work, Struggle, Career, Subordinate, Construction worker, Poverty, the Have nots, Bondage, Stability, Slow, Dryness, Longevity, Old Age, Property, House, Construction, Uncle, Bones, Joints, Leg, Sweating.",
+      "goodResult": "Disciplined, Responsible, Dedicated, Patience, Endurance, Justice, Career growth, Stability, Property gain, House construction, Head of organization, Mass leader, Political gain, Dominance, Good Political career, Timely result of effort, Gain from Servants / Subordinates /Masses etc.",
+      "badResult": "Darkness, Laziness, Sadness, Pessimism, Worry, Fear, Phobia, Humiliation, Confinement, Injustice, Delay, Limitation, Deprivation, Poverty, Less remuneration, Much struggle, Career loss / Slogging, Obstacles, Disease, Pain, Suffering, Emotionless, Impatient, Shirker, Bone fracture, Property dispute / litigation etc."
+    },
+    "Rahu": {
+      "deity": "Durga",
+      "signification": "Expansion, Ambition, Outward focus, Extremes, Obsession, Craving, Flamboyance, Foreign, Snake, Sudden event, Researcher, Planner, Only Head, Superstitious (bad), Roof, Flying, Other religion / faith, In-laws.",
+      "goodResult": "Flying, Pilot, Creativity, Innovation, Wish fulfilment, Material success, Daring, Risk taking ability, Unconventional, Medicine etc.",
+      "badResult": "Instability, Unorganized, Destructive, Cheating, Fraud, Theft, Thief, Robbery, Jailed, Confusion, Illusion, Hallucination, Greed, Lies, Scandals, Conspiracy, Poison, Accident, Addictions, Dreamy Eyed (Non execution)."
+    },
+    "Ketu": {
+      "deity": "Ganesha",
+      "signification": "Without head, Unguided, Without direction, Deficiency, Uniqueness, Spike, Thorn, Sharp object, Knife, Legs, Basement, Roots, Child, Foreign Language, Multi-colored, Flag, Mountain, Secret Task, Occult, Meditation, Devotion, Worship, Charity, Selflessness, Introversion, Foreign Language.",
+      "goodResult": "Extreme success, Extreme rise in life, Perfection, High work efficiency, Deep wisdom / understanding, Intuition, Psychic ability, Originality, Spirituality, Detachment, Male child etc.",
+      "badResult": "Confusion, Illusion, Lack of focus, Self-doubt, Blunder, Blind faith, Sudden loss, Loss, Break, Physical separation, Detachment, Accident, Injury (from sharp object), Surgery, Hospitalization, Fire, Dog-bite, Back / leg pain, Gut health issues, Intestine worms, Nitpicking, Child problem etc."
+    }
+  }
+}
