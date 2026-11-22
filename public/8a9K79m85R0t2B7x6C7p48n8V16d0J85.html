@@ -92,15 +92,6 @@
             aria-pressed="false">A+</button>
   </div>
 
-  <!-- Information -->
-  <button class="header-icon-btn"
-          type="button"
-          id="analysisGuideOpen"
-          title="General Analysis Reference"
-          aria-label="Open General Analysis Reference">
-    <span>i</span>
-  </button>
-
   <!-- Location -->
   <button class="header-icon-btn"
           id="locationButton"
@@ -123,15 +114,6 @@
       <circle cx="12" cy="8" r="4"/>
       <path d="M5 21a7 7 0 0 1 14 0"/>
     </svg>
-  </button>
-
-  <!-- Panchang Collapse / Expand -->
-  <button type="button"
-          class="header-panchang-btn"
-          id="panchangToggleBtn"
-          title="Collapse / Expand Panchang"
-          aria-label="Collapse or expand Panchang">
-    −
   </button>
 
 </div>
@@ -551,35 +533,6 @@
   </div>
 </main>
 
-
-<!-- GENERAL ANALYSIS REFERENCE POPUP -->
-
-<div id="analysisGuideOverlay" aria-hidden="true">
-
-  <section id="analysisGuidePanel"
-           role="dialog"
-           aria-modal="true"
-           aria-labelledby="analysisGuideTitle">
-
-    <div class="analysis-guide-header">
-      <div>
-        <h2 id="analysisGuideTitle">Analysis Framework</h2>
-        <p>Comprehensive Reference for analysis of chart · v1.1</p>
-      </div>
-
-      <button id="analysisGuideClose"
-              type="button"
-              aria-label="Close popup">×</button>
-    </div>
-
-    <div class="analysis-guide-scroll">
-      <article id="analysisGuideContent"
-               class="analysis-guide-content">
-      </article>
-    </div>
-
-  </section>
-</div>
 
 <!-- INSERT FOOTER CODE HERE -->
 <footer style="border-top: 1px solid var(--line); padding: 18px 0; margin-top: 40px; color: var(--muted); font-size: 0.85rem;">
@@ -8024,23 +7977,6 @@ mainPob.dataset.tz = defaultLocation.tz;
   mainForm.dispatchEvent(new Event('submit'));
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-  const toggleBtn = document.getElementById('panchangToggleBtn');
-  const bodyWrapper = document.getElementById('panchangBodyWrapper');
-
-  if (toggleBtn && bodyWrapper) {
-    toggleBtn.addEventListener('click', () => {
-      const isCollapsed = bodyWrapper.classList.toggle('collapsed');
-      toggleBtn.textContent = isCollapsed ? '+' : '-';
-      if (isCollapsed) {
-        toggleBtn.classList.add('active');
-      } else {
-        toggleBtn.classList.remove('active');
-      }
-    });
-  }
-});
-
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
@@ -8203,136 +8139,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <!-- ============================================
      10. ASSISTANT JAVASCRIPT
 ============================================ -->
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
 <script src="1a811i6bvX4980QzT12s.js"></script>
-
-<!-- GENERAL ANALYSIS POPUP CONTROLLER -->
-<script>
-(() => {
-
-  const overlay = document.getElementById('analysisGuideOverlay');
-  const openBtn = document.getElementById('analysisGuideOpen');
-  const closeBtn = document.getElementById('analysisGuideClose');
-  const content = document.getElementById('analysisGuideContent');
-
-  if (!overlay || !openBtn || !closeBtn || !content) return;
-
-  const GUIDE_URL = '234yt4K3czxyex78-guide.js';
-
-  let oldOverflow = '';
-  let guideLoaded = false;
-  let loading = false;
-
-  // LOAD CONTENT ONLY WHEN REQUIRED
-  async function loadAnalysisGuide() {
-
-    if (guideLoaded || loading) return;
-
-    loading = true;
-
-    content.innerHTML = `
-      <p style="text-align:center;color:var(--muted);">
-        Loading analysis framework...
-      </p>
-    `;
-
-    try {
-
-      const response = await fetch(GUIDE_URL, {
-        cache: 'no-cache'
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const markdown = await response.text();
-
-      if (!markdown.trim()) {
-        throw new Error('Analysis framework is empty.');
-      }
-
-      content.innerHTML = DOMPurify.sanitize(
-        marked.parse(markdown)
-      );
-
-      guideLoaded = true;
-
-    } catch (error) {
-
-      console.error('Analysis Guide Error:', error);
-
-      content.innerHTML = `
-        <div style="text-align:center;padding:30px;">
-          <p style="color:var(--bad);">
-            Unable to load the analysis framework.
-          </p>
-          <button type="button"
-                  class="btn"
-                  id="retryAnalysisGuide">
-            Retry
-          </button>
-        </div>
-      `;
-
-      content.querySelector('#retryAnalysisGuide')
-        ?.addEventListener('click', loadAnalysisGuide);
-
-    } finally {
-
-      loading = false;
-
-    }
-  }
-
-  // OPEN POPUP
-  async function openGuide() {
-
-    oldOverflow = document.body.style.overflow;
-
-    overlay.classList.add('is-open');
-    overlay.setAttribute('aria-hidden', 'false');
-
-    document.body.style.overflow = 'hidden';
-
-    closeBtn.focus();
-
-    await loadAnalysisGuide();
-  }
-
-  // CLOSE POPUP
-  function closeGuide() {
-
-    overlay.classList.remove('is-open');
-    overlay.setAttribute('aria-hidden', 'true');
-
-    document.body.style.overflow = oldOverflow;
-
-    openBtn.focus();
-  }
-
-  openBtn.addEventListener('click', openGuide);
-
-  closeBtn.addEventListener('click', closeGuide);
-
-  overlay.addEventListener('click', e => {
-    if (e.target === overlay) closeGuide();
-  });
-
-  document.addEventListener('keydown', e => {
-
-    if (
-      e.key === 'Escape' &&
-      overlay.classList.contains('is-open')
-    ) {
-      closeGuide();
-    }
-
-  });
-
-})();
-
 
 /* ==========================================
    COPY / EXPORT MENU — OPEN / CLOSE
