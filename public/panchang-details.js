@@ -96,6 +96,16 @@ function yogaKaranaIndex(ms,which){
  return which==='yoga'?Math.floor(sum/(40/3))%27:Math.min(59,Math.floor(diff/6));
 }
 var YOGA_NAMES=['Vishkambha','Priti','Ayushman','Saubhagya','Shobhana','Atiganda','Sukarma','Dhriti','Shula','Ganda','Vriddhi','Dhruva','Vyaghata','Harshana','Vajra','Siddhi','Vyatipata','Variyana','Parigha','Shiva','Siddha','Sadhya','Shubha','Shukla','Brahma','Indra','Vaidhriti'];
+var YOGA_MEANINGS=[
+ 'Door bolt/supporting pillar','Love/affection','Long-lived',
+ 'Long life of spouse (good fortune)','Splendid, bright','Great danger',
+ 'One with good deeds','Firmness','Shiva’s weapon of destruction (pain)',
+ 'Danger','Growth','Fixed, constant','Great blow','Cheerful',
+ 'Diamond (strong)','Accomplishment','Great fall','Chief/best',
+ 'Obstacle/hindrance','Lord Shiva (purity)','Accomplished/ready',
+ 'Possible','Auspicious','White, bright',
+ 'Creator (good knowledge and purity)','Ruler of gods','A class of gods'
+];
 var KARANA_NAMES=['Kimstughna','Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti','Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti','Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti','Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti','Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti','Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti','Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti','Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti','Shakuni','Chatushpada','Naga'];
 function eventName(which,i){return which==='yoga'?YOGA_NAMES[i]:KARANA_NAMES[i];}
 function planetMarkup(name){var palette=window.JA_PLANET_COLORS||{},color=palette[name];return color?'<span class="ja-panchang-planet-name" style="--ja-planet-color:'+color+'">'+esc(name)+'</span>':esc(name);}
@@ -111,43 +121,12 @@ function renderLunarWeek(){
  function part(which){var cuts=[{at:start,index:yogaKaranaIndex(start,which)}].concat(changes[which],[{at:end,index:yogaKaranaIndex(end,which)}]),rows='',nowLocal=ctx.instant+ctx.tz*3600000;
   if(!w.days.length){bodyNode.innerHTML='<div class="ja-panchang-current-summary"><strong>Sunrise data unavailable.</strong><small>Check the selected location and date.</small></div>';return;}
    for(var day=0;day<7;day++){var dayInfo=w.days[day],ds=dayInfo.start,de=dayInfo.end,today=ctx.instant>=ds&&ctx.instant<de,events='';
-   for(var j=0;j<cuts.length-1;j++){var x=cuts[j],y=cuts[j+1];if(y.at<=ds||x.at>=de)continue;var active=today&&ctx.instant>=x.at&&ctx.instant<y.at;events+='<div class="ja-panchang-event'+(active?' is-active':'')+'"><strong>'+esc(eventName(which,x.index))+'</strong><span class="ja-panchang-duration">'+formatPanchangInterval(x.at,y.at,ctx.tz,ds)+'</span>'+(active?'<em class="ja-panchang-now">Current</em>':'')+'</div>';}
+   for(var j=0;j<cuts.length-1;j++){var x=cuts[j],y=cuts[j+1];if(y.at<=ds||x.at>=de)continue;var active=today&&ctx.instant>=x.at&&ctx.instant<y.at;events+='<div class="ja-panchang-event'+(active?' is-active':'')+'"><strong>'+esc(eventName(which,x.index))+'</strong>'+(which==='yoga'&&YOGA_MEANINGS[x.index]?' <small class="ja-panchang-yoga-meaning">('+esc(YOGA_MEANINGS[x.index])+')</small>':'')+'<span class="ja-panchang-duration">'+formatPanchangInterval(x.at,y.at,ctx.tz,ds)+'</span>'+(active?'<em class="ja-panchang-now">Current</em>':'')+'</div>';}
    var dd=new Date(ds+ctx.tz*3600000);rows+='<tr class="'+(today?'is-today':'')+'"><th><span>'+DAYS[dayInfo.weekday]+'</span><small>'+pad(dd.getUTCDate())+'/'+pad(dd.getUTCMonth()+1)+'/'+dd.getUTCFullYear()+'</small></th><td>'+(events||'—')+'</td></tr>';
   }
   var heading=which==='yoga'?'Yoga':'Karana';return '<section class="ja-panchang-section ja-panchang-half"><div class="ja-panchang-table-wrap"><table class="ja-panchang-week-table"><thead><tr><th>Day</th><th>'+heading+' · Duration</th></tr></thead><tbody>'+rows+'</tbody></table></div></section>';
  }
- var yogaMeanings=[
-  ['Vishkambha','Door bolt/supporting pillar'],
-  ['Preeti','Love/affection'],
-  ['Aayushmaan','Long-lived'],
-  ['Saubhaagya','Long life of spouse (good fortune)'],
-  ['Sobhana','Splendid, bright'],
-  ['Atiganda','Great danger'],
-  ['Sukarman','One with good deeds'],
-  ['Dhriti','Firmness'],
-  ['Shoola','Shiva’s weapon of destruction (pain)'],
-  ['Ganda','Danger'],
-  ['Vriddhi','Growth'],
-  ['Dhruva','Fixed, constant'],
-  ['Vyaaghaata','Great blow'],
-  ['Harshana','Cheerful'],
-  ['Vajra','Diamond (strong)'],
-  ['Siddhi','Accomplishment'],
-  ['Vyatipaata','Great fall'],
-  ['Variyan','Chief/best'],
-  ['Parigha','Obstacle/hindrance'],
-  ['Shiva','Lord Shiva (purity)'],
-  ['Siddha','Accomplished/ready'],
-  ['Saadhya','Possible'],
-  ['Subha','Auspicious'],
-  ['Sukla','White, bright'],
-  ['Brahma','Creator (good knowledge and purity)'],
-  ['Indra','Ruler of gods'],
-  ['Vaidhriti','A class of gods']
- ];
- var referenceRows=yogaMeanings.map(function(item,index){return '<tr><td class="ja-yoga-reference-index">'+(index+1)+'</td><td><strong>'+esc(item[0])+'</strong></td><td>'+esc(item[1])+'</td></tr>';}).join('');
- bodyNode.innerHTML='<div class="ja-panchang-dual-grid ja-panchang-lunar-grid">'+part('yoga')+part('karana')+'</div>'+
-  '<section class="ja-yoga-reference-section"><h3>Table 5: Sun-Moon Yogas</h3><div class="ja-panchang-table-wrap ja-yoga-reference-wrap"><table class="ja-panchang-week-table ja-yoga-reference-table"><thead><tr><th>Index</th><th>Yoga</th><th>Meaning</th></tr></thead><tbody>'+referenceRows+'</tbody></table></div></section>';
+ bodyNode.innerHTML='<div class="ja-panchang-dual-grid ja-panchang-lunar-grid">'+part('yoga')+part('karana')+'</div>';
 }
 function localDayStart(ms,tz){var d=new Date(ms+tz*3600000);return Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate());}
 function sunEventForLocalDay(localMidnight,lat,lon,isRise){
@@ -169,16 +148,17 @@ function renderChaughadiyaHora(which){
  var localDate=new Date(sunrise+ctx.tz*3600000),wd=localDate.getUTCDay();
  weekLabel.textContent='';
  function table(title,slots){
-  var rows=slots.map(function(x){var active=ctx.instant>=x.start&&ctx.instant<x.end,label=x.primary||x.label,meta=x.meta||'';return '<tr class="'+(active?'is-today':'')+'"><td><span class="ja-panchang-slot-main">'+label+'</span>'+(meta?'<small class="ja-panchang-slot-meta">'+meta+'</small>':'')+(active?' <em class="ja-panchang-now">Now</em>':'')+'</td><td class="ja-panchang-duration">'+formatPanchangInterval(x.start,x.end,ctx.tz,sunrise)+'</td></tr>';}).join('');
+  var rows=slots.map(function(x){var active=ctx.instant>=x.start&&ctx.instant<x.end,label=x.primary||x.label,meta=x.meta||'';return '<tr class="'+(active?'is-today':'')+'"><td><span class="ja-panchang-slot-main">'+label+'</span>'+(x.trait?'<small class="ja-panchang-slot-trait">('+esc(x.trait)+')</small>':'')+(meta?'<small class="ja-panchang-slot-meta">'+meta+'</small>':'')+(active?' <em class="ja-panchang-now">Now</em>':'')+'</td><td class="ja-panchang-duration">'+formatPanchangInterval(x.start,x.end,ctx.tz,sunrise)+'</td></tr>';}).join('');
   return '<section class="ja-panchang-section ja-panchang-period-section"><div class="ja-panchang-table-wrap"><table class="ja-panchang-week-table ja-panchang-slots"><thead><tr><th>'+title+'</th><th>Duration</th></tr></thead><tbody>'+rows+'</tbody></table></div></section>';
  }
  var cycle=['Udveg','Chal','Labh','Amrit','Kaal','Shubh','Rog'],dayStart=[0,3,6,2,5,1,4],lordStart={0:0,1:3,2:6,3:2,4:5,5:1,6:4},planets=['Sun','Venus','Mercury','Moon','Saturn','Jupiter','Mars'];
  var chSlots=[],horaSlots=[];
+  var horaTraits={Sun:'Vigorous',Moon:'Gentle',Mars:'Aggressive',Mercury:'Quick',Jupiter:'Fruitful',Venus:'Beneficial',Saturn:'Sluggish'};
  function addPeriod(start,end,isDay){
   var duration=end-start,base=dayStart[wd],startIdx=isDay?base:(base+5)%7;
   for(var i=0;i<8;i++){var s=start+i*duration/8,e=start+(i+1)*duration/8,ix=(startIdx+i*(isDay?1:5))%7;chSlots.push({start:s,end:e,primary:cycle[ix],meta:(isDay?'DAY ':'NIGHT ')+(i+1)});}
   var lord=lordStart[wd],hd=duration/12,seq=isDay?lord:(lord+12)%7;
-  for(var h=0;h<12;h++){var hs=start+h*hd,he=start+(h+1)*hd;horaSlots.push({start:hs,end:he,primary:planetMarkup(planets[(seq+h)%7]),meta:(isDay?'DAY ':'NIGHT ')+(h+1)});}
+  for(var h=0;h<12;h++){var hs=start+h*hd,he=start+(h+1)*hd;var horaPlanet=planets[(seq+h)%7];horaSlots.push({start:hs,end:he,primary:planetMarkup(horaPlanet),trait:horaTraits[horaPlanet]||'',meta:(isDay?'DAY ':'NIGHT ')+(h+1)});}
  }
  addPeriod(sunrise,sunset,true);addPeriod(sunset,nextSunrise,false);
  var selected=table('Chaughadiya',chSlots)+table('Hora',horaSlots);var dayDate=new Date(sunrise+ctx.tz*3600000);subtitleNode.textContent=pad(dayDate.getUTCDate())+'/'+pad(dayDate.getUTCMonth()+1)+'/'+dayDate.getUTCFullYear()+' · '+fmtClock(sunrise,ctx.tz)+' – '+fmtClock(nextSunrise,ctx.tz)+' local chart time';bodyNode.innerHTML='<div class="ja-panchang-dual-grid">'+selected+'</div>';
