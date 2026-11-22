@@ -2575,8 +2575,7 @@ if (safeGet('pTithiEnds')) {
     }
 
     if (safeGet('pHora')) {
-      const trait = HORA_TRAITS[timing.hora] || '';
-      safeGet('pHora').textContent = `Hora: ${timing.hora}${trait ? ' - ' + trait : ''} (${fmtTime(timing.horaStart, activeTz)} - ${fmtTime(timing.horaEnd, activeTz)})`;
+      safeGet('pHora').textContent = `Hora: ${timing.hora} (${fmtTime(timing.horaStart, activeTz)} - ${fmtTime(timing.horaEnd, activeTz)})`;
     }
 
     if (safeGet('pRahuKaal')) {
