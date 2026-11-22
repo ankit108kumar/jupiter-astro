@@ -208,7 +208,8 @@ function renderAuspiciousWeek(){
  for(var day=0;day<7;day++){
   var dayInfo=w.days[day],localMid=dayInfo.localMid,weekday=dayInfo.weekday,rise=dayInfo.start,set=sunEventForLocalDay(localMid,ctx.lat,ctx.lon,false),nextRise=dayInfo.end,today=ctx.instant>=rise&&ctx.instant<nextRise,dayCell='',nightCell='',jupiterCell='';
   var validSunset=Number.isFinite(rise)&&Number.isFinite(set)&&Number.isFinite(nextRise)&&rise>0&&rise<set&&set<nextRise;
-  if(validSunset){
+  if(weekday===3){dayCell=nightCell='<span class="ja-panchang-empty">Not applicable</span>';}
+  else if(validSunset){
    var dayDur=set-rise,nightDur=nextRise-set,dayStart=rise+7*dayDur/15,dayEnd=rise+8*dayDur/15,nightStart=set+7*nightDur/15,nightEnd=set+8*nightDur/15;
    function periodCell(start,end){var active=ctx.instant>=start&&ctx.instant<end;return '<div class="ja-panchang-event'+(active?' is-active':'')+'"><div class="ja-panchang-duration">'+formatPanchangInterval(start,end,ctx.tz,localMid)+'</div>'+(active?'<em class="ja-panchang-now">Current</em>':'')+'</div>';}
    dayCell=periodCell(dayStart,dayEnd);nightCell=periodCell(nightStart,nightEnd);
