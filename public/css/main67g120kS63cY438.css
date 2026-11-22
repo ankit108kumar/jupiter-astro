@@ -4520,3 +4520,31 @@ body.ja-font-scale-enabled [data-ja-font-scale-target] {
 .nakshatra-hover-card {
   background: color-mix(in srgb, var(--surface) 90%, transparent) !important;
 }
+
+
+/* Hover-card content typography and compact inline metadata headers. */
+.zodiac-hover-card,
+.nakshatra-hover-card{
+  font-size:14.4px;
+}
+.zodiac-hover-card .zh-header,
+.nakshatra-hover-card .nh-header{
+  display:flex;
+  align-items:baseline;
+  flex-wrap:wrap;
+  column-gap:10px;
+  row-gap:2px;
+  margin:0 0 8px;
+}
+.zodiac-hover-card .zh-title,
+.nakshatra-hover-card .nh-title{
+  margin:0;
+}
+.zodiac-hover-card .zh-subtitle,
+.nakshatra-hover-card .nh-subtitle{
+  display:inline;
+  margin:0;
+  color:var(--muted);
+  font-size:10px;
+  font-weight:500;
+}
