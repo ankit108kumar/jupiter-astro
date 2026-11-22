@@ -116,7 +116,38 @@ function renderLunarWeek(){
   }
   var heading=which==='yoga'?'Yoga':'Karana';return '<section class="ja-panchang-section ja-panchang-half"><div class="ja-panchang-table-wrap"><table class="ja-panchang-week-table"><thead><tr><th>Day</th><th>'+heading+' · Duration</th></tr></thead><tbody>'+rows+'</tbody></table></div></section>';
  }
- bodyNode.innerHTML='<div class="ja-panchang-dual-grid ja-panchang-lunar-grid">'+part('yoga')+part('karana')+'</div>';
+ var yogaMeanings=[
+  ['Vishkambha','Door bolt/supporting pillar'],
+  ['Preeti','Love/affection'],
+  ['Aayushmaan','Long-lived'],
+  ['Saubhaagya','Long life of spouse (good fortune)'],
+  ['Sobhana','Splendid, bright'],
+  ['Atiganda','Great danger'],
+  ['Sukarman','One with good deeds'],
+  ['Dhriti','Firmness'],
+  ['Shoola','Shiva’s weapon of destruction (pain)'],
+  ['Ganda','Danger'],
+  ['Vriddhi','Growth'],
+  ['Dhruva','Fixed, constant'],
+  ['Vyaaghaata','Great blow'],
+  ['Harshana','Cheerful'],
+  ['Vajra','Diamond (strong)'],
+  ['Siddhi','Accomplishment'],
+  ['Vyatipaata','Great fall'],
+  ['Variyan','Chief/best'],
+  ['Parigha','Obstacle/hindrance'],
+  ['Shiva','Lord Shiva (purity)'],
+  ['Siddha','Accomplished/ready'],
+  ['Saadhya','Possible'],
+  ['Subha','Auspicious'],
+  ['Sukla','White, bright'],
+  ['Brahma','Creator (good knowledge and purity)'],
+  ['Indra','Ruler of gods'],
+  ['Vaidhriti','A class of gods']
+ ];
+ var referenceRows=yogaMeanings.map(function(item,index){return '<tr><td class="ja-yoga-reference-index">'+(index+1)+'</td><td><strong>'+esc(item[0])+'</strong></td><td>'+esc(item[1])+'</td></tr>';}).join('');
+ bodyNode.innerHTML='<div class="ja-panchang-dual-grid ja-panchang-lunar-grid">'+part('yoga')+part('karana')+'</div>'+
+  '<section class="ja-yoga-reference-section"><h3>Table 5: Sun-Moon Yogas</h3><div class="ja-panchang-table-wrap ja-yoga-reference-wrap"><table class="ja-panchang-week-table ja-yoga-reference-table"><thead><tr><th>Index</th><th>Yoga</th><th>Meaning</th></tr></thead><tbody>'+referenceRows+'</tbody></table></div></section>';
 }
 function localDayStart(ms,tz){var d=new Date(ms+tz*3600000);return Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate());}
 function sunEventForLocalDay(localMidnight,lat,lon,isRise){
