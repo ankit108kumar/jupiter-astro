@@ -777,3 +777,10 @@
     height:25px;
   }
 }
+
+
+/* Keep the document preview viewport width stable as content length changes. */
+#ja-reference-library-window .ja-lib-preview-stage,
+#ja-reference-library-window .ja-lib-preview-image-wrap {
+  scrollbar-gutter: stable;
+}
