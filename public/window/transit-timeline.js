@@ -1764,6 +1764,9 @@
   }
 
   function hidePlanetSignificationNow() {
+    if (activePlanetSignification && activePlanetSignification.indexOf("bav:") === 0) {
+      return;
+    }
     clearPlanetSignificationTimers();
     activePlanetSignification = null;
     if (window.JAHoverManager) window.JAHoverManager.untrack("transit-signification");
@@ -1866,6 +1869,9 @@
     section.querySelector(".jtt-bav-result-close").addEventListener("click", function () {
       section.hidden = true;
       divider.hidden = true;
+      if (activePlanetSignification && activePlanetSignification.indexOf("bav:") === 0) {
+        activePlanetSignification = null;
+      }
     });
     var body = panel.querySelector(".jtt-planet-signification-body");
     if (!body) return null;
@@ -1887,6 +1893,9 @@
     var title = section.querySelector(".jtt-bav-result-heading strong");
     var content = section.querySelector(".jtt-bav-result-content");
     var requestKey = planet + ":" + score + ":" + house;
+    clearPlanetSignificationTimers();
+    activePlanetSignification = "bav:" + requestKey;
+    removeTransitBasicTooltip();
     section.setAttribute("data-bav-request", requestKey);
     title.textContent = planet + " — BAV " + score + (house ? " · " + house + "H" : "");
     content.textContent = "Loading transit interpretation…";
