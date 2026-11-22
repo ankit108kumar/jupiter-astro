@@ -3621,7 +3621,7 @@ if (!placed) {
     var item = list.find(function (entry) { return entry.name === name; });
     if (!item) return;
     var fields = [
-      ["Category", item.category], ["Ruling planet", item.lord], ["Deity", item.deity],
+      ["Category", ({ D: "Downward", U: "Upward", S: "Straight", T: "Straight" })[String(item.category || "").trim().toUpperCase()] || item.category], ["Ruling planet", item.lord], ["Deity", item.deity],
       ["Nature", item.nature], ["Syllables", Array.isArray(item.letters) ? item.letters.join(" · ") : item.letters],
       ["Symbol", item.symbol], ["Shape", item.shape], ["Animal", item.animal], ["Trees", item.tree], ["Object", item.object]
     ];
