@@ -736,3 +736,10 @@ html[data-palette="wooden"] #ja-reference-library-window[data-ja-lib-theme="webs
     gap:8px;
   }
 }
+
+
+/* Stable scrollbar reservation keeps Library popup panes from shifting. */
+#ja-reference-library-window .ja-lib-sidebar,
+#ja-reference-library-window .ja-lib-content {
+  scrollbar-gutter: stable;
+}
