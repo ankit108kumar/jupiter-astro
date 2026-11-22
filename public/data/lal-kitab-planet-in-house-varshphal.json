@@ -1,0 +1,904 @@
+{
+  "title": "Lal Kitab – Planet in House (Varshphal)",
+  "description": "Source-preserved Lal Kitab Varshphal interpretations for nine planets across twelve houses. Each placement contains six fields. Empty strings represent source cells that were blank in the supplied notes; no interpretations have been invented.",
+  "recordCount": 108,
+  "planets": [
+    "Sun",
+    "Moon",
+    "Mars",
+    "Mercury",
+    "Jupiter",
+    "Venus",
+    "Saturn",
+    "Rahu",
+    "Ketu"
+  ],
+  "houses": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "fields": [
+    "offlineClassNotes",
+    "goodResult",
+    "ifBad",
+    "specialRules",
+    "recommendation",
+    "symptom"
+  ],
+  "entries": {
+    "Sun1": {
+      "offlineClassNotes": "Career, Father | Exalted, Native outshines in Career, very good for Father; If bad : Trouble in career, short age of Father (death in early age)\n Tension, Pressure, Aggression, Losses, Health issues; ‘Work Pressure’; ‘More hair-fall, if so’",
+      "goodResult": "Good for Career, Property, Winning in Competition. [CAREER, FATHER]",
+      "ifBad": "Sun with Rahu/ Ketu/ Saturn Results will be reverse, Chances of losing wealth, Court cases, delays, disputes, litigations. Problem in Career / Life of Father.",
+      "specialRules": "Venus in 7th House - Not good for Father, Mercury in 7th House - Not good for Relationship, Moon in 2nd House Good for Wealth.",
+      "recommendation": "Donation, Year of taking Action, Don't expect support from others.",
+      "symptom": "Lazy, Hair Fall, Hot Headed."
+    },
+    "Moon1": {
+      "offlineClassNotes": "Mother, Health, Wealth, Peace of Mind, Emotion, Hormone, Liquid cash (bank balance), Comfort, Pleasure, Bliss, Experience (what you feel), House, Vehicle, Property, Water, Milk, Fluid (body) Moon 1H : Good for Health, Wealth and Education, Sensitive, Money spent on Education not get wasted; earning due to education/learning; Mother loves a lot to native; If bad – fights, quarrels with Mother ~ Moon + Mars? [should take blessings from ‘Mother’]\n Moon 1H/3H/8H makes ‘Mars’ good in the Chart. Moon 1H (4L 1H) – Comfort is priority in life.\n Remedy : Take a bath mixing Kaccha milk in water [or Gangajal]; Take ‘Rice kept in silver box’ from mother and keep it in Almirah/Locker",
+      "goodResult": "Increases Emotions & Sensitivity, Good for Health, Wealth & Education, Support from Female.",
+      "ifBad": "Running Nose, Health Issues, Ignorance, Laziness, Negativity, Fight with Mother (Mo 1H/4H), Addiction towards Liquor, Issues in Marriage & Child Birth [motherhood], Loss of Gold [Jupiter 6H as well]",
+      "specialRules": "Jupiter in 4th House & Saturn in 9th House: Vehicle Purchase, Venus in 7th House: Issues in Marriage & Child Birth, Sun & Saturn in 6th House: Loss of Gold.",
+      "recommendation": "Don't Fight with Mother, Use Silver Utensils, Throw Coin in River.",
+      "symptom": "Throat Infection, Tonsils, Avoid Green Clothes, Green Vegetables."
+    },
+    "Mars1": {
+      "offlineClassNotes": "Mars in 1H, 12H, 5H _ Similar symptoms, very powerful. Mars in 1H/12H – Native is elder or alone; [if any elder brother – struggle in his life] Grahphal'\n Responsibility, Power, Authority [in household, family] Bold, Courageous; Doctor/Nurse/Pharmacy etc in neighbourhood; [Medicine (+expired) in house]",
+      "goodResult": "Energetic, Courageous, Action Oriented, Winning in Litigation, Good for Buying a Vehicle, Raj Yog Karka.",
+      "ifBad": "Problems in Married Life, Fire Accidents, Disputes, Inviting Troubles, Aggressive, Financial Crises, Inviting Troubles.",
+      "specialRules": "Sun in 2nd House & Moon in 12th House: Financial Crises, Jupiter in 7th House: Inviting Troubles.",
+      "recommendation": "Avoid Staying with In Laws, Don't Take Gifts, Hanuman Chalisa, Avoid Interacting with Sadhu/ Priests.",
+      "symptom": "Some one in the Family in into Police Department."
+    },
+    "Mercury1": {
+      "offlineClassNotes": "Mars afflicted (Career trouble) | Challenges in Career, Native likes to eat green veg a lot, Problem in Tonsil, Cough etc. [Remedy : Avoid wearing ‘Green’ colour clothes, Donation as per Rahu 1H]",
+      "goodResult": "Good for Business, Wealth, Long Life, Intelligent, Good for Career. DIG BALI",
+      "ifBad": "Selfish, Naughty, Bad Name, Less Spiritual, Ups & Down in Career, Foreign Travel, Addiction.",
+      "specialRules": "Moon in 7th House: Foreign Travel, Addiction.",
+      "recommendation": "Avoid Non Veg and Liquor.",
+      "symptom": "Harmonium, Hand Drums (Tabla), Yellow Teeth."
+    },
+    "Jupiter1": {
+      "offlineClassNotes": "Health, Education : Very Good Education, Impact on Health (Weight gain; Thyroid problem), Chubby, Sensitive with ‘Quality of Water’ [High TDS etc.]",
+      "goodResult": "Good for Family, Money Saving, Property, Social Service, good for Education, Support from Seniors and Govt, Aggressive but Pure Hearted, Long Life. [HEALTH, EDUCATION] [DIG BALI]",
+      "ifBad": "Reactive in Nature, Hasty Decisions, bad for Father's Health, Financial Losses. Health problems.",
+      "specialRules": "1. Saturn in 5th House: Bad for Child and Education. 2. Saturn in 1st House: Bad Year for Father's Health. 3. Running 51st Year: Bad for Mother. 4. Friendly Planets in 2nd House / 4th House: Good for Wealth.",
+      "recommendation": "Take Holy Dip in Pushkar on Kathik Poornima.",
+      "symptom": "Degree Holder."
+    },
+    "Venus1": {
+      "offlineClassNotes": "Venus in 1H, 2H, 3H. Venus 1H : Attractive, Good Looking, Attracts opposite gender, Affair before and after Marriage\n Remedy : \n i). offering ‘Curd, Kapoor, Deshi ghee’ in ‘Temple’\n ii). Bringing Venus in 7H [Burying Peach filled with Kohl in the garden] – for Venus 4H as well.",
+      "goodResult": "Good for Luck, Luxuries in Life, good for Vehicle, good for Communication, New Business Opportunity. ATTRACTIVE*",
+      "ifBad": "Affairs, Un-Planned Life, Health Issues to Partner / Mother, Child Related Tensions, Issues in Job.",
+      "specialRules": "1. Rahu in 7th House: Mental Issues to Partner. 2. Moon in 7th House: Problem with In Laws (Mother In Law). 3. Mars in 7th House: Good for Wealth and Child. 4. Sun in 7th House: Health Issues to Partner. (Venus sworn enemy of 'Sun')",
+      "recommendation": "Donate 7 Types of Grains.",
+      "symptom": "Affairs, Love Marriage."
+    },
+    "Saturn1": {
+      "offlineClassNotes": "Mars afflicted (Career trouble) | Debilitated in 1H, MKS, Health challenges (afflicted Sun), -ve thoughts/mind; Painful for self and father; Bad for Father (afflicts ‘Sun’), Trouble with Boss, Lowers confidence, unknown Fear, Partner not give much respect, *unattractive personality, Depression, Low Energy, Laziness [Cold Planet in Fiery place], Slow Mind. Career issues. Humiliation. Indisciplined (as Sun afflicted), Much Struggle, Suffering, Property issues. DELAY.\n \n Remedy: i). Take Kaccha Milk, ii). Mix ‘Sugar’ + Water, iii). Offer it on ‘Banyan’ Tree, iv). Take ‘gili mitti’, v). Do ‘Tilak’ on ‘Forehead; Other Remedies: \n (i). Take a bath – adding ‘Milk’ in Water. Wear ‘Silver’ Chain. [Rahu or Saturn in Lagna] (ii). Three Metal Ring : Gold + Silver + Copper [40, 30, 30 percent]",
+      "goodResult": "Good for Name & Fame, good for Logic & Reasoning, Hard Working and Intelligent, good for Politics. SHREWD",
+      "ifBad": "Bad for Partner's Health, Unnecessary Disputes, Loans, Insults and Tensions. DEPRESSION, -VE MINDSET, HEALTH / CAREER CRISIS, HUMILIATION",
+      "specialRules": "1. Mars Bad - Child in Trouble, Losses. 2. Rahu / Ketu Bad - Bad for Mother and Partner. 3. Mercury Bad - Bad for Career - Specially Business.",
+      "recommendation": "Milk, Sugar & Water in Bargad (Banyan) Tree – Put Tilak.",
+      "symptom": "Hairy, Eye Related Issues."
+    },
+    "Rahu1": {
+      "offlineClassNotes": "Reactive nature; Surya Grahan [Su + Ra] – Sun gets afflicted/bad in Chart; Mars afflicted\n Remedy : Offer ‘four(4)’ boondi laddu and ‘Black Umbrella’ to a ‘Sweeper’ - on Saturdays. \n For Sun : Offer ‘a copper vessel filled with wheat and jaggery’ in the temple every Sunday (Sun 2H)",
+      "goodResult": "Good for Wealth, Savings, More Income, Meeting with New People, Name & Fame, Sudden Gains, Lottery.",
+      "ifBad": "Challenges in Life, Health & Wealth Related Issues, Litigations, Conspiracy, Loss from Theft, (Cheating, Fraud), Unnecessary Expenditure.",
+      "specialRules": "1. If Mercury is Good: Rahu will give Good Results. 2. Venus in 7th House: Wealthy but partner in Trouble.",
+      "recommendation": "Donate Wheat Grain, Jaggery in Copper Vessel in Temple.",
+      "symptom": "Court Cases."
+    },
+    "Ketu1": {
+      "offlineClassNotes": "Sun becomes good (exalted), except in 7H.\nHeadless, Directionless, Stress, Makes lots of mistakes in life, needs ‘Guru/Mentor’ in life. If Disease : Headache, Mental issues, Stone problems, Kidney stone etc.\n Remedy : Keep red handkerchief.",
+      "goodResult": "Good Year for Success, Name & Fame, Travel, New Family Members, Wealth. [Raises you like 'Flag']",
+      "ifBad": "Bad for Child and Partner, Pain in Backbone, Eyes related issues, Tensions, Problems with Enemies.",
+      "specialRules": "1. Mars in 12th House: Ketu will give Good Results. 2. 2nd House & 7th House Empty: Mercury and Venus is Bad. 3. Sun in 7th House: bad for Health. 4. Bad Planet in 6th House: Stone - Sometimes Surgery.",
+      "recommendation": "Keep Red Color Handkerchief.",
+      "symptom": "Stone Pain (Pathri)."
+    },
+    "Sun2": {
+      "offlineClassNotes": "Venus bad, Tr Su 2H - Couple fight etc. | Jupiter good*\nRelationship \\ Challenges (Fight) in Relationship; Support by ‘Sun’ – Family, Authority, Govt, Luck favours*, Ends dispute/litigation. Offer Almonds in 'temple'.",
+      "goodResult": "Good for Career, Gains / Support from Seniors / Govt., Winning in Competition. [RELATIONSHIP]",
+      "ifBad": "Results will be reverse, Shock from Electricity, Eyes Related Issues, Dispute / Misunderstanding with Family Members, Legal Suits, Lazy, Poverty.",
+      "specialRules": "Sun with Rahu/ Ketu/ Saturn or Sun is BAD, Mars in 1st House / Moon in 3rd House.",
+      "recommendation": "Donation in Temple, Maintain good relationship with In Laws.",
+      "symptom": "Bad Relationship with Family, Gets Milk & Wheat Free, Drinks Milk in night."
+    },
+    "Moon2": {
+      "offlineClassNotes": "Happy, Good bank balance [Moon – liquid cash, currency] *Rohini Nk. (14 d.)– Wealthy. | Venus also starts giving ‘good result’ Moon 2H will make Venus also good}. Remedy : Offer ‘Milk’ in Shiv Temple [Shivling – Saturn, found in Narmada River] Moon is corrected with help of ‘Saturn’\n In case of Problem with Saturn – Deal with the help of ‘Venus’. For Mars – Deal with help of Jupiter. Sun – Direct Remedy \n Sun + Venus; Sun 7H*, Saturn 7H/8H – Dryness in Eyes [Saturn – dryness]",
+      "goodResult": "Support from Seniors, Spiritual Travel, Invitation for Marriage Party, Water near to Entry of House.",
+      "ifBad": "Accidents, Separation from Child, Diabetes, Fever, Running Nose, Issues Related to Private Parts.",
+      "specialRules": "Jupiter in 4th House: Gives Wealth, Venus becomes Good, Saturn in 4th House: Gets Parental Property, Sun in 4th House & Saturn in 11th House: Wealthy, Properties, Support from Seniors.",
+      "recommendation": "Take Blessings from Mother, Avoid keeping Idols (Stone) of GOD.",
+      "symptom": "Swing in House, Unused or Bad conditioned Mixer/ Juicer / Grinder or IRON."
+    },
+    "Mars2": {
+      "offlineClassNotes": "Gives Wealth and Property (Makes very good food, good cook) – good for food business CLOUD KITCHEN/RESTAURANT [8H] If BAD – ruins family\n Native should keep feeding people (distributing food). Guest keep coming and kitchen is functional (good symptom). Aggressive/Bold Speech.\n When it stops – Financial crisis ensues. Feeding to people – Remedy of Mars. Mars / Moon – is normally ‘Bad’ [Check for it first while examining any Kundali]\n Moon – emotional setback. Donation of Food _ good for making Mars good _ except Mars in 6H (No sweets/sweet food be given)",
+      "goodResult": "Lucky, Very Good for In Laws, Owner of Property, Serves to People, Spiritual Events, Marriage in Family, Buying a Property, Good for Share Market / Lottery.",
+      "ifBad": "Bad Mars - Health Issues - 9 Years, Cheater, Not good for Share Market / Lottery, Dispute with Brothers, Throat related issues.",
+      "specialRules": "",
+      "recommendation": "Wear Silver Ring, Donate Sweet Rice in Temple.",
+      "symptom": "Food Lover, Bank Loans."
+    },
+    "Mercury2": {
+      "offlineClassNotes": "RAJ YOGA, Wealth Yoga, gives money for sure [but Jupiter becomes bad in Chart] [Perform Remedy of ‘Afflicted/Bad Jupiter’]\n Milk may be offered in Shiv Temple, as Moon + Mercury' 2H - Wealth Yoga. Mercury, even alone in 2H, is big wealth yoga.",
+      "goodResult": "Success in Business, Good in Communication, Name & Fame, Learned, Good for Share Market, Restaurant, Writing, Paper Work and Printing, Commission Agent.",
+      "ifBad": "Bad for Father's Health, Over Speaking, Aggression, Change in thoughts, Confusion, Not good for Father, Sometimes Death or Serious Issues.",
+      "specialRules": "Jupiter in 6th / 7th House: Not good for Father, Sometimes Death or Serious Issues.",
+      "recommendation": "Donate Rice and Milk in Temple.",
+      "symptom": "Widow Sister, Old Glasses."
+    },
+    "Jupiter2": {
+      "offlineClassNotes": "Wealth : Makes Venus good; Very good for Wealth; Sweet talker / speech; If not afflicted : lives in Joint Family.",
+      "goodResult": "Good for Wealth, Name & Fame, Sudden Gains, Good Communication, good for Soil, good for Venus related Business, good for In Laws. [WEALTH]",
+      "ifBad": "Bad for Business, Financial Losses, Bad Name.",
+      "specialRules": "1. Saturn in 2nd House: Bad for Health. 2. Sun / Moon / Saturn in 6th House & 8th House Empty: Good for Name & Fame. 3. Ketu in 6th House: These people know about their Death in Advance. 4. Venus in 2nd House: Bad Name.",
+      "recommendation": "Donate Patisa to Newly Married Woman.",
+      "symptom": "Damaged Road Outside House."
+    },
+    "Venus2": {
+      "offlineClassNotes": "Good for Wealth, Makes 'Jupiter' good in chart. Relationship challenges due to Family.",
+      "goodResult": "Good for Career & Luxuries, good for Wealth, Child and Property, Brothers Support.",
+      "ifBad": "Bad for Relationship, Loss of Luxuries, bad for Father In Law's Health, Blood Related Issues.",
+      "specialRules": "",
+      "recommendation": "Donate Potato.",
+      "symptom": "Love to Wear Jeans & Curd."
+    },
+    "Saturn2": {
+      "offlineClassNotes": "Gives troubles but less than in Lagna or 5H. *May bring financial crisis (2H – Finance).\n i). Don’t work on credit or lend any money; Money will come in bits and pieces. Food issues (Cold/not on Time)/Liar. Abusive/Bitter/Harsh ’ [Sa/11/10 2nd]\n ii). If ‘Saturn’ is very bad – may give ‘Death’ in family. [2H – Marriage, Childbirth, Death]\n iii). If ‘Saturn’ is good in 2H : Native makes property, construct house; Expenses. Property Investment.\n Check Wall Clock, Musical Instruments, Radio are not in order\n Remedy:\n a). Bring Venus in 2H. b). if not possible, bring it in 7H (makes both good) _ TO BRING VENUS IN 2H : Offer ‘Dahi, Kapur, Deshi Ghee’ in Temple – every Friday. [Sa + Ve : Wealth Yoga] To Bring Venus 7H – Peach Remedy [Sa, Ve, Me – good] Given There is NO ENEMY in 7H.",
+      "goodResult": "Good for Property, good for Coal, Machinery Related Work, Support from Friends, Spiritual. MONEY STUCK IN MARKET (NEVER WORK ON CREDIT; MONEY COMES IN BITS AND PIECES)",
+      "ifBad": "Pressure, Tensions, Less Bank Balance, Ups & Down in Career, Health Issues to Mother, Bad News from In Laws. FOOD /SPEECH issues [Timing/Habit]",
+      "specialRules": "1. Jupiter in 4th House: Very Intelligent. 2. Jupiter in 10th House: Silent, Ego, Jealous, Miser. 3. Bad Mars: Health Issues. 4. Sun in 12th House: Gambler.",
+      "recommendation": "Avoid Mustard Oil (Hair Oil), Milk Tilak.",
+      "symptom": "Break in Education."
+    },
+    "Rahu2": {
+      "offlineClassNotes": "No direct remedy. Grahphal\nFinancial Trouble, Fluctuation in Finance, Problem in family [Ra 2H – captures ‘Bad Mercury’]\n Remedy : Keep ‘solid silver ball’ in ‘silver cage’; and wear it in ‘Silver chain’. If Rahu 2H gives good result : Lots of Money.",
+      "goodResult": "Ups & Down in Finance, Ups & Down in Family Pleasures, Loss of Faith In Him / Her, Problems in Intestine, Long Life.",
+      "ifBad": "No or Less Savings or Very High Savings.",
+      "specialRules": "",
+      "recommendation": "Keep Silver Ball. Never Donate Anything in Temple.",
+      "symptom": "Swing, Bell."
+    },
+    "Ketu2": {
+      "offlineClassNotes": "No direct remedy. Grahphal\nVery good, Support of Jupiter and Venus (both friends); Change and growth. Symptom : brings pickles / papad / lemon etc. receives it as gift (bad Ketu), break in/from family. If Bad : Offer 2 Kg Chana Dal in Temple [Jupiter + Ketu]",
+      "goodResult": "Growth in Career, Travel, Good for Wealth, Name & Fame, Spirituality, Change of Place Work / Residence.",
+      "ifBad": "Partner and Child Related Issues, Loans, Loss of Wealth, Struggle and Hurdles, Fights, Tensions.",
+      "specialRules": "1. Moon / Mars in 8th House: Bad Time. 2. Jupiter Exalted: Gives Lot of Money, Year of Wealth.",
+      "recommendation": "Kesar Tilak.",
+      "symptom": "Black Sesame, Tamarind."
+    },
+    "Sun3": {
+      "offlineClassNotes": "Efforts \\ No Support (even from family*), Self-Made, Very Talented and Experienced (by experiences/struggle of life), Struggle in life, On your own. Bring Sun 2",
+      "goodResult": "Spiritual Travels, Self Made Man, Property Buying, Short Travels, Good for Fame. [EFFORTS]",
+      "ifBad": "Bad for Career, Issues with Brothers, Theft in day time, Buying of Stolen Goods, Mother's Health is a Challenge, Bad Year for Maternal Uncles, Neighbor's Death.",
+      "specialRules": "If Sun is BAD, Moon is Bad, Mercury is Bad.",
+      "recommendation": "Avoid Affairs.",
+      "symptom": "Bad for Career, Issues with Brothers, Theft in day time, Buying of Stolen Goods."
+    },
+    "Moon3": {
+      "offlineClassNotes": "Mars 'bad'.\nMother – aggressive, dominant in household [father dies before mother] Mo – Me disease; Me – Mo disease Mars becomes powerful. Theme: Mind of native in sign, house of ‘Moon’. Inflow of Money there. Remedy: Wear Silver ‘Kada’ in hand; Offer Milk in ‘Shiv Temple’",
+      "goodResult": "Firm Decisions, Arrogant, Focused, Sharp Minded, Travel, Meeting with Friends, Support from Brothers.",
+      "ifBad": "Insult from Brothers, Unnecessary Travel, Mental Tension, Eyes Issues, Disturbed Sleep, Unknown Fear.",
+      "specialRules": "Mars in 4th House: Good, Property, Vehicles, Bold Personality, Mercury in 11th House: Unknown Fear, Jupiter in 9th House & Mercury in 5th House: Good for Health & Wealth.",
+      "recommendation": "Durga Chalisa, Use Silver Glass for Drinking Milk.",
+      "symptom": "Running Nose, School near to House, Less Courageous."
+    },
+    "Mars3": {
+      "offlineClassNotes": "Very powerful placement (significator of 3H) – No younger sibling (same gender, otherwise struggle in his life - career /child related). Feeding whole village is remedy of Mars ~~ simplified – feeding ‘Ants’",
+      "goodResult": "Supports to Others, Day Dreamer, Winner, Good for Name & Fame, Social Service, Profit in Business / Growth in Job.",
+      "ifBad": "Not Courageous, Issues in Paternal Uncle Life / Brother's Life, Dispute in Parental Property, Miscarriages, Abortion, Dispute with Brothers, Insulting, Blood Related Issues, Very Bad for Finance.",
+      "specialRules": "Mercury in 9th House: Will give Good Results, Jupiter in 11th House: Will give Good Results, Jupiter/ Moon/ Sun in 7th House & Mercury in 3rd House: Very Bad for Finance, Saturn in 9th House/ 11th House: Not Gives Bad Results.",
+      "recommendation": "Use Elephant's Tooth Ring.\n https://www.drikpanchang.com/lyrics/kavacham/gods/lord-narasimha/narasimha-kavacham.html Narasimha Kavach Stotra",
+      "symptom": "Small Head."
+    },
+    "Mercury3": {
+      "offlineClassNotes": "Mars afflicted (except Mars + Mercury 3H) | 'Look at 9H, 11H Planets carefully'.\nBad Placement, Mars also becomes bad. : RECITE 'DURGA CHALISA'. Feed 'Dogs'. Wear Silver Kada/Kalava. Three Metal Ring.\n If 4H is empty : Take 03 ‘leaves’ of ‘Palash’, separate three petals; put it in ‘Kaccha Milk’. Dig a small ‘Pit’.\n Put the petals in pit, put a stone over petal/leaves and fill the pit with ‘Soil’. [HOW MANY LEAVES?]\n Caution : Don’t use Stone of the colour of any, if, planet in 9H/11H",
+      "goodResult": "Good for Knowledge, Success in Career, Name & Fame, Patience, Courage, Efforts.",
+      "ifBad": "Bad for Career, Financial Loss, Unnecessary Travel, Loss in Lottery, Share Market, Bad Luck, Bad for Brothers, Mercury is Very Bad, Bad for Child.",
+      "specialRules": "Bad Mars in 5th / 11th House: Bad for Career, Moon in 5th & Jupiter in 9th House: Bad Luck, Moon in 11th House: Bad for Brothers, Venus is Good: Moon Bad, Sun & Saturn in 9th House: Mercury is Very Bad, Mars in 1st House: Bad for Child.",
+      "recommendation": "Take Help from Moon & Ketu, Durga Chalisa.",
+      "symptom": "Over Speaking, Spitting."
+    },
+    "Jupiter3": {
+      "offlineClassNotes": "Struggle : Struggle in life (like Sun 3H). Remedy : Recite Durga Chalisa. [M.K.S.]. Wear Kalava/ Silver Kada also help.\n Jupiter – Mercury (1, 7) to each other : Native doesn’t listen to elders",
+      "goodResult": "Very Good Placement, Focused, Spiritual Growth, good for Business, Support from Siblings, Support and Meetings with Friends, Travel, Start of New Work, Good News. [STRUGGLE]",
+      "ifBad": "Expenditures, Theft, Bad Friends, Loss in New Work, Loss in Investment.",
+      "specialRules": "Saturn in 4th House: Friends will Spoil / Burn the Money.",
+      "recommendation": "Durga Chalisa.",
+      "symptom": "Broken Umbrella."
+    },
+    "Venus3": {
+      "offlineClassNotes": "",
+      "goodResult": "Short Travel, good for Career, New Friends, Good Relationship, Aggressive Partner.",
+      "ifBad": "Less Confidence, bad for Relationship, Loss of Wealth, Loss from Siblings, Loss in Lottery and Share Market.",
+      "specialRules": "",
+      "recommendation": "Bury 4 Pieces of Peach (Aadu) Seeds – Make a Hole and Put Surma (Kohl).",
+      "symptom": "Lots of Expenditures, Low bank Balance."
+    },
+    "Saturn3": {
+      "offlineClassNotes": "Mars afflicted (except in exchange) | Hardworking, Slogging / Struggle in life, On your own [Both Sun or Saturn 3/3H] \\ Remedy : With help of ‘Ketu’ : Feed dogs. Grahphal\n : Saturn 3H seeks much hard-work from native, but keeps them ‘Stable’, not let fall from position, although it’s hard to rise.",
+      "goodResult": "Good for Name & Fame, Focused, good for Luxuries and Vehicles, Spirituality.",
+      "ifBad": "Unnecessary Tensions, Child Related Tensions, Insults from Relatives, Loss of Money, Unnecessary Travel. SLOW RISE IN LIFE BUT STABLE",
+      "specialRules": "1. Ketu in 3rd House / 10th/11th House: Good for Property. 2. Sun in 1st House / 3rd House / 5th House: Ketu Bad. 3. Saturn 3H/4H and Moon in 10th House: Bad for Mother.",
+      "recommendation": "Keep a Dog. Feed Dog. [Take help of 'Ketu']",
+      "symptom": "3rd House Empty."
+    },
+    "Rahu3": {
+      "offlineClassNotes": "Great, very good. Sun becomes three (03) times powerful.\n If Bad : Remedy to be performed on Wednesday, Saturday. [Me and Sa – friends of Rahu] Remedy : ‘Take three (03) coconut broom (seenk wali jhadu) – unpack it; tie it with ‘jute thread (sutli). Throw it in river one by one. [Jute bag (packing), thread, rope : Rahu]",
+      "goodResult": "Good for Name & Fame, Sudden Gains, Lucky Year, Good News from In Laws, good for Property, good for Writing & Communications, Always Leave Property Behind after his / her Death.",
+      "ifBad": "Bad for Married Life, Tensions with Siblings, Loss of Money, Problems Related to In Laws.",
+      "specialRules": "1. Mercury in 12th House: 34th Year is Very Bad. 2. Mars in 3rd House with Rahu: Very Good Raj Yoga, Very Good Writing Skills. 3. Sun will be Very Good – 3 Times Good.",
+      "recommendation": "Keep Elephant Tooth, 3 Brooms Throw in Running Water.",
+      "symptom": "Taj Mahal, Elephant Statue."
+    },
+    "Ketu3": {
+      "offlineClassNotes": "Native not likes to stay at home; Good yoga for foreign travel /settle / lots of travel in life. Remedy : Feed dogs / offer 2 kg ‘Chana Daal’ in Temple.",
+      "goodResult": "Good for International Travel, Courage, Money Saving.",
+      "ifBad": "Problem in Career and Relationship, Brother in Problem, Pain in Backbone, In Laws in Trouble, Court Cases.",
+      "specialRules": "",
+      "recommendation": "Gold Chain, Avoid South Facing House.",
+      "symptom": "3 Uncles, 3 Brother/ Sister, 3 Doors, 3 Windows."
+    },
+    "Sun4": {
+      "offlineClassNotes": "Wealth \\ Born with Silver Spoon, Wealthy; Good for Name, Fame [7A – 10H], ‘Like Caterpillar [Miser]’ Leaves much inheritance behind.",
+      "goodResult": "Good for Wealth, Name & Fame, Guests at Home, Blessings of Mother. [WEALTH]",
+      "ifBad": "Not good for Married Life, Fire Incidences, Financial Crises.",
+      "specialRules": "Moon in 1st House, Venus in 7th House: Smart But don't take Bold Decisions, Saturn in 7th House: Not good for Married Life, Jupiter in 10th House: Very Good for Wealth, Jupiter in 1st House: Fire Incidences, Mars Bad: Financial Circes.",
+      "recommendation": "Avoid Alcohol & Fish, Donate Food to Blinds, Avoid taking gifts (Electronic/ Electrical items) from In Laws, Avoid Saturn related work.",
+      "symptom": "Gets Free Gifts and Gets Prashad / Langur."
+    },
+    "Moon4": {
+      "offlineClassNotes": "Fond of house, vehicle, comfort lover, waterbody around house (Bad Moon – if not so; or Culvert/dirty water; Wastage of water / leakage – Bad Moon). \n Offer Milk in ‘Shiv Temple’. Offer Coins in 'River' / Ganges.  Grahphal\n Moon / Jupiter / Mercury 4H : Buys innerwear (undergarments) - Transit / Varshphal Rules.",
+      "goodResult": "Good for Wealth, Health & Education, Vehicle Purchase, Travel near to Sea or Travel through Sea, Other Source of Income, Gain from Property.",
+      "ifBad": "Involved in Others Problem, Threat from Water, Fight with Mother, Tensions, Toned Vest (Under Shirt).",
+      "specialRules": "Jupiter in 10th House: Avoid donation to Sadhu, Priest, Venus in 10th House: Support from Both Wife & Mother, Saturn in 9th House / 11th House: Support from Both Father & Mother, Mercury in 10th House: International Travel, Rahu in 10th House: Head Injury, Sun in 5th House & Jupiter in 2nd/9th House: Lucky Like KING.",
+      "recommendation": "Establish Water in Earthen Pot, Avoid Selling Milk, Donate Milk.",
+      "symptom": "Fight with Mother, Tensions, Toned Vest (Under Shirt)."
+    },
+    "Mars4": {
+      "offlineClassNotes": "Usually younger but ‘dominates’ household/family. Difference of 4-5 years between sibling [otherwise, trouble in life of sibling]",
+      "goodResult": "Energy level is HIGH, Property related issues Resolved, Additional Responsibility, Name & Fame.",
+      "ifBad": "Loss in Wealth, Problem with Brother, Issues at the time of Child Birth, Aggression & Mental Pressure, Tongue Related Issues, Mars will be Very Bad, Head Related Issues to Self / Mother, [**Blood related disease to Self / Mother], Child Related Issues, Very Bad for Finance.",
+      "specialRules": "Moon in 3rd / 8th House: Mars will give Good Results, Enemy Planet in 3rd / 4th / 8th House: Mars will give Very Bad, Jupiter / Sun in 3rd / 4th / 8th / 9th House: Good Result of Mars, Mercury / Moon in 6th House: Head Related Issues to Self / Mother, Bad Planet in 9th House: Child Related Issues, Mercury in 12th House: Very Bad for Finance.",
+      "recommendation": "Keep Honey in Earthen Pot and Bury in Lonely Place, Keep Silver Square Piece in Wallet.",
+      "symptom": "2 Marriages, Divorce."
+    },
+    "Mercury4": {
+      "offlineClassNotes": "Afflicts 'MOON' |\nGives lots of money, but ‘Superstitious’, Suicidal Thoughts (-ve). If Mercury 4H is bad : ‘Take 101 Palash leaves’, ‘Clean it in Kaccha Milk’ ‘ Thrown one by one in flowing water / river’. If Mercury 4H : Bad Moon [If moon is in good house / good – it gives lots of money]. Such as Moon in 2H and Mercury in 4H.\nIf Moon bad, Mercury gives good result*",
+      "goodResult": "Lucky, Good for Business, Work from Home, Good for Property & Vehicle, Honors Promises, Good for Sister & Married Life.",
+      "ifBad": "Bad for Sister & Married Life, Mother's Health, Sometimes feel like Committing Suicide.",
+      "specialRules": "Sun in 3rd / 5th / 11th House & Jupiter in 9th House: Raj Yog, Moon in 3rd / 4th / 6th House: Raj Yog, Moon in 2nd House: Very Good.",
+      "recommendation": "Silver Chain for Health, Gold Chain for Wealth.",
+      "symptom": "Lower Teeth not in Order."
+    },
+    "Jupiter4": {
+      "offlineClassNotes": "Saves 'Moon' even if Moon in 6H (to large extent). Exalted. Supports 5H.\nHome, Vehicle, Education, Luxury | Big House, Big Car, Big Expenditure [Extravagant] | Any planet in 4H (exp. Sun) makes person extravagant.",
+      "goodResult": "Very Good, good for Wealth, Lottery, Growth in Career, Blessings from Parents, good for Buying Property & Vehicle, good for Import / Export Business. [HOME, VEHICLE, EDUCATION, LUXURY]",
+      "ifBad": "Self destruction, Hidden Enemies, Losses, bad for Peace of Mind, Loss in Property & Vehicle.",
+      "specialRules": "1. Saturn in 2nd House: Lucky, Very Sharp. 2. Sun in 1st House: Both are Very Good. 3. Saturn in 9th House: Lucky for Family Members. 4. Moon in 2nd House: Better than Father.",
+      "recommendation": "Watering to Peepal Tree.",
+      "symptom": "Broken Umbrella."
+    },
+    "Venus4": {
+      "offlineClassNotes": "Hidden Relationship, DigBali - House, Vehicle, Comfort, Luxury.",
+      "goodResult": "Wealthy, Two Marriages, Growth in Career, Blessings of Parents, good for House & Vehicles, good for Import / Export Business.",
+      "ifBad": "Loss in Finance, Conspiracy, Tension & Pressure, Loss in Property.",
+      "specialRules": "1. Mercury in 6th House: Bad for Partner and Child till 34 Years of Age. 2. House No. 2nd / 7th House Empty: Venus will give Good Result.",
+      "recommendation": "Bury - 4 Pieces of Peach (Aadu) Seeds - Make a Hole and Put Surma (Kohl).",
+      "symptom": "Unused / Old Paint Box at Home."
+    },
+    "Saturn4": {
+      "offlineClassNotes": "Moon afflicted | Health challenges, Pain, Misery etc.\nGood for ‘Property, House’. 4H – Happiness, Pleasure – destroyed by Saturn. [Good Materialistically, Bad Mentally, living beings - usually]\n Bad for Mother, Self, Health, happiness. Painful childhood.\n \n Remedy : Make ‘Moon’ good [like Moon 2H]. i). Offer 4kg/400g ‘Kali Urad’ in River.",
+      "goodResult": "New ideas, good for Foreign Connection, Good for CONSTRUCTION, PROPERTY (multiple), good for Medicines (HEALING).",
+      "ifBad": "Instability, INSECURITY, Tensions in Family, Loss in Partnership, Aggression, Loans/ DEBT, Health Issues to Mother. PAINFUL CHILDHOOD, 'FEAR' Basically, 'Misery/Pain/Unsatisfaction/Fear' related to 4H",
+      "specialRules": "1. Moon in 2nd / 3rd House: Happy Life, Bad for Mother. 2. Moon in 10th House: Bad for Mother's Life. [Sa 3/4 & Mo 10]",
+      "recommendation": "Avoid Black Color Clothes [SHIRT], Feed Milk to Snakes. 'Food' to Blind Residents",
+      "symptom": "Broken Goggles, Tea Totter."
+    },
+    "Rahu4": {
+      "offlineClassNotes": "Conspiracy (by own people); makes ‘Moon’ bad in chart.\n If in ‘Birth chart’ : Native sleeps a lot; takes time to wake up [can’t wake up instantly] If Ra 4H – Bad,\n 4kg 100gm : Dried Coriander Seeds (sabut धनिया) – offer it in ‘river/flowing water’ – do it quarterly.",
+      "goodResult": "Good for Courage, Name, Fame, Success, Good Spending, good year for Research, Travels.",
+      "ifBad": "Disturbed Married Life, Bad Health, Child Miscarriages, Loss in Lottery, Not Good for partnership, Loans.",
+      "specialRules": "1. Moon in 1st House: Good for Wealth. 2. Mercury in Any House: Business Related to Mercury (In House) will give Gains. 3. If Moon is Bad - Bad Wealth / Financial Challenges.",
+      "recommendation": "400 Gms Coriander Seeds - In River.",
+      "symptom": "Pain in Legs (Partner's)."
+    },
+    "Ketu4": {
+      "offlineClassNotes": "Surgery to self, Mother, instability of house; living away from home; Good for foreign transfer/settlement, Change of house [Ketu – Maran Karak in 4H] MOON AFFLICTED (by worst enemy)\n Moon becomes afflicted in chart / Saturn becomes afflicted in chart. If much trouble : offer 400g chana dal in running water [Ju + Ke]",
+      "goodResult": "New Business Plans, Success in Court Cases, Good for Property.",
+      "ifBad": "Bad for Mother's Health, Tensions, Pressure, Diabetes, Problems in Private Parts, Problem in Child Health, Litigation.",
+      "specialRules": "1. Moon in 3rd/4th House: Ketu will give Good Results.",
+      "recommendation": "Pet (Dog), Chana Daal in Running Water.",
+      "symptom": "Problems in Mothers Health."
+    },
+    "Sun5": {
+      "offlineClassNotes": "Ego | Ego issues, Good result after child-birth [Big Tummy]. Grahphal",
+      "goodResult": "Good for Education, Special Year - Gods Blessing. [EGO]",
+      "ifBad": "Stomach upset, Aggressive, Very Bad for partner - Sometimes Death, Bad Year for Children, Pain in Hand (Family), Fight with Father, Khane (Food) mai Kankad (Stone).",
+      "specialRules": "Jupiter in 10th & Saturn in 3rd House: Very Bad for partner - Sometimes Death, Moon in 4th & Jupiter in 9th: Rajyog, Saturn in 9th or 11th House: Good for Father, Saturn 3rd: Bad Year for Children, Mars in 3rd and Jupiter in 9th / 12th House: Very Good Year -Wealth & Property.",
+      "recommendation": "Offer Food to Red Face Monkey.",
+      "symptom": "Pain in Hand (Family), Fight with Father, Khane (Food) mai Kankad (Stone)."
+    },
+    "Moon5": {
+      "offlineClassNotes": "Very good (for education); Gives Name/Fame, OSI, Earning through Stock Market; Bothers child a lot (for education); Good Education to Self as well as children. Very romantic. [Ve 5H also]; Remedy : Offer Plain Burfi to Young Girls, Offer Milk in ‘Shiv Temple’",
+      "goodResult": "Good Year, Success, Name & Fame, Support from Partner, Good for Share Market, Good for Diamond Business.",
+      "ifBad": "Dispute in Partnership, Not good for Electrical / Electronic Business, Stomach Upset, Cheated by Friends, Child Related Issues, Tough for Life.",
+      "specialRules": "Sun in 10th House: Tough for Life, Sun in 11th House: Tough for Life, Jupiter in 9th House & Mercury in 3rd House: Very Bad, Mercury in 11th House: Good for International Travel.",
+      "recommendation": "Spiritual Travel, Take Advice.",
+      "symptom": "Teacher in Family, School near to House."
+    },
+    "Mars5": {
+      "offlineClassNotes": "Aggressive, Action mode, most powerful placement, Sharp mind. It is told that Mars 5H is so powerful that when it activates (roars), - other planets in chart start giving result of preceding house. Misery / Sad due to 1st child – 1st child not does anything as per your expectations, wastes money spent on education [Mars 5H _ Ameero ka bap dada].",
+      "goodResult": "Guests at Home, Name & Fame, High Energy, Success in Education / Competition, Support from Govt / Seniors.",
+      "ifBad": "Misunderstanding, Change of Place, Punishment, Laziness, Property Related Issues, Fire Incidences, Theft, Problem related to Partner, Loss in Share Market / Lottery.",
+      "specialRules": "11th House Planet: Decides of Wealth & Property, 3rd House Planets: Decides Loss in Wealth & Property.",
+      "recommendation": "Plant a Neem Tree.",
+      "symptom": "Noise in Legs (Joints) at the Time of Standing Up."
+    },
+    "Mercury5": {
+      "offlineClassNotes": "Very good, good consultant {2, 5, 7}, income from speculation/stock market [knows how to earn money], Good for Money and Education; Should work after proper consultation",
+      "goodResult": "Good for Astrology, Consultation, Finance, Name & Fame, Social Circle, Good for Child.",
+      "ifBad": "Struggle in Career, Disputes, Bad for Father's Finance, Stomach Related Issues, Sudden Disturbance and Injury, Tensions & Pressure; Bad for Child**?",
+      "specialRules": "Mars in 3rd / 4th / 5th / 7th House /9th House: Mercury Bad & First House Planet is Spoiled, Moon / Jupiter in 3rd / 9th House: Good, Moon after Mercury.",
+      "recommendation": "Silver Ring.",
+      "symptom": "Money Plant."
+    },
+    "Jupiter5": {
+      "offlineClassNotes": "Education, Childbirth | Transit in 5H : Gives result of Past life ‘Good Karmas’ [Mantra Diksha] [Big Tummy] No Direct Remedy of 'Jupiter 5H'. Grahphal",
+      "goodResult": "Growth in Career, good for Entertainment & Education, Winning in Court Cases, Name & Fame, Lucky Year. [EDUCATION, CHILDBIRTH]",
+      "ifBad": "Sleeping Luck, bad for Maternal Uncles, Trouble in Education, Bad Name.",
+      "specialRules": "1. Rahu/ Mercury / Venus in 2nd / 9th / 11th House: Sleeping Luck. 2. Saturn in 9th House: Saturn will not give Bad Results.",
+      "recommendation": "Moon in 9th House: Very Lucky.",
+      "symptom": "Stomach Upset."
+    },
+    "Venus5": {
+      "offlineClassNotes": "i). Offer 1 kg ‘Atta’ daily in Temple for five (05) days, starting from Friday. Easily get into relationship; Much available, Romantic, Songs, Music etc.",
+      "goodResult": "Good for Friends & Social Circle, Creativity, Good Child Birth, good for Career.",
+      "ifBad": "Always Romantic, Affairs, bad for Child, Chances of Injury, Insults.",
+      "specialRules": "Any Planet in House No. 1: Venus is bad but Child is Protected.",
+      "recommendation": "Donate 1 Kg Wheat Floor in Temple - 8 Days Continuous.",
+      "symptom": "Love Marriage, Affairs."
+    },
+    "Saturn5": {
+      "offlineClassNotes": "[Brings challenges in Career, Relationship, Child] Avoid Child planning. 'Sun'/'5H' gets afflicted*?\n i). Challenges in Career (Sa 1H as well) ii). Not gets along with ‘Father’, Boss, Govt. iii). Patience, Shrewd natured, LAZY. SAD SONGS\n iv). Hard work for ‘Father’ v). Bad at Education, Break in Studies; Health issues, Problem in Digestion. vi). Don’t do any construction work while Saturn in 5H.\n vii). Likelihood of Miscarriage viii). Loss of/to children; Child fails in education; Laziness \n ** Construction of Building / Property purchase _ after child-birth. [Saturn 5H – Snake eats own egg] [Saturn 5H + Sun/Jupiter 10H : Good Result – Exchange]\n EXCEPTION : SUN 1H + SATURN 5H [Good Result]\n Remedy : \n if no planet or no enemy planet in 4H [Venus, Mercury etc] i). Offer (pour) ‘4 bottle of Black Rum’, one by one, in River.\n ii). Take 10 almonds (with shell) a). Offer it to Lord ‘Shiva’ in Temple b). Bring 5 pieces from offering. c). Tie it in ‘White’ clothes *unstitched d). Keep it in Almirah (where no sunlight comes)\n if 7H is empty:: i). Take four seeds of ‘Peach’ [Peach : Venus + Mercury] ii). Drill each one and fill ‘Kohl (surma)’ inside it. [Kohl/Surma – Saturn]\n iii). Bury it below the grassland [Park/Garden with grass etc.] ** there should be no enemy planet in 7H.",
+      "goodResult": "Intelligent, Good Name & Fame, Spirituality, Travel, Technical Knowledge, good for Iron, Machinery Related Business.",
+      "ifBad": "Loss of Money, Mental Tensions, Loss from Friends, Financial Crises, Ups & Down in Career. HEALTH, CAREER, BREAKUP, CHILD - problem",
+      "specialRules": "1. Saturn in 1st House (Varshphal): Losses. 2. Ketu in 4th House: Bad for First Child. 3. Sun / Mars/ Moon in 7th House (Varshphal): Gives Bad Result.",
+      "recommendation": "Donate Almonds in Temple.",
+      "symptom": "Break in Education."
+    },
+    "Rahu5": {
+      "offlineClassNotes": "Jupiter' is afflicted.\nTrouble in connecting emotionally, Fluctuation in mind (Mood swing), Dreamy; RELATIONSHIP CHALLENGES\n Remedy : Make 60g silver elephant [trunk towards sky], right leg forward – between 60-65g , Keep it in house, worship place (house) : gives money. [if in Birth chart*] In Varshphal : 5 Kg barley – mix it in 1l milk – and offer it in river/running water [Barley – Fishes food] [Rahu/Ketu _ associates with 'Fishes']\n (Elephant – is behind/beside – ‘Mata Laxmi’, showering gold coins around)",
+      "goodResult": "Good for Wealth & Gains, Gain in Lottery, good year for Investment, good year for Sports and Social Activities.",
+      "ifBad": "Ups & Down in Career, Delay in Success in Career, Problems with Friends and Relatives, Insult from Child.",
+      "specialRules": "",
+      "recommendation": "Silver Elephant (60 Gms).",
+      "symptom": "Electricity Pole Outside House."
+    },
+    "Ketu5": {
+      "offlineClassNotes": "Afflicts 'Sun', supports 'Jupiter'\nProblem in stomach, Disturbance in Menstrual cycle (of wife), Surgery while child-birth / miscarriage problems; Break in Education, Breakup [Wrong time to plan childbirth, except when Saturn in 9H*] Remedy : offer 400g Yellow Lemon [Ju + Ke] in river, OR, offer ‘5’ bananas in temple",
+      "goodResult": "Good for Health & Wealth, Success in Career, High Energies, Name & Fame.",
+      "ifBad": "Health Issues, Child Related Issues, Loss of Child, Unnecessary Travel, Tension in Relationship, Mother's Health Problem.",
+      "specialRules": "1. Moon/ Mars in 3rd House & Saturn in 9th House: Bad for Child - Normally Loss of Child.",
+      "recommendation": "Dog Feeding, Gold Chain.",
+      "symptom": "Dog Biting"
+    },
+    "Sun6": {
+      "offlineClassNotes": "Health, Career \\ Enough to ruin health and career; Much aggressive, Makes 'Mars' good but Afflicts 'Saturn', 'Ketu' also bad.",
+      "goodResult": "Winning in Court Cases, Gain from Foreigners, Good for Land Related Business. [HEALTH, CAREER]",
+      "ifBad": "Disputes, Litigation, Ups & Down in Career, Bad Year for Maternal Uncles, Health issues, Penalty with Govt, High Blood Pressure, Issues in Wife's Leg, Male Child is in Trouble, Fear from Enemies, Uncomfortable, Health Issues, Disputes with Partner.",
+      "specialRules": "Mercury in 12th House: High Blood Pressure, Venus/ Rahu/ Saturn/ Ketu in 1st House: Health issues, Penalty with Govt, Saturn in 12th House: Issues in Wife's Leg, Mars in 10th House: Male Child is in Trouble.",
+      "recommendation": "Donate in Temple, Do Remedy of Mercury, offer Party to Friends.",
+      "symptom": "Fear from Enemies, Uncomfortable, Health Issues, Disputes with Partner."
+    },
+    "Moon6": {
+      "offlineClassNotes": "Either Education will be good or Good Health to Mother [Health trouble during education]. [Usually education is good & sick mother]. Although, Moon 6H gives money to native. [Lots of, if SAV high] - Superstitious, (checking locks again; forget keys; counting notes etc.) – not sure.\n REMEDY ; Take a glass bottle with glass cap, put 4 square silver pieces – and ‘Holy water – Gangajal’ in bottle’ – keep it at your home. Offer Milk in ‘Shiv Temple’.‘Jupiter – Holy water’; Silver – Moon; Round bottle – Mercury",
+      "goodResult": "Good for Relationship with Foreigners, Winning in Competition, Support from Friends. Gives 'Money'.",
+      "ifBad": "Issues related to Mother, Loss of Goods in Travel, Tensions with Employees & Junior, Tough for Mother & Maternal Uncles, Urine Related Issues, Mother & Child both in Trouble.",
+      "specialRules": "Mercury in 12th House: Tough for Mother & Maternal Uncles, Ketu in 6th House: Urine Related Issues, Mars in 4th House / 8th House & Mercury in 2nd House: Mother & Child both in Trouble.",
+      "recommendation": "Avoid Over Speaking, Keep Rabbit.",
+      "symptom": "Widow in Family, Health & Wealth Related Issues, Check Lock again & Again."
+    },
+    "Mars6": {
+      "offlineClassNotes": "Mercury, Ketu, Saturn' - afflicted/bad. Their bad result at that placement.\nAggressive, Egoistic [Makes ‘Sun’ good in chart]; If very good, military officer.\n Caution : Don’t celebrate (no cake cutting), Don’t distribute sweets. No Cake cutting or Gifting [Because – Cake – Venus – debilitated in 6H] \n Remedy : Sprinkle ‘Salt’ over Cake. Taking some loan/debt, saves from health issues. || Distributing 'Sweets' may drag you in much 'Debt'.",
+      "goodResult": "Increases Confidence, Gain from Foreigners, Success in Competition, Increase in Friend Circle. [Don't distribute sweets]",
+      "ifBad": "Issues to Partner/ Brother/ Child, Health Issues to Mother, Unnecessary Travel, Loans, Expenditures, Threat of Injury, Bad for Brother and Sister Both, Problem / Injury related to Head.",
+      "specialRules": "Mercury 3rd / 12th House: Bad for Brother and Sister Both, Mercury in 12th House: Problem / Injury related to Head.",
+      "recommendation": "Donate Silver & Rice in Temple.",
+      "symptom": "Bank Load, Always Receive Gifts - Chocolates & Sweets."
+    },
+    "Mercury6": {
+      "offlineClassNotes": "Sad, Exalted in 6H. Grahphal. 'Ketu' bad.    'Mercury + Ketu 6H - lesser bad'\n Ruins at 7th (in Varshphal). E.g. : Mercury 6H, Venus 12H [Venus will not give result of exalted, it got ruined by Me 6H] ",
+      "goodResult": "Behaves like King, Intelligent, Good for Business & Finance, Good for Education, Good for Flowers, Machinery, Paper Related Business, Good for International Travel.",
+      "ifBad": "Bad for Mother's Health, Loss from Servants, Hurdles in Life, Breathing Related Issues, Eyes Related Issues.",
+      "specialRules": "Sun / Jupiter in 1st House: Good for Property, Saturn in 9th / 10th House: Good for Family / Lucky, Moon / Jupiter in 2nd House: Eye Related Issues, Moon in 2nd & Jupiter in 11th House: Eyes Related Issues, Sun in 8th House: Breathing Related Issues.",
+      "recommendation": "Silver Ring in Left Hand.",
+      "symptom": "Female Child Related Issues, Breathing Issues."
+    },
+    "Jupiter6": {
+      "offlineClassNotes": "Mercury Bad', 'Ketu' good.\nInsults, Challenges and Losses | Gives Insult, People call ‘Liar’ [as Ju 6H – not let fulfil promises], Native insults teacher/guru or doesn’t listen to rightful advice\n NOT listen to rightful advice; Loss / Theft of Gold / Mortgages ‘Gold’ [Natives having Jupiter 6H – shouldn’t mortgage Gold – selling it is preferable.]",
+      "goodResult": "God's Blessings, good for Hand Related Work, Less Hard Work, Luxuries in Life. [INSULTS, CHALLENGES, LOSSES]",
+      "ifBad": "Bad for Father's Health & Finance, Less Spirituality, bad for Maternal Uncles, Loans, Loss of Gold.",
+      "specialRules": "1. Mercury in 2nd House: Loss of Father at the age of 16th or Health Issues to Father. 2. Mercury in 12th House: Bad for Father's Age, Health & Wealth.",
+      "recommendation": "Donate Chana Dal in Temple, Keep Dog at Home (Pet).",
+      "symptom": "Loss of Gold."
+    },
+    "Venus6": {
+      "offlineClassNotes": "i). Offer curd and a packet of 6 kapoor in Temple",
+      "goodResult": "Winning in Competition, Challenges but Success, Gain from Friends, Luck in Favor.",
+      "ifBad": "Health Related Issues, Loss in Business, Insults, Problem with Reportees.",
+      "specialRules": "1. Enemy Planet in 7th House: Dispute in Relationships. 2. Jupiter in 12th House: Venus is very Bad.",
+      "recommendation": "Donate Food to Birds.",
+      "symptom": "Grocery Rappers (Packing Material) are being Folded and kept Carefully."
+    },
+    "Saturn6": {
+      "offlineClassNotes": "Bad 'Ketu', Good 'Mercury', 2H ruined by reverse aspect.\nTroubles, Challenges in Career, Pain, Leg Injury\n Caution : Don’t take/buy leather, slipper/shoes, iron, wine etc. from anyone (avoid black colour) (Applicable for Saturn 1H, 5H, 6H, 8H]\n \n Remedy : i). Take 6 pairs of leather shoes ii). Offer it to six (06) construction labourers on same day\n 2nd : Bring Jupiter in 2H. [Offer 2 kg Chana Daal in Temple] [Don’t donate shoes, if Tr Saturn 3, 6, 11]\n RULE : If some planet is bad in Varshphal but transiting from good position at D1, don’t make donation.\n \n 3rd Remedy : [6H – Pond, Stagnant Water]\n i). Take 6 glass bottles, with cap of Glass or Cork [Venus – Glass] ii). Fill it with Mustard Oil iii). Bury it in a ‘Pond’ in the soft soil; ensuring that all bottles are below water level. xx). Repeat it six (06) times, if in birth chart and comes in Varshphal. [Such remedy done in repetition]",
+      "goodResult": "Good for Business, Success in Competition, Support from Reportees, Court Case in Favor.",
+      "ifBad": "Bad for RELATION, Maternal Uncles, Disputes, Loss in BUSINESS/ CAREER \n REVERSE ASPECT ON 2H [Ruins 2H]",
+      "specialRules": "1. Saturn in 2nd / 7th / 9th / 12th House: Will Give Good Results. 2. Ketu in 10th House: Good for Sports Career. [Ke 6, Sa 10 also] 3. Sun in 12th House: Good for Married Life and Partner's Health. *4. Sa 6H, Ra 2H : Death in Family, *5. Sa 6H, Mo 2H - Financial Crisis, Health troubles, *6. Sa 6H, Ju 2H : Saturn not give bad result. *7. Sa 6H, Su 2H : Bad for Father, Career, problem with boss / Govt.",
+      "recommendation": "Keep a Black Dog. Donate Slippers.",
+      "symptom": "Corner House, Gifts - Leather Items. Never accept leather, liquor, iron, slipper, shoes etc. from anyone."
+    },
+    "Rahu6": {
+      "offlineClassNotes": "Very good; Good Mercury, Bad Jupiter; Good for winning competition, Taking Loans. 'Invites Health issues, litigation, disputes'\n If BAD : Remedy : Take ‘lead balls’ – paint it red (with paint); Dry it and keep it in pocket. If bad in 6H : gives litigation, dispute.",
+      "goodResult": "Good for Wealth, Growth in Career, Success in Litigation, Name & Fame, Intelligent, Courageous, Lucky, Successful, Winning in Competition, Foreign Travel.",
+      "ifBad": "Litigation, Aggression, Health Issues, Confusions, Problems in Construction, Mental Problems & Tensions, Accidents.",
+      "specialRules": "1. Mars / Mercury in 12th House: Health Related Issues. 2. Sun in 12th House: Bad for Name & Fame, Sometimes Litigation. 3. If Mercury / Ketu is Bad: Unnecessary Expenditures.",
+      "recommendation": "Brown Dog (Pet).",
+      "symptom": "Backache, Health Issues to paternal Uncle."
+    },
+    "Ketu6": {
+      "offlineClassNotes": "Bad Mercury, Good Jupiter'. Grahphal\nShould feed dogs. It cuts your loans (easy repayment of loans), makes you diabetic. *Wherever Ketu is placed, you have to surrender there*\n Symptom : Urine infection, Pain in legs/waist. Ketu 6H/8H : Dogs follow you on road.",
+      "goodResult": "Good for Spirituality, Success in Competition, Name & Fame, Repayment of Loans.",
+      "ifBad": "Problems from Enemies, Problems in Career, New Problems, Tensions, Health Related Issues, Problems with Partner, Financial Losses, Insults.",
+      "specialRules": "1. Moon in 2nd House: Very Bad for Maternal Uncles. 2. Moon Ketu in 6th House: Very Bad for Child and Mother.",
+      "recommendation": "Pet (Dog), Gold Ring in Left Hand.",
+      "symptom": "Dog Biting"
+    },
+    "Sun7": {
+      "offlineClassNotes": "Venus' bad, 'Mercury' good.\nCareer, Relationship \\ Enough to ruin career and relationship. Much egoist (Ego problem), Aggressive.",
+      "goodResult": "Support from Friends, Good for Business. [Good Mercury] [CAREER, RELATIONSHIP]",
+      "ifBad": "Not Good for Married Life, Health Issues to Partner, Dissatisfaction, Child Related Issues, Chances of Theft, Not good for Partnership, Health Issues Partner (Head), Bad Year for Children, Bad Year for Health & Wealth.",
+      "specialRules": "Venus in 1st House: Health Issues Partner (Head), Mercury in 9th House: Bad Year for Children, Jupiter / Venus/ Mercury/ Rahu / ketu in 11th House: Bad Year for Health & Wealth.",
+      "recommendation": "Leave Home after Drinking Water, Serve to Black / Brown Cow.",
+      "symptom": "Receive Gifts, Experience Insult, Downfall in Career, Year of Travel."
+    },
+    "Moon7": {
+      "offlineClassNotes": "Mercury' bad.\nGives Money; Obsessed around partner; Mind in opposite gender; watching porn etc. If afflicted in 7H – Yoga (opportunity) for Extra-Marital Affairs. [alone enough for EMA]. Varshphal : gets partner (sex) in the year; Gets money in that year/wealth. Remedy : Take a bath mixing lil milk in water (works for Moon 1H as well) [or Gangajal]",
+      "goodResult": "Beautiful / Smart Partner, Lawyer, Business Man, God Fearing, Good for Children, Good for Astrology, Good for Name & Fame. [Gives Relationship/partner]",
+      "ifBad": "Fighting with Mother is Bad, Mercury & Venus will be Weak, Not Good for Partner, Tensions, Health Issues with Partner, Threat from Tools & Weapon, Fight of Partner & Mother, Child Related Issues.",
+      "specialRules": "Saturn in 7th House: Threat from Tools & Weapon, Venus in 1st House: Fight of Partner & Mother, Mercury in 1st House: Addiction, Jupiter in 7th House: Child Related Issues.",
+      "recommendation": "Don't Sell Milk, Falling of Milk at the Time of Boiling.",
+      "symptom": "Nurse near to House, Beauty Parlor, Salon."
+    },
+    "Mars7": {
+      "offlineClassNotes": "Mercury 'bad', Mars (M.K.S.) bad.\nGod Vishnu ki tarah Palna krne wala’. Fulfils responsibility; Always gets responsibility; Earlier, relatives used to leave child at his place for some time for taking care of education or other reason etc. Fight/Aggression in Relation. Remedy : Keep feeding ‘female children’ [Kanya] in Navratri or otherwise; Keep a pet.",
+      "goodResult": "Connection in Higher Society, Be Careful from Politicians, Good for Career, Good for Astrology, Very Good for Wealth and Child Birth.",
+      "ifBad": "Fight with Partner, Injury to Sister / Brother's Wife, Insult due to Bad Friend Circle, Digestion related issues, Blood Related Issues, Invites Troubles, Bad for Business & Sister / Sister In Law.",
+      "specialRules": "Venus in 1st House: Very Good for Wealth and Child Birth, Jupiter/ Moon/ Sun in 1st / 7th House: Invites Troubles, Mercury in 1st / 7th / 8th House: Bad for Business & Sister / Sister In Law.",
+      "recommendation": "Offer Sweets to Sister/ Sister In Law.",
+      "symptom": "Issues in Married Life, 2 Marriages."
+    },
+    "Mercury7": {
+      "offlineClassNotes": "Good Consultant; Good at Business; *not good relation with female relatives**. Remedy : Feed ‘female child’, Do ‘Kanya Pujan’, MKS",
+      "goodResult": "Good for Business, Consultant, Good for Old Age, Intelligent, Name & Fame, Wealthy.",
+      "ifBad": "Aggressive, Allegations (True or False), Wealth related Issues, Bad for Married Life, Mars and Venus will give Bad Results, Bad for Finance, Never Lend the Money, Bad till 34 Years of Age, Losses in Childhood.",
+      "specialRules": "If Mercury is Bad, Ketu in 1st / 7th / 8th House: Bad for Finance, Never Lend the Money, If Mercury is Sleeping.",
+      "recommendation": "Partner should Avoid Blue and Black Color.",
+      "symptom": "Green Color Bottle, Mentally Retarded People Near Home."
+    },
+    "Jupiter7": {
+      "offlineClassNotes": "Mars', 'Mercury' - both bad.\nCareer, Relationship | Impacts career, gives knowledge, Money [7A – Moon]. May experience 'Fall' in career after 'Marriage/RELATION' if bad.",
+      "goodResult": "Good for Marriage, Relationship, Wealth Creation, Spirituality, Name & Fame. [Luck opens / Growth in Life - after 'Marriage', if Good] [CAREER, RELATIONSHIP]",
+      "ifBad": "Fear from Enemies, Misunderstanding with Children, Laziness, Mental Tension. [Loss / Fall after Marriage]",
+      "specialRules": "1. Saturn in 9th House: Thief. 2. Mercury in 9th House: Issues in Married Life.",
+      "recommendation": "Donate Chana Daal in Temple, Prey to Lord Shiva.",
+      "symptom": "Broken Umbrella. ** Gets gift of God's photos; Keeps Idol at home; Donates 'Yellow Clothes' to Brahmin etc. [AVOID]"
+    },
+    "Venus7": {
+      "offlineClassNotes": "Venus 7H : If afflicted, bring it in 2H or perform Venus 7H remedy. Grahphal",
+      "goodResult": "Good for Relationships, Good for Career Growth (Me friend), good for Travel, good for Partnership, Less Efforts for Success, Happiness and Success.",
+      "ifBad": "Bad for Self Efforts, Multiple Relationships, ** Relationship Challenges, Fights and Litigations.",
+      "specialRules": "",
+      "recommendation": "Wear Emerald / Diamond.",
+      "symptom": "Love Marriage, Problems in Private Parts of Body."
+    },
+    "Saturn7": {
+      "offlineClassNotes": "Venus good, Mercury good.\ni). Very good in 7H [Exalted] [Dig Bali] MONEY flows continuously.** ii). Good Property Yoga iii). Growth in Career, Business, Wealth\n iv). Brings challenges in relationship; lack of interest in partner v). ‘Saturn’ gives dryness/coldness/pain/misery/service/fear, wherever it places itself.\n \n If BAD : due to Rahu/Ketu/Sun etc. in Lagna/1H or, Sun / Mars 6H*\n Remedy : Bring Venus in 7H. [Remedy of Burying ‘Peach’ filled with Kohl in the garden] ** Don’t do this remedy, if Sun is in 7H.",
+      "goodResult": "Good for Business Travel, Good for Wealth, Good for Iron, Machinery, Petrol Related Business, Blessed Year. **Promotion, Gets Job, Growth in Career",
+      "ifBad": "Health Issues to Partner, Tension in Married Life, **(Misery to / from Partner/Spouse), Bad for Business Partnership.",
+      "specialRules": "1. Mercury / Enemy Planet in 3rd / 7th / 10th House: Bad for Father at 36 Years of Age. 2. Saturn in 1st House (Varshphal): Very Good Results. 3. If Mars / Moon / Venus Bad: Statue of Sorrow.",
+      "recommendation": "Serve to Black Cow.",
+      "symptom": "Worn Underwear."
+    },
+    "Rahu7": {
+      "offlineClassNotes": "Venus' bad. Normally bad. Trouble in Career, Dispute, Ups and downs in Career / Relationship. \n Birth-chart : Start from Job – finally into Business. [1. Job, … n. Business/own work]\n \n Remedy of Birth-chart Rahu 7H:\n i). Take 400g silver cuboid (sharp edges) brick; ii). Take glass bowl – put ‘holy water – Ganga Jal’ in it [*put holy water first, thereafter, normal water]\n iii). Dip Silver Brick in this glass bowl. Keep it in house, without covering the bowl.\n \n Varshphal Remedy\n i). Take seven (07) coconuts (worship) – श्रीफल ii). Offer one by one in River/running water (if no planet in 4H) Rahu – Shreephal – Dry Coconut (no water inside)\n \n Glass bottle : Venus + Mercury Holy Water (Gangajal) : Jupiter + Moon (Blessing)",
+      "goodResult": "Good for Business & Finance, Implementation of New Plans, Support from Govt, Increased Daily Income, good year for Business Setup, Success in Litigation.",
+      "ifBad": "Disputes in Monetary Transactions, Family Disputes, Challenge in Married Life, Health Issues to Partner, Unnecessary Travel.",
+      "specialRules": "Venus in 1st House: Problem Related to Partner, Losses.",
+      "recommendation": "7 Coconuts in River.",
+      "symptom": "2 Marriages, Divorce, Miscarriages."
+    },
+    "Ketu7": {
+      "offlineClassNotes": "Venus 'good', Mercury 'bad'\nSurrenders before partner; [Much obsession / may get trapped**] usually gives male child, if bad – separation from partner. Remedy : Striper boxer shorts (tied)\n Bad Ketu : 400g Yellow lemon – offer it in river. [Remedy for Ketu 5H, 7H & 8H]",
+      "goodResult": "Good for Career, Luxuries, Name & Fame, Good for Finance, Spiritual Travel.",
+      "ifBad": "Problems in Daily Life, Loss in (during) Travel, Bad Experience in Life, Expenditure, Tensions.",
+      "specialRules": "1. Mercury in 7th House: Bad till 34 Years of Age.",
+      "recommendation": "Avoid Lies, Donate Banana.",
+      "symptom": "Liar"
+    },
+    "Sun8": {
+      "offlineClassNotes": "Bad 'Mars'\nOutshine (in Crisis) | Outshines (only in Crisis), someone helps out when in big trouble, Gets more name / fame / recognition after death\n Special Rule : When 8H is bad, 10H is also bad. Bad/Malefic in 8H – ruins 10H (Career, Karma)",
+      "goodResult": "Royal Life, Good Year for Research, Reactive Communication, Long Term Planning, Good for Parental Property, Support from In Laws, Spirituality. [OUTSHINES IN CRISIS]",
+      "ifBad": "Heart Disease, Issues with Machinery, Fight with Partner, Eyes Related Issues, Children Related Tensions, Affairs, Headache, Loss in Litigation.",
+      "specialRules": "",
+      "recommendation": "Serve Elder Brother, Offer Food to Black/ Brown Cow, Avoid Non-Veg.",
+      "symptom": "Affairs, Headache, Loss in Litigation."
+    },
+    "Moon8": {
+      "offlineClassNotes": "Fail / change of subject, Education till graduation not useful in Career / Earning money. Gains through Education after 24 years of age (Moon activation age) or Post Graduation eduation. 24 Years : activation age of Moon; Negativity (effect) reduces after activation age of any planet. Moon 8H : 7A – 2H : Gives Money {during its Dasha}; Money of Bribery, Finding money on road. 8H – Gives delay, | Moon 8H – Travels a lot, Likes driving car {8H – Road}, Moon 8H – Romantic nature (but wish fulfilment not promised), Delay/break would be there. Remedy : Keep water in your house, bring it in plastic bottle from Cremation ground.\n Offer ‘8l Milk’ in the ‘Temple’ on Monday, every month. {Throw Coins in the Cremation Ground}",
+      "goodResult": "Either Mother or Education, Other Source of Income, Travel to Hills & Forest, Long Life.",
+      "ifBad": "Lot of Tensions, Negative Thinker, Pain in Body, Less Cash, Financial Crises.",
+      "specialRules": "",
+      "recommendation": "Serve to Old Ladies & Mother, Donate in the Name of Forefathers.",
+      "symptom": "Foreign Currency, Nazar Dosh (Evil Eye), Checks the Lock Again and Again."
+    },
+    "Mars8": {
+      "offlineClassNotes": "Very bad. Grahphal\nDon’t do direct remedy of ‘Mars 8H’. Caution : ‘Sugar, Desi Khand’ – never flow it in running water / river\n Remedy : if no planet in 4H _ Offer ‘Gud ki Revadi – 800gm’ in River, as Sun is very good in 4H. Sun 4H : Very good for Career",
+      "goodResult": "Good for Courage & Politics, Support from Seniors, Over Commitment, Invitation for Marriage.",
+      "ifBad": "Fear of Jail / Trapped, Problems in Career, Threat of Injury in Accident, Loss in New Investments, Problem with Machinery, Brother in Trouble.",
+      "specialRules": "Sun/ Moon/ Jupiter in 1st, 3rd, 4th, 8th House: Mars becomes Very Good.",
+      "recommendation": "Wear 5 Metal Ring.",
+      "symptom": "Widow / Widower in Family, Tandoor."
+    },
+    "Mercury8": {
+      "offlineClassNotes": "Bad 'Mars'\nMercury 8H – 12H : Very bad [Jail, Pharmacy, Psychiatry]\n Aspect : Mercury 4H – 10H | Mercury 3H --- 9H | Mercury 5H – 9H. All above : similar result – stress on Mind\n Offer 8kg ‘sabut green moong’ in river/flowing water (if 4H – empty or friend is sitting). Stationery items to children of people living around 'Cremation ground'. Lifestyle remedy : Use ‘Black’ innerwear",
+      "goodResult": "Success in Struggle, Hand Related Work, Good for Mining, Tantra, Spiritual Writing.",
+      "ifBad": "Struggle, Disease, Ups & Down in Career, Jail, Self Destruction, Wealth Loss, Bad for Mother / Child, Rahu is Bad - Jail / Hospitalization.",
+      "specialRules": "If Rahu is Bad - Jail / Hospitalization, Jupiter/ Sun/ Mars in 8th House: Mercury will not give Bad Results, Moon / Sun in 4th House: Mercury will become good after 34 Years of Age, Moon / Ketu in 2nd House: Bad for Mother / Child.",
+      "recommendation": "Store Rain Water at Roof Top.",
+      "symptom": "Place Change of Temple, Money Plant."
+    },
+    "Jupiter8": {
+      "offlineClassNotes": "9H Planet becomes good.\nDonation, Expenses | Never contribute/donate for construction for temple [it invites problems in career, property disputes etc.] \n Remedy : Offer 800g Turmeric roots in Temple, Plant 'Peepal Tree' in Cremation Ground.",
+      "goodResult": "Gods Blessings, Donation, Name & Fame, Foreign Travel, Growth in Career, Spirituality. [DONATION, EXPENSES]",
+      "ifBad": "Tensions, Issues in Married Life, Breathing Issues, Cold.",
+      "specialRules": "1. Mars in 4th House: Poverty. 2. Mars + Saturn in 4th House: Always in Tension. 3. Mercury in 9th House: Good, Lucky.",
+      "recommendation": "Gold Chain.",
+      "symptom": "Swing (Jhula), Piggy Bank."
+    },
+    "Venus8": {
+      "offlineClassNotes": "800g jimikand (suran), offer it in Temple, every Friday. For Good health to spouse/partner, good relationship, less trouble",
+      "goodResult": "Good for Spirituality, good for Parental Property, Support from Friends.",
+      "ifBad": "Dispute with Family Members, Harsh Language of Partner, Health Issues to Partner, Issues related to Private Parts of Body.",
+      "specialRules": "If Moon in Good in Chart, Venus will not give Bad Results.",
+      "recommendation": "Serve to Black Cow.",
+      "symptom": "Allegations."
+    },
+    "Saturn8": {
+      "offlineClassNotes": "i). Health related challenges; Health issues to parents [Mother] ii). Long Disease, Painful time iii). Ruins, any planet in 9H.\n iv). Afflicts ‘Conjunct planet’ except it is ‘Mars’ v). Saturn + Venus/Mercury 8H : 8H is not good. vi). Mars + Saturn 8H : Only this combination is not bad.\n \n Remedy : Offer 8kg ‘kali urad’ in running water/river.",
+      "goodResult": "Good for Business Partnership, Import / Export, Researches, International Travel, good for Buying Property.",
+      "ifBad": "Loss of Property, Impatience, Anxiety, Unnecessary Talks, Loss in Business.",
+      "specialRules": "1. Any Planet with Saturn: That Planet will Bad Result. 2. No Planet in 12th House: Bad for Old Age. 3. Ketu in 1st – 7th House: Saturn will always Good Result.",
+      "recommendation": "Avoid Liquor, Wear Bathroom Sleepers While Taking Shower.",
+      "symptom": "Corner House, Accidents."
+    },
+    "Rahu8": {
+      "offlineClassNotes": "i). Take 344 Lead Coins ii). Make 8 packets of 43 coins, in a paper envelope (newspaper)\n iii). Offer it in River/running water – one by one. [Quarterly]",
+      "goodResult": "Good for Luxuries Life, Parental Property, Courageous.",
+      "ifBad": "Alone, No Support, Stomach Related Issues, Changes in Career - Multiple Times, Have Everything but Looks like Nothing, Accidents.",
+      "specialRules": "1. Mars in 1st / 8th House: Rahu will give Good Results. 2. Saturn in 6th House: Rahu will give Good Results, But Serious Issues Related to Health. 3. Saturn in 2nd / 3rd House: Bad for Paternal Uncles.",
+      "recommendation": "Lead & Coconut - Throw in River.",
+      "symptom": "Water Leakage."
+    },
+    "Ketu8": {
+      "offlineClassNotes": "Bad 'Mars'\nSurgery to self/mother; Financial trouble, Hurdles; Pain in waist/legs.",
+      "goodResult": "Good for Gains from Govt, New Business Plans, Spirituality, Interest in Jyotish.",
+      "ifBad": "Allergies, Health Issues, Unnecessary Expenditure, Fire Accidents, Accidents.",
+      "specialRules": "1. Mars in 12th House: Ketu will not Give Bad Results. 2. If Jupiter is Bad: Mars is also Bad. 3. Mars / Saturn in 7th House: Very Bad.",
+      "recommendation": "Donate Black and White Blanket in Temple.",
+      "symptom": "Electric Shock."
+    },
+    "Sun9": {
+      "offlineClassNotes": "Father, Foreign Travel, Pilgrimage | Very good for Father, Good yoga for Foreign Travel / Settlement",
+      "goodResult": "Lucky Year, Buying of Vehicle, Sharp Minded, Spiritual Travel, Winning in Competition, Good for Name & Fame, Foreign Travel. [FATHER, FOREIGN, TRAVEL, PILGRIMAGE]",
+      "ifBad": "Issues with Brothers, Issues in Mother's Health, Bad for Maternal Uncles, Property Disputes, Loans, Loss in Share Market, Foreign Travel & Tensions.",
+      "specialRules": "",
+      "recommendation": "Avoid Getting or Gifting Silver, Rice & Milk, Avoid Over Aggression or Over Politeness.",
+      "symptom": "Keeps Changing Plans, Loss of Money for Foreign Travel, Visits Places related to other Dharma, Egoistic."
+    },
+    "Moon9": {
+      "offlineClassNotes": "Nine times good; Good Result of Education/Learning after 24 years of age (failure/change). Offer Milk in Shiv Temple",
+      "goodResult": "Positivity, Health & Wealth, Good Relationship with Siblings, Long Distance Travel, Donation, Tantra/Mantra Sadhna', Meditation, Good for Education.",
+      "ifBad": "Confused, Disturbance in Peace, Over Spending, Tension in Married Life, Less Share in Parental Property.",
+      "specialRules": "Any Planet in 5th House: Will Support Moon (Hidden Way), If 3rd House Empty: Wear Yellow Safire in Gold.",
+      "recommendation": "Spiritual Travel, Take Blessings from Elders.",
+      "symptom": "Silver Coin at Home or in Wallet, Good Year for Education."
+    },
+    "Mars9": {
+      "offlineClassNotes": "Father is powerful.",
+      "goodResult": "Good for Wealth/ Property, Support from Friends and Family, Increase in Income, Spiritual Travel, Good for Health.",
+      "ifBad": "All above points will become BAD.",
+      "specialRules": "Enemy Planets in 3rd House / 5th House: All Good Results will become BAD.",
+      "recommendation": "Keep Red Handkerchief, Hanuman Chalisa.",
+      "symptom": "Over Speaking, Aggressive, Superstitions."
+    },
+    "Mercury9": {
+      "offlineClassNotes": "Ruins 3H planet (s), except if Mars in 3H\nPitri Dosh (lesser bad than Mercury in 8H) – Mars and Jupiter ruined.\nBring Mercury to Venus placement : offer claypot filled with Mushroom in Temple, as many times as Placement of Venus [if Venus 5H – 5 times]",
+      "goodResult": "Not good.",
+      "ifBad": "Pitru Dosh, Short Life, Short Vision, Insults, Disputes, Loss in Lottery, Smuggling.",
+      "specialRules": "Jupiter / Ketu / Moon in 1st / 3rd / 5th / 6th / 7th / 9th / 11th House: Mercury in not Bad, Jupiter in 6th / 8th / 10th / 11th House: Short Life.",
+      "recommendation": "Keep Mushrooms in Earthen Pot and Donate in Temple.",
+      "symptom": "Tabeez, Babooti, Tulsi, Money Plant."
+    },
+    "Jupiter9": {
+      "offlineClassNotes": "Father, Pilgrimage, Long Travel | Very good for Money, Travel, Pilgrimage (Spiritual Travel). Grahphal",
+      "goodResult": "Lucky, Laziness, Wealthy, Jeweler, Spirituality, Good Deed in Family, Buying of Gold. [FATHER, PILGRIMAGE, LONG TRAVEL]",
+      "ifBad": "Tension related to Children, Financial Losses.",
+      "specialRules": "1. Mercury in 4th House: Rajyog. 2. Mercury in 3rd & Moon in 5th House: Bad Results. 3. Mercury in 5th & Moon in 3rd House: Good Results. 4. Venus in 3rd / 5th & Moon in 3rd / 5th House: Very Bad. 5. Mars in 3rd & Sun in 5th House: Most Benefic.",
+      "recommendation": "Holy Dip in Ganga.",
+      "symptom": "Temple in the Corner of the House."
+    },
+    "Venus9": {
+      "offlineClassNotes": "i). Take nine (09) silver nails ii). Hammer it in the stem of ‘Neem Tree’ at your shoulder’s height iii). Throw away the hammer/stone used to do this.\n iv). Perform this remedy on Friday.",
+      "goodResult": "Good for Luck and father, good for Wealth, Support from In Laws, Business in Partner's Name, Spiritual Tours. LDR, SEPARATION",
+      "ifBad": "Tension from Brothers and Children, Education will not help in Career, More Efforts Less Gains. Financial Losses",
+      "specialRules": "",
+      "recommendation": "Bury Silver Square Piece in Neem Tree.",
+      "symptom": "Lots of Shoes, Footwear."
+    },
+    "Saturn9": {
+      "offlineClassNotes": "i). Good placement of Saturn ii). Good for Property [not 3+] iii). Makes ‘Jupiter’ also good in Chart iv). Religious work\n if any problem – make ‘Jupiter’ good in Chart Remedy : Bring Jupiter in 10H : ‘Take a bath in holy water for 10 days’.",
+      "goodResult": "Good for Business, New Business Plans, Good for Buying Property & Construction, Good for Gain in Politics and Communications, Gain from Gold & Silver.",
+      "ifBad": "Insults, Loss in Lottery and Share Market, Loans, Disputes, Litigation.",
+      "specialRules": "1. Ketu in 5th House: Good for Child Birth. 2. Mars in 4th House: Bad for Luck. 3. Mercury in 6th / 7th House: Partner from Rich Family.",
+      "recommendation": "Holy Dip in Ganga - 9 Days.",
+      "symptom": "Eyes Related Issues."
+    },
+    "Rahu9": {
+      "offlineClassNotes": "Afflicts 'Jupiter'\nYear of Religious Travel [Should visit riverside temple]\n If BAD : Father in trouble; Luck will not support you; Court matters, Hospital visit\n Remedy : i) Take 9 kg Barley, ii). Add 2l milk, iii). Mix together iv). Offer it in river / running water.\n \n If Good Rahu 9H : Makes you Spiritual. If afflicted : show off of ‘Religious activities’, ‘Rituals’ [Pompous, dharmik hone ka dikhawan]\n Visiting other’s religious places. Soft toys in house.",
+      "goodResult": "Good for Saturn Related Career, Sudden Gains, Foreign Travel, Spiritual Travel.",
+      "ifBad": "Insults, Child Related Issues, Issues Related to Siblings, Miscarriages, Bad for Grand Father and In Laws.",
+      "specialRules": "",
+      "recommendation": "Wear Gold Chain. Keep Dog at Home.",
+      "symptom": "Tension with Siblings, Friends and Relatives."
+    },
+    "Ketu9": {
+      "offlineClassNotes": "Ketu exalted, 'Moon' becomes bad.\nBest placement, if bad – surgery to father; if good – take blessings from native [Ju + Ke]. [Remedy : 21g Gold bar with sharp edges – keep in locker]",
+      "goodResult": "Obedient Son, Lucky, Good for Health & Wealth, Foreign Travel.",
+      "ifBad": "Loss of Property, Loans, Tensions with Children, Tensions with In Laws.",
+      "specialRules": "",
+      "recommendation": "Gold Brick (21 Grams) - Sharp Corners.",
+      "symptom": "No Male Child to Sister."
+    },
+    "Sun10": {
+      "offlineClassNotes": "Career | Good for Career [given ‘Saturn’ is good]",
+      "goodResult": "Gain in Job/ Business/ Govt, Buying of Vehicle, Good for Health & Property, Superstitious. [CAREER]",
+      "ifBad": "Not good for Mother's Health, Unnecessary Tensions, Downfall in Career, Tension Related to Children, Misunderstanding with Father, Health Issues to Father, Misunderstanding with Mother, Health Issues to Mother.",
+      "specialRules": "Venus in 4th House: Misunderstanding with Father, Serious Health Issues to Father, Venus in 5th House: Misunderstanding with Mother, Health Issues to Mother.",
+      "recommendation": "Avoid Blue / Black Clothes, Throw Copper Coin in River, use White Cap.",
+      "symptom": "Blood Pressure, Coins (Khote Sikke), Issues with Lungs / Knee."
+    },
+    "Moon10": {
+      "offlineClassNotes": "Knee pain to mother; Eyesight issue (Cataract etc.) to mother; Cancer (like disease) in family. \n Remedy : i). Offer Milk in Shiv Temple. ii). 400g Sabut Rice + 400g sabut misri with thread; tie it in White cloth and flow it in running water/river (if 4H is empty)\n iii). Moon 10H – Poisonous Milk [Take ‘milk from Madar plant (ank)’ 8-10 drops – offer it in flowing water/river)], If 4H is empty* : Calotropis gigantea plant]",
+      "goodResult": "Travel, Planner & Executer, Hard Working.",
+      "ifBad": "Immature Decisions, Stinking Water, Bad Relationship with Mother, Bad Company, Money Loss, Diseases, Loss in Sale In Property.",
+      "specialRules": "",
+      "recommendation": "Avoid Drinking Milk In Night, Serve to Paternal Aunt.",
+      "symptom": "Surgery of Mother- Eye Related / Stomach, Cancer to Relative."
+    },
+    "Mars10": {
+      "offlineClassNotes": "Exalted (Directional Strength), if Good _ rise in career, if Bad _ Fall in career (usually). Remedy : Offer ‘Bhuna hua chana’ to ‘Hiran (Deer)’\n If Mars is in 10H in Birth-chart : ‘Keep Brass/Copper deer in house.",
+      "goodResult": "Good for Career, Politics, Good for Education/ Child, Name & Fame, Financial Growth.",
+      "ifBad": "False Allegations, Loss of Wealth, Hurdles, Fear from Enemies, Expenditures, Foreign Travel & Short Travel, Eyes Related Issues, Child Related Issues, Punishment from Govt - Allegations, Bad Results of Mars.",
+      "specialRules": "Sun in 4th House: Eyes Related Issues, Moon in 4th House: Good for Health & Wealth, Gain in Career, Sun in 6th House: Child Related Issues, Moon in 5th House: Eyes Related Issues, Saturn in 4th House: Punishment from Govt - Allegations, Saturn/ Rahu/ Venus/ Moon in 2nd House: Bad Results of Mars.",
+      "recommendation": "Hanuman Chalisa, Keep Deer at Home.",
+      "symptom": "Someone in Family in Military/ Army / in Medical Profession."
+    },
+    "Mercury10": {
+      "offlineClassNotes": "No direct remedy. Do remedy of Saturn, wherever placed. (if needed). If one gifts you ‘Watch’ – good time. [Symptom: Stopped watch at house]\n Venus 9H : Shoes, Clothes. Venus 7H / Jupiter 7H : Don’t distribute / gift clothes to anyone.",
+      "goodResult": "Intelligent, Very Talkative, Knowledge of Legal Matters, Business Man, Wealthy and Selfish, Sudden Gains.",
+      "ifBad": "Sudden Gains in Negative Events, Bad for Father's Life, Jail, Disputes, Litigation, Hospitalization, Hurdles, Allegations, Financial Losses.",
+      "specialRules": "",
+      "recommendation": "Donate Coconut in Temple, Don't Spoil Saturn.",
+      "symptom": "Watch in Gift."
+    },
+    "Jupiter10": {
+      "offlineClassNotes": "Career | Good for Career, Better for House Construction / Renovation / Interiors",
+      "goodResult": "Growth in Career, Good for Education Related. Name & Fame, Wealthy. [CAREER]",
+      "ifBad": "Bad Jupiter, Struggle in Life & Career, bad for Father's Finance, good for Saturn Related Work.",
+      "specialRules": "1. Moon in 4th House: Gain from Govt, Growth in Career. 2. Sun in 5th House: Multiple Marriages. 3. Mercury in 4th House: Bad Luck. 4. Moon in 10th House: Gain from Saturn Related Work. 5. Sun Saturn in 4th House: Fire Accident.",
+      "recommendation": "Avoid Wearing Gold, Throw Copper Coin in River.",
+      "symptom": "Bad Name."
+    },
+    "Venus10": {
+      "offlineClassNotes": "No direct remedy be performed. Make Saturn good in Chart.\n i). Take a marble stone (ve) ii). Clean it with holy water iii). put ‘while Chandan tilak’ on it each Friday iv). On 10th Friday, after ‘Tilak’, offer it in running water/river",
+      "goodResult": "Success in Career, Gain in Gold and Silver, Blessings in Child, Relatives, Impressive Talks, Multiple Sources of Income. In Yearly Chart – Marriage Yoga.",
+      "ifBad": "Relationship Issues, Affairs, Blood and Skin Related Issues, Health Issues to Self and Partner, Mental Pressure and Tensions. WEIGHT GAIN TO PARTNER",
+      "specialRules": "",
+      "recommendation": "White Chandan Tilak on Marble (10 Days) and Throw in Running Water.",
+      "symptom": "Fatty Partner."
+    },
+    "Saturn10": {
+      "offlineClassNotes": "No direct remedy is performed. Make ‘Moon’ good. If BAD : Trouble in Career. If Good : Rise in Career. Grahphal",
+      "goodResult": "Good for Name & Fame in Career, Support from Family, Relatives and in Office/ Work Place, Travel, Spiritual Travel, International Travel, Donations.",
+      "ifBad": "Problems in Partnership, Tensions & Pressure. Problem in Career / Business",
+      "specialRules": "1. Mercury in 7th House: Gains in In Laws Family. 2. Moon in 1st House & Jupiter in 4th House: Good for Vehicles. 3. Sun / Mars / Moon in 4th House: Bad from 36th Year till 27 Years.",
+      "recommendation": "Avoid Alcohol & Sea Food.",
+      "symptom": "Washing Machine Not In Order."
+    },
+    "Rahu10": {
+      "offlineClassNotes": "Keep your head covered, avoid hair colour (**never do it black, if required); - to avoid problems in Career. [Keep Saturn good in chart so that Rahu 10th house gives good result to you] If Rahu 10H much troubled : Remedy : Take 4 kg ‘desi khand’ and offer it in river / flowing river.",
+      "goodResult": "Good for Name & Fame, good for Politics, Social Service, New Plans, Success in Career, Spiritual Travel, Success in Wealth, Responsibilities, Growth in Career.",
+      "ifBad": "Family Issues, Problems with Friends and Relatives, Litigation, Losses in Court Cases, Problem with Partners.",
+      "specialRules": "1. If Mars is Bad - Rahu will give Bad Results. 2. Moon in 4th House: Eyes Related Issues.",
+      "recommendation": "Wear White Cap, Avoid Hair Color.",
+      "symptom": "Coins (Khote Sikke)."
+    },
+    "Ketu10": {
+      "offlineClassNotes": "Change / Instability in Career, Trouble in career; Keeps changing work [Keep Saturn good]",
+      "goodResult": "Name & Fame, Good for Career, Good for Sports, Travel, Success in Competition.",
+      "ifBad": "Loss of Wealth and Career, Less Energy, Litigation, Tensions in Married Life, Not Good for Children.",
+      "specialRules": "1. Saturn in 6th House: Successful Sports Person. 2. Saturn in 4th House: Death of Child, Bad for Children.",
+      "recommendation": "Honey in Silver Box - At Home.",
+      "symptom": "Accidents, Pain in Joints."
+    },
+    "Sun11": {
+      "offlineClassNotes": "Father-in-Law \\ Ruins Father-in-Law (*health issues). Powerful social circle / networking.",
+      "goodResult": "Gain from Govt/ Seniors, Luxury in Life, Good year for Children, Good Year for Spirituality, Good Year for Earning, Good Year for Hobbies / Pleasures. [FATHER-IN-LAW]",
+      "ifBad": "Bad Year for Brother in Law, Accident, Loss of Money because of Friends/ Relatives, Tension with Father, Loss in Foreign Travel, Problem to Father In Law, Father, Boss., Insults.",
+      "specialRules": "Mercury in 3rd House: Spoils good effects of Sun, Gives Bad Luck, Moon in 5th House: Bad year for Health & Wealth.",
+      "recommendation": "Avoid Non-Veg & Alcohol, Avoid Affairs, Avoid False Promises.",
+      "symptom": "Loss in Foreign Travel, Problem to Father In Law /Father / Boss, Insults."
+    },
+    "Moon11": {
+      "offlineClassNotes": "Moon 11/12 – Bad Ketu. Ketu 11/12 – Bad Moon.\nif bad – Financial Crisis, Lots of Expenditure, troubles same as moon 10H. If Good (SAV) : Lots of Money/Wealth.  Remedy : Take 11l milk [11 nos. of 1l milk packet] i). Offer it in ‘Bhairon Temple’, OR, ii). Donate it to 11 construction labourers – same day",
+      "goodResult": "Support from Seniors, Travel, Name & Fame, Agriculture Income, Partner Supportive, Sacrificing Nature.",
+      "ifBad": "Hurdles in Career, Miscarriages, Fight with Neighbor, Financial Crises, Health Issues to Parents, Bad for Property - Self / Brother's, Siblings in Tension.",
+      "specialRules": "Mercury in 3rd House: Bad for Property - Self / Brother's, Siblings in Tension, Mercury in 5th House: Both Becomes Good.",
+      "recommendation": "Donate Milk in Bhairo Temple.",
+      "symptom": "Mother's Surgery - Eyes Related, Female Child."
+    },
+    "Mars11": {
+      "offlineClassNotes": "Tent, Community Hall, event venue, marriage hall etc. nearby your house.\n Varshphal : Marriage or Death in Family Remedy : Distribute food standing below a tent",
+      "goodResult": "Planning & Execution, Good for Wealth, Good for Maternal Family, Good for Spiritual Experiences, Good for Business.",
+      "ifBad": "Fighting, Diseases, Loans, Unnecessary disputes with Brothers, Litigation.",
+      "specialRules": "If Jupiter is Good in Chart: Mars will give Good Results.",
+      "recommendation": "Keep Honey in Earthen Pot - at Home.",
+      "symptom": "Honey, Playing Cards, Chess Board."
+    },
+    "Mercury11": {
+      "offlineClassNotes": "Native does business or own work (profession). Mercury – 2H, 4H, 5H, 7H, 11H – If good, Business – Raj yoga; Good Acc…\n Mercury 2H : Good at Finance, Portfolio manager, investment banker etc.",
+      "goodResult": "Good for Child, Child Education, Good for Diamond Business, Good for Self Efforts towards Business, Struggle but Success, Good for Luxury Items.",
+      "ifBad": "Controlled Dispute, Unnecessary Aggression, Loss in Property, Wealth Loss, Hurdles, Accidents.",
+      "specialRules": "",
+      "recommendation": "Avoid Taking Tabeez, Copper Coin in Neck.",
+      "symptom": "Lot of Expenditure, Less Income."
+    },
+    "Jupiter11": {
+      "offlineClassNotes": "Rahu' bad\nWealth, Gains, Name & Fame | Very good for Money, Name & Fame.  Grahphal",
+      "goodResult": "Good for Relationship and Support from Friends, good for Property and Wealth, Multiple Earning Sources, good for Education. [WEALTH, GAINS, NAME & FAME]",
+      "ifBad": "Alone, Financial Losses, Bad News [Death in family], Unnecessary Expenditure, Children Related Issues, Tensions.",
+      "specialRules": "1. Friendly Planet in 3rd House: Good Life & Good Wealth. 2. Venus in 3rd House: Good for In Laws but Bad for Family (Self). 3. Mars in 3rd House: Good for Own Family but Bad for In Laws.",
+      "recommendation": "Gold Chain (Father), Live in Joint Family.",
+      "symptom": "Breathing Issues, Broken Pearl Mala at Home."
+    },
+    "Venus11": {
+      "offlineClassNotes": "Good placement, Gives lots of money\n i). a packet of ‘Wick’ and ‘desi ghee’ – offer in Temple  ii). Offer 2kg Chana Dal in Temple [Significator exchange]\n iii). Put earthen lamp of ‘Mustard oil’ in Temple or near ‘Peepal tree’",
+      "goodResult": "Good for Wealth and Income, good for Career, Dhan Yoga, Support from Friends and Relatives, good for Land, Property, Hotel, Restaurant and Stones related Business.",
+      "ifBad": "Bad for Father's Health and Partner's Health, Loss due to Friends and Relatives.",
+      "specialRules": "1. Rahu in 12th House: Female Child. 2. Mercury in 3rd House: Bad for Partner's Family.",
+      "recommendation": "Donate Mustard Oil in Temple.",
+      "symptom": "Skin Disease."
+    },
+    "Saturn11": {
+      "offlineClassNotes": "Remedy : i). Before sunrise, take spirit/wine/mustard oil in right hand ii). Offer it your left-hand side on soil, just after you get to soil, moving outside your house.   Grahphal\n [Keep ‘Soil in some bucket etc.’ outside flat/home] every Saturday continuously.\n \n B. Offer ‘Wine’ in ‘Bhairav Temple’ on Saturday, if Sun is not in 2H.",
+      "goodResult": "Good for Wealth, Patience, Courage, good for Property, International Travel, good for Fulfillment of Desire, good for Entertainment.",
+      "ifBad": "Mental Tension, Loans, Not Good for Child Related Issues.",
+      "specialRules": "Saturn in 1st House (Varshphal): Good for Gains.",
+      "recommendation": "Install Water Pot at Home, Avoid South Facing House.",
+      "symptom": "Disputes with Brothers."
+    },
+    "Rahu11": {
+      "offlineClassNotes": "Gives ‘Tension, Pressure, Litigation, Police matters, problem in Career; If Good – WEALTHY.\n ‘Grand-father’ – dies before 8 years of age of native or stays away from grand-father. [if in Birth chart]\n Rahu 11th : Lead elephant. ?? 4 kg lead, 4 coconut, 11 kg barley ---- Offer it in river / running water.",
+      "goodResult": "Good for Success, good for Travel, Gains from Foreigners, Foreign Travel.",
+      "ifBad": "Bad Relationships with Friends and Relatives, Bad for Sleep, Bad for Married Life, Health Issues to Father, Loss in Income, Ups & Down in Career, Loans, Repayment of Loan is also Tough.",
+      "specialRules": "",
+      "recommendation": "Lead & Coconut - Running Water, Wear Gold Chain.",
+      "symptom": "Broken Screen of Mobile, Broken Glass at Home."
+    },
+    "Ketu11": {
+      "offlineClassNotes": "Lots of Expenditure. Burns your savings.[Bad Moon] * Saturn 9H – is very good. Remedy : (i) Take 11 white mooli with green leaves. (ii) Keep it in your bed, beside you sleep, on Friday. (iii). On Saturday, rotate anti-clockwise over head (11 times) and offer it in temple.",
+      "goodResult": "Success in Career, Wealth, Travel, Spiritual Travel, New Energy, New Plans.",
+      "ifBad": "Expenditure, Child Related Issues, Health Issues to Partner, Tensions, Fights in Family, Loss of Money, Issues with Friends and Relatives.",
+      "specialRules": "1. Saturn in 3rd House: Good for Property. 2. Mercury in 3rd House: Very Bad for Health, Stomach related Issues.",
+      "recommendation": "Donate Radish in Temple.",
+      "symptom": "Female Child."
+    },
+    "Sun12": {
+      "offlineClassNotes": "Weak, Powerless \\ Very Weak, Powerless; Grahan Yoga [eqv. Su + Ra]",
+      "goodResult": "Winning in Competition, Develop Other Source on Income, Good for Business, Good time with Friends & Family, Travel, Support from Friends & Family. [WEAK, POWERLESS]",
+      "ifBad": "Sudden Losses, Machinery Related Issues, Insults, Tensions related to others, Spoils good effects of Sun, Gives Bad Luck, Bad for Partner.",
+      "specialRules": "Mercury in 3rd House: Spoils good effects of Sun, Gives Bad Luck, Saturn in 6th House: Bad for Partner.",
+      "recommendation": "Avoid taking Gifts (Electrical/ Electronic Items), Donate Food to Ants, Avoid Construction, Painting of House, Electricity Work at Home/Office.",
+      "symptom": "Gift from in Laws (Mobile), Eyes Related Issues to Partner, Broken Glass, BP."
+    },
+    "Moon12": {
+      "offlineClassNotes": "Ketu 'bad'\nEducation away from home; Income/Earning away from home (MNC, Hostel). Moon 11/12H – Working in night shift \n Remedy : i). Offer Milk in Shiv Temple ii). Put a pitcher (Me 12) on roof and fill it with rainwater (keeps refilling) If no rain; put solid ice (cube) in pitcher on roof [buy from market, not from fridge] iii). Keep ‘rainwater’ in your house.",
+      "goodResult": "Very Intelligent, Researcher, Import - Export, High Intuition.",
+      "ifBad": "Mental Tensions, Sleep Disturbed, Mother's Love - Less, Education at Far Place, Bad for Wealth, Poverty Yoga, Fear from Water and Water Related Diseases, Very Bad for Child.",
+      "specialRules": "Ketu in 8th House: Very Bad for Child.",
+      "recommendation": "Keep Rain Water at Home, Serve to Mother In Law.",
+      "symptom": "Do Not Stay at Ground Floor, Checks the Locks Again & Again."
+    },
+    "Mars12": {
+      "offlineClassNotes": "Mars in 12H – controls – Saturn, Mercury, Rahu and Ketu in Chart [not give much bad result]\n If in Birth-chart/Varshphal (Ma 12/12H) – Saturn, Rahu, Ketu – not bring much trouble/danger. (exception : Rahu 2H and Mars 12H – very bad year/chart)\n Powerful, very good\n Generic Remedy for Mars : a). Keep ‘Honey’ in Square Silver Box. b). Put ‘Saunf’ in Red cloth and keep it below pillow.\n \n Mercury 12H / Rahu 12H / Mars 12H : Place ‘saunf’ in Red color cloth below pillow (sew cloth by red yarn) – 100-200g\n Trouble by ‘Mars, Mercury, Saturn, or Rahu/Ketu’",
+      "goodResult": "Peaceful Year, Courage, Spirituality, New Ideas, Success in Career, Protects from Threats, Good for Child, Partner, Property, Rahu Under Control.",
+      "ifBad": "All above points will be reversed.",
+      "specialRules": "Mercury and/or Ketu in 3rd / 8th House: No Bad Results of Mars, Both will be Silent, Jupiter in 2nd House: Most Benefic, Both will give Good Results.",
+      "recommendation": "Donate Oil Sweets to Friends and in Temple.",
+      "symptom": "Brother in Foreign, Hidden Enemies."
+    },
+    "Mercury12": {
+      "offlineClassNotes": "Very bad, ruins Planet(s) in 3H, 4H, 6H\nKamine Dost’ Offer ‘ 12 Pitcher/Earthen Pot’ in River. [12 Pitchers – quarterly]. \n If 12H Bad – Stress, Sleep disturbance, Psychiatrist, Medicine [profession may be related to these fields]",
+      "goodResult": "Support from Children, Good for Wealth.",
+      "ifBad": "Struggle, Loss of Money and Health, Additional Responsibilities, Loss of Job, Litigation, Loss in Business, Sister in Trouble, Accidents, Loans, Fights with Friends, Headache, Bad for Father.",
+      "specialRules": "Marriage at 25th Year: Bad for Father, Jupiter in 2nd / 12th House: Mercury Not Bad, Saturn in 12th House: Good for Property, Any Planet in 6th House: Will give Bad Results, Jupiter / Saturn in 7th House: Will give Good Results.",
+      "recommendation": "Throw Earthen Pot in River.",
+      "symptom": "Over Speaking / Foolish Friends."
+    },
+    "Jupiter12": {
+      "offlineClassNotes": "Bad 'Rahu'\nTravel, Losses, Investment | Lots of Expenditure, Losses, Sleep disturbance, Travel\n Tr Jupiter over Moon, 4th , 5th from Natal Moon : Gives ‘Weight Gain’ | Jupiter – 5th, 6th, 7th, 11th – Gives Money [11th – weakest among these; 7th – Best**?]",
+      "goodResult": "Very Intelligent, Uninterrupted Income, Property, Vehicle, Servants, good for Health, Winning in Competition, Good for Foreign Connections and Income. [TRAVEL, LOSSES, INVESTMENT]",
+      "ifBad": "Loss in Business, Dispute with Father, Property Loss by Relatives, Not Good for Partnerships, Bad Health, Child and Partner Related Issues.",
+      "specialRules": "",
+      "recommendation": "Avoid Mala in Neck. Clean the House (Jaale).",
+      "symptom": "to someone in Family, Lazy, Attack."
+    },
+    "Venus12": {
+      "offlineClassNotes": "Very good. If bad – health issues to partner.\n i). Take 100 kg ‘White Jwar’ (more weight than partner) ii). Offer it to ‘Pigeons’ or Offer it in ‘Temple’",
+      "goodResult": "Good for Career and Govt Related Business / Job, Execution of Plan, Good Health, Business Travel, Good Relationship with Relatives, good for Education.",
+      "ifBad": "Family Issues due to Friends/ Relatives, bad for Relationship, Health Issues to Partner.",
+      "specialRules": "Mercury in 6th House: Raj Yoga.",
+      "recommendation": "Fennel Seeds (Saunf) in Red Cloth – Below Pillow.",
+      "symptom": "Health Issues to Partner."
+    },
+    "Saturn12": {
+      "offlineClassNotes": "Good for Investment. Remedy : take one (01) handful of ‘Almonds with shell’ and offer to Fishes.",
+      "goodResult": "Lucky Year, Courage, good for Wealth, Support from Friends, good for Property.",
+      "ifBad": "Bad investment, Theft, Loss of Money, Dispute with Partner and Children.",
+      "specialRules": "1. Sun in 6th House: Bad for Partner & Married Life. 2. Enemy Planet in 2nd House: Bad Time.",
+      "recommendation": "Avoid Liquor & Non Veg, Donate Food to Black Ants.",
+      "symptom": "Old Bed, Bad Health of Mother."
+    },
+    "Rahu12": {
+      "offlineClassNotes": "Worst placement of Rahu (like Rahu 8th).  Grahphal\n Ruins Jupiter in Chart. Has to leave house within 1 year of birth. (change of house)\n Grand-father : not takes care of your father, leaves your father.\n Rahu 12th : Litigation, Police, Hospital, Tension, Pressure, Unplanned expenditure, Cyber-attacks, Digital arrests, Income Tax/ ED /GST Notice, Challan etc. \n Don’t invite ‘birds on roof/house and feed them’; no green grass / plants on roof.\n \n Remedy of Rahu 12th : Never try to do direct remedy of Rahu 12th House.\n i). 8 kg ‘Kaccha Coal’ (barbeque) – flow it in ‘dirty water/culvert’ [remedy with help of ‘Saturn’]\n ii). Make 13 packet of ‘saunf in red clothes’/ put 12 packet on the roof and put one (01) in below your bed. [remedy with help of ‘Mars’]\n Rahu 12, Mars 11; Rahu 12, Saturn 8H; Rahu 1H, Mars 12H. Rahu 12, Mars 2H : these combinations are good. [Put Saunf in red cloth in bed]",
+      "goodResult": "Good for Relationships with Friends and Relatives, good year for Investment and Repayment of Loans, good for Foreign Income and In Laws, Spiritual.",
+      "ifBad": "Bad News, Tensions, Sleep Disorder, Loans, Disputes and Fights, Loss of Property, Vehicles & Income, Loss in Lottery and Share Market.",
+      "specialRules": "1. Sun in 6th House: Bad for Partner & Married Life. 2. Enemy Planet in 2nd House: Bad Time.",
+      "recommendation": "Fennel Seeds (Saunf) in Red Cloth - Under Pillow.",
+      "symptom": "Disturbed Night Sleep, Blue Bed sheet, Blue Footwear."
+    },
+    "Ketu12": {
+      "offlineClassNotes": "Best placement. (Moon becomes bad). Change and Growth, Change of place. Remedy : Offer 12 bananas in Temple. \n [Special Remedy: Offer 12 dozen bananas – if child not studies; for better exam result]",
+      "goodResult": "Wealthy, Success in Career, Expenditure, Support from Children, Change of Place.",
+      "ifBad": "Problem in Luck, Problem with Children and Partner, Tensions, Loss in Career, Loans.",
+      "specialRules": "1. Rahu in 6th House: Very Good for Career. 2. Mars in 6th House: Ketu is Bad.",
+      "recommendation": "",
+      "symptom": "Broken Bed."
+    }
+  }
+}
