@@ -1,0 +1,82 @@
+{
+  "source": "User-supplied BAV transit result descriptions",
+  "planets": {
+    "Sun": {
+      "0": "Death like Pain (Month of disease and accident)\nStress in mind, travel without results, health issues. Expenses.\nBad deeds, disappointment, loss of money, chance of theft, problem from seniors.\nWorries, miseries, health trouble, tensions.",
+      "1": "Stress in mind, travel without results, health issues. Expenses.\nBad deeds, disappointment, loss of money, chance of theft, problem from seniors.\nWorries, miseries, health trouble, tensions.",
+      "2": "Stress in mind, travel without results, health issues. Expenses.\nBad deeds, disappointment, loss of money, chance of theft, problem from seniors.",
+      "3": "Stress in mind, travel without results, health issues. Expenses.",
+      "4": "Mixed results, gain of money, expenses.",
+      "5": "Education & learning, influential social circle, company of good people. Gain of Money.",
+      "6": "Wealth acquisition, physically fit, charming personality, comfort from vehicle.\nEducation & learning, influential social circle, company of good people. Gain of Money.",
+      "7": "Respect from all, courage, prestigious assignments and jobs.\nWealth acquisition, physically fit, charming personality, comfort from vehicle.\nEducation & learning, influential social circle, company of good people. Gain of Money.",
+      "8": "High Status both social & political, Govt. favour, honour & wealth, lives as a king.\nRespect from all, courage, prestigious assignments and jobs.\nWealth acquisition, physically fit, charming personality, comfort from vehicle.\nEducation & learning, influential social circle, company of good people. Gain of Money."
+    },
+    "Moon": {
+      "0": "Anxiety, Miseries, Mrityu-Tulya Kasht.\nDangers from reptiles, unavoidable problems.\nLoss of friendship & wealth, issues in relationship, sickness to mother, quarrels.\nConflict with friends or relatives, unpleasant moments.",
+      "1": "Dangers from reptiles, unavoidable problems.\nLoss of friendship & wealth, issues in relationship, sickness to mother, quarrels.\nConflict with friends or relatives, unpleasant moments.",
+      "2": "Loss of friendship & wealth, issues in relationship, sickness to mother, quarrels.\nConflict with friends or relatives, unpleasant moments.",
+      "3": "Conflict with friends or relatives, unpleasant moments.",
+      "4": "Mixed results, happiness with some problems.",
+      "5": "Satisfied, morally strong, comfortable. [Gives Money 5+ BAV unafflicted]. Happiness.",
+      "6": "Idealistic, calm, ethical, company of good people.\nSatisfied, morally strong, comfortable. [Gives Money 5+ BAV unafflicted]. Happiness.",
+      "7": "Rich food, festivities & enjoyment, wealth & quality clothes, learning of mantras.\nIdealistic, calm, ethical, company of good people.\nSatisfied, morally strong, comfortable. [Gives Money 5+ BAV unafflicted]. Happiness.",
+      "8": "Fame, fortunate, grace, lavishness, high moral courage, popular.\nRich food, festivities & enjoyment, wealth & quality clothes, learning of mantras.\nIdealistic, calm, ethical, company of good people.\nSatisfied, morally strong, comfortable. [Gives Money 5+ BAV unafflicted]. Happiness."
+    },
+    "Mars": {
+      "0": "Stomach issues, eye disease, accidents, death like situation.\nInjuries, fire, surgery, fever, health issues.\nQuarrels over money matters, humiliation through enemies.\nIssues with siblings, spouse.",
+      "1": "Injuries, fire, surgery, fever, health issues.\nQuarrels over money matters, humiliation through enemies.\nIssues with siblings, spouse.",
+      "2": "Quarrels over money matters, humiliation through enemies.\nIssues with siblings, spouse.",
+      "3": "Issues with siblings, spouse.",
+      "4": "Mixed results, problems & some good times.",
+      "5": "Good looks & supportive behaviour.",
+      "6": "Support of superiors, promotion.\nGood looks & supportive behaviour.",
+      "7": "Favour from authority, benefits from government.\nSupport of superiors, promotion.\nGood looks & supportive behaviour.",
+      "8": "Gain of land, win over enemies, fame, superiority, wealth.\nFavour from authority, benefits from government.\nSupport of superiors, promotion.\nGood looks & supportive behaviour."
+    },
+    "Mercury": {
+      "0": "Losses, disease, fear of death, death*.\nLoss to enemy, wrong decisions, directionless.\nMiscommunication, sickness, low confidence.\nStress, tension, worries.\nLack of focus, low enthusiasm.",
+      "1": "Loss to enemy, wrong decisions, directionless.\nMiscommunication, sickness, low confidence.\nStress, tension, worries.\nLack of focus, low enthusiasm.",
+      "2": "Miscommunication, sickness, low confidence.\nStress, tension, worries.\nLack of focus, low enthusiasm.",
+      "3": "Stress, tension, worries.\nLack of focus, low enthusiasm.",
+      "4": "Lack of focus, low enthusiasm.",
+      "5": "Expansion of Social circle, relation with influential people.",
+      "6": "Success, Intelligence, Ability to resolve difficult issues, Good communication. Expansion of Social circle, relation with influential people.",
+      "7": "Happiness, Wealth, Learning, charitable living, no worries. Success, Intelligence, Ability to resolve difficult issues, Good communication. Expansion of Social circle, relation with influential people.",
+      "8": "Fortunate, all round good luck, honour from Authorities. Happiness, Wealth, Learning, charitable living, no worries. Success, Intelligence, Ability to resolve difficult issues, Good communication. Expansion of Social circle, relation with influential people."
+    },
+    "Jupiter": {
+      "0": "Loss of Children, Destruction of Wealth, No support.\nLoss of Wealth, Enmity, Hurdles, Disease.\nProblems from Authority, Problems from / of children.\nDistress, Hurdles, Low energy, Ear trouble.",
+      "1": "Loss of Wealth, Enmity, Hurdles, Disease.\nProblems from Authority, Problems from / of children.\nDistress, Hurdles, Low energy, Ear trouble.",
+      "2": "Problems from Authority, Problems from / of children.\nDistress, Hurdles, Low energy, Ear trouble.",
+      "3": "Distress, Hurdles, Low energy, Ear trouble.",
+      "4": "Mixed results, some ups-downs.",
+      "5": "Good friends, No enemies, Success in work, Support available.",
+      "6": "Comforts, Jewellery, Vehicles, Expensive & Lavish lifestyle. Good friends, No enemies, Success in work, Support available.",
+      "7": "Good Fortune, Happiness from Children, Successful. Comforts, Jewellery, Vehicles, Expensive & Lavish lifestyle. Good friends, No enemies, Success in work, Support available.",
+      "8": "Wealthy, Powerful, Status of a king, Fame, Honour. Good Fortune, Happiness from Children, Successful. Comforts, Jewellery, Vehicles, Expensive & Lavish lifestyle. Good friends, No enemies, Success in work, Support available."
+    },
+    "Venus": {
+      "0": "Calamities or Troubles of all kinds; Theft of Vehicle.\nFear from water, poison, health issues.\nDemotion, fall from position.\nEnmity with neighbours, others.",
+      "1": "Fear from water, poison, health issues.\nDemotion, fall from position.\nEnmity with neighbours, others.",
+      "2": "Demotion, fall from position.\nEnmity with neighbours, others.",
+      "3": "Enmity with neighbours, others.",
+      "4": "Mixed results, good and bad.",
+      "5": "Association with new friends / social circle.",
+      "6": "Meet loveable women or wife /spouse. / Sex.\nAssociation with new friends / social circle.",
+      "7": "Acquires precious stones, ornaments & jewellery.\nMeet loveable women or wife /spouse. / Sex.\nAssociation with new friends / social circle.",
+      "8": "Enjoy all kinds of pleasure, exotic, luxurious food, clothes, beauty.\nAcquires precious stones, ornaments & jewellery. Meet loveable women or wife /spouse. / Sex.\nAssociation with new friends / social circle."
+    },
+    "Saturn": {
+      "0": "Loss of all possessions, Extreme problem, crisis, hardship. Possibility of Death.\nBad deeds, Sickness, Health issues.\nConfinement (Stuck somewhere), Anxiety, Disease & Poverty. Loss of Subordinates.",
+      "1": "Bad deeds, Sickness, Health issues.\nConfinement (Stuck somewhere), Anxiety, Disease & Poverty. Loss of Subordinates.",
+      "2": "Confinement (Stuck somewhere), Anxiety, Disease & Poverty. Loss of Subordinates.",
+      "3": "Loss of Subordinates, gives Wealth & Women.",
+      "4": "Moderate results, some hurdles before success. Wealth and Women (partner).",
+      "5": "Gain of wealth, Results from hard work. Wealth and Women (partner).",
+      "6": "Head of a Group, Gains with work. Gain of wealth, Results from hard work. Wealth and Women (partner).",
+      "7": "Leader of Masses, Good wealth, Dominance. Head of a Group, Gains with work. Gain of wealth, Results from hard work. Wealth and Women (partner).",
+      "8": "Good Political career, head of a town/organisation. (Makes the native reach top position in organisation.) Leader of Masses, Good wealth, Dominance. Head of a Group, Gains with work. Gain of wealth, Results from hard work. Wealth and Women (partner)."
+    }
+  }
+}
