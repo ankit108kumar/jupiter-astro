@@ -738,7 +738,13 @@
           houseNumber + 'H</span>'
         : escapeTableText(house) + 'H';
       var value = hasScore
-        ? '<span class="jtt-house-score-detail' + scoreClass + '"> [' + escapeTableText(score) + ']</span>'
+        ? (scoreType === "bav"
+          ? '<button type="button" class="jtt-house-score-detail jtt-bav-result-trigger' + scoreClass +
+            '" data-bav-result-planet="' + escapeTableText(planet) + '" data-bav-result-score="' + escapeTableText(score) +
+            '" data-bav-result-house="' + (Number.isInteger(houseNumber) ? houseNumber : '') +
+            '" aria-label="Show ' + escapeTableText(planet) + ' BAV ' + escapeTableText(score) + ' transit result">[' +
+            escapeTableText(score) + ']</button>'
+          : '<span class="jtt-house-score-detail' + scoreClass + '"> [' + escapeTableText(score) + ']</span>')
         : '';
       return '<span class="jtt-house-score">' + houseMarkup + value + '</span>';
     }
@@ -1826,6 +1832,91 @@
     });
   }
 
+  var bavTransitResultsPromise = null;
+  function loadBavTransitResults() {
+    if (!bavTransitResultsPromise) {
+      bavTransitResultsPromise = fetch("/data/bav-transit-results.json", {
+        credentials: "same-origin", cache: "force-cache"
+      }).then(function (response) {
+        if (!response.ok) throw new Error("BAV transit result database returned HTTP " + response.status);
+        return response.json();
+      }).then(function (data) {
+        if (!data || !data.planets) throw new Error("BAV transit result database has an invalid structure.");
+        return data.planets;
+      }).catch(function (error) {
+        bavTransitResultsPromise = null;
+        throw error;
+      });
+    }
+    return bavTransitResultsPromise;
+  }
+
+  function ensureBavTransitResultPanel() {
+    if (!windowEl) return null;
+    var panel = windowEl.querySelector(".jtt-bav-result-panel");
+    if (panel) return panel;
+    var tablePanel = windowEl.querySelector("[data-jtt-transit-table]");
+    if (!tablePanel || !tablePanel.parentNode) return null;
+    panel = document.createElement("section");
+    panel.className = "jtt-bav-result-panel";
+    panel.hidden = true;
+    panel.setAttribute("aria-live", "polite");
+    panel.innerHTML = '<div class="jtt-bav-result-heading"><strong></strong><button type="button" class="jtt-bav-result-close" aria-label="Close BAV result">×</button></div><div class="jtt-bav-result-content"></div>';
+    panel.querySelector(".jtt-bav-result-close").addEventListener("click", function () {
+      panel.hidden = true;
+    });
+    tablePanel.insertAdjacentElement("afterend", panel);
+    return panel;
+  }
+
+  function showBavTransitResult(trigger) {
+    var planet = trigger.getAttribute("data-bav-result-planet");
+    var score = Number(trigger.getAttribute("data-bav-result-score"));
+    var house = trigger.getAttribute("data-bav-result-house");
+    if (!planet || !Number.isInteger(score) || score < 0 || score > 8) return;
+    var panel = ensureBavTransitResultPanel();
+    if (!panel) return;
+    var title = panel.querySelector(".jtt-bav-result-heading strong");
+    var content = panel.querySelector(".jtt-bav-result-content");
+    title.textContent = planet + " — BAV " + score + (house ? " · " + house + "H" : "");
+    content.textContent = "Loading transit interpretation…";
+    panel.hidden = false;
+    loadBavTransitResults().then(function (results) {
+      if (!panel.isConnected || panel.hidden || title.textContent.indexOf(planet + " — BAV " + score) !== 0) return;
+      var interpretation = results[planet] && results[planet][String(score)];
+      content.replaceChildren();
+      if (!interpretation) {
+        content.textContent = "No interpretation is available for this planet and BAV score.";
+        return;
+      }
+      String(interpretation).split(/\n+/).filter(Boolean).forEach(function (paragraph) {
+        var p = document.createElement("p");
+        p.textContent = paragraph;
+        content.appendChild(p);
+      });
+    }).catch(function (error) {
+      if (!panel.isConnected) return;
+      content.textContent = "BAV transit interpretation could not be loaded.";
+      console.error("Jupiter Astro: Unable to load BAV transit interpretations.", error);
+    });
+  }
+
+  function bindBavTransitResultTriggers(host) {
+    if (!host || host.__jttBavResultBound) return;
+    host.__jttBavResultBound = true;
+    host.addEventListener("click", function (event) {
+      var trigger = event.target && event.target.closest ? event.target.closest(".jtt-bav-result-trigger") : null;
+      if (!trigger || !host.contains(trigger)) return;
+      showBavTransitResult(trigger);
+    });
+    host.addEventListener("keydown", function (event) {
+      var trigger = event.target && event.target.closest ? event.target.closest(".jtt-bav-result-trigger") : null;
+      if (!trigger || !host.contains(trigger) || (event.key !== "Enter" && event.key !== " ")) return;
+      event.preventDefault();
+      showBavTransitResult(trigger);
+    });
+  }
+
   function renderTransitTableFromContext() {
     if (!windowEl) return;
     var host = windowEl.querySelector("[data-jtt-table-scroll]");
@@ -1856,6 +1947,7 @@
       }
       bindDurationTooltips(host);
       bindHouseResultTooltips(host);
+      bindBavTransitResultTriggers(host);
       bindPlanetSignificationHover(host);
       bindNakshatraStoryHover(host);
       ensurePlanetSignificationPanel();
