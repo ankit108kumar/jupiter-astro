@@ -1237,6 +1237,8 @@
 
     var panel = ensurePlanetSignificationPanel();
     if (!panel) return;
+    // Nakshatra stories must not retain House / Planet-in-House / BAV sections.
+    hideHouseBasedSectionsForNatalResult(panel);
     var title = panel.querySelector(".jtt-planet-signification-title");
     var body = panel.querySelector(".jtt-planet-signification-body");
     var meta = panel.querySelector(".jtt-nakshatra-story-meta");
@@ -1841,6 +1843,8 @@
     var panel = ensurePlanetSignificationPanel();
     if (!panel) return;
 
+    // Planetary signification must not retain House / Planet-in-House / BAV sections.
+    hideHouseBasedSectionsForNatalResult(panel);
     var title = panel.querySelector(".jtt-planet-signification-title");
     var body = panel.querySelector(".jtt-planet-signification-body");
     var storyMeta = panel.querySelector(".jtt-nakshatra-story-meta");
