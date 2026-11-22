@@ -687,3 +687,10 @@ html,body,*{scrollbar-width:thin;scrollbar-color:#c9c6d0 transparent}
 .ja-panchang-dialog .ja-panchang-event strong{
   font-size:12.65px!important;
 }
+
+
+/* Chaughadiya quality cues: restrained text colour and subtle matching duration tint. */
+.ja-panchang-dialog .ja-panchang-period-section tr.ja-panchang-period-inauspicious .ja-panchang-slot-main{color:#c34b4b!important;font-weight:650!important}
+.ja-panchang-dialog .ja-panchang-period-section tr.ja-panchang-period-inauspicious .ja-panchang-duration{color:#b94a4a!important;background:rgba(205,72,72,.055)!important;box-shadow:inset 0 0 0 1px rgba(205,72,72,.07)!important;border-radius:6px!important}
+.ja-panchang-dialog .ja-panchang-period-section tr.ja-panchang-period-auspicious .ja-panchang-slot-main{color:#328354!important;font-weight:650!important}
+.ja-panchang-dialog .ja-panchang-period-section tr.ja-panchang-period-auspicious .ja-panchang-duration{color:#328354!important;background:rgba(57,151,96,.055)!important;box-shadow:inset 0 0 0 1px rgba(57,151,96,.07)!important;border-radius:6px!important}
