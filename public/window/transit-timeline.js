@@ -1415,9 +1415,77 @@
     panel.classList.remove("is-nakshatra-story");
   }
 
-  function showHouseSignification(houseNumber) {
+  var transitPlanetHouseResultsPromise = null;
+  function loadTransitPlanetHouseResults() {
+    if (!transitPlanetHouseResultsPromise) {
+      transitPlanetHouseResultsPromise = fetch("/data/transit-planet-house-results.json", {
+        credentials: "same-origin", cache: "force-cache"
+      }).then(function (response) {
+        if (!response.ok) throw new Error("Planet-in-house transit database returned HTTP " + response.status);
+        return response.json();
+      }).then(function (data) {
+        if (!data || !data.planets) throw new Error("Planet-in-house transit database has an invalid structure.");
+        return data.planets;
+      }).catch(function (error) {
+        transitPlanetHouseResultsPromise = null;
+        throw error;
+      });
+    }
+    return transitPlanetHouseResultsPromise;
+  }
+
+  function ensureTransitPlanetHouseSection(panel) {
+    if (!panel) return null;
+    var section = panel.querySelector(".jtt-transit-planet-house-section");
+    if (section) return section;
+    var divider = document.createElement("div");
+    divider.className = "jtt-transit-planet-house-divider";
+    divider.setAttribute("role", "separator");
+    var section = document.createElement("section");
+    section.className = "jtt-transit-planet-house-section";
+    section.hidden = true;
+    section.setAttribute("aria-live", "polite");
+    section.innerHTML = '<div class="jtt-transit-planet-house-heading"></div><div class="jtt-transit-planet-house-content"></div>';
+    var bavSection = ensureBavTransitResultSection(panel);
+    if (bavSection && bavSection.parentNode === panel) {
+      bavSection.insertAdjacentElement("afterend", divider);
+    } else {
+      var body = panel.querySelector(".jtt-planet-signification-body");
+      if (!body) return null;
+      body.insertAdjacentElement("afterend", divider);
+    }
+    divider.insertAdjacentElement("afterend", section);
+    return section;
+  }
+
+  function showTransitPlanetHouseResult(panel, planet, houseNumber) {
+    if (!panel || !planet || !Number.isInteger(houseNumber) || houseNumber < 1 || houseNumber > 12) return;
+    var section = ensureTransitPlanetHouseSection(panel);
+    if (!section) return;
+    var heading = section.querySelector(".jtt-transit-planet-house-heading");
+    var content = section.querySelector(".jtt-transit-planet-house-content");
+    var divider = panel.querySelector(".jtt-transit-planet-house-divider");
+    var requestKey = planet + ":" + houseNumber;
+    section.setAttribute("data-transit-planet-house-request", requestKey);
+    heading.textContent = "Tr " + planet + " " + houseNumber + "H";
+    content.textContent = "Loading transit interpretation…";
+    divider.hidden = false;
+    section.hidden = false;
+    loadTransitPlanetHouseResults().then(function (results) {
+      if (!section.isConnected || section.hidden ||
+          section.getAttribute("data-transit-planet-house-request") !== requestKey) return;
+      var result = results[planet] && results[planet][String(houseNumber)];
+      content.textContent = result || "No planet-in-house transit interpretation is available.";
+    }).catch(function (error) {
+      if (!section.isConnected || section.getAttribute("data-transit-planet-house-request") !== requestKey) return;
+      content.textContent = "Planet-in-house transit interpretation could not be loaded.";
+      console.error("Jupiter Astro: Unable to load planet-in-house transit interpretations.", error);
+    });
+  }
+
+  function showHouseSignification(houseNumber, planet) {
     clearNakshatraStoryForOtherSignification();
-    var houseKey = "house:" + houseNumber;
+    var houseKey = "house:" + houseNumber + ":" + (planet || "");
     clearPlanetSignificationTimers();
     activePlanetSignification = houseKey;
 
@@ -1435,6 +1503,7 @@
     panel.classList.remove("is-visible");
     void panel.offsetWidth;
     panel.classList.add("is-visible");
+    showTransitPlanetHouseResult(panel, planet, houseNumber);
 
     loadHouseSignifications().then(function (houses) {
       if (activePlanetSignification !== houseKey || !panel.isConnected) return;
@@ -1551,11 +1620,11 @@
       var houseNumber = Number(target.getAttribute("data-result-house"));
       if (!Number.isInteger(houseNumber) || houseNumber < 1 || houseNumber > 12) return;
       if (window.JAHoverManager) window.JAHoverManager.activate("transit-signification", function () {
-        if (target.isConnected) { showHouseSignification(houseNumber); showTransitBasicTooltip(target); }
+        if (target.isConnected) { showHouseSignification(houseNumber, target.getAttribute("data-result-planet")); showTransitBasicTooltip(target); }
       }, hidePlanetSignificationNow, 300);
       else {
         clearTimeout(houseResultOpenTimer);
-        houseResultOpenTimer = setTimeout(function () { if (target.isConnected) { showHouseSignification(houseNumber); showTransitBasicTooltip(target); } }, 300);
+        houseResultOpenTimer = setTimeout(function () { if (target.isConnected) { showHouseSignification(houseNumber, target.getAttribute("data-result-planet")); showTransitBasicTooltip(target); } }, 300);
       }
     });
     host.addEventListener("pointerout", function (event) {
@@ -1576,9 +1645,9 @@
       var houseNumber = Number(target.getAttribute("data-result-house"));
       if (!Number.isInteger(houseNumber) || houseNumber < 1 || houseNumber > 12) return;
       if (window.JAHoverManager) window.JAHoverManager.activate("transit-signification", function () {
-        showHouseSignification(houseNumber); showTransitBasicTooltip(target);
+        showHouseSignification(houseNumber, target.getAttribute("data-result-planet")); showTransitBasicTooltip(target);
       }, hidePlanetSignificationNow, 0);
-      else { showHouseSignification(houseNumber); showTransitBasicTooltip(target); }
+      else { showHouseSignification(houseNumber, target.getAttribute("data-result-planet")); showTransitBasicTooltip(target); }
     });
 
     host.addEventListener("focusout", function (event) {
