@@ -2567,3 +2567,63 @@ body.jtt-window-open{overflow:hidden!important;overscroll-behavior:none!importan
   outline:2px solid rgba(183,131,48,.7);
   outline-offset:4px;
 }
+
+
+/* BAV score actions and the interpretation panel beneath the transit table. */
+#ja-transit-timeline-window .jtt-bav-result-trigger{
+  appearance:none;
+  border:0;
+  padding:0 2px;
+  margin:0;
+  background:transparent;
+  color:inherit;
+  font:inherit;
+  font-variant-numeric:tabular-nums;
+  cursor:pointer;
+  border-radius:4px;
+}
+#ja-transit-timeline-window .jtt-bav-result-trigger:hover{
+  text-decoration:underline;
+  text-underline-offset:2px;
+}
+#ja-transit-timeline-window .jtt-bav-result-trigger:focus-visible{
+  outline:2px solid var(--jtt-accent,#b78330);
+  outline-offset:2px;
+}
+#ja-transit-timeline-window .jtt-bav-result-panel{
+  margin:12px 0 18px;
+  padding:15px 18px;
+  border:1px solid var(--jtt-line,rgba(110,120,140,.22));
+  border-radius:12px;
+  background:var(--jtt-surface,rgba(255,255,255,.94));
+  color:var(--jtt-ink,#252638);
+  box-shadow:0 4px 16px rgba(30,35,50,.06);
+}
+#ja-transit-timeline-window .jtt-bav-result-panel[hidden]{display:none!important}
+#ja-transit-timeline-window .jtt-bav-result-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:9px;
+  font-size:14px;
+  font-weight:700;
+}
+#ja-transit-timeline-window .jtt-bav-result-close{
+  width:28px;height:28px;
+  border:0;border-radius:50%;
+  background:transparent;color:var(--jtt-muted,#707789);
+  font-size:21px;line-height:1;cursor:pointer;
+}
+#ja-transit-timeline-window .jtt-bav-result-close:hover{
+  background:rgba(120,130,150,.12);
+}
+#ja-transit-timeline-window .jtt-bav-result-content{
+  font-size:13px;
+  line-height:1.65;
+  color:var(--jtt-ink,#252638);
+}
+#ja-transit-timeline-window .jtt-bav-result-content p{
+  margin:0 0 7px;
+}
+#ja-transit-timeline-window .jtt-bav-result-content p:last-child{margin-bottom:0}
