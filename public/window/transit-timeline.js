@@ -1869,6 +1869,7 @@
     section.querySelector(".jtt-bav-result-close").addEventListener("click", function () {
       section.hidden = true;
       divider.hidden = true;
+      panel.classList.remove("has-bav-result");
       if (activePlanetSignification && activePlanetSignification.indexOf("bav:") === 0) {
         activePlanetSignification = null;
       }
@@ -1901,6 +1902,7 @@
     content.textContent = "Loading transit interpretation…";
     divider.hidden = false;
     section.hidden = false;
+    panel.classList.add("has-bav-result");
     panel.hidden = false;
     panel.classList.remove("is-visible");
     void panel.offsetWidth;
