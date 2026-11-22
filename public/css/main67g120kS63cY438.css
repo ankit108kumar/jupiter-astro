@@ -109,6 +109,7 @@ html[data-palette="lavender-peach"] body {
 [data-palette="lavender-peach"] .chip,
 [data-palette="lavender-peach"] .sugg,
 [data-palette="lavender-peach"] .zodiac-hover-card,
+[data-palette="lavender-peach"] .nakshatra-hover-card,
 [data-palette="lavender-peach"] .inline-error-popup {
   background: linear-gradient(
     145deg,
@@ -604,6 +605,7 @@ html[data-palette="wooden"] .panchang-item,
 html[data-palette="wooden"] .chip,
 html[data-palette="wooden"] .sugg,
 html[data-palette="wooden"] .zodiac-hover-card,
+html[data-palette="wooden"] .nakshatra-hover-card,
 html[data-palette="wooden"] .inline-error-popup,
 html[data-palette="wooden"] .desc-editor,
 html[data-palette="wooden"] .desc-toolbar {
@@ -1731,7 +1733,7 @@ input:focus-visible { border-color: var(--saffron); }
   max-height: min(72vh, 620px);
   overflow: auto;
   padding: 12px 14px;
-  background: color-mix(in srgb, var(--surface) 0%, transparent);
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
   color: var(--ink);
   border: 1px solid rgba(212, 160, 74, 0.25);
   border-left: 2px solid rgba(212, 160, 74, 0.45);
@@ -1794,7 +1796,7 @@ input:focus-visible { border-color: var(--saffron); }
   max-height: min(72vh, 620px);
   overflow: auto;
   padding: 12px 14px;
-  background: color-mix(in srgb, var(--surface) 0%, transparent);
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
   color: var(--ink);
   border: 1px solid rgba(212, 160, 74, 0.25);
   border-left: 2px solid rgba(212, 160, 74, 0.45);
@@ -1829,7 +1831,7 @@ input:focus-visible { border-color: var(--saffron); }
 }
 .nakshatra-hover-card .nh-label { color: var(--muted); font-weight: 600; }
 .nakshatra-hover-card .nh-value { color: var(--ink); overflow-wrap: anywhere; }
-.ja-nakshatra-hover { cursor: help; text-decoration: underline dotted rgba(180, 130, 55, .55); text-underline-offset: 3px; }
+.ja-nakshatra-hover { cursor: help; text-decoration: none; font-size: 1.125em; }
 @media (max-width: 520px) {
   .nakshatra-hover-card .nh-grid { grid-template-columns: minmax(0, 1fr); }
 }
@@ -2537,6 +2539,7 @@ html[data-palette="cosmic"] .panchang-item,
 html[data-palette="cosmic"] .chip,
 html[data-palette="cosmic"] .sugg,
 html[data-palette="cosmic"] .zodiac-hover-card,
+html[data-palette="cosmic"] .nakshatra-hover-card,
 html[data-palette="cosmic"] .inline-error-popup,
 html[data-palette="cosmic"] .desc-editor,
 html[data-palette="cosmic"] .desc-toolbar {
@@ -4508,4 +4511,11 @@ body.ja-font-scale-enabled [data-ja-font-scale-target] {
 .nakshatra-hover-card,
 .inline-error-popup {
   scrollbar-gutter: stable;
+}
+
+
+/* Keep both hover information cards consistently 90% opaque across palettes. */
+.zodiac-hover-card,
+.nakshatra-hover-card {
+  background: color-mix(in srgb, var(--surface) 90%, transparent) !important;
 }
