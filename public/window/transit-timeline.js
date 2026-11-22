@@ -1994,9 +1994,12 @@
         source.className = "jtt-transit-natal-result-source";
         source.textContent = match.source;
 
-        var heading = document.createElement("div");
-        heading.className = "jtt-transit-natal-result-heading";
-        heading.textContent = "Transit of " + transitPlanet + " over Natal " + match.planet;
+        if (matches.length > 1) {
+          var heading = document.createElement("div");
+          heading.className = "jtt-transit-natal-result-heading";
+          heading.textContent = "Transit of " + transitPlanet + " over Natal " + match.planet;
+          rowElement.appendChild(heading);
+        }
 
         var description = document.createElement("div");
         description.className = "jtt-transit-natal-result-description";
@@ -2006,7 +2009,6 @@
           : "No interpretation is available for this planet pair.";
 
         rowElement.appendChild(source);
-        rowElement.appendChild(heading);
         rowElement.appendChild(description);
         if (index > 0) {
           var divider = document.createElement("div");
