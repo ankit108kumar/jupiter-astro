@@ -744,7 +744,7 @@
           ? '<button type="button" class="jtt-house-score-detail jtt-bav-result-trigger' + scoreClass +
             '" data-bav-result-planet="' + escapeTableText(planet) + '" data-bav-result-score="' + escapeTableText(score) +
             '" data-bav-result-house="' + (Number.isInteger(houseNumber) ? houseNumber : '') +
-            '" aria-label="Show ' + escapeTableText(planet) + ' BAV ' + escapeTableText(score) + ' transit result">[' +
+            '" data-bav-result-source="moon" aria-label="Show ' + escapeTableText(planet) + ' BAV ' + escapeTableText(score) + ' transit result">[' +
             escapeTableText(score) + ']</button>'
           : '<span class="jtt-house-score-detail' + scoreClass + '"> [' + escapeTableText(score) + ']</span>')
         : '';
@@ -2035,16 +2035,24 @@
   function bindBavTransitResultTriggers(host) {
     if (!host || host.__jttBavResultBound) return;
     host.__jttBavResultBound = true;
+    function activateBavColumnResult(trigger) {
+      var source = trigger.getAttribute("data-bav-result-source") || "moon";
+      var planet = trigger.getAttribute("data-bav-result-planet");
+      var score = trigger.getAttribute("data-bav-result-score");
+      var house = Number(trigger.getAttribute("data-bav-result-house"));
+      if (source !== "moon" || !planet || !Number.isInteger(house) || house < 1 || house > 12) return;
+      showHouseSignification(house, planet, source, score);
+    }
     host.addEventListener("click", function (event) {
       var trigger = event.target && event.target.closest ? event.target.closest(".jtt-bav-result-trigger") : null;
       if (!trigger || !host.contains(trigger)) return;
-      showBavTransitResult(trigger);
+      activateBavColumnResult(trigger);
     });
     host.addEventListener("keydown", function (event) {
       var trigger = event.target && event.target.closest ? event.target.closest(".jtt-bav-result-trigger") : null;
       if (!trigger || !host.contains(trigger) || (event.key !== "Enter" && event.key !== " ")) return;
       event.preventDefault();
-      showBavTransitResult(trigger);
+      activateBavColumnResult(trigger);
     });
   }
 
