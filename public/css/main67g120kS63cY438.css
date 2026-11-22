@@ -4209,6 +4209,7 @@ flex-shrink: 0;
 .ja-navtara-table th:first-child,
 .ja-navtara-table td:first-child {
   width: 190px;
+  font-size: 1.125em;
 }
 
 .ja-navtara-planet {
@@ -4219,7 +4220,7 @@ flex-shrink: 0;
 .ja-navtara-tara {
   margin-left: 4px;
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: 0.81rem;
   font-weight: 450;
 }
 
