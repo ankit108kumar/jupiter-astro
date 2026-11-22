@@ -789,7 +789,7 @@
       var navamsaNumber = Number.isFinite(Number(row.navamsaIndex)) ? Number(row.navamsaIndex) : '';
 
       return '<tr>' +
-        '<td class="jtt-planet-cell"><strong tabindex="0" aria-label="View ' + escapeTableText(row.planet) + ' signification">' + escapeTableText(row.planet) + '</strong>' + markers + '</td>' +
+        '<td class="jtt-planet-cell"><strong class="jtt-planet-signification-trigger" tabindex="0" role="button" aria-label="View ' + escapeTableText(row.planet) + ' signification">' + escapeTableText(row.planet) + '</strong>' + markers + '</td>' +
         '<td class="jtt-sign-cell">' + renderDurationCell(row.signDuration, escapeTableText(row.sign), 'Sign duration') + '</td>' +
         '<td class="jtt-house-cell">' + houseScore(row.fromLagna, row.sav, 'sav', row.planet, 'lagna') + '</td>' +
         '<td class="jtt-house-cell">' + houseScore(row.fromMoon, row.bav, 'bav', row.planet, 'moon') + '</td>' +
@@ -1711,7 +1711,7 @@
 
   function loadPlanetSignifications() {
     if (!planetSignificationsPromise) {
-      planetSignificationsPromise = fetch("/data/planet-significations.json", {
+      planetSignificationsPromise = fetch("/data/planet-signification-reference.json", {
         credentials: "same-origin",
         cache: "force-cache"
       }).then(function (response) {
@@ -1866,7 +1866,29 @@
         return;
       }
       body.replaceChildren();
-      appendFormattedSignification(body, entry);
+      if (entry.deity) {
+        var deity = document.createElement("div");
+        deity.className = "jtt-planet-signification-deity";
+        deity.textContent = "Deity: " + entry.deity;
+        body.appendChild(deity);
+      }
+      var sections = [
+        { label: "Signification", value: entry.signification },
+        { label: "Good Result", value: entry.goodResult },
+        { label: "Bad Result", value: entry.badResult }
+      ];
+      sections.forEach(function (item) {
+        if (!item.value) return;
+        var section = document.createElement("section");
+        section.className = "jtt-planet-signification-detail";
+        var heading = document.createElement("strong");
+        heading.textContent = item.label;
+        var content = document.createElement("div");
+        content.textContent = item.value;
+        section.appendChild(heading);
+        section.appendChild(content);
+        body.appendChild(section);
+      });
     }).catch(function (error) {
       if (activePlanetSignification !== planet || !panel.isConnected) return;
       body.textContent = "Planetary signification could not be loaded.";
@@ -2013,6 +2035,20 @@
       return Array.isArray(rows) ? rows[rowIndex] || null : null;
     }
 
+    function activatePlanetReference(trigger, delay) {
+      var planet = String(trigger.textContent || "").trim();
+      if (!planet) return;
+      var open = function () {
+        showPlanetSignification(planet);
+      };
+      if (window.JAHoverManager) {
+        window.JAHoverManager.activate("transit-signification", open, hidePlanetSignificationNow, delay);
+      } else {
+        clearTimeout(planetSignificationHoverTimer);
+        planetSignificationHoverTimer = setTimeout(open, delay);
+      }
+    }
+
     function activateNatalMatch(trigger, delay) {
       var row = resolveTransitRow(trigger);
       var transitPlanet = row && String(row.planet || "").trim();
@@ -2031,6 +2067,12 @@
     }
 
     host.addEventListener("pointerover", function (event) {
+      var planetTrigger = event.target && event.target.closest
+        ? event.target.closest(".jtt-planet-signification-trigger") : null;
+      if (planetTrigger && host.contains(planetTrigger)) {
+        if (!event.relatedTarget || !planetTrigger.contains(event.relatedTarget)) activatePlanetReference(planetTrigger, 300);
+        return;
+      }
       var trigger = event.target && event.target.closest
         ? event.target.closest(".jtt-transit-natal-trigger") : null;
       if (!trigger || !host.contains(trigger)) return;
@@ -2038,6 +2080,16 @@
       activateNatalMatch(trigger, 300);
     });
     host.addEventListener("pointerout", function (event) {
+      var planetTrigger = event.target && event.target.closest
+        ? event.target.closest(".jtt-planet-signification-trigger") : null;
+      if (planetTrigger && host.contains(planetTrigger)) {
+        if (event.relatedTarget && (planetTrigger.contains(event.relatedTarget) ||
+            event.relatedTarget.closest && event.relatedTarget.closest(".jtt-planet-signification-panel"))) return;
+        clearTimeout(planetSignificationHoverTimer);
+        if (window.JAHoverManager) window.JAHoverManager.leave("transit-signification", 5000);
+        else hidePlanetSignification();
+        return;
+      }
       var trigger = event.target && event.target.closest
         ? event.target.closest(".jtt-transit-natal-trigger") : null;
       if (!trigger || !host.contains(trigger)) return;
@@ -2048,12 +2100,21 @@
       else hidePlanetSignification();
     });
     host.addEventListener("focusin", function (event) {
+      var planetTrigger = event.target && event.target.closest
+        ? event.target.closest(".jtt-planet-signification-trigger") : null;
+      if (planetTrigger && host.contains(planetTrigger)) {
+        activatePlanetReference(planetTrigger, 0);
+        return;
+      }
       var trigger = event.target && event.target.closest
         ? event.target.closest(".jtt-transit-natal-trigger") : null;
       if (!trigger || !host.contains(trigger)) return;
       activateNatalMatch(trigger, 0);
     });
     host.addEventListener("focusout", function (event) {
+      if (event.target.closest && event.target.closest(".jtt-planet-signification-trigger") &&
+          !(event.relatedTarget && event.relatedTarget.closest && event.relatedTarget.closest(".jtt-planet-signification-panel")) &&
+          window.JAHoverManager) window.JAHoverManager.leave("transit-signification", 5000);
       if (event.target.closest && event.target.closest(".jtt-transit-natal-trigger") &&
           !(event.relatedTarget && event.relatedTarget.closest && event.relatedTarget.closest(".jtt-planet-signification-panel")) &&
           window.JAHoverManager) window.JAHoverManager.leave("transit-signification", 5000);
