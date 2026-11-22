@@ -2312,26 +2312,13 @@
   opacity: 1;
   transform: translateY(0);
 }
-#ja-transit-timeline-window .jtt-planet-signification-header {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  column-gap: 12px;
-  row-gap: 3px;
-  min-width: 0;
-}
 #ja-transit-timeline-window .jtt-planet-signification-title {
-  margin: 0;
+  margin: 0 0 8px;
   color: var(--jtt-accent);
   font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 15px;
   font-weight: 600;
   line-height: 1.35;
-}
-#ja-transit-timeline-window .jtt-planet-signification-deity,
-#ja-transit-timeline-window .jtt-nakshatra-story-meta,
-#ja-transit-timeline-window .jtt-transit-natal-result-source {
-  margin: 0;
 }
 #ja-transit-timeline-window .jtt-planet-signification-body {
   color: var(--jtt-ink);
