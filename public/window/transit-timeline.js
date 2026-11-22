@@ -1241,7 +1241,6 @@
     hideHouseBasedSectionsForNatalResult(panel);
     var title = panel.querySelector(".jtt-planet-signification-title");
     var body = panel.querySelector(".jtt-planet-signification-body");
-    panel.querySelectorAll(".jtt-planet-signification-deity, .jtt-transit-natal-result-source").forEach(function (node) { node.remove(); });
     var meta = panel.querySelector(".jtt-nakshatra-story-meta");
     if (!meta) {
       meta = document.createElement("div");
@@ -1748,14 +1747,11 @@
     panel.setAttribute("aria-atomic", "true");
     panel.hidden = true;
 
-    var header = document.createElement("div");
-    header.className = "jtt-planet-signification-header";
     var title = document.createElement("div");
     title.className = "jtt-planet-signification-title";
     var body = document.createElement("div");
     body.className = "jtt-planet-signification-body";
-    header.appendChild(title);
-    panel.appendChild(header);
+    panel.appendChild(title);
     panel.appendChild(body);
     tablePanel.insertAdjacentElement("afterend", panel);
     panel.addEventListener("pointerenter", function () {
@@ -1852,14 +1848,7 @@
     var title = panel.querySelector(".jtt-planet-signification-title");
     var body = panel.querySelector(".jtt-planet-signification-body");
     var storyMeta = panel.querySelector(".jtt-nakshatra-story-meta");
-    if (storyMeta) storyMeta.remove();
-    panel.querySelectorAll(".jtt-transit-natal-result-source").forEach(function (node) { node.remove(); });
-    var deityMeta = panel.querySelector(".jtt-planet-signification-deity");
-    if (!deityMeta) {
-      deityMeta = document.createElement("div");
-      deityMeta.className = "jtt-planet-signification-deity";
-      title.insertAdjacentElement("afterend", deityMeta);
-    }
+    if (storyMeta) storyMeta.hidden = true;
     panel.classList.remove("is-nakshatra-story");
     title.textContent = planet;
     body.textContent = "Loading planetary signification…";
@@ -1878,10 +1867,10 @@
       }
       body.replaceChildren();
       if (entry.deity) {
-        deityMeta.textContent = "Deity: " + entry.deity;
-        deityMeta.hidden = false;
-      } else {
-        deityMeta.hidden = true;
+        var deity = document.createElement("div");
+        deity.className = "jtt-planet-signification-deity";
+        deity.textContent = "Deity: " + entry.deity;
+        body.appendChild(deity);
       }
       var sections = [
         { label: "Signification", value: entry.signification },
@@ -2001,8 +1990,7 @@
     var title = panel.querySelector(".jtt-planet-signification-title");
     var body = panel.querySelector(".jtt-planet-signification-body");
     var storyMeta = panel.querySelector(".jtt-nakshatra-story-meta");
-    if (storyMeta) storyMeta.remove();
-    panel.querySelectorAll(".jtt-planet-signification-deity").forEach(function (node) { node.remove(); });
+    if (storyMeta) storyMeta.hidden = true;
     panel.classList.remove("is-nakshatra-story");
     hideHouseBasedSectionsForNatalResult(panel);
     body.replaceChildren();
@@ -2015,7 +2003,7 @@
     var source = document.createElement("div");
     source.className = "jtt-transit-natal-result-source";
     source.textContent = match.source;
-    title.insertAdjacentElement("afterend", source);
+    body.appendChild(source);
 
     var description = document.createElement("div");
     description.className = "jtt-transit-natal-result-description";
