@@ -680,3 +680,10 @@ html,body,*{scrollbar-width:thin;scrollbar-color:#c9c6d0 transparent}
 .ja-panchang-dialog .ja-panchang-dialog-body table thead th{
   font-size:110%!important;
 }
+
+
+/* Ensure Yoga, Karana and other Panchang event names receive the
+   requested 15% table-content increase despite older fixed-size rules. */
+.ja-panchang-dialog .ja-panchang-event strong{
+  font-size:12.65px!important;
+}
