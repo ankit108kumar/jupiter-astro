@@ -2508,3 +2508,29 @@ body.jtt-window-open{overflow:hidden!important;overscroll-behavior:none!importan
  outline-offset:3px;
  border-radius:3px;
 }
+
+
+/* Transit Timeline: stable scrollbar gutter prevents content/table width shifts. */
+#ja-transit-timeline-window .jtt-main,
+#ja-transit-timeline-window .jtt-table-scroll {
+  scrollbar-gutter: stable;
+}
+
+/* Murti Nirnay: plain text only, without glow or decorative effects. */
+#ja-transit-timeline-window .jtt-murti-cell {
+  font-weight: 500;
+  text-shadow: none !important;
+}
+#ja-transit-timeline-window .jtt-murti-gold,
+#ja-transit-timeline-window .jtt-murti-silver {
+  color: #16803C !important;
+  text-shadow: none !important;
+}
+#ja-transit-timeline-window .jtt-murti-copper {
+  color: #202020 !important;
+  text-shadow: none !important;
+}
+#ja-transit-timeline-window .jtt-murti-iron {
+  color: #DC2626 !important;
+  text-shadow: none !important;
+}
