@@ -2742,3 +2742,15 @@ body.jtt-window-open{overflow:hidden!important;overscroll-behavior:none!importan
   margin: 12px 0;
   background: var(--jtt-line-strong);
 }
+
+
+#ja-transit-timeline-window .jtt-transit-natal-trigger {
+  cursor: pointer;
+  border-radius: 4px;
+  outline-offset: 2px;
+}
+#ja-transit-timeline-window .jtt-transit-natal-trigger:hover,
+#ja-transit-timeline-window .jtt-transit-natal-trigger:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
