@@ -2266,8 +2266,7 @@
   font: inherit;
   line-height: inherit;
   text-align: inherit;
-  text-decoration: underline dotted var(--jtt-accent);
-  text-underline-offset: 3px;
+  text-decoration: none;
   cursor: pointer;
 }
 #ja-transit-timeline-window .jtt-nakshatra-story-trigger:not(.jtt-duration-wrap) {
