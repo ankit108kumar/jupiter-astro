@@ -699,10 +699,20 @@
 
   function renderVedhaCell(planets, titlePrefix, markClass) {
     if (!Array.isArray(planets) || !planets.length) return '<td class="jtt-vedha-cell"></td>';
-    var names = planets.map(escapeTableText).join(", ");
+    var abbreviations = {
+      Sun: "Su", Moon: "Mo", Mars: "Ma", Mercury: "Me",
+      Jupiter: "Ju", Venus: "Ve", Saturn: "Sa", Rahu: "Ra", Ketu: "Ke"
+    };
+    var fullNames = planets.map(function (planet) {
+      return String(planet == null ? "" : planet);
+    });
+    var names = fullNames.map(escapeTableText).join(", ");
+    var shortNames = fullNames.map(function (planet) {
+      return escapeTableText(abbreviations[planet] || planet.slice(0, 2));
+    }).join(", ");
     return '<td class="jtt-vedha-cell" title="' + escapeTableText(titlePrefix.replace(/\s*caused by\s*/i, "") + ": " + names) + '">' +
       '<span class="jtt-vedha-mark' + (markClass ? ' ' + markClass : '') + '">X</span> ' +
-      '<span class="jtt-vedha-planets">(' + names + ')</span></td>';
+      '<span class="jtt-vedha-planets">(' + shortNames + ')</span></td>';
   }
 
   function renderTransitTable(data) {
@@ -787,14 +797,14 @@
       '<thead>' +
         '<tr>' +
           '<th class="jtt-sticky-planet">Planet</th>' +
-          '<th>Sign</th>' +
+          '<th>Tr Sign</th>' +
           '<th>From Lagna</th>' +
           '<th>From Moon</th>' +
           '<th title="Natal Planet (Sign)">Natal (Sign)</th>' +
-          '<th>Nakshatra</th>' +
+          '<th>Tr Nakshatra</th>' +
           '<th>Nk. Count</th>' +
           '<th title="Natal Planet (Nakshatra)">Natal (Nak.)</th>' +
-          '<th>Navamsa</th>' +
+          '<th>Tr Navamsa</th>' +
           '<th title="Natal Planet (Navamsa)">Natal (D9)</th>' +
           '<th>Vedha (from)</th>' +
           '<th title="Reverse Vedha (from)">Rev. Vedha</th>' +
