@@ -6,13 +6,13 @@ This is a **standalone research implementation**. It is not imported into the li
 
 Supported planets:
 - **Sun and Moon:** direct sidereal motion; chronological Pada sequence 1 → 2 → 3 → 4.
-- **Rahu:** retrograde sidereal motion; chronological Pada sequence 4 → 3 → 2 → 1.
+- **Rahu and Ketu:** retrograde sidereal motion; chronological Pada sequence 4 → 3 → 2 → 1.
 
-Ketu and other planets are not enabled in this module.
+The engine determines motion handling from the planet name. It expects the callback to return that planet's own Lahiri sidereal longitude.
 
 ## Method
 
-The correction/reference database supplies the Nakshatra entry timestamp. The next entry for the same planet supplies the exit timestamp.
+The correction/reference database supplies the Nakshatra entry timestamp. The next entry for the **same planet** supplies the exit timestamp.
 
 1. Read the existing ephemeris' Lahiri sidereal longitude at both endpoints.
 2. Calculate signed angular displacement in the expected direction.
@@ -21,7 +21,7 @@ The correction/reference database supplies the Nakshatra entry timestamp. The ne
 5. Solve the three internal 3°20′ Pada boundaries by bisection.
 6. Return the four chronological Pada ranges and Navamsa signs.
 
-For retrograde Rahu, the interval begins at Pada 4 and proceeds through 3, 2, and 1. The module handles this ordering; callers must not reverse the returned rows.
+For retrograde Rahu and Ketu, the interval begins at Pada 4 and proceeds through 3, 2, and 1. The module handles this ordering; callers must not reverse the returned rows.
 
 The endpoint timestamps are exact by construction. Internal timestamps are estimates from the ephemeris motion profile. A small solver tolerance is numerical precision, not proof of equivalent astronomical accuracy.
 
@@ -32,7 +32,7 @@ The existing JupiterAstro `siderealPlanetLongitude(planet, jd)` accepts Julian D
 ```js
 const msToJd = ms => ms / 86400000 + 2440587.5;
 const result = window.JAHybridNavamsa.calculate({
-  planet: "Rahu",                 // "Sun", "Moon", or "Rahu"
+  planet: "Ketu",                 // "Sun", "Moon", "Rahu", or "Ketu"
   nakshatraIndex: "Ashwini",      // name or zero-based index
   entryTime: entryMs,
   exitTime: exitMs,
@@ -42,7 +42,17 @@ const result = window.JAHybridNavamsa.calculate({
 });
 ```
 
-Load this module only in a research/test harness when required. This commit does not wire it into the live application.
+Use the same call shape for Sun, Moon and Rahu; change only `planet` and supply that planet's correct interval. Load this module only in a research/test harness when required. This commit does not wire it into the live application.
+
+## Planet-specific correction records
+
+Select consecutive records from the same planet's Nakshatra array:
+- Sun: `data.Sun.Nakshatra`
+- Moon: `data.Moon.Nakshatra`
+- Rahu: `data.Rahu.Nakshatra`
+- Ketu: `data.Ketu.Nakshatra`
+
+The current record is the interval entry and the next record is its exit. The last record has no following endpoint. Do not use Rahu's timestamps as Ketu's interval endpoints, or vice versa. Do not substitute a longitude calculated for one node as the callback result for the other; pass the selected planet through to the ephemeris.
 
 ## Correction JSON timestamps
 
@@ -54,8 +64,6 @@ const exitMs  = JAHybridNavamsa.parseIstTimestamp(nextEntry.entered_at);
 ```
 
 This parser interprets the value as UTC+05:30 and returns epoch milliseconds. If a source timestamp already contains `Z` or an explicit offset, use ordinary offset-aware ISO parsing instead; do not apply the IST conversion twice.
-
-Select consecutive records from the same planet's Nakshatra array: current record = interval entry, next record = interval exit. The last record has no following endpoint.
 
 ## Output
 
@@ -69,19 +77,19 @@ Select consecutive records from the same planet's Nakshatra array: current recor
 
 The module throws instead of returning a result if the planet is unsupported, the interval is invalid, endpoint motion has the wrong direction, longitude is non-finite, or sampled motion is non-monotonic.
 
-The callback must return Lahiri sidereal longitude in degrees. Entry and exit must belong to the same planet and Nakshatra transit, and must use the same time basis.
+The callback must return the selected planet's Lahiri sidereal longitude in degrees. Entry and exit must belong to the same planet and Nakshatra transit, and must use the same time basis.
 
 ## Validation protocol before production use
 
-Compare against an independent reference such as Drik Panchang:
+Validate each planet separately against an independent reference such as Drik Panchang:
 
 1. **Hybrid calibrated longitude:** this module.
-2. **Equal-quarter baseline:** entry plus 1/4, 2/4 and 3/4 of the reference interval. For Rahu these transitions correspond to Pada 3, 2 and 1 after the Pada 4 entry.
+2. **Equal-quarter baseline:** entry plus 1/4, 2/4 and 3/4 of the reference interval. For Rahu/Ketu these transitions correspond to Pada 3, 2 and 1 after the Pada 4 entry.
 3. **Direct-longitude baseline:** solve absolute Navamsa boundaries using the uncalibrated ephemeris.
 
 Report signed error, mean/median/maximum absolute error, exact-minute matches, and percentages within stated tolerances. State source precision explicitly. A minute-rounded reference cannot validate sub-minute astronomical accuracy.
 
-Do not conclude universal superiority from a small sample. Validate multiple years and Nakshatras, inspect endpoint residuals and monotonicity, and use an independent ephemeris/reference before production integration.
+Do not conclude universal superiority from a small sample. Validate multiple years and Nakshatras for all four planets, inspect endpoint residuals and monotonicity, and use an independent ephemeris/reference before production integration.
 
 ## Explicit non-goals of this commit
 

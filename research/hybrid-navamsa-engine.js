@@ -1,7 +1,7 @@
 /* ==========================================================================
    JupiterAstro — Hybrid Calibrated Longitude Navamsa Engine
    Standalone research module; deliberately NOT imported by the live app.
-   Sun/Moon: direct motion. Rahu: retrograde motion.
+   Sun/Moon: direct motion. Rahu/Ketu: retrograde motion.
    ========================================================================== */
 (function (root, factory) {
   const api = factory();
@@ -10,6 +10,8 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
   const NAKSHATRA_SPAN_DEG = 40 / 3, PADA_SPAN_DEG = 10 / 3;
+  const SUPPORTED_PLANETS = ["Sun", "Moon", "Rahu", "Ketu"];
+  const RETROGRADE_PLANETS = ["Rahu", "Ketu"];
   const SIGNS = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
   const NAKSHATRAS = ["Ashwini","Bharani","Krittika","Rohini","Mrigashira","Ardra","Punarvasu","Pushya","Ashlesha","Magha","Purva Phalguni","Uttara Phalguni","Hasta","Chitra","Swati","Vishakha","Anuradha","Jyeshtha","Mula","Purva Ashadha","Uttara Ashadha","Shravana","Dhanishtha","Shatabhisha","Purva Bhadrapada","Uttara Bhadrapada","Revati"];
   const normalize360 = x => ((x % 360) + 360) % 360;
@@ -45,18 +47,24 @@
     return ms;
   }
   function calculate(options) {
-    if (!options || !["Sun","Moon","Rahu"].includes(options.planet)) throw new TypeError('planet must be "Sun", "Moon", or "Rahu".');
+    if (!options || !SUPPORTED_PLANETS.includes(options.planet)) {
+      throw new TypeError('planet must be "Sun", "Moon", "Rahu", or "Ketu".');
+    }
     if (typeof options.getSiderealLongitude !== "function") throw new TypeError("getSiderealLongitude callback is required.");
     const startMs=toMs(options.entryTime,"entryTime"), endMs=toMs(options.exitTime,"exitTime");
     if (!(endMs>startMs)) throw new RangeError("exitTime must be after entryTime.");
-    const nakIndex=resolveNakshatraIndex(options.nakshatraIndex), retrograde=options.planet==="Rahu", direction=retrograde?-1:1;
+    const nakIndex=resolveNakshatraIndex(options.nakshatraIndex);
+    const retrograde=RETROGRADE_PLANETS.includes(options.planet), direction=retrograde?-1:1;
     const getLon=t=>{
       const v=Number(options.getSiderealLongitude(options.planet,t));
       if (!Number.isFinite(v)) throw new TypeError("Ephemeris returned a non-finite longitude at "+new Date(t).toISOString());
       return normalize360(v);
     };
     const startLon=getLon(startMs), endLon=getLon(endMs), rawSignedTravel=signedDelta(startLon,endLon), rawTravel=direction*rawSignedTravel;
-    if (!(rawTravel>0 && rawTravel<180)) throw new RangeError("Unexpected endpoint direction/travel ("+rawSignedTravel+"°). "+(retrograde?"Rahu must move retrograde.":"Sun/Moon must move direct.")+" Check interval, ephemeris, ayanamsa and timezone.");
+    const expectedMotion=retrograde?"retrograde":"direct";
+    if (!(rawTravel>0 && rawTravel<180)) {
+      throw new RangeError("Unexpected endpoint direction/travel ("+rawSignedTravel+"°). "+options.planet+" must move "+expectedMotion+" during this reference interval. Check interval, ephemeris, ayanamsa and timezone.");
+    }
     const sampleCount=Math.max(8,Math.floor(options.monotonicSamples||32)), profile=[];
     let previous=0;
     for(let i=0;i<=sampleCount;i++){
@@ -72,7 +80,7 @@
       const timestampMs=(lo+hi)/2,calibrated=calibratedAt(timestampMs);
       return {timestampMs,iso:new Date(timestampMs).toISOString(),calibratedProgressDeg:calibrated,targetProgressDeg:target,residualArcsec:(calibrated-target)*3600};
     }
-    // Rahu traverses each Nakshatra in reverse Pada order.
+    // Direct planets traverse 1→2→3→4; retrograde nodes traverse 4→3→2→1.
     const order=retrograde?[4,3,2,1]:[1,2,3,4];
     const boundaries=[1,2,3].map((step,i)=>({boundaryAfterPada:order[i],nextPada:order[i+1],nextNavamsaSign:getNavamsaSign(nakIndex,order[i+1]),...solve(step*PADA_SPAN_DEG)}));
     const bounds=[{timestampMs:startMs,iso:new Date(startMs).toISOString(),targetProgressDeg:0},...boundaries,{timestampMs:endMs,iso:new Date(endMs).toISOString(),targetProgressDeg:NAKSHATRA_SPAN_DEG}];
@@ -86,5 +94,5 @@
       boundaries,padas,sampledMotionProfile:profile
     };
   }
-  return Object.freeze({calculate,getNavamsaSign,signedDelta,parseIstTimestamp,constants:Object.freeze({nakshatraSpanDeg:NAKSHATRA_SPAN_DEG,padaSpanDeg:PADA_SPAN_DEG,signs:SIGNS.slice(),nakshatras:NAKSHATRAS.slice()})});
+  return Object.freeze({calculate,getNavamsaSign,signedDelta,parseIstTimestamp,constants:Object.freeze({nakshatraSpanDeg:NAKSHATRA_SPAN_DEG,padaSpanDeg:PADA_SPAN_DEG,signs:SIGNS.slice(),nakshatras:NAKSHATRAS.slice(),supportedPlanets:SUPPORTED_PLANETS.slice(),retrogradePlanets:RETROGRADE_PLANETS.slice()})});
 });
