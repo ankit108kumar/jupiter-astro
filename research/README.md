@@ -46,13 +46,11 @@ Use the same call shape for Sun, Moon and Rahu; change only `planet` and supply 
 
 ## Planet-specific correction records
 
-Select consecutive records from the same planet's Nakshatra array:
-- Sun: `data.Sun.Nakshatra`
-- Moon: `data.Moon.Nakshatra`
-- Rahu: `data.Rahu.Nakshatra`
-- Ketu: `data.Ketu.Nakshatra`
+Select consecutive records from the same planet's Nakshatra reference series. The current record is the interval entry and the next record is its exit; the last record has no following endpoint.
 
-The current record is the interval entry and the next record is its exit. The last record has no following endpoint. Do not use Rahu's timestamps as Ketu's interval endpoints, or vice versa. Do not substitute a longitude calculated for one node as the callback result for the other; pass the selected planet through to the ephemeris.
+**Important data prerequisite:** the original correction-data inspection established the Sun and Moon Nakshatra series. It did not establish that separate Rahu and Ketu Nakshatra series are present in the JSON. Before running either node, inspect the actual data schema and confirm that a complete, correctly ordered entry series exists for that node. Do not assume `data.Rahu.Nakshatra` or `data.Ketu.Nakshatra` exists. If Ketu reference entries are absent, they must be sourced or derived through a separately validated method before this engine can calculate Ketu transit intervals. Never silently reuse Rahu timestamps as Ketu's own interval timestamps.
+
+The longitude callback must also return the selected node's own sidereal longitude.
 
 ## Correction JSON timestamps
 
