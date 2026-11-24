@@ -41,18 +41,16 @@ The endpoint timestamps are anchored to the JSON Nakshatra references. Internal 
 
 ## Application integration
 
-The production HTML loads the reconciliation engine and its application adapter as external scripts:
+The production HTML loads the reconciliation engine and its global natal/transit adapter as external scripts:
 
 - \`/research/planetary-reference-reconciliation.js\`
 - \`/research/planetary-reference-transit-adapter.js\`
 
 The adapter reads the selected transit timestamp and obtains the current sidereal longitude through the existing \`siderealPlanetLongitude(planet, jd)\` function. The adapter converts epoch milliseconds to Julian Day for that callback.
 
-For all four planets, the transit reconciliation table reports:
-- Current Sign, Nakshatra and Navamsa labels.
-- Entry and exit timestamps for each division.
-- Total duration of the current interval.
-- The source used: JSON reference or hybrid derivation.
+For Saturn, Jupiter, Rahu and Ketu, the adapter reconciles Sign, Nakshatra and Navamsa classifications for both natal and transit positions. It preserves the original ephemeris longitude and degree values. Verified classifications are applied to the existing chart calculations and existing transit displays; no separate reconciliation table is rendered. Existing transit timeline duration cells consume JSON reference intervals (or hybrid Rahu/Ketu Navamsa intervals) through the current data provider, with the ephemeris interval calculation retained as fallback outside reference coverage.
+
+A compact fixed information strip at the lower-left reports the planets whose labels were updated, the planets verified, elapsed verification time in milliseconds, and verification timestamp. A chart load/re-open performs one combined natal + current-transit verification and displays one status update. A new transit timestamp/query triggers a fresh status update. Cached verification results are reused when the same timestamp and longitudes are requested.
 
 Reference timestamps are interpreted using the correction database's declared timezone and UTC offset. The current correction dataset is based on New Delhi/IST. Displayed reference timestamps are explicitly labelled IST.
 
@@ -107,10 +105,12 @@ Validate each planet and division independently against an external reference su
 
 Report signed error, mean/median/maximum absolute error, exact-minute matches, and percentages within stated tolerances. State source precision explicitly. A minute-rounded reference cannot validate sub-minute astronomical accuracy. Validate multiple years and Nakshatras, inspect endpoint residuals and monotonicity, and use an independent ephemeris/reference before making broad accuracy claims.
 
-## Explicit boundaries of Phase 1
+## Explicit implementation boundaries
 
+- Both natal and transit classifications are reconciled; this is not transit-only.
 - The existing planetary longitude and chart calculation engine is not replaced or modified.
-- The reconciliation engine remains in its own JavaScript file and is connected through external script tags.
+- The reconciliation engine and adapter remain in their own JavaScript files and are connected through external script tags.
 - No artificial Rahu/Ketu Navamsa rows are added to the correction JSON.
 - The correction JSON itself is not modified.
+- No new table, button, page, or popup is added; the status strip is the only new UI element requested.
 - The reference dataset remains New Delhi/IST based; this phase displays those reference timestamps in IST and does not apply a geographic time correction to the astronomical event.
