@@ -60,7 +60,13 @@
 </head>
 </html>
 
-<body>
+<body class="ja-page-loading">
+<div id="jaPageLoadingOverlay" role="status" aria-live="polite" aria-label="Loading page">
+  <div class="ja-page-loading-content">
+    <span class="ja-loading-spinner" aria-hidden="true"></span>
+    <span>Loading...</span>
+  </div>
+</div>
 
 <header class="brand">
   <div class="wrap" style="align-items: center;">
@@ -2639,7 +2645,10 @@ if (safeGet('pTithiEnds')) {
 /* ================= INITIALIZATION ================= */
 
 window.addEventListener('load', () => {
-  setTimeout(updatePrashnaLivePanchang, 200);
+  setTimeout(() => {
+    updatePrashnaLivePanchang();
+    if (window.__jaPageReadyGate) window.__jaPageReadyGate.markPanchangReady();
+  }, 200);
 
   const mainFormEl = document.getElementById('mainForm');
 
@@ -4193,7 +4202,7 @@ function schedulePlanetaryReferenceUpdate(kData, targetEl, prefix, getEvalMs, ge
   const token = (targetEl.__jaPlanetaryUpdateToken || 0) + 1;
   targetEl.__jaPlanetaryUpdateToken = token;
   const start = window.performance && performance.now ? performance.now() : Date.now();
-  loadPlanetaryReferenceAdapter().then(async adapter => {
+  return loadPlanetaryReferenceAdapter().then(async adapter => {
     if (!targetEl.isConnected || targetEl.__jaPlanetaryUpdateToken !== token) return;
     const evalMs = Number(getEvalMs());
     const rawTransit = getTransitPlanetPositions(evalMs);
@@ -6626,7 +6635,7 @@ document.getElementById(`${prefix}-lkMonthlyDuration`).textContent =
   }
 
   openTab('overview');
-  schedulePlanetaryReferenceUpdate(kData, targetEl, prefix, () => currentEvalMs, () => activeTabKey, async () => {
+  const referenceUpdate = schedulePlanetaryReferenceUpdate(kData, targetEl, prefix, () => currentEvalMs, () => activeTabKey, async () => {
     nk = nakOfPosition(kData.ch.planets.Moon);
     const lagnaChip = document.getElementById(`${prefix}-jaLagnaChip`);
     const rashiChip = document.getElementById(`${prefix}-jaRashiChip`);
@@ -6637,6 +6646,10 @@ document.getElementById(`${prefix}-lkMonthlyDuration`).textContent =
     const chartInstance = activeChartsRegistry.get(prefix);
     if (chartInstance) await chartInstance.refreshCurrentTab();
   });
+  if (prefix === 'main') {
+    await referenceUpdate;
+    if (window.__jaPageReadyGate) window.__jaPageReadyGate.markChartReady();
+  }
 }
 
 
@@ -8983,6 +8996,48 @@ const result = section === 'planets'
   var kind=cardKind(card);if(!kind)return;
   e.preventDefault();openCard(kind);
  },true);
+})();
+</script>
+<script>
+(function () {
+  const overlay = document.getElementById('jaPageLoadingOverlay');
+  if (!overlay) return;
+
+  const state = { loaded: document.readyState === 'complete', chart: false, panchang: false, fonts: false, painted: false };
+  const minimumVisibleMs = 2000;
+  let shownAt = 0;
+  let finishing = false;
+
+  function maybeReveal() {
+    if (finishing || !state.loaded || !state.chart || !state.panchang || !state.fonts || !state.painted) return;
+    finishing = true;
+    const remaining = Math.max(0, minimumVisibleMs - (performance.now() - shownAt));
+    window.setTimeout(() => {
+      overlay.classList.add('is-hidden');
+      document.body.classList.remove('ja-page-loading');
+      window.setTimeout(() => overlay.remove(), 300);
+    }, remaining);
+  }
+
+  window.__jaPageReadyGate = {
+    markChartReady: () => { state.chart = true; maybeReveal(); },
+    markPanchangReady: () => { state.panchang = true; maybeReveal(); }
+  };
+
+  if (!state.loaded) {
+    window.addEventListener('load', () => { state.loaded = true; maybeReveal(); }, { once: true });
+  }
+
+  const fontsReady = document.fonts && document.fonts.ready
+    ? document.fonts.ready
+    : Promise.resolve();
+  fontsReady.then(() => { state.fonts = true; maybeReveal(); });
+
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    state.painted = true;
+    shownAt = performance.now();
+    maybeReveal();
+  }));
 })();
 </script>
 </body>
