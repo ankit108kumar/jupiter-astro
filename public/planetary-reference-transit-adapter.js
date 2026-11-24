@@ -10,7 +10,7 @@ const SIGNS=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio',
 const NAK=['Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu','Pushya','Ashlesha','Magha','Purva Phalguni','Uttara Phalguni','Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha','Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishta','Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'];
 const ORD=['First','Second','Third','Fourth'];
 const CACHE=new Map();
-let enginePromise=null,engine=null,requestSequence=0,statusHideTimer=null,latestStatus=null;
+let enginePromise=null,engine=null,requestSequence=0,statusHideTimer=null,latestStatus=null,timelineTimestamp=null,timelineUpdated=new Set(),timelineRefreshTimer=null,lastStatusModel=null;
 const EPHEMERIS_VERSION='JupiterAstro-existing-sidereal-ephemeris';
 function nowMs(){return root.performance&&typeof root.performance.now==='function'?root.performance.now():Date.now();}
 function msToJd(ms){return Number(ms)/86400000+2440587.5;}
@@ -71,16 +71,25 @@ function showLatestStatus(){
  displayStatusForOneSecond();
 }
 function showStatus(result,elapsed,scope){
- const updated=result.updated||[],verified=result.verified||[],errors=result.errors||[];
- const names=updated.length?updated.join(', '):'None (reference values already matched)';
- const heading=errors.length?'Planetary data verification incomplete':verified.length?'Planetary data verified and updated':'Planetary reference not available for this date';
+ const updated=result.updated||[],verified=result.verified||[],unavailable=result.unavailable||[],partial=result.partial||[],errors=result.errors||[];
+ const durations=Array.from(new Set([...(result.timelineUpdated||[]),...timelineUpdated])).sort();
+ const heading=errors.length?'Reference check incomplete':unavailable.length&&!verified.length?'Reference data unavailable':updated.length?'Reference check · corrections applied':'Reference check complete';
  const firstLine=heading+' · '+(scope||'Chart');
- const secondLine='Updated: '+names+' · Verified: '+(verified.join(', ')||'—')+
-  ' · '+Math.max(0,elapsed).toFixed(1)+' ms · '+dateLabel(Date.now())+
-  (errors.length?' · Note: '+errors.join('; '):'');
- latestStatus={state:errors.length?'warning':'ready',title:firstLine+'\n'+secondLine,html:'<span class="ja-pr-line"><strong>'+escapeHtml(heading)+'</strong> · '+escapeHtml(scope||'Chart')+'</span>'+
+ const secondLine='Verified: '+(verified.join(', ')||'—')+
+  ' · Updated: '+(updated.join(', ')||'—')+
+  ' · No data: '+(unavailable.join(', ')||'—')+
+  (partial.length?' · Partial: '+partial.join(', '):'')+
+  ' · Timeline duration: '+(durations.join(', ')||'—')+
+  ' · '+Math.max(0,elapsed).toFixed(1)+' ms'+
+  (errors.length?' · Errors: '+errors.join('; '):'');
+ latestStatus={state:errors.length?'warning':unavailable.length?'warning':'ready',title:firstLine+'\n'+secondLine,html:'<span class="ja-pr-line"><strong>'+escapeHtml(heading)+'</strong> · '+escapeHtml(scope||'Chart')+'</span>'+
   '<span class="ja-pr-line">'+escapeHtml(secondLine)+'</span>'};
+ lastStatusModel={result,elapsed,scope};
  showLatestStatus();
+}
+function scheduleTimelineStatusRefresh(){
+ if(!lastStatusModel||timelineRefreshTimer!==null)return;
+ timelineRefreshTimer=root.setTimeout(()=>{timelineRefreshTimer=null;if(lastStatusModel)showStatus(lastStatusModel.result,lastStatusModel.elapsed,lastStatusModel.scope);},40);
 }
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 async function getEngine(){
@@ -125,32 +134,40 @@ async function reconcilePositions(positions,timestamp,scope,options){
    const calculated={};
    PLANETS.forEach(p=>{if(positions[p]&&Number.isFinite(positions[p].lon))calculated[p]=currentLabels(p,positions[p].lon);});
    const result={results:{},errors:{}};await Promise.all(PLANETS.map(async p=>{try{result.results[p]=await e.verify({planet:p,timestamp:at,calculated:calculated[p]||{},ephemerisLongitudeAt:longitudeAt,ephemerisVersion:EPHEMERIS_VERSION});}catch(error){result.errors[p]={code:error.code||'ERROR',message:error.message};}}));
-   const verified=[],updated=[],errors=[];
+   const verified=[],updated=[],unavailable=[],partial=[],errors=[];
    PLANETS.forEach(p=>{
     const item=result.results&&result.results[p];
-    if(!item){errors.push((result.errors&&result.errors[p]&&result.errors[p].message)||p+' verification unavailable');return;}
+    if(!item){unavailable.push(p);errors.push((result.errors&&result.errors[p]&&result.errors[p].message)||p+' verification unavailable');return;}
     const supported=DIVISIONS.map(d=>item.divisions&&item.divisions[d.toLowerCase()]).filter(Boolean);
-    if(supported.some(x=>x.reference))verified.push(p);
+    const covered=supported.filter(x=>x.reference&&x.status!=='coverage-open-ended');
+    if(covered.length===DIVISIONS.length)verified.push(p);
+    else if(covered.length)partial.push(p);
+    else unavailable.push(p);
     if(supported.some(x=>x.corrected))updated.push(p);
    });
-   payload={results:result.results||{},verified,updated,errors,version:e.getDiagnostics().version};
+   payload={results:result.results||{},verified,updated,unavailable,partial,errors,version:e.getDiagnostics().version};
    CACHE.set(cacheKey,payload);while(CACHE.size>40)CACHE.delete(CACHE.keys().next().value);
   }
   const out=makePositions(positions,payload.results),elapsed=nowMs()-start;
   if(token===requestSequence&&!options.silent)showStatus(payload,elapsed,scope);
-  return{positions:out,results:payload.results,verified:payload.verified.slice(),updated:payload.updated.slice(),errors:payload.errors.slice(),elapsedMs:elapsed,referenceVersion:payload.version};
+  return{positions:out,results:payload.results,verified:payload.verified.slice(),updated:payload.updated.slice(),unavailable:(payload.unavailable||[]).slice(),partial:(payload.partial||[]).slice(),errors:payload.errors.slice(),elapsedMs:elapsed,referenceVersion:payload.version};
  }catch(error){
   const elapsed=nowMs()-start;
-  if(token===requestSequence&&!options.silent)showStatus({verified:[],updated:[],errors:[error.message]},elapsed,scope);
+  if(token===requestSequence&&!options.silent)showStatus({verified:[],updated:[],unavailable:PLANETS.slice(),partial:[],errors:[error.message]},elapsed,scope);
   console.error('JupiterAstro planetary reference verification failed:',error);
-  return{positions:Object.assign({},positions),results:{},verified:[],updated:[],errors:[error.message],elapsedMs:elapsed,referenceVersion:null};
+  return{positions:Object.assign({},positions),results:{},verified:[],updated:[],unavailable:PLANETS.slice(),partial:[],errors:[error.message],elapsedMs:elapsed,referenceVersion:null};
  }
 }
 function getInterval(planet,division,timestamp){
  if(!engine)return null;
+ const at=Number(timestamp);
+ if(at!==timelineTimestamp){timelineTimestamp=at;timelineUpdated.clear();scheduleTimelineStatusRefresh();}
  try{
-  const q=engine.getTransitReference(planet,division,Number(timestamp),longitudeAt,EPHEMERIS_VERSION);
+  const q=engine.getTransitReference(planet,division,at,longitudeAt,EPHEMERIS_VERSION);
   if(!q||q.startMs==null||q.endMs==null||!Number.isFinite(Number(q.startMs))||!Number.isFinite(Number(q.endMs)))return null;
+  if(Number(q.startMs)>at||Number(q.endMs)<=at)return null;
+  timelineUpdated.add(planet+' '+division);
+  scheduleTimelineStatusRefresh();
   return{startMs:Number(q.startMs),endMs:Number(q.endMs),source:q.referenceSource||'json',derived:!!q.derived};
  }catch(e){return null;}
 }
