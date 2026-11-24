@@ -12,7 +12,7 @@ const ORD=['First','Second','Third','Fourth'];
 const CACHE=new Map();
 let enginePromise=null,engine=null,requestSequence=0;
 const EPHEMERIS_VERSION='JupiterAstro-existing-sidereal-ephemeris';
-function nowMs(){return root.performance&&typeof root.performance.now==='function'?root.nowMs():Date.now();}
+function nowMs(){return root.performance&&typeof root.performance.now==='function'?root.performance.now():Date.now();}
 function msToJd(ms){return Number(ms)/86400000+2440587.5;}
 function longitudeAt(planet,timestampMs){
  if(typeof root.siderealPlanetLongitude!=='function')throw new Error('Existing siderealPlanetLongitude() is unavailable.');
