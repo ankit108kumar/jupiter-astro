@@ -1306,6 +1306,9 @@ const CO_LORD = { 7: ['Mars', 'Ketu'], 10: ['Saturn', 'Rahu'] };
 const signOf = l => Math.floor(l / 30);
 const navamsaOf = l => Math.floor(l / (10 / 3)) % 12;
 function nakOf(l) { const span = 40 / 3, i = Math.min(26, Math.floor(l / span)); return { i, pada: Math.min(4, Math.floor((l - i * span) / (span / 4)) + 1), frac: (l - i * span) / span }; }
+function signOfPosition(position) { return Number.isInteger(position?.jaReference?.indices?.sign) ? position.jaReference.indices.sign : signOf(position.lon); }
+function nakOfPosition(position) { const base = nakOf(position.lon); const ref = position?.jaReference?.indices; return Number.isInteger(ref?.nakshatra) ? { ...base, i: ref.nakshatra, pada: Number.isInteger(ref.pada) ? ref.pada : base.pada } : base; }
+function navamsaOfPosition(position) { return Number.isInteger(position?.jaReference?.indices?.navamsa) ? position.jaReference.indices.navamsa : navamsaOf(position.lon); }
 function dignity(name, sign) {
   if (!(name in EXALT)) return null;
   if (EXALT[name] === sign) return ['ex', 'Exalted'];
@@ -1364,6 +1367,7 @@ function vargaSign(lon, n) {
   return ((r % 12) + 12) % 12;
 }
 const vargottamaIn = lon => VARGAS.filter(([n]) => n > 1 && vargaSign(lon, n) === signOf(lon)).map(([n]) => 'D' + n);
+function vargottamaForPosition(position) { if (!Number.isInteger(position?.jaReference?.indices?.navamsa)) return vargottamaIn(position.lon); const list = vargottamaIn(position.lon).filter(x => x !== 'D9'); if (navamsaOfPosition(position) === signOfPosition(position)) list.push('D9'); return list; }
 
 /* ================= JAIMINI ARUDHA & KARAKAS ================= */
 function houseLord(sign, pos, deg) {
@@ -1441,8 +1445,8 @@ function calculateRahuBav(pos1, ascSign) {
 /* ================= TRANSIT TIMELINE DATA ADAPTER =================
    One selected-kundali adapter supplies all nine rows to the floating
    Transit Timeline. Transit positions are cached by evaluation timestamp.
-   Duration intervals use the same in-app sidereal ephemeris; a future JSON
-   duration provider can override the basic interval without changing the UI.
+   Reference classifications and duration intervals are supplied by the global
+   natal/transit reconciliation adapter; the ephemeris remains the longitude source.
    ====================================================================== */
 const TRANSIT_POSITION_CACHE = new Map();
 const TRANSIT_TIMELINE_DATA_CACHE = new WeakMap();
@@ -1472,6 +1476,10 @@ function siderealPlanetLongitude(planet, jd) {
 
   return rev(tropical - lahiri(jd));
 }
+
+// Public callback for the external planetary-reference reconciliation adapter.
+// This exposes the existing function without changing its calculation.
+window.siderealPlanetLongitude = siderealPlanetLongitude;
 
 function signedLongitudeDelta(from, to) {
   let delta = to - from;
@@ -1527,7 +1535,11 @@ function formatTransitTimelineDateTime(timestamp) {
 }
 
 function getTransitDivisionInterval(planet, evalMs, longitude, division) {
-  // Extension point for the user's forthcoming duration JSON. The eventual
+  const referenceInterval = window.JAPlanetaryReconciliation && window.JAPlanetaryReconciliation.getInterval(planet, division, evalMs);
+  if (referenceInterval && Number.isFinite(referenceInterval.startMs) && Number.isFinite(referenceInterval.endMs) && referenceInterval.startMs <= Number(evalMs) && referenceInterval.endMs > Number(evalMs)) {
+    return { startMs: referenceInterval.startMs, endMs: referenceInterval.endMs, startText: formatTransitTimelineDateTime(referenceInterval.startMs), endText: formatTransitTimelineDateTime(referenceInterval.endMs), source: referenceInterval.source || 'planetary-reference-json' };
+  }
+  // Extension point for an optional external duration provider.
   // JSON format can be adapted here without changing table rendering.
   const provider = window.JA_TRANSIT_DURATION_PROVIDER;
   if (typeof provider === 'function') {
@@ -1598,7 +1610,7 @@ function transitPlanetStatusMarkers(planet, position, sign, transitPositions) {
   if (status && status[0] === 'ex') markers.push('↑');
   else if (status && status[0] === 'deb') markers.push('↓');
 
-  if (vargottamaIn(position.lon).includes('D9')) markers.push('□');
+  if (Number.isInteger(position?.jaReference?.indices?.navamsa) ? navamsaOfPosition(position) === sign : vargottamaIn(position.lon).includes('D9')) markers.push('□');
   return markers;
 }
 
@@ -1613,20 +1625,20 @@ function getTransitTimelineTableData(k, evalMs) {
   if (chartCache.has(cacheKey)) return chartCache.get(cacheKey);
 
   const transitPositions = getTransitPlanetPositions(cacheKey);
-  const natalMoonNak = nakOf(k.ch.planets.Moon.lon).i;
+  const natalMoonNak = nakOfPosition(k.ch.planets.Moon).i;
   const natalPlanets = PL.map(([name]) => name);
   const matchingPlanets = predicate => natalPlanets
-    .filter(name => predicate(k.ch.planets[name].lon))
+    .filter(name => predicate(k.ch.planets[name]))
     .map(name => {
       const natalPosition = k.ch.planets[name];
-      const natalSign = signOf(natalPosition.lon);
+      const natalSign = signOfPosition(natalPosition);
       const markers = [];
       if (natalPosition.retro) markers.push('R');
       if (k.combust && k.combust[name]) markers.push('C');
       const status = dignity(name, natalSign);
       if (status && status[0] === 'ex') markers.push('↑');
       else if (status && status[0] === 'deb') markers.push('↓');
-      if (vargottamaIn(natalPosition.lon).includes('D9')) markers.push('□');
+      if (navamsaOfPosition(natalPosition) === natalSign) markers.push('□');
       return { name, color: PLANET_COLORS[name], markers };
     });
 
@@ -1644,9 +1656,9 @@ function getTransitTimelineTableData(k, evalMs) {
 
   const rows = PL.map(([planet]) => {
     const position = transitPositions[planet];
-    const sign = signOf(position.lon);
-    const nak = nakOf(position.lon);
-    const navamsa = vargaSign(position.lon, 9);
+    const sign = signOfPosition(position);
+    const nak = nakOfPosition(position);
+    const navamsa = Number.isInteger(position?.jaReference?.indices?.navamsa) ? navamsaOfPosition(position) : vargaSign(position.lon, 9);
 
     const signDuration = getInterval(planet, position.lon, 'sign');
     const nakshatraDuration = getInterval(planet, position.lon, 'nakshatra');
@@ -1681,16 +1693,16 @@ function getTransitTimelineTableData(k, evalMs) {
       sav: k.av.sav[sign],
       fromMoon: houseFrom(sign, k.moonSign),
       bav,
-      natalPlanetsInSign: matchingPlanets(lon => signOf(lon) === sign),
+      natalPlanetsInSign: matchingPlanets(position => signOfPosition(position) === sign),
       nakshatra: NAK[nak.i][0],
       nakshatraDuration,
       countFromJanmaNakshatra: ((nak.i - natalMoonNak + 27) % 27) + 1,
       nakshatraLord: NAK[nak.i][1],
-      natalPlanetsInNakshatra: matchingPlanets(lon => nakOf(lon).i === nak.i),
+      natalPlanetsInNakshatra: matchingPlanets(position => nakOfPosition(position).i === nak.i),
       navamsa: SIGNS[navamsa][0],
       navamsaIndex: navamsa + 1,
       navamsaDuration,
-      natalPlanetsInNavamsa: matchingPlanets(lon => vargaSign(lon, 9) === navamsa),
+      natalPlanetsInNavamsa: matchingPlanets(position => (Number.isInteger(position?.jaReference?.indices?.navamsa) ? navamsaOfPosition(position) : vargaSign(position.lon, 9)) === navamsa),
       vedha: '',
       reverseVedha: '',
       murti
@@ -4104,18 +4116,22 @@ function jaSpecialPointRows(k){
  return order.map(name=>{const p=points.find(x=>x.name===name);if(!p||!Number.isFinite(p.lon))return{name,degree:'—',sign:'—',nakshatra:'—',navamsa:'—',source:p?.source||'Not calculated'};const lon=rev(p.lon),sg=signOf(lon),nk=nakOf(lon);return{...p,degree:dms(lon%30),sign:SIGNS[sg][0],nakshatra:NAK[nk.i][0],navamsa:SIGNS[navamsaOf(lon)][0]};});
 }
 
-function buildCompleteKundali(input, offsetDays = 0) {
+async function buildCompleteKundali(input, offsetDays = 0) {
   const ch = computeChart(input);
+  const birthMs = jdToMs(ch.jd);
+  const natalReconciliation = window.JAPlanetaryReconciliation
+    ? await window.JAPlanetaryReconciliation.reconcilePositions(ch.planets, birthMs, 'Natal', { silent: true })
+    : { positions: ch.planets, verified: [], updated: [], errors: ['Reference adapter unavailable; using calculated positions.'], elapsedMs: 0 };
+  ch.planets = natalReconciliation.positions;
   const ascSign = signOf(ch.asc);
   const pos1 = {}, deg = {}, combust = {};
 
   PL.forEach(([n]) => {
-    pos1[n] = signOf(ch.planets[n].lon);
+    pos1[n] = signOfPosition(ch.planets[n]);
     deg[n] = ch.planets[n].lon % 30;
     combust[n] = isCombust(n, ch.planets);
   });
 
-  const birthMs = jdToMs(ch.jd);
   const moonSign = pos1.Moon;
   const md = mahadashas(ch.planets.Moon.lon, birthMs, 365.25, offsetDays);
   const karakas = charaKarakas(ch.planets);
@@ -4125,7 +4141,7 @@ function buildCompleteKundali(input, offsetDays = 0) {
   const av = ashtakavarga(pos1, ascSign);
   const shani = saturnCycles(moonSign, ch.jd);
 
-  const kBundle = { ch, ascSign, pos1, deg, combust, birthMs, moonSign, md, padas, shani, chain, av, karakas, input, offsetDays };
+  const kBundle = { ch, ascSign, pos1, deg, combust, birthMs, moonSign, md, padas, shani, chain, av, karakas, input, offsetDays, jaNatalReconciliation: natalReconciliation };
   kBundle.lp = lifePromisesEngine(kBundle);
   return kBundle;
 }
@@ -4153,7 +4169,7 @@ function getPlanetMarks(p, sign, kData) {
 
 function getVargaItems(kData, n) {
   const posN = {};
-  PL.forEach(([p]) => { posN[p] = typeof n === 'number' ? vargaSign(kData.ch.planets[p].lon, n) : kData.pos1[p]; });
+  PL.forEach(([p]) => { posN[p] = typeof n === 'number' ? (n === 1 ? signOfPosition(kData.ch.planets[p]) : n === 9 ? navamsaOfPosition(kData.ch.planets[p]) : vargaSign(kData.ch.planets[p].lon, n)) : kData.pos1[p]; });
   const ascN = typeof n === 'number' ? vargaSign(kData.ch.asc, n) : kData.ascSign;
   const al = arudhaOf(ascN, posN, kData.deg);
   const items = [
@@ -4483,7 +4499,7 @@ const RenderTabs = {
     const secChart = getSecondaryChart(k, secKey);
     const avk = avkahada(k.ch.planets.Moon.lon);
     const pc = panchangAt(k.ch.planets.Sun.lon, k.ch.planets.Moon.lon);
-    const nk = nakOf(k.ch.planets.Moon.lon);
+    const nk = nakOfPosition(k.ch.planets.Moon);
     const kharaResults = jaYogiAndKhara(k);
     return `
       <div class="two">
@@ -4610,7 +4626,7 @@ const RenderTabs = {
 </header>
           <dl class="kv" id="${prefix}-metadata">
             <dt>Atmakaraka</dt><dd>${k.karakas[0].planet} <span class="sub">${dms(k.karakas[0].deg, false)}</span></dd>
-            <dt>Karakamsa</dt><dd>${SIGNS[navamsaOf(k.ch.planets[k.karakas[0].planet].lon)][0]} <span class="sub">AK in navamsa</span></dd>
+            <dt>Karakamsa</dt><dd>${SIGNS[navamsaOfPosition(k.ch.planets[k.karakas[0].planet])][0]} <span class="sub">AK in navamsa</span></dd>
             <dt>Darakaraka</dt><dd>${k.karakas[k.karakas.length - 1].planet}</dd>
             <dt>Arudha Lagna</dt><dd>${SIGNS[k.padas[0].sign][0]} <span class="sub">house ${houseFrom(k.padas[0].sign, k.ascSign)}</span></dd>
             <dt>Upapada</dt><dd>${SIGNS[k.padas[11].sign][0]} <span class="sub">house ${houseFrom(k.padas[11].sign, k.ascSign)}</span></dd>
@@ -4763,16 +4779,16 @@ ${createCopyExportButton({
       </tr>
     `;
     PL.forEach(([p]) => {
-      const pl = k.ch.planets[p], s = signOf(pl.lon), dg = dignity(p, s);
+      const pl = k.ch.planets[p], s = signOfPosition(pl), dg = dignity(p, s);
       const st = [dg ? dg[1] : '', pl.retro && p !== 'Rahu' && p !== 'Ketu' ? 'Retro' : '', k.combust[p] ? 'Combust' : ''].filter(Boolean).join(', ');
       rows += `
         <tr>
           <td><span class="pname">${p}</span></td><td>${SIGNS[s][0]}</td>
           <td class="num">${dms(pl.lon % 30)}</td><td class="num">${dms(pl.lon)}</td>
-          <td>${NAK[nakOf(pl.lon).i][0]} · ${nakOf(pl.lon).pada}</td>
-          <td class="num c">${houseFrom(s, k.ascSign)}</td><td>${SIGNS[navamsaOf(pl.lon)][0]}</td>
+          <td>${NAK[nakOfPosition(pl).i][0]} · ${nakOfPosition(pl).pada}</td>
+          <td class="num c">${houseFrom(s, k.ascSign)}</td><td>${SIGNS[navamsaOfPosition(pl)][0]}</td>
           <td>${kmap[p] || ''}</td><td>${st}</td>
-          <td>${vargottamaIn(pl.lon).join(', ')}</td>
+          <td>${vargottamaForPosition(pl).join(', ')}</td>
         </tr>
       `;
     });
@@ -4848,13 +4864,18 @@ dasha(k, prefix, evalMs = Date.now()) {
     `;
 },
       
-  transit(k, prefix, evalMs = Date.now(), selectedVarga = (window.trSelectedVarga || 9)) {
+  async transit(k, prefix, evalMs = Date.now(), selectedVarga = (window.trSelectedVarga || 9)) {
     // 1. Generate Natal D1 Birth Chart data
     const d1 = getVargaItems(k, 1);
     const evalJd = msToJd(evalMs);
-    const tr = getTransitPlanetPositions(evalMs);
+    const calculatedTransitPositions = getTransitPlanetPositions(evalMs);
+    const transitCheck = window.JAPlanetaryReconciliation
+      ? await window.JAPlanetaryReconciliation.reconcilePositions(calculatedTransitPositions, evalMs, 'Transit')
+      : { positions: calculatedTransitPositions, verified: [], updated: [], errors: ['Reference adapter unavailable; using calculated positions.'], elapsedMs: 0 };
+    const tr = transitCheck.positions;
+    TRANSIT_POSITION_CACHE.set(Math.trunc(Number(evalMs)), tr);
     const titems = PL.map(([p, , ab]) => {
-      const sign = signOf(tr[p].lon);
+      const sign = signOfPosition(tr[p]);
       // Construct a temporary mock kData object for transit planets check
       const mockK = { ch: { planets: tr }, combust: { [p]: isCombust(p, tr) } };
       return { 
@@ -4903,13 +4924,13 @@ dasha(k, prefix, evalMs = Date.now()) {
       'Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter',
       'Venus', 'Saturn', 'Rahu', 'Ketu'
     ];
-    const birthMoonNakIndex = nakOf(k.ch.planets.Moon.lon).i;
+    const birthMoonNakIndex = nakOfPosition(k.ch.planets.Moon).i;
 
     const renderNavTaraGrid = planetaryPositions => {
       const lattaRows = navTaraPlanetNames.map(planet => {
         const position = planetaryPositions && planetaryPositions[planet];
         if (!position || !Number.isFinite(position.lon)) return null;
-        const nakIndex = nakOf(position.lon).i;
+        const nakIndex = nakOfPosition(position).i;
         return { planet, nakshatra: NAK[nakIndex][0] };
       }).filter(Boolean);
       const lattaHits = window.JupiterTransitTimeline &&
@@ -4930,7 +4951,7 @@ dasha(k, prefix, evalMs = Date.now()) {
           const occupants = navTaraPlanetNames.filter(planet => {
             const position = planetaryPositions && planetaryPositions[planet];
             return position && Number.isFinite(position.lon) &&
-              nakOf(position.lon).i === nakIndex;
+              nakOfPosition(position).i === nakIndex;
           });
           const occupantHtml = occupants.map(planet =>
             `<strong class="ja-navtara-occupant" style="color:${PLANET_COLORS[planet] || 'var(--ink)'}">${planet}</strong>`
@@ -4977,7 +4998,7 @@ dasha(k, prefix, evalMs = Date.now()) {
     // 2. Divisional (Varga) Calculations (Default: D9 Navamsa)
     const natalVarga = getVargaItems(k, selectedVarga);
     const trVargaItems = PL.map(([p, , ab]) => {
-      const sign = vargaSign(tr[p].lon, selectedVarga);
+      const sign = selectedVarga === 1 ? signOfPosition(tr[p]) : selectedVarga === 9 ? (Number.isInteger(tr[p]?.jaReference?.indices?.navamsa) ? navamsaOfPosition(tr[p]) : vargaSign(tr[p].lon, 9)) : vargaSign(tr[p].lon, selectedVarga);
       const mockK = { ch: { planets: tr }, combust: { [p]: isCombust(p, tr) } };
       return { 
         t: ab, 
@@ -5013,7 +5034,7 @@ dasha(k, prefix, evalMs = Date.now()) {
     const tStr = `${pad(evalDate.getHours())}:${pad(evalDate.getMinutes())}`;
 
     const trRows = PL.map(([p]) => {
-      const s = signOf(tr[p].lon);
+      const s = signOfPosition(tr[p]);
       const fm = houseFrom(s, k.moonSign);
       const good = GOCHAR_GOOD[p].includes(fm);
       return `
@@ -5634,9 +5655,9 @@ function getJupiterTransitTimelineRegistry() {
 }
 
 /* ================= FULL UI COMPONENT CONTROLLER ================= */
-function renderKundaliComponent(
+async function renderKundaliComponent(
   targetEl, kData, prefix, title, subtitle, recordId = ''
-) {  const nk = nakOf(kData.ch.planets.Moon.lon);
+) {  const nk = nakOfPosition(kData.ch.planets.Moon);
   const nowMs = Date.now();
   const dNow = kData.chain.length
   ? kData.chain.slice(0, 3).map(p => p.lord).join('–')
@@ -5645,6 +5666,18 @@ function renderKundaliComponent(
   // 1. Initialize evaluation timestamp (defaults to current system time)
   let currentEvalMs = Date.now();
   let activeTabKey = 'overview';
+  const initialTransitPositions = getTransitPlanetPositions(currentEvalMs);
+  const transitInitialCheck = window.JAPlanetaryReconciliation
+    ? await window.JAPlanetaryReconciliation.reconcilePositions(initialTransitPositions, currentEvalMs, 'Transit', { silent: true })
+    : { positions: initialTransitPositions, verified: [], updated: [], errors: ['Reference adapter unavailable; using calculated positions.'], elapsedMs: 0 };
+  TRANSIT_POSITION_CACHE.set(Math.trunc(Number(currentEvalMs)), transitInitialCheck.positions);
+  const natalInitialCheck = kData.jaNatalReconciliation || { verified: [], updated: [], errors: [], elapsedMs: 0 };
+  const verifiedNames = Array.from(new Set([...(natalInitialCheck.verified || []), ...(transitInitialCheck.verified || [])]));
+  const updatedNames = Array.from(new Set([...(natalInitialCheck.updated || []), ...(transitInitialCheck.updated || [])]));
+  const verificationErrors = [...(natalInitialCheck.errors || []), ...(transitInitialCheck.errors || [])];
+  if (window.JAPlanetaryReconciliation && typeof window.JAPlanetaryReconciliation.showStatus === 'function') {
+    window.JAPlanetaryReconciliation.showStatus({ verified: verifiedNames, updated: updatedNames, errors: verificationErrors }, (natalInitialCheck.elapsedMs || 0) + (transitInitialCheck.elapsedMs || 0), 'Natal + current transit');
+  }
 
   const timelineContext = {
     id: prefix,
@@ -5661,7 +5694,7 @@ function renderKundaliComponent(
         .slice(0, 3).map(p => {
           const natalPosition = kData.ch.planets[p.lord];
           const house = natalPosition
-            ? houseFrom(signOf(natalPosition.lon), kData.ascSign)
+            ? houseFrom(signOfPosition(natalPosition), kData.ascSign)
             : null;
           return { lord: p.lord, house };
         })
@@ -5765,12 +5798,12 @@ function renderKundaliComponent(
     targetEl.__jaTransitChartFocusBound = true;
   }
 
-  function openTab(tabKey) {
+  async function openTab(tabKey) {
     getJupiterTransitTimelineRegistry().setActive(prefix, false);
     activeTabKey = tabKey;
     // Pass currentEvalMs to render the selected event date
     body.innerHTML = tabKey === 'transit'
-  ? RenderTabs[tabKey](kData, prefix, currentEvalMs, window.trSelectedVarga || 9)
+  ? await RenderTabs[tabKey](kData, prefix, currentEvalMs, window.trSelectedVarga || 9)
   : RenderTabs[tabKey](kData, prefix, currentEvalMs);
 
     if (window.JupiterTransitTimeline && window.JupiterTransitTimeline.isOpen()) {
@@ -7179,11 +7212,11 @@ if (!Number.isFinite(tz)) {
 
   const [hh, mm, ss] = tobVal.split(':').map(Number);
   const input = { y: dateObj.y, m: dateObj.m, d: dateObj.d, hh, mm: mm || 0, ss: ss || 0, tz, lat, lon };
-  const kBundle = buildCompleteKundali(input);
+  const kBundle = await buildCompleteKundali(input);
   const name = document.getElementById('nm').value.trim() || 'Primary Chart';
   const sub = `${document.getElementById('dob').value} ${tobVal} · ${pobVal}`;
 
-  renderKundaliComponent(document.getElementById('mainChartResult'), kBundle, 'main', name, sub);
+  await renderKundaliComponent(document.getElementById('mainChartResult'), kBundle, 'main', name, sub);
 });
 
 // Dynamic Research Forms Engine
@@ -7733,7 +7766,7 @@ sec.querySelectorAll('input, textarea').forEach(field => {
     if (typeof activeChartsRegistry !== 'undefined') activeChartsRegistry.delete(`rc${n}`);
   });
 
-sec.querySelector('form').addEventListener('submit', ev => {
+sec.querySelector('form').addEventListener('submit', async ev => {
     ev.preventDefault();
     const formEl = ev.currentTarget;
     const data = Object.fromEntries(new FormData(formEl).entries());
@@ -7792,7 +7825,7 @@ sec.querySelector('form').addEventListener('submit', ev => {
 
     const [hh, mm, ss] = data.tob.split(':').map(Number);
     const input = { y: dateObj.y, m: dateObj.m, d: dateObj.d, hh, mm: mm || 0, ss: ss || 0, tz, lat, lon };
-    const kBundle = buildCompleteKundali(input);
+    const kBundle = await buildCompleteKundali(input);
 
     // Render Selected Tag Badges and Description beside "Chart No. X"
     const headerMeta = sec.querySelector(`#rcHeaderMeta${n}`);
@@ -7825,7 +7858,7 @@ if (data.desc && data.desc.trim()) {
     toggleBar.querySelector('.arrow-icon').style.transform = 'rotate(-90deg)';
 
     // Render complete chart component
-  renderKundaliComponent(
+  await renderKundaliComponent(
       document.getElementById(`rcResult${n}`),
       kBundle,
       `rc${n}`,
@@ -8777,6 +8810,8 @@ const result = section === 'planets'
   You have been logged out successfully.
 </div>
 
+<script src="/planetary-reference-reconciliation.js"></script>
+<script src="/planetary-reference-transit-adapter.js"></script>
 <script src="/font-scale.js"></script>
 <script src="/detailed-dasha-overview.js"></script>	
 <script type="module" src="/Firebase.js"></script>
