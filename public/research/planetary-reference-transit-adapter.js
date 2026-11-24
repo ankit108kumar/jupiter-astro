@@ -87,7 +87,8 @@ function makePositions(positions,results){
  }
  return out;
 }
-async function reconcilePositions(positions,timestamp,scope){
+async function reconcilePositions(positions,timestamp,scope,options){
+ options=options||{};
  const token=++requestSequence,start=performance.now(),at=Math.trunc(Number(timestamp));
  if(!Number.isFinite(at))throw new Error('Invalid timestamp for planetary reconciliation.');
  const cacheKey=at+'|'+PLANETS.map(p=>p+':'+(positions[p]&&positions[p].lon)).join('|');
@@ -110,11 +111,11 @@ async function reconcilePositions(positions,timestamp,scope){
    CACHE.set(cacheKey,payload);while(CACHE.size>40)CACHE.delete(CACHE.keys().next().value);
   }
   const out=makePositions(positions,payload.results),elapsed=performance.now()-start;
-  if(token===requestSequence)showStatus(payload,elapsed,scope);
+  if(token===requestSequence&&!options.silent)showStatus(payload,elapsed,scope);
   return{positions:out,results:payload.results,verified:payload.verified.slice(),updated:payload.updated.slice(),errors:payload.errors.slice(),elapsedMs:elapsed,referenceVersion:payload.version};
  }catch(error){
   const elapsed=performance.now()-start;
-  if(token===requestSequence)showStatus({verified:[],updated:[],errors:[error.message]},elapsed,scope);
+  if(token===requestSequence&&!options.silent)showStatus({verified:[],updated:[],errors:[error.message]},elapsed,scope);
   console.error('JupiterAstro planetary reference verification failed:',error);
   return{positions:Object.assign({},positions),results:{},verified:[],updated:[],errors:[error.message],elapsedMs:elapsed,referenceVersion:null};
  }
