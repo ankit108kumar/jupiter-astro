@@ -4116,22 +4116,48 @@ function jaSpecialPointRows(k){
  return order.map(name=>{const p=points.find(x=>x.name===name);if(!p||!Number.isFinite(p.lon))return{name,degree:'—',sign:'—',nakshatra:'—',navamsa:'—',source:p?.source||'Not calculated'};const lon=rev(p.lon),sg=signOf(lon),nk=nakOf(lon);return{...p,degree:dms(lon%30),sign:SIGNS[sg][0],nakshatra:NAK[nk.i][0],navamsa:SIGNS[navamsaOf(lon)][0]};});
 }
 
-async function buildCompleteKundali(input, offsetDays = 0) {
-  const ch = computeChart(input);
+const jaPlanetaryPageReady = new Promise(resolve => {
+  const startDelay = () => window.setTimeout(resolve, 3000);
+  if (document.readyState === 'complete') startDelay();
+  else window.addEventListener('load', startDelay, { once: true });
+});
+let jaPlanetaryAdapterPromise = null;
+function loadPlanetaryScript(src) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => { script.remove(); reject(new Error('Unable to load ' + src)); };
+    document.head.appendChild(script);
+  });
+}
+function loadPlanetaryReferenceAdapter() {
+  if (window.JAPlanetaryReconciliation) return Promise.resolve(window.JAPlanetaryReconciliation);
+  if (!jaPlanetaryAdapterPromise) {
+    jaPlanetaryAdapterPromise = jaPlanetaryPageReady
+      .then(() => window.JAPlanetaryReference ? null : loadPlanetaryScript('/planetary-reference-reconciliation.js'))
+      .then(() => loadPlanetaryScript('/planetary-reference-transit-adapter.js'))
+      .then(() => {
+        if (!window.JAPlanetaryReconciliation) throw new Error('Planetary reference adapter did not initialize.');
+        return window.JAPlanetaryReconciliation;
+      })
+      .catch(error => { jaPlanetaryAdapterPromise = null; throw error; });
+  }
+  return jaPlanetaryAdapterPromise;
+}
+function bundleFromChart(ch, input, offsetDays = 0, natalReconciliation = null) {
+  if (natalReconciliation && natalReconciliation.positions) {
+    ch = Object.assign({}, ch, { planets: natalReconciliation.positions });
+  }
   const birthMs = jdToMs(ch.jd);
-  const natalReconciliation = window.JAPlanetaryReconciliation
-    ? await window.JAPlanetaryReconciliation.reconcilePositions(ch.planets, birthMs, 'Natal', { silent: true })
-    : { positions: ch.planets, verified: [], updated: [], errors: ['Reference adapter unavailable; using calculated positions.'], elapsedMs: 0 };
-  ch.planets = natalReconciliation.positions;
   const ascSign = signOf(ch.asc);
   const pos1 = {}, deg = {}, combust = {};
-
   PL.forEach(([n]) => {
     pos1[n] = signOfPosition(ch.planets[n]);
     deg[n] = ch.planets[n].lon % 30;
     combust[n] = isCombust(n, ch.planets);
   });
-
   const moonSign = pos1.Moon;
   const md = mahadashas(ch.planets.Moon.lon, birthMs, 365.25, offsetDays);
   const karakas = charaKarakas(ch.planets);
@@ -4140,11 +4166,50 @@ async function buildCompleteKundali(input, offsetDays = 0) {
   const chain = dashaChain(md.list, Date.now(), 365.25);
   const av = ashtakavarga(pos1, ascSign);
   const shani = saturnCycles(moonSign, ch.jd);
-
   const kBundle = { ch, ascSign, pos1, deg, combust, birthMs, moonSign, md, padas, shani, chain, av, karakas, input, offsetDays, jaNatalReconciliation: natalReconciliation };
   kBundle.lp = lifePromisesEngine(kBundle);
   return kBundle;
 }
+function buildCompleteKundali(input, offsetDays = 0) {
+  return bundleFromChart(computeChart(input), input, offsetDays);
+}
+function schedulePlanetaryReferenceUpdate(kData, targetEl, prefix, getEvalMs, refreshRenderedChart) {
+  const token = (targetEl.__jaPlanetaryUpdateToken || 0) + 1;
+  targetEl.__jaPlanetaryUpdateToken = token;
+  const start = window.performance && performance.now ? performance.now() : Date.now();
+  loadPlanetaryReferenceAdapter().then(async adapter => {
+    if (!targetEl.isConnected || targetEl.__jaPlanetaryUpdateToken !== token) return;
+    const evalMs = Number(getEvalMs());
+    const rawTransit = getTransitPlanetPositions(evalMs);
+    const [natalResult, transitResult] = await Promise.all([
+      adapter.reconcilePositions(kData.ch.planets, kData.birthMs, 'Natal', { silent: true }),
+      adapter.reconcilePositions(rawTransit, evalMs, 'Transit', { silent: true })
+    ]);
+    if (!targetEl.isConnected || targetEl.__jaPlanetaryUpdateToken !== token) return;
+    const rebuilt = bundleFromChart(kData.ch, kData.input, kData.offsetDays, natalResult);
+    Object.assign(kData, rebuilt);
+    TRANSIT_POSITION_CACHE.set(Math.trunc(evalMs), transitResult.positions);
+    const elapsed = (window.performance && performance.now ? performance.now() : Date.now()) - start;
+    const contexts = {
+      Natal: { verified: natalResult.verified || [], updated: natalResult.updated || [], unavailable: natalResult.unavailable || [], partial: natalResult.partial || [] },
+      Transit: { verified: transitResult.verified || [], updated: transitResult.updated || [], unavailable: transitResult.unavailable || [], partial: transitResult.partial || [] }
+    };
+    const errors = [...(natalResult.errors || []), ...(transitResult.errors || [])];
+    if ((natalResult.updated || []).length || (transitResult.updated || []).length || Number(getEvalMs()) === evalMs) {
+      await refreshRenderedChart();
+    }
+    adapter.showStatus({
+      contexts,
+      verified: Array.from(new Set([...contexts.Natal.verified, ...contexts.Transit.verified])),
+      updated: Array.from(new Set([...contexts.Natal.updated, ...contexts.Transit.updated])),
+      unavailable: Array.from(new Set([...contexts.Natal.unavailable, ...contexts.Transit.unavailable])),
+      partial: Array.from(new Set([...contexts.Natal.partial, ...contexts.Transit.partial])),
+      timelineUpdated: [],
+      errors
+    }, elapsed, 'Natal + current transit');
+  }).catch(error => console.warn('Deferred planetary reference update skipped; calculated positions remain active.', error));
+}
+
 
 // Calculates 0 to 29 degrees proportionally for any divisional chart (D1, D9, D10, etc.)
 function getVargaDeg(lon, n) {
@@ -5657,33 +5722,17 @@ function getJupiterTransitTimelineRegistry() {
 /* ================= FULL UI COMPONENT CONTROLLER ================= */
 async function renderKundaliComponent(
   targetEl, kData, prefix, title, subtitle, recordId = ''
-) {  const nk = nakOfPosition(kData.ch.planets.Moon);
+) {  let nk = nakOfPosition(kData.ch.planets.Moon);
   const nowMs = Date.now();
   const dNow = kData.chain.length
   ? kData.chain.slice(0, 3).map(p => p.lord).join('–')
   : '—';
   
-  // 1. Initialize evaluation timestamp (defaults to current system time)
+  // Render with the existing ephemeris immediately; reference reconciliation is deferred.
   let currentEvalMs = Date.now();
   let activeTabKey = 'overview';
   const initialTransitPositions = getTransitPlanetPositions(currentEvalMs);
-  const transitInitialCheck = window.JAPlanetaryReconciliation
-    ? await window.JAPlanetaryReconciliation.reconcilePositions(initialTransitPositions, currentEvalMs, 'Transit', { silent: true })
-    : { positions: initialTransitPositions, verified: [], updated: [], errors: ['Reference adapter unavailable; using calculated positions.'], elapsedMs: 0 };
-  TRANSIT_POSITION_CACHE.set(Math.trunc(Number(currentEvalMs)), transitInitialCheck.positions);
-  const natalInitialCheck = kData.jaNatalReconciliation || { verified: [], updated: [], errors: [], elapsedMs: 0 };
-  const verifiedNames = Array.from(new Set([...(natalInitialCheck.verified || []), ...(transitInitialCheck.verified || [])]));
-  const updatedNames = Array.from(new Set([...(natalInitialCheck.updated || []), ...(transitInitialCheck.updated || [])]));
-  const noCoverageNames = Array.from(new Set([...(natalInitialCheck.unavailable || []), ...(transitInitialCheck.unavailable || [])]));
-  const partialNames = Array.from(new Set([...(natalInitialCheck.partial || []), ...(transitInitialCheck.partial || [])]));
-  const verificationErrors = [...(natalInitialCheck.errors || []), ...(transitInitialCheck.errors || [])];
-  const verificationContexts = {
-    Natal: { verified: natalInitialCheck.verified || [], updated: natalInitialCheck.updated || [], unavailable: natalInitialCheck.unavailable || [], partial: natalInitialCheck.partial || [] },
-    Transit: { verified: transitInitialCheck.verified || [], updated: transitInitialCheck.updated || [], unavailable: transitInitialCheck.unavailable || [], partial: transitInitialCheck.partial || [] }
-  };
-  if (window.JAPlanetaryReconciliation && typeof window.JAPlanetaryReconciliation.showStatus === 'function') {
-    window.JAPlanetaryReconciliation.showStatus({ contexts: verificationContexts, verified: verifiedNames, updated: updatedNames, unavailable: noCoverageNames, partial: partialNames, timelineUpdated: [], errors: verificationErrors }, (natalInitialCheck.elapsedMs || 0) + (transitInitialCheck.elapsedMs || 0), 'Natal + current transit');
-  }
+  TRANSIT_POSITION_CACHE.set(Math.trunc(Number(currentEvalMs)), initialTransitPositions);
 
   const timelineContext = {
     id: prefix,
@@ -5693,7 +5742,7 @@ async function renderKundaliComponent(
       chartTitle: title + (recordId ? ' (' + recordId + ')' : ''),
       janmaRashi: SIGNS[kData.moonSign][0],
       lagna: SIGNS[kData.ascSign][0],
-      nakshatra: NAK[nk.i][0],
+      nakshatra: NAK[nakOfPosition(kData.ch.planets.Moon).i][0],
       dasha: dashaChain(kData.md.list, currentEvalMs, 365.25)
         .slice(0, 3).map(p => p.lord).join(' - ') || '—',
       dashaSequence: dashaChain(kData.md.list, currentEvalMs, 365.25)
@@ -5764,9 +5813,9 @@ async function renderKundaliComponent(
         <p>${esc(subtitle)}</p>
       </div>
       <div class="chips">
-        <span class="chip"><span>Lagna</span>${SIGNS[kData.ascSign][0]}</span>
-        <span class="chip"><span>Rashi</span>${SIGNS[kData.moonSign][0]}</span>
-        <span class="chip"><span>Nakshatra</span>${NAK[nk.i][0]} (Pada ${nk.pada})</span>
+        <span class="chip"><span>Lagna</span><span id="${prefix}-jaLagnaChip">${SIGNS[kData.ascSign][0]}</span></span>
+        <span class="chip"><span>Rashi</span><span id="${prefix}-jaRashiChip">${SIGNS[kData.moonSign][0]}</span></span>
+        <span class="chip"><span>Nakshatra</span><span id="${prefix}-jaNakChip">${NAK[nk.i][0]} (Pada ${nk.pada})</span></span>
         <span class="chip"><span>Dasha</span><b id="${prefix}-dashaChipValue">${dNow}</b></span>
       
 </div>
@@ -6550,10 +6599,21 @@ document.getElementById(`${prefix}-lkMonthlyDuration`).textContent =
   }
 
   openTab('overview');
+  schedulePlanetaryReferenceUpdate(kData, targetEl, prefix, () => currentEvalMs, async () => {
+    nk = nakOfPosition(kData.ch.planets.Moon);
+    const lagnaChip = document.getElementById(`${prefix}-jaLagnaChip`);
+    const rashiChip = document.getElementById(`${prefix}-jaRashiChip`);
+    const nakChip = document.getElementById(`${prefix}-jaNakChip`);
+    if (lagnaChip) lagnaChip.textContent = SIGNS[kData.ascSign][0];
+    if (rashiChip) rashiChip.textContent = SIGNS[kData.moonSign][0];
+    if (nakChip) nakChip.textContent = NAK[nk.i][0] + ' (Pada ' + nk.pada + ')';
+    const chartInstance = activeChartsRegistry.get(prefix);
+    if (chartInstance) await chartInstance.refreshCurrentTab();
+  });
 }
 
 
-/* ================= AUTOCOMPLETE BINDER ================= */
+ /* ================= AUTOCOMPLETE BINDER ================= */
 /* ================= GOOGLE SHEETS 2-WAY BINDING ================= */
 // Set your Web App URL here so both Fetch and Save can use it
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx02wG3xKMKegEYNYMI-pQbmXhnPiielVJbYtPIXs0waU7150qys4Y1psaulXX1U4qx/exec";
@@ -8816,8 +8876,6 @@ const result = section === 'planets'
   You have been logged out successfully.
 </div>
 
-<script src="/planetary-reference-reconciliation.js"></script>
-<script src="/planetary-reference-transit-adapter.js"></script>
 <script src="/font-scale.js"></script>
 <script src="/detailed-dasha-overview.js"></script>	
 <script type="module" src="/Firebase.js"></script>
