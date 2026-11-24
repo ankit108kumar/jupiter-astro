@@ -5750,9 +5750,10 @@ async function renderKundaliComponent(
           const natalMoonNakshatra = nakOfPosition(kData.ch.planets.Moon).i;
           const lordPosition = kData.ch.planets[p.lord];
           const lordNakshatra = lordPosition ? nakOfPosition(lordPosition).i : null;
-          const tara = Number.isInteger(lordNakshatra)
+          const nakshatraCount = Number.isInteger(lordNakshatra)
             ? ((lordNakshatra - natalMoonNakshatra + 27) % 27) + 1
             : null;
+          const tara = nakshatraCount == null ? null : ((nakshatraCount - 1) % 9) + 1;
           return { lord: p.lord, tara };
         })
     }),
