@@ -48,7 +48,7 @@ function ensureStrip(){
  if(el)return el;
  const style=document.createElement('style');
  style.id='ja-planetary-verification-style';
- style.textContent='#ja-planetary-verification-strip{position:fixed;left:10px;bottom:10px;z-index:100600;max-width:min(560px,calc(100vw - 20px));padding:7px 10px;border:1px solid rgba(117,104,139,.24);border-radius:8px;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);box-shadow:0 3px 14px rgba(40,32,54,.09);color:#514b5e;font:500 10px/1.45 Inter,system-ui,sans-serif;pointer-events:none}#ja-planetary-verification-strip strong{font-weight:700;color:#34303d}#ja-planetary-verification-strip[data-state="error"]{color:#a23d3d}';
+ style.textContent='#ja-planetary-verification-strip{position:fixed!important;left:50%!important;bottom:10px!important;transform:translateX(-50%);z-index:100600;width:min(1120px,calc(100vw - 24px));box-sizing:border-box;padding:5px 12px;border:1px solid rgba(117,104,139,.24);border-radius:8px;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);box-shadow:0 3px 14px rgba(40,32,54,.09);color:#514b5e;font:500 11px/1.3 Inter,system-ui,sans-serif;pointer-events:none;opacity:1!important;visibility:visible!important;animation:none!important;transition:none!important}#ja-planetary-verification-strip .ja-pr-line{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:100%}#ja-planetary-verification-strip strong{font-weight:700;color:#34303d}#ja-planetary-verification-strip[data-state="error"],#ja-planetary-verification-strip[data-state="warning"]{color:#a23d3d}';
  document.head.appendChild(style);
  el=document.createElement('div');el.id='ja-planetary-verification-strip';el.setAttribute('role','status');el.setAttribute('aria-live','polite');el.dataset.state='loading';el.textContent='Verifying planetary reference data…';document.body.appendChild(el);
  return el;
@@ -58,10 +58,14 @@ function showStatus(result,elapsed,scope){
  const names=updated.length?updated.join(', '):'None (reference values already matched)';
  const heading=errors.length?'Planetary data verification incomplete':verified.length?'Planetary data verified and updated':'Planetary reference not available for this date';
  el.dataset.state=errors.length?'warning':'ready';
- el.innerHTML='<strong>'+escapeHtml(heading)+'</strong> · '+(scope||'Chart')+
-  '<br>Updated: '+escapeHtml(names)+' · Verified: '+escapeHtml(verified.join(', ')||'—')+
-  '<br>Verification: '+Math.max(0,elapsed).toFixed(1)+' ms · '+escapeHtml(dateLabel(Date.now()))+
-  (errors.length?'<br>Note: '+escapeHtml(errors.join('; ')):'');
+ el.hidden=false;el.style.display='block';
+ const firstLine=heading+' · '+(scope||'Chart');
+ const secondLine='Updated: '+names+' · Verified: '+(verified.join(', ')||'—')+
+  ' · '+Math.max(0,elapsed).toFixed(1)+' ms · '+dateLabel(Date.now())+
+  (errors.length?' · Note: '+errors.join('; '):'');
+ el.title=firstLine+'\n'+secondLine;
+ el.innerHTML='<span class="ja-pr-line"><strong>'+escapeHtml(heading)+'</strong> · '+escapeHtml(scope||'Chart')+'</span>'+
+  '<span class="ja-pr-line">'+escapeHtml(secondLine)+'</span>';
 }
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 async function getEngine(){
