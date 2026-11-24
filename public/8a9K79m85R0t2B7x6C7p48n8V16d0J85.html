@@ -1367,6 +1367,7 @@ function vargaSign(lon, n) {
   return ((r % 12) + 12) % 12;
 }
 const vargottamaIn = lon => VARGAS.filter(([n]) => n > 1 && vargaSign(lon, n) === signOf(lon)).map(([n]) => 'D' + n);
+function vargottamaForPosition(position) { const list = vargottamaIn(position.lon).filter(x => x !== 'D9'); if (navamsaOfPosition(position) === signOfPosition(position)) list.push('D9'); return list; }
 
 /* ================= JAIMINI ARUDHA & KARAKAS ================= */
 function houseLord(sign, pos, deg) {
@@ -4785,7 +4786,7 @@ ${createCopyExportButton({
           <td>${NAK[nakOfPosition(pl).i][0]} · ${nakOfPosition(pl).pada}</td>
           <td class="num c">${houseFrom(s, k.ascSign)}</td><td>${SIGNS[navamsaOfPosition(pl)][0]}</td>
           <td>${kmap[p] || ''}</td><td>${st}</td>
-          <td>${vargottamaIn(pl.lon).join(', ')}</td>
+          <td>${vargottamaForPosition(pl).join(', ')}</td>
         </tr>
       `;
     });
