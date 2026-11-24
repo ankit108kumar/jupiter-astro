@@ -60,7 +60,7 @@ function displayStatusForOneSecond(){
  const info=document.getElementById('ja-planetary-verification-info');
  if(info)info.hidden=false;
  if(statusHideTimer!==null)root.clearTimeout(statusHideTimer);
- statusHideTimer=root.setTimeout(()=>{el.hidden=true;statusHideTimer=null;},1000);
+ statusHideTimer=root.setTimeout(()=>{el.hidden=true;statusHideTimer=null;},2500);
 }
 function showLatestStatus(){
  if(!latestStatus)return;
