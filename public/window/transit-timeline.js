@@ -2312,11 +2312,11 @@
         snapshot.dashaSequence.forEach(function (item, index) {
           if (index) dasha.appendChild(document.createTextNode(" - "));
           dasha.appendChild(document.createTextNode(item.lord || ""));
-          if (Number.isInteger(Number(item.house)) && Number(item.house) >= 1 && Number(item.house) <= 12) {
-            var house = document.createElement("span");
-            house.className = "jtt-dasha-house";
-            house.textContent = " (" + item.house + ")";
-            dasha.appendChild(house);
+          if (Number.isInteger(Number(item.tara)) && Number(item.tara) >= 1 && Number(item.tara) <= 27) {
+            var tara = document.createElement("span");
+            tara.className = "jtt-dasha-tara";
+            tara.textContent = " (" + item.tara + ")";
+            dasha.appendChild(tara);
           }
         });
       } else {
