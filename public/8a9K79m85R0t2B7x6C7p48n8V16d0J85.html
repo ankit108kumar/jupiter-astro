@@ -7294,16 +7294,22 @@ mainForm.addEventListener('submit', async e => {
   const dateObj = parseDmy(document.getElementById('dob').value);
   if (!dateObj) {
     showButtonError(document.getElementById('dob'), 'Enter Date of birth as DD/MM/YYYY (e.g. 15/08/1947).');
+    setMainChartLoading('Unable to load. Please check the chart details.', true);
+    if (window.__jaPageReadyGate) window.__jaPageReadyGate.markChartReady();
     return;
   }
   const tobVal = document.getElementById('tob').value;
   if (!tobVal) {
     showButtonError(document.getElementById('tob'), 'Enter Time of birth.');
+    setMainChartLoading('Unable to load. Please check the chart details.', true);
+    if (window.__jaPageReadyGate) window.__jaPageReadyGate.markChartReady();
     return;
   }
   const pobVal = mainPob.value;
   if (!pobVal && (!mainPob.dataset.lat || !mainPob.dataset.lon)) {
     showButtonError(mainPob, 'Enter Place of birth.');
+    setMainChartLoading('Unable to load. Please check the chart details.', true);
+    if (window.__jaPageReadyGate) window.__jaPageReadyGate.markChartReady();
     return;
   }
 
@@ -7312,6 +7318,8 @@ let lat = parseFloat(mainPob.dataset.lat), lon = parseFloat(mainPob.dataset.lon)
     const found = findPlace(pobVal);
     if (!found) {
       showInlineError(mainPob, "City not found. Please select from suggestions or enter coordinates.");
+      setMainChartLoading('Unable to load. Please check the chart details.', true);
+      if (window.__jaPageReadyGate) window.__jaPageReadyGate.markChartReady();
       return;
     }
     lat = found.lat; lon = found.lon; tz = found.tz;
@@ -7329,6 +7337,7 @@ if (!Number.isFinite(tz)) {
     console.error('Timezone lookup failed:', err);
     setMainChartLoading('Unable to load. Please try again.', true);
     showInlineError('Unable to determine the timezone for this location.');
+    if (window.__jaPageReadyGate) window.__jaPageReadyGate.markChartReady();
     return;
   }
 }
@@ -7344,6 +7353,7 @@ if (!Number.isFinite(tz)) {
   } catch (err) {
     console.error('Prashna Kundali generation failed:', err);
     setMainChartLoading('Unable to load. Please try again.', true);
+    if (window.__jaPageReadyGate) window.__jaPageReadyGate.markChartReady();
   }
 });
 
