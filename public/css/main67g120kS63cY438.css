@@ -4548,3 +4548,42 @@ body.ja-font-scale-enabled [data-ja-font-scale-target] {
   font-size:10px;
   font-weight:500;
 }
+
+/* Simple, theme-aware first-paint state for the Prashna Kundali mount. */
+.ja-chart-loading {
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.ja-loading-spinner {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  border: 2px solid var(--line-strong);
+  border-top-color: var(--saffron);
+  border-radius: 50%;
+  animation: ja-loading-spin 0.8s linear infinite;
+}
+
+.ja-chart-loading.is-error {
+  color: var(--muted);
+}
+
+@keyframes ja-loading-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ja-loading-spinner {
+    animation: none;
+    border-top-color: var(--line-strong);
+  }
+}
+
