@@ -92,12 +92,12 @@ function buildDerivedNavamsa(planet,fn,ephemerisVersion,atTimestamp){
     }
     const crossing=Math.round((lo+hi)/2);
     const boundaryLongitude=rev360(zodiacStart+targetSpan*quarter/4);
-    events.push({label:navamsaLabel(boundaryLongitude),enteredAtUTC:crossing,enteredAt:new Date(crossing).toISOString(),source:'derived-hybrid-sampled-angular-profile',boundaryLongitude,anchor:'calibrated-ephemeris-quarter-crossing',referenceInterval:{start:a.enteredAt,end:b.enteredAt},direction:direction>0?'direct':'retrograde'});
+    events.push({label:navamsaLabel(rev360(boundaryLongitude+(direction<0?-1e-7:1e-7))),enteredAtUTC:crossing,enteredAt:new Date(crossing).toISOString(),source:'derived-hybrid-sampled-angular-profile',boundaryLongitude,anchor:'calibrated-ephemeris-quarter-crossing',referenceInterval:{start:a.enteredAt,end:b.enteredAt},direction:direction>0?'direct':'retrograde'});
     found++;
    }
    if(!found)warnings.push('Quarter '+quarter+' crossing not bracketed for '+a.label+' → '+b.label);
   }
-  events.push({label:navamsaLabel(zodiacStart),enteredAtUTC:start,enteredAt:a.enteredAt,source:'derived-hybrid-sampled-angular-profile',boundaryLongitude:zodiacStart,anchor:'json-nakshatra-ingress',direction:direction>0?'direct':'retrograde'});
+  events.push({label:navamsaLabel(rev360(zodiacStart+(direction<0?-1e-7:1e-7))),enteredAtUTC:start,enteredAt:a.enteredAt,source:'derived-hybrid-sampled-angular-profile',boundaryLongitude:zodiacStart,anchor:'json-nakshatra-ingress',direction:direction>0?'direct':'retrograde'});
   calibrations.push({nakshatraFrom:a.label,nakshatraTo:b.label,startAtUTC:start,endAtUTC:end,referenceDirection:direction>0?'direct':'retrograde',rawEphemerisTravelDegrees:rawNetTravel,referenceSpanDegrees:targetSpan,calibrationScale,calibratedTravelDegrees:rawNetTravel*calibrationScale,endpointResidualDegrees:rawNetTravel*calibrationScale-targetSpan,sampleCount:samples.length,sampling:'uniform timestamp samples; unwrapped sidereal longitude; calibrated to signed reference Nakshatra span'});
  }
  events.sort((a,b)=>a.enteredAtUTC-b.enteredAtUTC);
