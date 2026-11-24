@@ -1473,6 +1473,10 @@ function siderealPlanetLongitude(planet, jd) {
   return rev(tropical - lahiri(jd));
 }
 
+// Public callback for the external planetary-reference reconciliation adapter.
+// This exposes the existing function without changing its calculation.
+window.siderealPlanetLongitude = siderealPlanetLongitude;
+
 function signedLongitudeDelta(from, to) {
   let delta = to - from;
   if (delta > 180) delta -= 360;
