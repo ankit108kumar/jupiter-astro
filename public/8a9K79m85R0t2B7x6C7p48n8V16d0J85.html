@@ -5674,9 +5674,11 @@ async function renderKundaliComponent(
   const natalInitialCheck = kData.jaNatalReconciliation || { verified: [], updated: [], errors: [], elapsedMs: 0 };
   const verifiedNames = Array.from(new Set([...(natalInitialCheck.verified || []), ...(transitInitialCheck.verified || [])]));
   const updatedNames = Array.from(new Set([...(natalInitialCheck.updated || []), ...(transitInitialCheck.updated || [])]));
+  const noCoverageNames = Array.from(new Set([...(natalInitialCheck.unavailable || []), ...(transitInitialCheck.unavailable || [])]));
+  const partialNames = Array.from(new Set([...(natalInitialCheck.partial || []), ...(transitInitialCheck.partial || [])]));
   const verificationErrors = [...(natalInitialCheck.errors || []), ...(transitInitialCheck.errors || [])];
   if (window.JAPlanetaryReconciliation && typeof window.JAPlanetaryReconciliation.showStatus === 'function') {
-    window.JAPlanetaryReconciliation.showStatus({ verified: verifiedNames, updated: updatedNames, errors: verificationErrors }, (natalInitialCheck.elapsedMs || 0) + (transitInitialCheck.elapsedMs || 0), 'Natal + current transit');
+    window.JAPlanetaryReconciliation.showStatus({ verified: verifiedNames, updated: updatedNames, unavailable: noCoverageNames, partial: partialNames, timelineUpdated: [], errors: verificationErrors }, (natalInitialCheck.elapsedMs || 0) + (transitInitialCheck.elapsedMs || 0), 'Natal + current transit');
   }
 
   const timelineContext = {
