@@ -2,7 +2,7 @@
 
 ## Status and scope
 
-Phase 1 integrates the standalone \`JAPlanetaryReference\` reconciliation engine into the live JupiterAstro transit view through external script references. The reconciliation logic remains in its own JavaScript files; it is not duplicated in the main HTML.
+Global natal + transit reconciliation integrates the standalone \`JAPlanetaryReference\` engine into the shared JupiterAstro chart pipeline through external scripts. The same verification path runs for natal positions when a chart is generated/re-opened and for transit positions whenever the selected transit time/query changes. Reconciliation logic remains in its own JavaScript files; it is not duplicated in the main HTML.
 
 Supported planets:
 - **Saturn**
@@ -46,7 +46,7 @@ The production HTML loads the reconciliation engine and its global natal/transit
 - \`/research/planetary-reference-reconciliation.js\`
 - \`/research/planetary-reference-transit-adapter.js\`
 
-The adapter reads the selected transit timestamp and obtains the current sidereal longitude through the existing \`siderealPlanetLongitude(planet, jd)\` function. The adapter converts epoch milliseconds to Julian Day for that callback.
+The adapter verifies natal planetary positions at the chart's birth timestamp and transit positions at the selected transit timestamp. It obtains sidereal longitude through the existing \`siderealPlanetLongitude(planet, jd)\` function. The adapter converts epoch milliseconds to Julian Day for that callback.
 
 For Saturn, Jupiter, Rahu and Ketu, the adapter reconciles Sign, Nakshatra and Navamsa classifications for both natal and transit positions. It preserves the original ephemeris longitude and degree values. Verified classifications are applied to the existing chart calculations and existing transit displays; no separate reconciliation table is rendered. Existing transit timeline duration cells consume JSON reference intervals (or hybrid Rahu/Ketu Navamsa intervals) through the current data provider, with the ephemeris interval calculation retained as fallback outside reference coverage.
 
@@ -108,9 +108,11 @@ Report signed error, mean/median/maximum absolute error, exact-minute matches, a
 ## Explicit implementation boundaries
 
 - Both natal and transit classifications are reconciled; this is not transit-only.
+- Both natal and transit classifications are reconciled; this is not transit-only.
 - The existing planetary longitude and chart calculation engine is not replaced or modified.
 - The reconciliation engine and adapter remain in their own JavaScript files and are connected through external script tags.
 - No artificial Rahu/Ketu Navamsa rows are added to the correction JSON.
 - The correction JSON itself is not modified.
+- No new table, button, page, or popup is added; the compact verification strip is the only new UI element requested.
 - No new table, button, page, or popup is added; the status strip is the only new UI element requested.
 - The reference dataset remains New Delhi/IST based; this phase displays those reference timestamps in IST and does not apply a geographic time correction to the astronomical event.
