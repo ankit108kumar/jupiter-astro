@@ -263,6 +263,24 @@
     );
   }
 
+  // Share the exact MD/AD/PD count values already returned for the
+  // Detailed Dasha Overview's active row. The Transit Timeline must not
+  // independently recalculate these counts.
+  function getRunningSequence(kData, evalMs) {
+    const byOffset = cacheByChart.get(kData);
+    const cache = byOffset && byOffset.get(String(kData.offsetDays || 0));
+    if (!cache || !Array.isArray(cache.rows) || !cache.rows.length) return null;
+
+    const row = cache.rows[selectedRowIndex(cache.rows, Number(evalMs))];
+    if (!row) return null;
+
+    return [
+      { lord: row.md, tara: row.mdNo },
+      { lord: row.ad, tara: row.adNo },
+      { lord: row.pd, tara: row.pdNo }
+    ];
+  }
+
   function escapeHtml(value) {
     return String(value == null ? "" : value)
       .replace(/[&<>"']/g, ch => ({
@@ -557,6 +575,12 @@ function renderVirtual(instance, forceCentre) {
 
       if (instance.disposed || activeInstances.get(container) !== instance || !ui.section.isConnected) return;
 
+      // If the Transit Timeline is open, refresh it from these same DDO rows.
+      if (window.JupiterTransitTimeline &&
+          typeof window.JupiterTransitTimeline.syncFromContext === "function") {
+        window.JupiterTransitTimeline.syncFromContext();
+      }
+
 // Do not expose the table until the complete dataset is ready.
 if (!instance.rows || !instance.rows.length) {
   throw new Error("The Dasha timeline contains no periods.");
@@ -623,6 +647,6 @@ ui.loading.hidden = true;
     queued.forEach(options => mount(options));
   });
 
-  window.DetailedDashaOverview = { mount };
+  window.DetailedDashaOverview = { mount, getRunningSequence };
 
 })();
