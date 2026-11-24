@@ -1536,7 +1536,7 @@ function formatTransitTimelineDateTime(timestamp) {
 
 function getTransitDivisionInterval(planet, evalMs, longitude, division) {
   const referenceInterval = window.JAPlanetaryReconciliation && window.JAPlanetaryReconciliation.getInterval(planet, division, evalMs);
-  if (referenceInterval && Number.isFinite(referenceInterval.startMs) && Number.isFinite(referenceInterval.endMs) && referenceInterval.startMs < Number(evalMs) && referenceInterval.endMs > Number(evalMs)) {
+  if (referenceInterval && Number.isFinite(referenceInterval.startMs) && Number.isFinite(referenceInterval.endMs) && referenceInterval.startMs <= Number(evalMs) && referenceInterval.endMs > Number(evalMs)) {
     return { startMs: referenceInterval.startMs, endMs: referenceInterval.endMs, startText: formatTransitTimelineDateTime(referenceInterval.startMs), endText: formatTransitTimelineDateTime(referenceInterval.endMs), source: referenceInterval.source || 'planetary-reference-json' };
   }
   // Extension point for an optional external duration provider.
