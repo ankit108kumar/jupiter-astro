@@ -4918,7 +4918,7 @@ dasha(k, prefix, evalMs = Date.now()) {
       'Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter',
       'Venus', 'Saturn', 'Rahu', 'Ketu'
     ];
-    const birthMoonNakIndex = nakOf(k.ch.planets.Moon.lon).i;
+    const birthMoonNakIndex = nakOfPosition(k.ch.planets.Moon).i;
 
     const renderNavTaraGrid = planetaryPositions => {
       const lattaRows = navTaraPlanetNames.map(planet => {
@@ -7755,7 +7755,7 @@ sec.querySelectorAll('input, textarea').forEach(field => {
     if (typeof activeChartsRegistry !== 'undefined') activeChartsRegistry.delete(`rc${n}`);
   });
 
-sec.querySelector('form').addEventListener('submit', ev => {
+sec.querySelector('form').addEventListener('submit', async ev => {
     ev.preventDefault();
     const formEl = ev.currentTarget;
     const data = Object.fromEntries(new FormData(formEl).entries());
