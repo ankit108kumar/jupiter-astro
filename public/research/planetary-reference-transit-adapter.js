@@ -36,6 +36,8 @@ function nakInfo(label){
  const p=ORD.findIndex(x=>s.includes(x.toLowerCase()+' pada'));
  return{i,pada:p<0?null:p+1};
 }
+function navamsaAt(longitude){const lon=((longitude%360)+360)%360,s=Math.floor(lon/30),deg=lon-s*30,part=Math.min(8,Math.floor(deg/(30/9)));return([0,9,6,3][s%4]+part)%12;}
+function padaFromNakshatraAndNavamsa(nakIndex,navIndex){for(let pada=1;pada<=4;pada++){const segment=nakIndex*4+(pada-1),midpoint=segment*(10/3)+(5/3);if(navamsaAt(midpoint)===navIndex)return pada;}return null;}
 function dateLabel(ms){
  try{return new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true}).format(new Date(ms))+' IST';}
  catch(_){return new Date(ms).toISOString();}
@@ -83,6 +85,7 @@ function makePositions(positions,results){
     }
    }
   }
+  if(Number.isInteger(indices.nakshatra)&&Number.isInteger(indices.navamsa)&&!Number.isInteger(indices.pada))indices.pada=padaFromNakshatraAndNavamsa(indices.nakshatra,indices.navamsa);
   if(Object.keys(labels).length)copy.jaReference={labels,indices,intervals,verified:true};
   out[p]=copy;
  }
