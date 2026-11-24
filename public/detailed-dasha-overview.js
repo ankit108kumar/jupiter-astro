@@ -263,6 +263,15 @@
     );
   }
 
+  // Drop DDO rows when natal reconciliation changes the chart data they depend on.
+  function invalidate(kData) {
+    if (!kData) return;
+    cacheByChart.delete(kData);
+    Array.from(liveInstances).forEach(instance => {
+      if (instance.kData === kData) disposeInstance(instance);
+    });
+  }
+
   // Share the exact MD/AD/PD count values already returned for the
   // Detailed Dasha Overview's active row. The Transit Timeline must not
   // independently recalculate these counts.
@@ -647,6 +656,6 @@ ui.loading.hidden = true;
     queued.forEach(options => mount(options));
   });
 
-  window.DetailedDashaOverview = { mount, getRunningSequence };
+  window.DetailedDashaOverview = { mount, getRunningSequence, invalidate };
 
 })();
