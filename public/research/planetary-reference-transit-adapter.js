@@ -125,7 +125,7 @@ function getInterval(planet,division,timestamp){
  if(!engine)return null;
  try{
   const q=engine.getTransitReference(planet,division,Number(timestamp),longitudeAt,EPHEMERIS_VERSION);
-  if(!q||!Number.isFinite(Number(q.startMs))||!Number.isFinite(Number(q.endMs)))return null;
+  if(!q||q.startMs==null||q.endMs==null||!Number.isFinite(Number(q.startMs))||!Number.isFinite(Number(q.endMs)))return null;
   return{startMs:Number(q.startMs),endMs:Number(q.endMs),source:q.referenceSource||'json',derived:!!q.derived};
  }catch(e){return null;}
 }
