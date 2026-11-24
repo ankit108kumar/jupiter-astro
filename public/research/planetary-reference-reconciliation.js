@@ -1,5 +1,5 @@
 /* JupiterAstro Hybrid Planetary Reference Reconciliation
- * v1.4.0 — browser module; JSON-backed divisions plus hybrid Rahu/Ketu Navamsa.
+ * v1.5.0 — browser module; JSON-backed divisions plus hybrid Rahu/Ketu Navamsa.
  * API: window.JAPlanetaryReference.create({url}).init(); engine.verify({...})
  * Direct JSON scope: Saturn, Jupiter, Rahu, Ketu. No direct Rahu/Ketu Navamsa exists.
  */
