@@ -12,6 +12,7 @@ const ORD=['First','Second','Third','Fourth'];
 const CACHE=new Map();
 let enginePromise=null,engine=null,requestSequence=0;
 const EPHEMERIS_VERSION='JupiterAstro-existing-sidereal-ephemeris';
+function nowMs(){return root.performance&&typeof root.performance.now==='function'?root.nowMs():Date.now();}
 function msToJd(ms){return Number(ms)/86400000+2440587.5;}
 function longitudeAt(planet,timestampMs){
  if(typeof root.siderealPlanetLongitude!=='function')throw new Error('Existing siderealPlanetLongitude() is unavailable.');
@@ -89,7 +90,7 @@ function makePositions(positions,results){
 }
 async function reconcilePositions(positions,timestamp,scope,options){
  options=options||{};
- const token=++requestSequence,start=performance.now(),at=Math.trunc(Number(timestamp));
+ const token=++requestSequence,start=nowMs(),at=Math.trunc(Number(timestamp));
  if(!Number.isFinite(at))throw new Error('Invalid timestamp for planetary reconciliation.');
  const cacheKey=at+'|'+PLANETS.map(p=>p+':'+(positions[p]&&positions[p].lon)).join('|');
  let payload=CACHE.get(cacheKey);
@@ -110,11 +111,11 @@ async function reconcilePositions(positions,timestamp,scope,options){
    payload={results:result.results||{},verified,updated,errors,version:e.getDiagnostics().version};
    CACHE.set(cacheKey,payload);while(CACHE.size>40)CACHE.delete(CACHE.keys().next().value);
   }
-  const out=makePositions(positions,payload.results),elapsed=performance.now()-start;
+  const out=makePositions(positions,payload.results),elapsed=nowMs()-start;
   if(token===requestSequence&&!options.silent)showStatus(payload,elapsed,scope);
   return{positions:out,results:payload.results,verified:payload.verified.slice(),updated:payload.updated.slice(),errors:payload.errors.slice(),elapsedMs:elapsed,referenceVersion:payload.version};
  }catch(error){
-  const elapsed=performance.now()-start;
+  const elapsed=nowMs()-start;
   if(token===requestSequence&&!options.silent)showStatus({verified:[],updated:[],errors:[error.message]},elapsed,scope);
   console.error('JupiterAstro planetary reference verification failed:',error);
   return{positions:Object.assign({},positions),results:{},verified:[],updated:[],errors:[error.message],elapsedMs:elapsed,referenceVersion:null};
