@@ -521,7 +521,12 @@
   </section>
 
   <!-- MOUNT TARGET FOR PRIMARY CHART -->
-  <div id="mainChartResult"></div>
+  <div id="mainChartResult" aria-busy="true">
+    <div class="ja-chart-loading" role="status">
+      <span class="ja-loading-spinner" aria-hidden="true"></span>
+      <span>Loading...</span>
+    </div>
+  </div>
 
   <!-- DYNAMIC RESEARCH SERIES -->
   <div id="research-series"></div>
@@ -5857,6 +5862,7 @@ async function renderKundaliComponent(
 </div>
 <div class="tab-body" style="padding-top:16px;"></div>
   `;
+  targetEl.setAttribute('aria-busy', 'false');
 
   const body = targetEl.querySelector('.tab-body');
   const btns = targetEl.querySelectorAll('.tab-btn');
@@ -7257,6 +7263,19 @@ const mainForm = document.getElementById('mainForm');
 const mainPob = document.getElementById('pob'), mainPobList = document.getElementById('pobList');
 bindPlaceAutocomplete(mainPob, mainPobList);
 
+function setMainChartLoading(message, isError = false) {
+  const target = document.getElementById('mainChartResult');
+  if (!target) return;
+  target.setAttribute('aria-busy', String(!isError));
+  target.innerHTML = `<div class="ja-chart-loading${isError ? ' is-error' : ''}" role="${isError ? 'alert' : 'status'}">${isError ? '' : '<span class="ja-loading-spinner" aria-hidden="true"></span>'}<span>${message}</span></div>`;
+}
+
+function waitForChartLoadingPaint() {
+  return new Promise(resolve => requestAnimationFrame(() =>
+    requestAnimationFrame(resolve)
+  ));
+}
+
 mainForm.addEventListener('submit', async e => {
   e.preventDefault();
   const dateObj = parseDmy(document.getElementById('dob').value);
@@ -7285,6 +7304,9 @@ let lat = parseFloat(mainPob.dataset.lat), lon = parseFloat(mainPob.dataset.lon)
     lat = found.lat; lon = found.lon; tz = found.tz;
   }
 
+  setMainChartLoading('Loading...');
+  await waitForChartLoadingPaint();
+
  // India is always IST (UTC +5:30).
 // Call Google Time Zone API only for places without a known timezone.
 if (!Number.isFinite(tz)) {
@@ -7292,18 +7314,24 @@ if (!Number.isFinite(tz)) {
     tz = await getPlaceTimezone(lat, lon, dateObj, tobVal);
   } catch (err) {
     console.error('Timezone lookup failed:', err);
+    setMainChartLoading('Unable to load. Please try again.', true);
     showInlineError('Unable to determine the timezone for this location.');
     return;
   }
 }
 
-  const [hh, mm, ss] = tobVal.split(':').map(Number);
-  const input = { y: dateObj.y, m: dateObj.m, d: dateObj.d, hh, mm: mm || 0, ss: ss || 0, tz, lat, lon };
-  const kBundle = await buildCompleteKundali(input);
-  const name = document.getElementById('nm').value.trim() || 'Primary Chart';
-  const sub = `${document.getElementById('dob').value} ${tobVal} · ${pobVal}`;
+  try {
+    const [hh, mm, ss] = tobVal.split(':').map(Number);
+    const input = { y: dateObj.y, m: dateObj.m, d: dateObj.d, hh, mm: mm || 0, ss: ss || 0, tz, lat, lon };
+    const kBundle = await buildCompleteKundali(input);
+    const name = document.getElementById('nm').value.trim() || 'Primary Chart';
+    const sub = `${document.getElementById('dob').value} ${tobVal} · ${pobVal}`;
 
-  await renderKundaliComponent(document.getElementById('mainChartResult'), kBundle, 'main', name, sub);
+    await renderKundaliComponent(document.getElementById('mainChartResult'), kBundle, 'main', name, sub);
+  } catch (err) {
+    console.error('Prashna Kundali generation failed:', err);
+    setMainChartLoading('Unable to load. Please try again.', true);
+  }
 });
 
 // Dynamic Research Forms Engine
