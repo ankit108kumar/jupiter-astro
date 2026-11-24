@@ -5684,7 +5684,7 @@ async function renderKundaliComponent(
         .slice(0, 3).map(p => {
           const natalPosition = kData.ch.planets[p.lord];
           const house = natalPosition
-            ? houseFrom(signOf(natalPosition.lon), kData.ascSign)
+            ? houseFrom(signOfPosition(natalPosition), kData.ascSign)
             : null;
           return { lord: p.lord, house };
         })
