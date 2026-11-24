@@ -1571,6 +1571,15 @@ function getTransitDivisionInterval(planet, evalMs, longitude, division) {
   return getBasicTransitDivisionInterval(planet, evalMs, longitude, division);
 }
 
+function getReferenceSignAt(planet, timestamp) {
+  const reference = window.JAPlanetaryReconciliation &&
+    window.JAPlanetaryReconciliation.getInterval(planet, 'Sign', timestamp);
+  if (!reference || !reference.label) return null;
+  const label = String(reference.label).trim().toLowerCase();
+  const index = SIGNS.findIndex(sign => String(sign[0]).trim().toLowerCase() === label);
+  return index >= 0 ? index : null;
+}
+
 function getBasicTransitDivisionInterval(planet, evalMs, longitude, division) {
   const evalJd = msToJd(evalMs);
   const currentIndex = transitDivisionIndex(longitude, division);
@@ -1667,9 +1676,11 @@ function getTransitTimelineTableData(k, evalMs) {
     let murti = '';
     // Murti Nirnay is intentionally left blank for Moon.
     if (planet !== 'Moon' && signDuration && Number.isFinite(signDuration.startMs)) {
-      const moonAtIngress = siderealPlanetLongitude('Moon', msToJd(signDuration.startMs));
-      const ingressMoonSign = signOf(moonAtIngress);
-      const countFromJanmaRashi = houseFrom(ingressMoonSign, k.moonSign);
+      const ingressMoonSign = getReferenceSignAt('Moon', signDuration.startMs);
+      const moonSignAtIngress = ingressMoonSign == null
+        ? signOf(siderealPlanetLongitude('Moon', msToJd(signDuration.startMs)))
+        : ingressMoonSign;
+      const countFromJanmaRashi = houseFrom(moonSignAtIngress, k.moonSign);
       murti = countFromJanmaRashi === 1 || countFromJanmaRashi === 6 || countFromJanmaRashi === 11
         ? 'Gold'
         : countFromJanmaRashi === 2 || countFromJanmaRashi === 5 || countFromJanmaRashi === 9
@@ -4188,6 +4199,15 @@ function schedulePlanetaryReferenceUpdate(kData, targetEl, prefix, getEvalMs, ge
     if (!targetEl.isConnected || targetEl.__jaPlanetaryUpdateToken !== token) return;
     const rebuilt = bundleFromChart(kData.ch, kData.input, kData.offsetDays, natalResult);
     Object.assign(kData, rebuilt);
+    // Reconciliation can change natal placement, transit divisions, ingress
+    // durations, and every derived row that depends on them. Drop the chart's
+    // cached transit table before any UI is rebuilt.
+    TRANSIT_TIMELINE_DATA_CACHE.delete(kData);
+    if ((natalResult.updated || []).length &&
+        window.DetailedDashaOverview &&
+        typeof window.DetailedDashaOverview.invalidate === 'function') {
+      window.DetailedDashaOverview.invalidate(kData);
+    }
     TRANSIT_POSITION_CACHE.set(Math.trunc(evalMs), transitResult.positions);
     const elapsed = (window.performance && performance.now ? performance.now() : Date.now()) - start;
     const contexts = {
@@ -4197,6 +4217,10 @@ function schedulePlanetaryReferenceUpdate(kData, targetEl, prefix, getEvalMs, ge
     const errors = [...(natalResult.errors || []), ...(transitResult.errors || [])];
     if ((natalResult.updated || []).length || (transitResult.updated || []).length || getActiveTab() === 'transit') {
       await refreshRenderedChart();
+    }
+    if (window.JupiterTransitTimeline &&
+        typeof window.JupiterTransitTimeline.syncFromContext === 'function') {
+      window.JupiterTransitTimeline.syncFromContext();
     }
     adapter.showStatus({
       contexts,
