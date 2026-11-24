@@ -43,67 +43,65 @@ function nakStep(a,b){const x=nakIndex(a),y=nakIndex(b);if(x<0||y<0)throw err('U
 function buildDerivedNavamsa(planet,fn,ephemerisVersion){
  if(typeof fn!=='function')throw err('An ephemerisLongitudeAt callback is required to derive '+planet+' Navamsa','MISSING_EPHEMERIS_CALLBACK');
  let id=fnIds.get(fn);if(!id){id=nextFnId++;fnIds.set(fn,id);}
- const sampleMs=cfg.navamsaSampleMs||3600000,probeMs=cfg.angularSpeedProbeMs||300000,maxSamples=cfg.maxNavamsaSamples||500000;
- const cacheKey=[state.version,ephemerisVersion||'unspecified',planet,id,sampleMs,probeMs,'angular-speed-endpoint-cal-v2'].join('|');
+ const sampleCount=cfg.navamsaSampleCount||512,timeToleranceMs=cfg.navamsaTimeToleranceMs||250;
+ const cacheKey=[state.version,ephemerisVersion||'unspecified',planet,id,sampleCount,timeToleranceMs,'hybrid-sampled-profile-v3'].join('|');
  if(derivedCache.has(cacheKey))return derivedCache.get(cacheKey);
  const nak=state.index[planet]?.Nakshatra;
  if(!Array.isArray(nak)||nak.length<2)throw err('At least two consecutive '+planet+' Nakshatra reference events are required','INSUFFICIENT_NAKSHATRA_REFERENCE');
  const events=[],warnings=[],calibrations=[];let totalSamples=0;
- // Derive signed angular speed from the ephemeris longitude by a centered finite
- // difference. Integrate speed (trapezoidal rule), then calibrate its integral
- // to the exact signed 13°20′ span between consecutive JSON Nakshatra ingresses.
- function angularSpeedAt(t){
-  const before=longitudeAt(fn,planet,t-probeMs),after=longitudeAt(fn,planet,t+probeMs);
-  return signedDelta(before,after)/(2*probeMs/86400000); // degrees/day, signed
- }
+ // Hybrid sampled-profile method: unwrap the ephemeris longitude through each
+ // reference Nakshatra interval, calibrate net travel to its signed 13°20′
+ // reference span, then solve each internal quarter crossing independently.
  for(let i=0;i<nak.length-1;i++){
   const a=nak[i],b=nak[i+1],start=a.enteredAtUTC,end=b.enteredAtUTC;
   if(end<=start)throw err('Non-positive Nakshatra reference interval','INVALID_NAKSHATRA_INTERVAL');
-  const direction=nakStep(a.label,b.label),targetSpan=direction*NAK_SPAN,zodiacStart=nakIndex(a.label)*NAK_SPAN;
-  const nodes=[];let t=start;
-  while(t<end){
-   if(++totalSamples>maxSamples)throw err('Derived Navamsa sample safety limit exceeded','SAMPLE_LIMIT');
-   nodes.push({t,speed:angularSpeedAt(t)});t=Math.min(end,t+sampleMs);
+  const direction=nakStep(a.label,b.label),targetSpan=direction*NAK_SPAN;
+  // Chronological entry is the lower Nakshatra boundary for direct motion,
+  // but the upper boundary for retrograde motion.
+  const zodiacStart=rev360((nakIndex(a.label)+(direction<0?1:0))*NAK_SPAN);
+  const samples=[];let previous=null,unwrapped=0;
+  for(let j=0;j<=sampleCount;j++){
+   const t=start+(end-start)*j/sampleCount;
+   const lon=longitudeAt(fn,planet,t);
+   if(previous!==null)unwrapped+=signedDelta(previous,lon);
+   samples.push({timestampMs:t,longitude:lon,unwrappedDeg:unwrapped});
+   previous=lon;totalSamples++;
   }
-  if(nodes.length<2||nodes[nodes.length-1].t!==end){if(++totalSamples>maxSamples)throw err('Derived Navamsa sample safety limit exceeded','SAMPLE_LIMIT');nodes.push({t:end,speed:angularSpeedAt(end)});}
-  let integrated=0;nodes[0].movement=0;
-  for(let j=1;j<nodes.length;j++){
-   const dt=(nodes[j].t-nodes[j-1].t)/86400000;
-   const area=(nodes[j-1].speed+nodes[j].speed)*0.5*dt;
-   if(!Number.isFinite(area)||Math.abs(area)>5)throw err('Invalid angular-speed integration segment','INVALID_SPEED_INTEGRAL');
-   integrated+=area;nodes[j].movement=integrated;
-  }
-  if(Math.abs(integrated)<0.0001)throw err('Integrated angular movement is effectively zero across Nakshatra interval','STATIONARY_NAKSHATRA_INTERVAL');
-  if(Math.sign(integrated)!==direction)throw err('Integrated angular-speed direction conflicts with chronological Nakshatra reference direction','DIRECTION_MISMATCH');
-  const scale=targetSpan/integrated;
-  if(!Number.isFinite(scale)||scale<0.5||scale>2)throw err('Angular-speed endpoint calibration scale outside safety range: '+scale,'CALIBRATION_OUT_OF_RANGE');
-  // Invert the integrated, linearly varying angular-speed curve to find each
-  // internal Navamsa boundary. A bisection solve operates on the local
-  // trapezoidal integral, rather than assuming constant angular velocity.
+  const rawNetTravel=samples[samples.length-1].unwrappedDeg;
+  if(Math.abs(rawNetTravel)<1e-7)throw err('Ephemeris net angular travel is effectively zero across Nakshatra interval','STATIONARY_NAKSHATRA_INTERVAL');
+  if(Math.sign(rawNetTravel)!==direction)throw err('Ephemeris angular direction conflicts with chronological Nakshatra reference direction','DIRECTION_MISMATCH');
+  const calibrationScale=targetSpan/rawNetTravel;
+  if(!Number.isFinite(calibrationScale)||calibrationScale<0.5||calibrationScale>2)throw err('Angular-travel calibration scale outside safety range: '+calibrationScale,'CALIBRATION_OUT_OF_RANGE');
   for(let quarter=1;quarter<=3;quarter++){
-   const targetMovement=integrated*quarter/4;
-   let k=1;while(k<nodes.length&&((direction>0&&nodes[k].movement<targetMovement)||(direction<0&&nodes[k].movement>targetMovement)))k++;
-   if(k>=nodes.length)continue;
-   const n0=nodes[k-1],n1=nodes[k],dtDays=(n1.t-n0.t)/86400000;
-   let lo=0,hi=1;
-   for(let n=0;n<48;n++){
-    const u=(lo+hi)/2;
-    const localArea=(n0.speed*u+(n1.speed-n0.speed)*u*u/2)*dtDays;
-    const movement=n0.movement+localArea;
-    if((direction>0&&movement<targetMovement)||(direction<0&&movement>targetMovement))lo=u;else hi=u;
+   const targetProgress=targetSpan*quarter/4;
+   let found=0;
+   for(let j=0;j<sampleCount;j++){
+    const leftSample=samples[j],rightSample=samples[j+1];
+    const leftProgress=leftSample.unwrappedDeg*calibrationScale;
+    const rightProgress=rightSample.unwrappedDeg*calibrationScale;
+    if(targetProgress<Math.min(leftProgress,rightProgress)-1e-9||targetProgress>Math.max(leftProgress,rightProgress)+1e-9)continue;
+    let lo=leftSample.timestampMs,hi=rightSample.timestampMs;
+    const targetRaw=targetProgress/calibrationScale;
+    const increasing=rightSample.unwrappedDeg>=leftSample.unwrappedDeg;
+    const rawAt=t=>leftSample.unwrappedDeg+signedDelta(leftSample.longitude,longitudeAt(fn,planet,t));
+    for(let k=0;k<70&&hi-lo>timeToleranceMs;k++){
+     const mid=(lo+hi)/2,value=rawAt(mid);
+     if((value<targetRaw)===increasing)lo=mid;else hi=mid;
+    }
+    const crossing=Math.round((lo+hi)/2);
+    const boundaryLongitude=rev360(zodiacStart+targetSpan*quarter/4);
+    events.push({label:navamsaLabel(boundaryLongitude),enteredAtUTC:crossing,enteredAt:new Date(crossing).toISOString(),source:'derived-hybrid-sampled-angular-profile',boundaryLongitude,anchor:'calibrated-ephemeris-quarter-crossing',referenceInterval:{start:a.enteredAt,end:b.enteredAt},direction:direction>0?'direct':'retrograde'});
+    found++;
    }
-   const crossing=Math.round(n0.t+(n1.t-n0.t)*(lo+hi)/2);
-   const calibratedLongitude=rev360(zodiacStart+targetSpan*quarter/4);
-   events.push({label:navamsaLabel(calibratedLongitude),enteredAtUTC:crossing,enteredAt:new Date(crossing).toISOString(),source:'derived-angular-speed-endpoint-calibrated',boundaryLongitude:calibratedLongitude,anchor:'integrated-angular-speed-quarter-boundary',referenceInterval:{start:a.enteredAt,end:b.enteredAt}});
+   if(!found)warnings.push('Quarter '+quarter+' crossing not bracketed for '+a.label+' → '+b.label);
   }
-  // The JSON Nakshatra ingress itself is an exact 13°20′ anchor.
-  events.push({label:navamsaLabel(zodiacStart),enteredAtUTC:start,enteredAt:a.enteredAt,source:'derived-angular-speed-endpoint-calibrated',boundaryLongitude:rev360(zodiacStart),anchor:'json-nakshatra-ingress'});
-  calibrations.push({nakshatraFrom:a.label,nakshatraTo:b.label,startAtUTC:start,endAtUTC:end,referenceDirection:direction>0?'direct':'retrograde',integratedEphemerisMovementDegrees:integrated,referenceSpanDegrees:targetSpan,scaleFactor:scale,endpointResidualDegrees:integrated*scale-targetSpan,angularSpeedStartDegPerDay:nodes[0].speed,angularSpeedEndDegPerDay:nodes[nodes.length-1].speed,sampleCount:nodes.length,integration:'trapezoidal angular-speed integration; linearly interpolated speed within each sample interval'});
+  events.push({label:navamsaLabel(zodiacStart),enteredAtUTC:start,enteredAt:a.enteredAt,source:'derived-hybrid-sampled-angular-profile',boundaryLongitude:zodiacStart,anchor:'json-nakshatra-ingress',direction:direction>0?'direct':'retrograde'});
+  calibrations.push({nakshatraFrom:a.label,nakshatraTo:b.label,startAtUTC:start,endAtUTC:end,referenceDirection:direction>0?'direct':'retrograde',rawEphemerisTravelDegrees:rawNetTravel,referenceSpanDegrees:targetSpan,calibrationScale,calibratedTravelDegrees:rawNetTravel*calibrationScale,endpointResidualDegrees:rawNetTravel*calibrationScale-targetSpan,sampleCount:samples.length,sampling:'uniform timestamp samples; unwrapped sidereal longitude; calibrated to signed reference Nakshatra span'});
  }
  events.sort((a,b)=>a.enteredAtUTC-b.enteredAtUTC);
  const dedup=[];for(const e of events){if(dedup.length&&dedup[dedup.length-1].enteredAtUTC===e.enteredAtUTC){dedup[dedup.length-1]=e;continue;}dedup.push(e);}
  for(let i=1;i<dedup.length;i++)if(dedup[i].enteredAtUTC<=dedup[i-1].enteredAtUTC)throw err('Derived Navamsa events are not strictly chronological','DERIVED_EVENT_ORDER');
- const result={events:dedup,warnings,calibrations,source:'derived-angular-speed-endpoint-calibrated',calibrationMethod:'Signed angular speed is estimated by centered finite differences of sidereal longitude, integrated over each reference Nakshatra interval using the trapezoidal rule, normalized so the integrated movement equals the exact signed 13°20′ span, and inverted at quarter-span boundaries using bisection with linearly interpolated angular speed.',ephemerisVersion:ephemerisVersion||null,referenceVersion:state.version,sampleMs,angularSpeedProbeMs:probeMs,samples:totalSamples};
+ const result={events:dedup,warnings,calibrations,source:'derived-hybrid-sampled-angular-profile',calibrationMethod:'Adapted from Hybrid Transit Engine V2.1: sample sidereal longitude across each reference Nakshatra interval, unwrap angular progression, calibrate signed net travel to the exact signed 13°20′ reference span, and refine each internal quarter crossing by bisection inside its sampled bracket. Retrograde intervals anchor at the upper Nakshatra boundary.',ephemerisVersion:ephemerisVersion||null,referenceVersion:state.version,sampleCount,samples:totalSamples,timeToleranceMs};
  derivedCache.set(cacheKey,result);return result;
 }
 function derivedInterval(planet,t,fn,ephemerisVersion){const built=buildDerivedNavamsa(planet,fn,ephemerisVersion),q=interval(built.events,t);if(q.status==='outside-coverage'||q.status==='unavailable')return q;return Object.assign(q,{source:'derived-angular-speed-endpoint-calibrated',warnings:built.warnings,calibrations:built.calibrations,calibrationMethod:built.calibrationMethod,ephemerisVersion:built.ephemerisVersion,referenceVersion:built.referenceVersion});}
