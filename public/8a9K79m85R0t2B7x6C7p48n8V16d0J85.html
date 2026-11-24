@@ -58,7 +58,6 @@
 </style>
 <style id="ja-misc-sensitive-styles">.ja-misc-sensitive-card{margin:0 0 14px;min-width:0}.ja-misc-sensitive-card header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.ja-misc-sensitive-card h3{margin:0}.ja-misc-sensitive-card .sub{margin:4px 0 0}.ja-misc-reference-label{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.82rem;font-weight:600}.ja-misc-reference-label select{min-width:145px;padding:7px 10px;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);color:var(--text)}.ja-misc-sensitive-card table{width:100%;border-collapse:collapse}.ja-misc-sensitive-card th,.ja-misc-sensitive-card td{padding:9px 11px;text-align:left;border-bottom:1px solid var(--line)}.ja-misc-sensitive-card th{font-size:.76rem;color:var(--muted);font-weight:650}.ja-misc-sensitive-card td{font-size:.86rem;font-weight:400}.ja-misc-sensitive-card td small{display:block;color:var(--muted);font-size:.73rem;margin-top:3px}.ja-misc-sensitive-card .num{font-variant-numeric:tabular-nums;white-space:nowrap}.ja-misc-formula{font-size:.76rem;line-height:1.55;margin:10px 2px 0}.ja-misc-accuracy{margin:12px 0;padding:10px 12px;border-radius:9px;background:#fff8e9;color:#916d31;font-size:.8rem;line-height:1.5}</style>
 </head>
-</html>
 
 <body class="ja-page-loading">
 <div id="jaPageLoadingOverlay" role="status" aria-live="polite" aria-label="Loading page">
@@ -9017,6 +9016,9 @@ const result = section === 'planets'
   const minimumVisibleMs = 2000;
   let shownAt = 0;
   let finishing = false;
+  document.body.classList.add('ja-page-loading');
+  const coveredElements = Array.from(document.body.children).filter(element => element !== overlay);
+  coveredElements.forEach(element => { element.inert = true; });
 
   function maybeReveal() {
     if (finishing || !state.loaded || !state.chart || !state.panchang || !state.fonts || !state.painted) return;
@@ -9025,6 +9027,7 @@ const result = section === 'planets'
     window.setTimeout(() => {
       overlay.classList.add('is-hidden');
       document.body.classList.remove('ja-page-loading');
+      coveredElements.forEach(element => { element.inert = false; });
       window.setTimeout(() => overlay.remove(), 300);
     }, remaining);
   }
