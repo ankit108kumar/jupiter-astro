@@ -62,7 +62,7 @@
 <body class="ja-page-loading">
 <div id="jaPageLoadingOverlay" role="status" aria-live="polite" aria-label="Loading page">
   <div class="ja-page-loading-content">
-    <span class="ja-loading-spinner" aria-hidden="true"></span>
+    <span class="ja-page-loading-dots" aria-hidden="true"><i></i><i></i><i></i></span>
     <span>Loading...</span>
   </div>
 </div>
@@ -9013,7 +9013,7 @@ const result = section === 'planets'
   if (!overlay) return;
 
   const state = { loaded: document.readyState === 'complete', chart: false, panchang: false, fonts: false, painted: false };
-  const minimumVisibleMs = 2000;
+  const minimumVisibleMs = 1500;
   let shownAt = 0;
   let finishing = false;
   document.body.classList.add('ja-page-loading');
