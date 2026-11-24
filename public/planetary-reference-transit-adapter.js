@@ -80,7 +80,7 @@ function makePositions(positions,results){
   if(item){
    for(const d of DIVISIONS){
     const row=item.divisions&&item.divisions[d.toLowerCase()];
-    const label=row&&row.final;
+    const label=row&&row.reference?row.final:null;
     if(label){labels[d]=label;intervals[d]=row;
      if(d==='Sign')indices.sign=signIndex(label);
      if(d==='Nakshatra'){const q=nakInfo(label);if(q){indices.nakshatra=q.i;indices.pada=q.pada;}}
