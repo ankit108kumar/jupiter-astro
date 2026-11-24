@@ -30,7 +30,8 @@ function signIndex(label){
  return SIGNS.findIndex(x=>s.startsWith(x.toLowerCase()));
 }
 function nakInfo(label){
- const s=String(label||'').trim().toLowerCase();
+ const raw=String(label||'').trim().toLowerCase();
+ const s=raw.replace(/^dhanishtha/,'dhanishta');
  const i=NAK.findIndex(x=>s.startsWith(x.toLowerCase()));
  if(i<0)return null;
  const p=ORD.findIndex(x=>s.includes(x.toLowerCase()+' pada'));
