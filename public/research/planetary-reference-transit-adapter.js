@@ -54,12 +54,14 @@ function ensureStrip(){
  return el;
 }
 function showStatus(result,elapsed,scope){
- const el=ensureStrip(),updated=result.updated||[],verified=result.verified||[];
+ const el=ensureStrip(),updated=result.updated||[],verified=result.verified||[],errors=result.errors||[];
  const names=updated.length?updated.join(', '):'None (reference values already matched)';
- el.dataset.state=result.errors&&result.errors.length?'warning':'ready';
- el.innerHTML='<strong>Planetary data verified and updated</strong> · '+(scope||'Chart')+
+ const heading=errors.length?'Planetary data verification incomplete':verified.length?'Planetary data verified and updated':'Planetary reference not available for this date';
+ el.dataset.state=errors.length?'warning':'ready';
+ el.innerHTML='<strong>'+escapeHtml(heading)+'</strong> · '+(scope||'Chart')+
   '<br>Updated: '+escapeHtml(names)+' · Verified: '+escapeHtml(verified.join(', ')||'—')+
-  '<br>Verification: '+Math.max(0,elapsed).toFixed(1)+' ms · '+escapeHtml(dateLabel(Date.now()));
+  '<br>Verification: '+Math.max(0,elapsed).toFixed(1)+' ms · '+escapeHtml(dateLabel(Date.now()))+
+  (errors.length?'<br>Note: '+escapeHtml(errors.join('; ')):'');
 }
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 async function getEngine(){
