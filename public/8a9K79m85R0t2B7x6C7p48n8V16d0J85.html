@@ -1445,8 +1445,8 @@ function calculateRahuBav(pos1, ascSign) {
 /* ================= TRANSIT TIMELINE DATA ADAPTER =================
    One selected-kundali adapter supplies all nine rows to the floating
    Transit Timeline. Transit positions are cached by evaluation timestamp.
-   Duration intervals use the same in-app sidereal ephemeris; a future JSON
-   duration provider can override the basic interval without changing the UI.
+   Reference classifications and duration intervals are supplied by the global
+   natal/transit reconciliation adapter; the ephemeris remains the longitude source.
    ====================================================================== */
 const TRANSIT_POSITION_CACHE = new Map();
 const TRANSIT_TIMELINE_DATA_CACHE = new WeakMap();
