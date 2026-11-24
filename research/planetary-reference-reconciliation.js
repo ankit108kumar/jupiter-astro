@@ -5,7 +5,7 @@
  */
 (function(root){
 'use strict';
-const VERSION='1.1.0', PLANETS=['Saturn','Jupiter','Rahu','Ketu'], DIVS=['Sign','Nakshatra','Navamsa'];
+const VERSION='1.3.0', PLANETS=['Saturn','Jupiter','Rahu','Ketu'], DIVS=['Sign','Nakshatra','Navamsa'];
 const DB='JA_PlanetaryReference', STORE='databases', NAK=['Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu','Pushya','Ashlesha','Magha','Purva Phalguni','Uttara Phalguni','Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha','Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishta','Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'];
 const err=(m,c='JA_REFERENCE_ERROR')=>Object.assign(new Error(m),{code:c});
 const obj=x=>!!x&&typeof x==='object'&&!Array.isArray(x);
@@ -36,14 +36,79 @@ function ephemDirection(fn,p,t){if(typeof fn!=='function')return{status:'not-che
 function rev360(x){return((x%360)+360)%360;}
 function signedDelta(a,b){return((b-a+540)%360)-180;}
 const SIGNS=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
-function navamsaLabel(lon){const slot=Math.floor(rev360(lon)/(360/108)+1e-9),sign=slot%12;return SIGNS[sign]+' ('+(sign+1)+')';}
+const NAK_SPAN=360/27, NAV_SPAN=360/108;
+function navamsaLabel(lon){const slot=Math.floor(rev360(lon)/NAV_SPAN+1e-9),sign=slot%12;return SIGNS[sign]+' ('+(sign+1)+')';}
 function longitudeAt(fn,planet,t){let v=fn(planet,t);if(typeof v!=='number'||!Number.isFinite(v)){if(planet==='Ketu'){const r=fn('Rahu',t);if(typeof r==='number'&&Number.isFinite(r))return rev360(r+180);}throw err('Ephemeris longitude callback must return a finite sidereal degree for '+planet+' at '+t,'INVALID_EPHEMERIS_LONGITUDE');}return rev360(v);}
-function buildDerivedNavamsa(planet,fn,ephemerisVersion){if(typeof fn!=='function')throw err('An ephemerisLongitudeAt callback is required to derive '+planet+' Navamsa','MISSING_EPHEMERIS_CALLBACK');let id=fnIds.get(fn);if(!id){id=nextFnId++;fnIds.set(fn,id);}const cacheKey=[state.version,ephemerisVersion||'unspecified',planet,id,cfg.navamsaSampleMs||21600000].join('|');if(derivedCache.has(cacheKey))return derivedCache.get(cacheKey);const nak=state.index[planet]?.Nakshatra;if(!Array.isArray(nak)||nak.length<2)throw err('At least two consecutive '+planet+' Nakshatra reference events are required','INSUFFICIENT_NAKSHATRA_REFERENCE');const step=360/108,sampleMs=cfg.navamsaSampleMs||21600000,maxSamples=cfg.maxNavamsaSamples||200000,events=[],warnings=[];let samples=0;const getLon=(t)=>longitudeAt(fn,planet,t);const first=nak[0],firstLon=getLon(first.enteredAtUTC);events.push({label:navamsaLabel(firstLon),enteredAtUTC:first.enteredAtUTC,enteredAt:new Date(first.enteredAtUTC).toISOString(),source:'derived-calibrated',anchor:'nakshatra-ingress'});
-for(let i=0;i<nak.length-1;i++){const start=nak[i].enteredAtUTC,end=nak[i+1].enteredAtUTC;if(end<=start)continue;let ta=start,la=getLon(ta);while(ta<end){if(++samples>maxSamples)throw err('Derived Navamsa sample safety limit exceeded','SAMPLE_LIMIT');const tb=Math.min(end,ta+sampleMs),lb=getLon(tb),delta=signedDelta(la,lb);if(Math.abs(delta)>30){warnings.push('Large longitude jump in '+planet+' sample interval at '+new Date(ta).toISOString());ta=tb;la=lb;continue;}if(Math.abs(delta)>1e-10){const u0=la,u1=la+delta,lo=Math.min(u0,u1),hi=Math.max(u0,u1),k0=Math.floor(lo/step)+1,k1=Math.floor((hi-1e-10)/step);for(let k=k0;k<=k1;k++){const target=k*step,offsetTarget=target-u0;let left=ta,right=tb;for(let n=0;n<42&&right-left>100;n++){const mid=Math.floor((left+right)/2),midLon=getLon(mid),unwrapped=u0+signedDelta(la,midLon);if((delta>0&&unwrapped<target)||(delta<0&&unwrapped>target))left=mid;else right=mid;}const crossing=Math.floor((left+right)/2);if(crossing>start&&crossing<end){const normTarget=rev360(target),lab=navamsaLabel(normTarget);events.push({label:lab,enteredAtUTC:crossing,enteredAt:new Date(crossing).toISOString(),source:'derived-calibrated',boundaryLongitude:normTarget,anchor:'ephemeris-boundary'});}}}ta=tb;la=lb;}}
-events.sort((a,b)=>a.enteredAtUTC-b.enteredAtUTC);const dedup=[];for(const e of events){if(dedup.length&&dedup[dedup.length-1].enteredAtUTC===e.enteredAtUTC){dedup[dedup.length-1]=e;continue;}dedup.push(e);}const result={events:dedup,warnings,source:'derived-calibrated',ephemerisVersion:ephemerisVersion||null,referenceVersion:state.version,sampleMs,samples};derivedCache.set(cacheKey,result);return result;}
-function derivedInterval(planet,t,fn,ephemerisVersion){const built=buildDerivedNavamsa(planet,fn,ephemerisVersion),q=interval(built.events,t);if(q.status==='outside-coverage'||q.status==='unavailable')return q;return Object.assign(q,{source:'derived-calibrated',warnings:built.warnings,ephemerisVersion:built.ephemerisVersion,referenceVersion:built.referenceVersion});}
+function nakStep(a,b){const x=nakIndex(a),y=nakIndex(b);if(x<0||y<0)throw err('Unrecognized Nakshatra label in reference series: '+a+' / '+b,'UNKNOWN_NAKSHATRA');const k=(y-x+27)%27;if(k===1)return 1;if(k===26)return-1;throw err('Consecutive Nakshatra reference labels are not adjacent: '+a+' → '+b,'NON_ADJACENT_NAKSHATRA');}
+function buildDerivedNavamsa(planet,fn,ephemerisVersion){
+ if(typeof fn!=='function')throw err('An ephemerisLongitudeAt callback is required to derive '+planet+' Navamsa','MISSING_EPHEMERIS_CALLBACK');
+ let id=fnIds.get(fn);if(!id){id=nextFnId++;fnIds.set(fn,id);}
+ const sampleMs=cfg.navamsaSampleMs||3600000,probeMs=cfg.angularSpeedProbeMs||300000,maxSamples=cfg.maxNavamsaSamples||500000;
+ const cacheKey=[state.version,ephemerisVersion||'unspecified',planet,id,sampleMs,probeMs,'angular-speed-endpoint-cal-v2'].join('|');
+ if(derivedCache.has(cacheKey))return derivedCache.get(cacheKey);
+ const nak=state.index[planet]?.Nakshatra;
+ if(!Array.isArray(nak)||nak.length<2)throw err('At least two consecutive '+planet+' Nakshatra reference events are required','INSUFFICIENT_NAKSHATRA_REFERENCE');
+ const events=[],warnings=[],calibrations=[];let totalSamples=0;
+ // Derive signed angular speed from the ephemeris longitude by a centered finite
+ // difference. Integrate speed (trapezoidal rule), then calibrate its integral
+ // to the exact signed 13°20′ span between consecutive JSON Nakshatra ingresses.
+ function angularSpeedAt(t){
+  const before=longitudeAt(fn,planet,t-probeMs),after=longitudeAt(fn,planet,t+probeMs);
+  return signedDelta(before,after)/(2*probeMs/86400000); // degrees/day, signed
+ }
+ for(let i=0;i<nak.length-1;i++){
+  const a=nak[i],b=nak[i+1],start=a.enteredAtUTC,end=b.enteredAtUTC;
+  if(end<=start)throw err('Non-positive Nakshatra reference interval','INVALID_NAKSHATRA_INTERVAL');
+  const direction=nakStep(a.label,b.label),targetSpan=direction*NAK_SPAN,zodiacStart=nakIndex(a.label)*NAK_SPAN;
+  const nodes=[];let t=start;
+  while(t<end){
+   if(++totalSamples>maxSamples)throw err('Derived Navamsa sample safety limit exceeded','SAMPLE_LIMIT');
+   nodes.push({t,speed:angularSpeedAt(t)});t=Math.min(end,t+sampleMs);
+  }
+  if(nodes.length<2||nodes[nodes.length-1].t!==end){if(++totalSamples>maxSamples)throw err('Derived Navamsa sample safety limit exceeded','SAMPLE_LIMIT');nodes.push({t:end,speed:angularSpeedAt(end)});}
+  let integrated=0;nodes[0].movement=0;
+  for(let j=1;j<nodes.length;j++){
+   const dt=(nodes[j].t-nodes[j-1].t)/86400000;
+   const area=(nodes[j-1].speed+nodes[j].speed)*0.5*dt;
+   if(!Number.isFinite(area)||Math.abs(area)>5)throw err('Invalid angular-speed integration segment','INVALID_SPEED_INTEGRAL');
+   integrated+=area;nodes[j].movement=integrated;
+  }
+  if(Math.abs(integrated)<0.0001)throw err('Integrated angular movement is effectively zero across Nakshatra interval','STATIONARY_NAKSHATRA_INTERVAL');
+  if(Math.sign(integrated)!==direction)throw err('Integrated angular-speed direction conflicts with chronological Nakshatra reference direction','DIRECTION_MISMATCH');
+  const scale=targetSpan/integrated;
+  if(!Number.isFinite(scale)||scale<0.5||scale>2)throw err('Angular-speed endpoint calibration scale outside safety range: '+scale,'CALIBRATION_OUT_OF_RANGE');
+  // Invert the integrated, linearly varying angular-speed curve to find each
+  // internal Navamsa boundary. A bisection solve operates on the local
+  // trapezoidal integral, rather than assuming constant angular velocity.
+  for(let quarter=1;quarter<=3;quarter++){
+   const targetMovement=integrated*quarter/4;
+   let k=1;while(k<nodes.length&&((direction>0&&nodes[k].movement<targetMovement)||(direction<0&&nodes[k].movement>targetMovement)))k++;
+   if(k>=nodes.length)continue;
+   const n0=nodes[k-1],n1=nodes[k],dtDays=(n1.t-n0.t)/86400000;
+   let lo=0,hi=1;
+   for(let n=0;n<48;n++){
+    const u=(lo+hi)/2;
+    const localArea=(n0.speed*u+(n1.speed-n0.speed)*u*u/2)*dtDays;
+    const movement=n0.movement+localArea;
+    if((direction>0&&movement<targetMovement)||(direction<0&&movement>targetMovement))lo=u;else hi=u;
+   }
+   const crossing=Math.round(n0.t+(n1.t-n0.t)*(lo+hi)/2);
+   const calibratedLongitude=rev360(zodiacStart+targetSpan*quarter/4);
+   events.push({label:navamsaLabel(calibratedLongitude),enteredAtUTC:crossing,enteredAt:new Date(crossing).toISOString(),source:'derived-angular-speed-endpoint-calibrated',boundaryLongitude:calibratedLongitude,anchor:'integrated-angular-speed-quarter-boundary',referenceInterval:{start:a.enteredAt,end:b.enteredAt}});
+  }
+  // The JSON Nakshatra ingress itself is an exact 13°20′ anchor.
+  events.push({label:navamsaLabel(zodiacStart),enteredAtUTC:start,enteredAt:a.enteredAt,source:'derived-angular-speed-endpoint-calibrated',boundaryLongitude:rev360(zodiacStart),anchor:'json-nakshatra-ingress'});
+  calibrations.push({nakshatraFrom:a.label,nakshatraTo:b.label,startAtUTC:start,endAtUTC:end,referenceDirection:direction>0?'direct':'retrograde',integratedEphemerisMovementDegrees:integrated,referenceSpanDegrees:targetSpan,scaleFactor:scale,endpointResidualDegrees:integrated*scale-targetSpan,angularSpeedStartDegPerDay:nodes[0].speed,angularSpeedEndDegPerDay:nodes[nodes.length-1].speed,sampleCount:nodes.length,integration:'trapezoidal angular-speed integration; linearly interpolated speed within each sample interval'});
+ }
+ events.sort((a,b)=>a.enteredAtUTC-b.enteredAtUTC);
+ const dedup=[];for(const e of events){if(dedup.length&&dedup[dedup.length-1].enteredAtUTC===e.enteredAtUTC){dedup[dedup.length-1]=e;continue;}dedup.push(e);}
+ for(let i=1;i<dedup.length;i++)if(dedup[i].enteredAtUTC<=dedup[i-1].enteredAtUTC)throw err('Derived Navamsa events are not strictly chronological','DERIVED_EVENT_ORDER');
+ const result={events:dedup,warnings,calibrations,source:'derived-angular-speed-endpoint-calibrated',calibrationMethod:'Signed angular speed is estimated by centered finite differences of sidereal longitude, integrated over each reference Nakshatra interval using the trapezoidal rule, normalized so the integrated movement equals the exact signed 13°20′ span, and inverted at quarter-span boundaries using bisection with linearly interpolated angular speed.',ephemerisVersion:ephemerisVersion||null,referenceVersion:state.version,sampleMs,angularSpeedProbeMs:probeMs,samples:totalSamples};
+ derivedCache.set(cacheKey,result);return result;
+}
+function derivedInterval(planet,t,fn,ephemerisVersion){const built=buildDerivedNavamsa(planet,fn,ephemerisVersion),q=interval(built.events,t);if(q.status==='outside-coverage'||q.status==='unavailable')return q;return Object.assign(q,{source:'derived-angular-speed-endpoint-calibrated',warnings:built.warnings,calibrations:built.calibrations,calibrationMethod:built.calibrationMethod,ephemerisVersion:built.ephemerisVersion,referenceVersion:built.referenceVersion});}
 async function verify(input){if(!obj(input))throw err('verify expects an object','INVALID_ARGUMENT');const p=String(input.planet||'');if(!PLANETS.includes(p))throw err('Unsupported planet: '+p,'UNSUPPORTED_PLANET');const t=epoch(input.timestamp);if(!state)await init();const rows=state.index[p]||{},out={planet:p,timestamp:t,sourceVersion:state.version,calculated:{},verified:{},divisions:{},diagnostics:{warnings:[],referenceTimezone:state.timezone,utcOffsetMinutes:state.offset,validationWarnings:state.warnings,validationErrors:state.errors}};
-for(const d of DIVS){const c=calcValue(input.calculated,d);out.calculated[d.toLowerCase()]=c;let a=rows[d],q,source='json';if(!Array.isArray(a)&&d==='Navamsa'&&(p==='Rahu'||p==='Ketu')){try{q=derivedInterval(p,t,input.ephemerisLongitudeAt,input.ephemerisVersion);source='derived-calibrated';}catch(e){out.diagnostics.warnings.push('Navamsa derivation unavailable: '+e.message);q={status:'unavailable',reason:e.code||e.message};}}else q=Array.isArray(a)?interval(a,t):{status:a===null?'invalid-reference-series':'unavailable'};if(q.status==='outside-coverage'||q.status==='unavailable'){const s=q.status==='unavailable'?(q.reason||'reference-series-missing'):q.status;out.divisions[d.toLowerCase()]={status:s,calculated:c,reference:null,final:c,corrected:false,duration:null,referenceSource:source};out.verified[d.toLowerCase()]=c;continue;}const match=c===null?null:norm(c)===norm(q.label),dir=q.index&&Array.isArray(a)?direction(a[q.index-1].label,q.label,d):'unknown';const row={status:q.status,calculated:c,reference:q.label,final:q.label,matches:match,corrected:c!==null&&!match,referenceSource:source,direction:dir,entryAtUTC:q.entry,exitAtUTC:q.exit,entryAtISO:new Date(q.entry).toISOString(),exitAtISO:q.exit===null?null:new Date(q.exit).toISOString(),elapsedMs:q.elapsedMs,remainingMs:q.remainingMs,totalStayMs:q.totalMs,durationComplete:q.durationComplete};if(source==='derived-calibrated'){row.derived=true;row.warning='Navamsa boundaries are derived from the supplied sidereal longitude callback and are not direct JSON observations.';row.derivationWarnings=q.warnings||[];row.ephemerisVersion=q.ephemerisVersion;}if(!q.exit)row.warning=(row.warning?row.warning+' ':'')+'Exit is unknown at the end of reference coverage.';if(p==='Saturn'||p==='Jupiter'){row.ephemerisDirection=ephemDirection(input.ephemerisLongitudeAt,p,t);if(dir!=='unknown'&&row.ephemerisDirection.status!=='not-checked'&&row.ephemerisDirection.status!=='stationary'&&row.ephemerisDirection.status!==dir){row.directionMismatch=true;out.diagnostics.warnings.push(d+' reference direction differs from ephemeris sample');}if(row.ephemerisDirection.status==='stationary')row.possibleStation=true;}out.divisions[d.toLowerCase()]=row;out.verified[d.toLowerCase()]=q.label;}
+for(const d of DIVS){const c=calcValue(input.calculated,d);out.calculated[d.toLowerCase()]=c;let a=rows[d],q,source='json';if(!Array.isArray(a)&&d==='Navamsa'&&(p==='Rahu'||p==='Ketu')){try{q=derivedInterval(p,t,input.ephemerisLongitudeAt,input.ephemerisVersion);source='derived-angular-speed-endpoint-calibrated';}catch(e){out.diagnostics.warnings.push('Navamsa derivation unavailable: '+e.message);q={status:'unavailable',reason:e.code||e.message};}}else q=Array.isArray(a)?interval(a,t):{status:a===null?'invalid-reference-series':'unavailable'};if(q.status==='outside-coverage'||q.status==='unavailable'){const s=q.status==='unavailable'?(q.reason||'reference-series-missing'):q.status;out.divisions[d.toLowerCase()]={status:s,calculated:c,reference:null,final:c,corrected:false,duration:null,referenceSource:source};out.verified[d.toLowerCase()]=c;continue;}const match=c===null?null:norm(c)===norm(q.label),dir=q.index&&Array.isArray(a)?direction(a[q.index-1].label,q.label,d):'unknown';const row={status:q.status,calculated:c,reference:q.label,final:q.label,matches:match,corrected:c!==null&&!match,referenceSource:source,direction:dir,entryAtUTC:q.entry,exitAtUTC:q.exit,entryAtISO:new Date(q.entry).toISOString(),exitAtISO:q.exit===null?null:new Date(q.exit).toISOString(),elapsedMs:q.elapsedMs,remainingMs:q.remainingMs,totalStayMs:q.totalMs,durationComplete:q.durationComplete};if(source==='derived-angular-speed-endpoint-calibrated'){row.derived=true;row.warning='Navamsa boundaries use integrated angular speed, calibrated to the exact 13°20′ Nakshatra reference span; they are derived, not direct JSON observations.';row.derivationWarnings=q.warnings||[];row.ephemerisVersion=q.ephemerisVersion;}if(!q.exit)row.warning=(row.warning?row.warning+' ':'')+'Exit is unknown at the end of reference coverage.';if(p==='Saturn'||p==='Jupiter'){row.ephemerisDirection=ephemDirection(input.ephemerisLongitudeAt,p,t);if(dir!=='unknown'&&row.ephemerisDirection.status!=='not-checked'&&row.ephemerisDirection.status!=='stationary'&&row.ephemerisDirection.status!==dir){row.directionMismatch=true;out.diagnostics.warnings.push(d+' reference direction differs from ephemeris sample');}if(row.ephemerisDirection.status==='stationary')row.possibleStation=true;}out.divisions[d.toLowerCase()]=row;out.verified[d.toLowerCase()]=q.label;}
 out.motionPolicy=(p==='Rahu'||p==='Ketu')?'preserve-existing-node-retrograde-policy':'preserve-existing-ephemeris-motion';out.diagnostics.completedAt=new Date().toISOString();const ck=[state.version,p,...DIVS.map(d=>{const a=rows[d];return Array.isArray(a)?d+':'+(upper(a,t)-1):d+':x';})].join('|');out.cache={intervalKey:ck,previouslySeen:resultCache.has(ck)};resultCache.set(ck,true);return out;}
 async function verifyAll(input){await init();const result={timestamp:input.timestamp,results:{},errors:{}};await Promise.all(PLANETS.map(async p=>{try{result.results[p]=await verify({planet:p,timestamp:input.timestamp,calculated:input.calculated?.[p]||{},ephemerisLongitudeAt:input.ephemerisLongitudeAt});}catch(e){result.errors[p]={code:e.code||'ERROR',message:e.message};}}));return result;}
 function getInterval(p,d,t){if(!state)throw err('Call init first','NOT_INITIALIZED');if(!PLANETS.includes(p)||!DIVS.includes(d))throw err('Invalid planet/division','INVALID_ARGUMENT');return interval(state.index[p]?.[d],epoch(t));}
