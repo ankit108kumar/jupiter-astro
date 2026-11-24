@@ -1367,7 +1367,7 @@ function vargaSign(lon, n) {
   return ((r % 12) + 12) % 12;
 }
 const vargottamaIn = lon => VARGAS.filter(([n]) => n > 1 && vargaSign(lon, n) === signOf(lon)).map(([n]) => 'D' + n);
-function vargottamaForPosition(position) { const list = vargottamaIn(position.lon).filter(x => x !== 'D9'); if (navamsaOfPosition(position) === signOfPosition(position)) list.push('D9'); return list; }
+function vargottamaForPosition(position) { if (!Number.isInteger(position?.jaReference?.indices?.navamsa)) return vargottamaIn(position.lon); const list = vargottamaIn(position.lon).filter(x => x !== 'D9'); if (navamsaOfPosition(position) === signOfPosition(position)) list.push('D9'); return list; }
 
 /* ================= JAIMINI ARUDHA & KARAKAS ================= */
 function houseLord(sign, pos, deg) {
@@ -1610,7 +1610,7 @@ function transitPlanetStatusMarkers(planet, position, sign, transitPositions) {
   if (status && status[0] === 'ex') markers.push('↑');
   else if (status && status[0] === 'deb') markers.push('↓');
 
-  if (navamsaOfPosition(position) === sign) markers.push('□');
+  if (Number.isInteger(position?.jaReference?.indices?.navamsa) ? navamsaOfPosition(position) === sign : vargottamaIn(position.lon).includes('D9')) markers.push('□');
   return markers;
 }
 
@@ -1658,7 +1658,7 @@ function getTransitTimelineTableData(k, evalMs) {
     const position = transitPositions[planet];
     const sign = signOfPosition(position);
     const nak = nakOfPosition(position);
-    const navamsa = navamsaOfPosition(position);
+    const navamsa = Number.isInteger(position?.jaReference?.indices?.navamsa) ? navamsaOfPosition(position) : vargaSign(position.lon, 9);
 
     const signDuration = getInterval(planet, position.lon, 'sign');
     const nakshatraDuration = getInterval(planet, position.lon, 'nakshatra');
@@ -1702,7 +1702,7 @@ function getTransitTimelineTableData(k, evalMs) {
       navamsa: SIGNS[navamsa][0],
       navamsaIndex: navamsa + 1,
       navamsaDuration,
-      natalPlanetsInNavamsa: matchingPlanets(position => navamsaOfPosition(position) === navamsa),
+      natalPlanetsInNavamsa: matchingPlanets(position => (Number.isInteger(position?.jaReference?.indices?.navamsa) ? navamsaOfPosition(position) : vargaSign(position.lon, 9)) === navamsa),
       vedha: '',
       reverseVedha: '',
       murti
@@ -4993,7 +4993,7 @@ dasha(k, prefix, evalMs = Date.now()) {
     // 2. Divisional (Varga) Calculations (Default: D9 Navamsa)
     const natalVarga = getVargaItems(k, selectedVarga);
     const trVargaItems = PL.map(([p, , ab]) => {
-      const sign = selectedVarga === 1 ? signOfPosition(tr[p]) : selectedVarga === 9 ? navamsaOfPosition(tr[p]) : vargaSign(tr[p].lon, selectedVarga);
+      const sign = selectedVarga === 1 ? signOfPosition(tr[p]) : selectedVarga === 9 ? (Number.isInteger(tr[p]?.jaReference?.indices?.navamsa) ? navamsaOfPosition(tr[p]) : vargaSign(tr[p].lon, 9)) : vargaSign(tr[p].lon, selectedVarga);
       const mockK = { ch: { planets: tr }, combust: { [p]: isCombust(p, tr) } };
       return { 
         t: ab, 
