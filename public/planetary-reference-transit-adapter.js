@@ -83,7 +83,7 @@ function showStatus(result,elapsed,scope){
  };
  const hasContexts=!!(contexts.Natal||contexts.Transit);
  const errors=result.errors||[];
- const heading=errors.length?'Reference check incomplete':(result.unavailable||[]).length&&!(result.verified||[]).length?'Reference data unavailable':(result.updated||[]).length?'Reference check · corrections applied':'Reference check complete';
+ const heading=errors.length?'Reference check incomplete':(result.unavailable||[]).length?'Reference coverage incomplete':(result.updated||[]).length?'Reference check · corrections applied':'Reference check complete';
  const firstLine=hasContexts?heading+' · '+contextLine('Natal',contexts.Natal):heading+' · '+(scope||'Chart');
  const secondLine=hasContexts
   ? contextLine('Transit',contexts.Transit)+' · Timeline durations: '+labelList(durations)+' · '+Math.max(0,elapsed).toFixed(1)+' ms'
