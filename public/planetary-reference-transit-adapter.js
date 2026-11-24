@@ -177,7 +177,7 @@ function getInterval(planet,division,timestamp){
   if(Number(q.startMs)>at||Number(q.endMs)<=at)return null;
   timelineUpdated.add(planet+' '+division);
   scheduleTimelineStatusRefresh();
-  return{startMs:Number(q.startMs),endMs:Number(q.endMs),source:q.referenceSource||'json',derived:!!q.derived};
+  return{label:q.label||null,startMs:Number(q.startMs),endMs:Number(q.endMs),source:q.referenceSource||'json',derived:!!q.derived};
  }catch(e){return null;}
 }
 root.JAPlanetaryReconciliation=Object.freeze({
