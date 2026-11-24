@@ -10,7 +10,7 @@ const SIGNS=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio',
 const NAK=['Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu','Pushya','Ashlesha','Magha','Purva Phalguni','Uttara Phalguni','Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha','Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishta','Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'];
 const ORD=['First','Second','Third','Fourth'];
 const CACHE=new Map();
-let enginePromise=null,engine=null,requestSequence=0,statusHideTimer=null,latestStatus=null,timelineTimestamp=null,timelineUpdated=new Set(),timelineRefreshTimer=null,lastStatusModel=null;
+let enginePromise=null,engine=null,requestSequence=0,statusHideTimer=null,latestStatus=null,latestByScope={},timelineTimestamp=null,timelineUpdated=new Set(),timelineRefreshTimer=null,lastStatusModel=null;
 const EPHEMERIS_VERSION='JupiterAstro-existing-sidereal-ephemeris';
 function nowMs(){return root.performance&&typeof root.performance.now==='function'?root.performance.now():Date.now();}
 function msToJd(ms){return Number(ms)/86400000+2440587.5;}
@@ -71,19 +71,25 @@ function showLatestStatus(){
  displayStatusForOneSecond();
 }
 function showStatus(result,elapsed,scope){
- const updated=result.updated||[],verified=result.verified||[],unavailable=result.unavailable||[],partial=result.partial||[],errors=result.errors||[];
  const durations=Array.from(new Set([...(result.timelineUpdated||[]),...timelineUpdated])).sort();
- const heading=errors.length?'Reference check incomplete':unavailable.length&&!verified.length?'Reference data unavailable':updated.length?'Reference check · corrections applied':'Reference check complete';
- const firstLine=heading+' · '+(scope||'Chart');
- const secondLine='Verified: '+(verified.join(', ')||'—')+
-  ' · Updated: '+(updated.join(', ')||'—')+
-  ' · No data: '+(unavailable.join(', ')||'—')+
-  (partial.length?' · Partial: '+partial.join(', '):'')+
-  ' · Timeline duration: '+(durations.join(', ')||'—')+
-  ' · '+Math.max(0,elapsed).toFixed(1)+' ms'+
-  (errors.length?' · Errors: '+errors.join('; '):'');
- latestStatus={state:errors.length?'warning':unavailable.length?'warning':'ready',title:firstLine+'\n'+secondLine,html:'<span class="ja-pr-line"><strong>'+escapeHtml(heading)+'</strong> · '+escapeHtml(scope||'Chart')+'</span>'+
-  '<span class="ja-pr-line">'+escapeHtml(secondLine)+'</span>'};
+ const contexts=result.contexts||{
+  Natal:latestByScope.Natal||null,
+  Transit:latestByScope.Transit||null
+ };
+ const labelList=(items)=>items&&items.length?items.join(', '):'—';
+ const contextLine=(name,item)=>{
+  if(!item)return name+': pending';
+  return name+' — Verified: '+labelList(item.verified)+' · Updated: '+labelList(item.updated)+' · No data: '+labelList(item.unavailable)+(item.partial&&item.partial.length?' · Partial: '+labelList(item.partial):'');
+ };
+ const hasContexts=!!(contexts.Natal||contexts.Transit);
+ const errors=result.errors||[];
+ const heading=errors.length?'Reference check incomplete':(result.unavailable||[]).length&&!(result.verified||[]).length?'Reference data unavailable':(result.updated||[]).length?'Reference check · corrections applied':'Reference check complete';
+ const firstLine=hasContexts?heading+' · '+contextLine('Natal',contexts.Natal):heading+' · '+(scope||'Chart');
+ const secondLine=hasContexts
+  ? contextLine('Transit',contexts.Transit)+' · Timeline durations: '+labelList(durations)+' · '+Math.max(0,elapsed).toFixed(1)+' ms'
+  : 'Verified: '+labelList(result.verified)+' · Updated: '+labelList(result.updated)+' · No data: '+labelList(result.unavailable)+(result.partial&&result.partial.length?' · Partial: '+labelList(result.partial):'')+' · Timeline durations: '+labelList(durations)+' · '+Math.max(0,elapsed).toFixed(1)+' ms';
+ const warning=errors.length||(result.unavailable||[]).length||(result.partial||[]).length;
+ latestStatus={state:warning?'warning':'ready',title:firstLine+'\n'+secondLine,html:'<span class="ja-pr-line"><strong>'+escapeHtml(firstLine)+'</strong></span><span class="ja-pr-line">'+escapeHtml(secondLine)+'</span>'};
  lastStatusModel={result,elapsed,scope};
  showLatestStatus();
 }
@@ -148,12 +154,15 @@ async function reconcilePositions(positions,timestamp,scope,options){
    payload={results:result.results||{},verified,updated,unavailable,partial,errors,version:e.getDiagnostics().version};
    CACHE.set(cacheKey,payload);while(CACHE.size>40)CACHE.delete(CACHE.keys().next().value);
   }
+  if(scope==='Natal'||scope==='Transit')latestByScope[scope]=payload;
   const out=makePositions(positions,payload.results),elapsed=nowMs()-start;
   if(token===requestSequence&&!options.silent)showStatus(payload,elapsed,scope);
   return{positions:out,results:payload.results,verified:payload.verified.slice(),updated:payload.updated.slice(),unavailable:(payload.unavailable||[]).slice(),partial:(payload.partial||[]).slice(),errors:payload.errors.slice(),elapsedMs:elapsed,referenceVersion:payload.version};
  }catch(error){
   const elapsed=nowMs()-start;
-  if(token===requestSequence&&!options.silent)showStatus({verified:[],updated:[],unavailable:PLANETS.slice(),partial:[],errors:[error.message]},elapsed,scope);
+  const failed={verified:[],updated:[],unavailable:PLANETS.slice(),partial:[],errors:[error.message]};
+  if(scope==='Natal'||scope==='Transit')latestByScope[scope]=failed;
+  if(token===requestSequence&&!options.silent)showStatus(failed,elapsed,scope);
   console.error('JupiterAstro planetary reference verification failed:',error);
   return{positions:Object.assign({},positions),results:{},verified:[],updated:[],unavailable:PLANETS.slice(),partial:[],errors:[error.message],elapsedMs:elapsed,referenceVersion:null};
  }
