@@ -37,7 +37,7 @@ function rev360(x){return((x%360)+360)%360;}
 function signedDelta(a,b){return((b-a+540)%360)-180;}
 const SIGNS=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
 const NAK_SPAN=360/27, NAV_SPAN=360/108;
-function navamsaLabel(lon){const slot=Math.floor(rev360(lon)/NAV_SPAN+1e-9),sign=slot%12;return SIGNS[sign]+' ('+(sign+1)+')';}
+function navamsaLabel(lon){const s=Math.floor(rev360(lon)/30),deg=rev360(lon)-s*30,el=s%4,part=Math.min(8,Math.floor(deg/(30/9))),r=([0,9,6,3][el]+part)%12;return SIGNS[r]+' ('+(r+1)+')';}
 function longitudeAt(fn,planet,t){let v=fn(planet,t);if(typeof v!=='number'||!Number.isFinite(v)){if(planet==='Ketu'){const r=fn('Rahu',t);if(typeof r==='number'&&Number.isFinite(r))return rev360(r+180);}throw err('Ephemeris longitude callback must return a finite sidereal degree for '+planet+' at '+t,'INVALID_EPHEMERIS_LONGITUDE');}return rev360(v);}
 function nakStep(a,b){const x=nakIndex(a),y=nakIndex(b);if(x<0||y<0)throw err('Unrecognized Nakshatra label in reference series: '+a+' / '+b,'UNKNOWN_NAKSHATRA');const k=(y-x+27)%27;if(k===1)return 1;if(k===26)return-1;throw err('Consecutive Nakshatra reference labels are not adjacent: '+a+' → '+b,'NON_ADJACENT_NAKSHATRA');}
 function buildDerivedNavamsa(planet,fn,ephemerisVersion,atTimestamp){
