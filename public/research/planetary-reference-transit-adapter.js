@@ -21,7 +21,7 @@ function longitudeAt(planet,timestampMs){
 function currentLabels(planet,lon){
  const sign=Math.floor((((lon%360)+360)%360)/30),span=360/27,nak=Math.min(26,Math.floor((((lon%360)+360)%360)/span));
  const pada=Math.min(4,Math.floor(((((lon%360)+360)%360)-nak*span)/(span/4))+1);
- const nav=Math.floor((((lon%360)+360)%360)/(10/3))%12;
+ const signStart=Math.floor((((lon%360)+360)%360)/30),within=(((lon%360)+360)%360)-signStart*30,part=Math.min(8,Math.floor(within/(30/9))),nav=([0,9,6,3][signStart%4]+part)%12;
  return{Sign:SIGNS[sign]+' ('+(sign+1)+')',Nakshatra:NAK[nak]+' '+ORD[pada-1]+' Pada',Navamsa:SIGNS[nav]+' ('+(nav+1)+')'};
 }
 function signIndex(label){
