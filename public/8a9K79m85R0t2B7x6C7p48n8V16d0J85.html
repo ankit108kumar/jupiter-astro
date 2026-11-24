@@ -4173,7 +4173,7 @@ function bundleFromChart(ch, input, offsetDays = 0, natalReconciliation = null) 
 function buildCompleteKundali(input, offsetDays = 0) {
   return bundleFromChart(computeChart(input), input, offsetDays);
 }
-function schedulePlanetaryReferenceUpdate(kData, targetEl, prefix, getEvalMs, refreshRenderedChart) {
+function schedulePlanetaryReferenceUpdate(kData, targetEl, prefix, getEvalMs, getActiveTab, refreshRenderedChart) {
   const token = (targetEl.__jaPlanetaryUpdateToken || 0) + 1;
   targetEl.__jaPlanetaryUpdateToken = token;
   const start = window.performance && performance.now ? performance.now() : Date.now();
@@ -4195,7 +4195,7 @@ function schedulePlanetaryReferenceUpdate(kData, targetEl, prefix, getEvalMs, re
       Transit: { verified: transitResult.verified || [], updated: transitResult.updated || [], unavailable: transitResult.unavailable || [], partial: transitResult.partial || [] }
     };
     const errors = [...(natalResult.errors || []), ...(transitResult.errors || [])];
-    if ((natalResult.updated || []).length || (transitResult.updated || []).length || Number(getEvalMs()) === evalMs) {
+    if ((natalResult.updated || []).length || (transitResult.updated || []).length || getActiveTab() === 'transit') {
       await refreshRenderedChart();
     }
     adapter.showStatus({
@@ -6599,7 +6599,7 @@ document.getElementById(`${prefix}-lkMonthlyDuration`).textContent =
   }
 
   openTab('overview');
-  schedulePlanetaryReferenceUpdate(kData, targetEl, prefix, () => currentEvalMs, async () => {
+  schedulePlanetaryReferenceUpdate(kData, targetEl, prefix, () => currentEvalMs, () => activeTabKey, async () => {
     nk = nakOfPosition(kData.ch.planets.Moon);
     const lagnaChip = document.getElementById(`${prefix}-jaLagnaChip`);
     const rashiChip = document.getElementById(`${prefix}-jaRashiChip`);
