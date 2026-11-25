@@ -28,8 +28,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm
-          cache-dependency-path: research/de440-moon-audit/package.json
 
       - name: Download official JPL and NAIF kernels
         shell: bash
