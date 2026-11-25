@@ -1,0 +1,33 @@
+JupiterAstro Global Ephemeris — data provenance
+
+1. Planetary coefficients
+   Format: VSOP87D (heliocentric spherical coordinates, dynamical ecliptic
+   and equinox of date).
+   Bodies included: Earth, Mercury, Venus, Mars, Jupiter, Saturn.
+   Original theory: P. Bretagnon & G. Francou (1988), Astronomy &
+   Astrophysics, 202, 309.
+   Source distribution used to build the JSON: https://github.com/ctdk/vsop87
+   The source distribution identifies VSOP87D as spherical variables of date.
+
+2. Lunar longitude coefficients
+   Meeus, Astronomical Algorithms, Chapter 47, Table 47.A (60 periodic terms).
+   Table values were transcribed from PyMeeus:
+   https://github.com/architest/pymeeus/blob/master/pymeeus/Moon.py
+   PyMeeus is distributed under GNU LGPL version 3 or later. The table
+   is attributed in the JSON metadata; consult the PyMeeus repository for
+   its complete license text and obligations.
+
+3. Time scale
+   Input clock time is interpreted as UTC after explicit timezone parsing.
+   Ephemeris calculations use TT. The current implementation uses a
+   rounded 69.1-second Delta-T estimate for late 2026. This is suitable
+   for a verification run but is not a substitute for a date-specific
+   USNO/IERS Earth-orientation value.
+
+4. Model limitations
+   VSOP87D geocentric positions use a light-time iteration for planets.
+   Annual aberration and nutation are not separately applied.
+   The Sun is derived from the negative geocentric Earth vector.
+   Rahu is the mean ascending node; Ketu is exactly opposite.
+   The Lahiri polynomial is the existing JupiterAstro polynomial and is
+   intentionally preserved.
