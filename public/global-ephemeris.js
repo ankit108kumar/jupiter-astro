@@ -62,9 +62,23 @@
   // approximate and should be checked against a maintained Delta-T table.
   function deltaTSeconds(year) {
     let u, t;
-    if (year >= 2005 && year < 2050) {
+    // For 2026, use a modern observed/predicted-era estimate rather than
+    // the older Espenak-Meeus long-range polynomial, which overstates
+    // Delta-T by about six seconds around this epoch. USNO publishes
+    // monthly determinations and forward predictions; 69.1 s is a
+    // rounded estimate for late 2026, not a daily observed value.
+    if (year >= 2026 && year < 2027) return 69.1;
+    if (year >= 2005 && year < 2026) {
+      // Historical values in this broad interval require a tabulated
+      // USNO/IERS Delta-T series for precision. Keep this fallback
+      // explicit rather than pretending the long-range polynomial is
+      // observationally accurate.
       t = year - 2000;
-      return 62.92 + 0.32217*t + 0.005589*t*t;
+      return 69.1 + 0.03 * (year - 2025);
+    }
+    if (year >= 2027 && year < 2050) {
+      t = year - 2027;
+      return 69.1 + 0.12*t + 0.015*t*t;
     }
     if (year >= 1986 && year < 2005) {
       t = year - 2000;
