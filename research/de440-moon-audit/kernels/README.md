@@ -1,1 +1,0 @@
-Place the official `de440s.bsp` and `naif0012.tls` files in this directory. Binary kernels are excluded from Git by `.gitignore`; do not commit the 32 MB ephemeris file.
