@@ -1,10 +1,9 @@
 {
-  "name": "jupiterastro-de440-moon-audit",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
-  "description": "Isolated JPL DE440s audit for Moon sidereal sign ingress timestamps.",
-  "engines": { "node": ">=20" },
-  "scripts": { "audit": "node ./src/run-audit.mjs" },
-  "dependencies": { "@usgs-astrogeology/spiceql": "1.9.0" }
+  "name":"jupiterastro-de440-moon-audit",
+  "version":"1.0.0",
+  "private":true,
+  "type":"module",
+  "engines":{"node":">=20"},
+  "scripts":{"audit":"node ./src/build-sample.mjs && node ./src/run-audit.mjs"},
+  "dependencies":{"@usgs-astrogeology/spiceql":"1.9.0"}
 }
