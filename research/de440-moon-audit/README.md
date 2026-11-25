@@ -27,7 +27,7 @@ Pass the local path to `Planetary Transit correction v4.json`:
 
 ```bash
 npm install
-npm run audit -- "/absolute/path/to/Planetary Transit correction v4.json"
+MOON_CORRECTION_JSON="/absolute/path/to/Planetary Transit correction v4.json" npm run audit
 ```
 
 The runner refuses to continue if the source JSON or either kernel is missing. It does not silently substitute Moshier or any other ephemeris.
