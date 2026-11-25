@@ -18,7 +18,7 @@ const diff=x=>{const y=rev(x);return y>180?y-360:y;};
 function root(ms,signNo){const boundary=(signNo-1)*30;let lo=ms-12*3600000,hi=ms+12*3600000,fl=diff(sid(lo)-boundary),fh=diff(sid(hi)-boundary);if(!(fl<=0&&fh>=0))throw new Error('Existing-engine crossing not bracketed: '+new Date(ms).toISOString());for(let i=0;i<55;i++){const m=(lo+hi)/2;if(diff(sid(m)-boundary)<0)lo=m;else hi=m;}return (lo+hi)/2;}
 const parseIST=s=>Date.parse(s.replace('T',' ')+'+05:30');
 const N=300, selected=[];
-for(let i=0;i<N;i++){const idx=Math.round(i*(events.length-1)/(N-1)),e=events[idx],sn=Number((e.sign.match(/\\((\\d+)\\)/)||[])[1]);if(!sn)throw new Error('Unrecognized sign '+e.sign);const jsonMs=parseIST(e.entered_at),engineMs=root(jsonMs,sn);selected.push({index:idx+1,sign:e.sign,json_entered_at_local:e.entered_at,existing_engine_entered_at_local:new Date(engineMs+19800000).toISOString().replace('T',' ').slice(0,19)});}
+for(let i=0;i<N;i++){const idx=Math.round(i*(events.length-1)/(N-1)),e=events[idx],sn=Number((e.sign.match(/\((\d+)\)/)||[])[1]);if(!sn)throw new Error('Unrecognized sign '+e.sign);const jsonMs=parseIST(e.entered_at),engineMs=root(jsonMs,sn);selected.push({index:idx+1,sign:e.sign,json_entered_at_local:e.entered_at,existing_engine_entered_at_local:new Date(engineMs+19800000).toISOString().replace('T',' ').slice(0,19)});}
 const quote=s=>'"'+String(s).replaceAll('"','""')+'"';
 const csv=['index,sign,json_entered_at_local,existing_engine_entered_at_local',...selected.map(r=>[r.index,quote(r.sign),quote(r.json_entered_at_local),quote(r.existing_engine_entered_at_local)].join(','))].join('\\n');
 const out=path.join(root,'data','moon-sign-sample-300.csv');fs.mkdirSync(path.dirname(out),{recursive:true});fs.writeFileSync(out,csv);
