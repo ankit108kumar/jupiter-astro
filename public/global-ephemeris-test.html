@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JupiterAstro Global Ephemeris Test</title>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#202433;background:#f5f7fb}
+body{margin:0;padding:28px;max-width:1120px;margin-inline:auto}
+h1{font-size:24px;margin:0 0 6px}.sub{color:#667085;margin:0 0 22px}
+.panel{background:white;border:1px solid #e4e8f0;border-radius:16px;padding:18px;box-shadow:0 8px 28px #1725540b}
+.controls{display:flex;gap:12px;align-items:end;flex-wrap:wrap}
+label{display:grid;gap:6px;font-size:12px;color:#667085}
+input{font:inherit;padding:10px 12px;border:1px solid #d7dce5;border-radius:9px;color:#202433}
+button{padding:11px 16px;border:0;border-radius:9px;background:#e97836;color:white;font-weight:650;cursor:pointer}
+.meta{margin:16px 0;color:#667085;font-size:13px;line-height:1.7}
+.status{margin-top:12px;font-size:13px;color:#475467}
+.table-wrap{overflow:auto;margin-top:14px}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:14px}
+th,td{text-align:left;padding:12px 10px;border-bottom:1px solid #edf0f5;white-space:nowrap}
+th{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:#667085;background:#fafbfc}
+td:first-child{font-weight:650}
+.note{font-size:12px;color:#667085;margin-top:18px;line-height:1.6}
+.error{color:#b42318}
+</style>
+</head>
+<body>
+<h1>JupiterAstro Global Ephemeris Test</h1>
+<p class="sub">Independent test page — does not alter the live JupiterAstro calculation engine.</p>
+<section class="panel">
+ <div class="controls">
+  <label>Date and time (IST, UTC+05:30)
+   <input id="when" type="datetime-local" value="2026-11-25T19:30">
+  </label>
+  <button id="calculate">Calculate nine planets</button>
+ </div>
+ <div id="status" class="status">Ready. Coefficient data loads when calculation starts.</div>
+ <div id="meta" class="meta"></div>
+ <div class="table-wrap">
+  <table>
+   <thead><tr><th>Planet</th><th>Sign</th><th>Degree in sign</th><th>Nakshatra</th><th>Pada</th><th>Navamsa</th></tr></thead>
+   <tbody id="results"><tr><td colspan="6">Enter a date and calculate.</td></tr></tbody>
+  </table>
+ </div>
+ <p class="note">Models: VSOP87D for Sun and Mercury–Saturn; Meeus Table 47.A for Moon; mean Rahu with Ketu exactly opposite. Lahiri polynomial is the agreed JupiterAstro polynomial. Output is geocentric sidereal longitude. Delta-T is estimated; nutation and annual aberration are not separately applied. This test page does not replace existing application functions.</p>
+</section>
+<script src="./global-ephemeris.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const names = ['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn','Rahu','Ketu'];
+$('calculate').addEventListener('click', async () => {
+  const value = $('when').value;
+  if (!value) { $('status').textContent = 'Select a date and time.'; return; }
+  const iso = value + ':00+05:30';
+  $('status').textContent = 'Calculating…';
+  $('results').innerHTML = '<tr><td colspan="6">Calculating…</td></tr>';
+  try {
+    const result = await window.JupiterAstroGlobalEphemeris.calculate(iso);
+    $('results').innerHTML = names.map(name => {
+      const p = result.positions[name];
+      return '<tr><td>'+p.planet+'</td><td>'+p.sign+'</td><td>'+p.degreeInSign.formatted+
+        '</td><td>'+p.nakshatra+'</td><td>'+p.pada+'</td><td>'+p.navamsa+'</td></tr>';
+    }).join('');
+    $('meta').textContent = 'UTC: '+result.inputUTC+' | JD(TT): '+result.jdTT.toFixed(8)+
+      ' | Delta-T: '+result.deltaTSeconds.toFixed(2)+' s | Lahiri: '+
+      result.ayanamsa.toFixed(8)+'° | Model: '+result.version;
+    $('status').textContent = 'Calculation completed.';
+  } catch (e) {
+    $('status').textContent = e.message;
+    $('status').className = 'status error';
+    $('results').innerHTML = '<tr><td colspan="6">Calculation failed.</td></tr>';
+  }
+});
+$('calculate').click();
+</script>
+</body>
+</html>
