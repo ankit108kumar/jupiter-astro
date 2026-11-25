@@ -1,1 +1,0 @@
-The 300-row CSV is generated locally by `src/build-sample.mjs` from the correction JSON. It is intentionally not committed; the source correction JSON remains outside this isolated audit folder.
