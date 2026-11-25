@@ -1,7 +1,0 @@
-node_modules/
-kernels/*.bsp
-kernels/*.tls
-data/*.csv
-!data/.gitkeep
-output/*
-!output/.gitkeep
