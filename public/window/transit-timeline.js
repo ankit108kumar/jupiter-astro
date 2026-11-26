@@ -2528,10 +2528,7 @@
         '<div class="jtt-window-title">Jupiter Astro · Transit Timeline</div>' +
         '<div class="jtt-titlebar-tools">' +
           '<div class="jtt-info-wrap">' +
-            '<button class="jtt-info-button" type="button" data-jtt-action="info" title="Transit Timeline information" aria-label="Transit Timeline information" aria-expanded="false" aria-controls="jtt-info-popover">i</button>' +
-            '<div class="jtt-info-popover" id="jtt-info-popover" data-jtt-info-popover hidden role="note">' +
-              'Connected to the active Research Kundali. Date and time changes are shared with Planetary Transits.' +
-            '</div>' +
+            '<button class="jtt-info-button" type="button" data-jtt-action="info" title="Transit Timeline information" aria-label="Transit Timeline information" aria-expanded="false">i</button>' +
           '</div>' +
           '<div class="jtt-global-export-wrap">' +
             '<button class="jtt-global-export-button" type="button" data-jtt-action="export-toggle" title="Copy or export planetary table" aria-label="Copy or export planetary table" aria-expanded="false" aria-controls="jtt-global-export-menu">' +
@@ -2747,9 +2744,7 @@
 
     var infoWrap = event.target.closest(".jtt-info-wrap");
     if (!infoWrap) {
-      var existingInfo = windowEl.querySelector("[data-jtt-info-popover]");
       var existingInfoButton = windowEl.querySelector('[data-jtt-action="info"]');
-      if (existingInfo) existingInfo.hidden = true;
       if (existingInfoButton) existingInfoButton.setAttribute("aria-expanded", "false");
     }
 
