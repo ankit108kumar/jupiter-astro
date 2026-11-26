@@ -1737,6 +1737,27 @@ function siderealPlanetLongitude(planet, jd) {
 // This exposes the existing function without changing its calculation.
 window.siderealPlanetLongitude = siderealPlanetLongitude;
 
+function jaCorrectedSiderealPlanetLongitude(planet, jd) {
+  const raw = siderealPlanetLongitude(planet, jd);
+  if (!jaLongitudeReferenceReady || !jaLongitudeEngine) return raw;
+  try {
+    const result = jaLongitudeEngine.calculate({
+      planet,
+      timestamp: jdToMs(jd),
+      ephemerisLongitudeAt: jaSiderealLongitudeAt
+    });
+    if (result.calibration &&
+        result.calibration.method !== "unanchored-ephemeris-fallback" &&
+        Number.isFinite(result.reconstructedLongitude) &&
+        Math.abs(result.correctionDegrees) <= 2) {
+      return result.reconstructedLongitude;
+    }
+  } catch (error) {
+    // Preserve the native ephemeris for this sample if reconciliation is unavailable.
+  }
+  return raw;
+}
+
 function signedLongitudeDelta(from, to) {
   let delta = to - from;
   if (delta > 180) delta -= 360;
@@ -1759,7 +1780,7 @@ function findTransitDivisionBoundary(planet, evalJd, currentIndex, division, dir
 
   for (let elapsed = stepDays; elapsed <= maxDays + stepDays / 2; elapsed += stepDays) {
     const outsideJd = evalJd + direction * elapsed;
-    const outsideLon = siderealPlanetLongitude(planet, outsideJd);
+    const outsideLon = jaCorrectedSiderealPlanetLongitude(planet, outsideJd);
 
     if (transitDivisionIndex(outsideLon, division) !== currentIndex) {
       let same = sameSideJd;
@@ -1769,7 +1790,7 @@ function findTransitDivisionBoundary(planet, evalJd, currentIndex, division, dir
       // than the minute precision used by the display.
       for (let n = 0; n < 30; n++) {
         const mid = (same + other) / 2;
-        const midLon = siderealPlanetLongitude(planet, mid);
+        const midLon = jaCorrectedSiderealPlanetLongitude(planet, mid);
         if (transitDivisionIndex(midLon, division) === currentIndex) same = mid;
         else other = mid;
       }
@@ -1840,8 +1861,8 @@ function getBasicTransitDivisionInterval(planet, evalMs, longitude, division) {
   const evalJd = msToJd(evalMs);
   const currentIndex = transitDivisionIndex(longitude, division);
   const probeDays = 0.05;
-  const before = siderealPlanetLongitude(planet, evalJd - probeDays);
-  const after = siderealPlanetLongitude(planet, evalJd + probeDays);
+  const before = jaCorrectedSiderealPlanetLongitude(planet, evalJd - probeDays);
+  const after = jaCorrectedSiderealPlanetLongitude(planet, evalJd + probeDays);
   const dailySpeed = Math.abs(signedLongitudeDelta(before, after) / (probeDays * 2));
 
   const startJd = findTransitDivisionBoundary(
