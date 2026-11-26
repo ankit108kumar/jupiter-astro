@@ -11,6 +11,51 @@
   if (window.__JA_TRANSIT_TIMELINE_LOADED) return;
   window.__JA_TRANSIT_TIMELINE_LOADED = true;
 
+  function ensureInfoToastService() {
+    if (window.JAInfoToast && typeof window.JAInfoToast.show === "function") return window.JAInfoToast;
+    var node = null, timer = null;
+    function hide() {
+      if (timer) window.clearTimeout(timer);
+      timer = null;
+      if (!node) return;
+      node.classList.remove("is-visible");
+      if (typeof node.hidePopover === "function") {
+        try { if (node.matches(":popover-open")) node.hidePopover(); } catch (error) {}
+      }
+    }
+    function promote() {
+      if (!node || !node.classList.contains("is-visible") || typeof node.showPopover !== "function") return;
+      try { if (node.matches(":popover-open")) node.hidePopover(); node.showPopover(); } catch (error) {}
+    }
+    function show(message, options) {
+      options = options || {};
+      if (!node || !node.isConnected) {
+        node = document.createElement("div");
+        node.className = "ja-info-toast";
+        node.setAttribute("popover", "manual");
+        node.setAttribute("role", "status");
+        node.setAttribute("aria-live", "polite");
+        document.body.appendChild(node);
+      }
+      node.textContent = String(message || "");
+      node.classList.toggle("is-warning", options.variant === "warning");
+      node.classList.remove("is-visible");
+      if (typeof node.showPopover === "function") {
+        try { if (node.matches(":popover-open")) node.hidePopover(); node.showPopover(); } catch (error) {}
+      }
+      void node.offsetWidth;
+      node.classList.add("is-visible");
+      if (timer) window.clearTimeout(timer);
+      timer = window.setTimeout(hide, Math.max(500, Number(options.duration) || 2000));
+    }
+    document.addEventListener("fullscreenchange", function () {
+      if (node && node.classList.contains("is-visible")) window.requestAnimationFrame(promote);
+    });
+    window.addEventListener("pagehide", hide);
+    window.JAInfoToast = { show: show, hide: hide };
+    return window.JAInfoToast;
+  }
+
   var WINDOW_ID = "ja-transit-timeline-window";
   var LAUNCHER_ID = "ja-transit-timeline-launcher";
   var THEME_KEY = "ja-transit-timeline-theme-mode";
@@ -2238,52 +2283,14 @@
     });
   }
 
-  var durationToastElement = null;
-  var durationToastTimer = null;
   var durationStatusText = "Duration updated for all planets";
+  var durationStatusSignature = null;
 
   function showDurationStatusToast() {
-    if (!durationToastElement) {
-      durationToastElement = document.createElement("div");
-      durationToastElement.className = "jtt-duration-toast";
-      durationToastElement.setAttribute("popover", "manual");
-      durationToastElement.setAttribute("role", "status");
-      durationToastElement.setAttribute("aria-live", "polite");
-      document.body.appendChild(durationToastElement);
-    } else if (!durationToastElement.isConnected) {
-      document.body.appendChild(durationToastElement);
-    }
-
-    durationToastElement.textContent = durationStatusText;
-    durationToastElement.classList.toggle("is-incomplete", durationStatusText.indexOf("Duration incomplete") === 0);
-
-    // A manual popover is promoted to the browser top layer. Unlike z-index,
-    // this reliably places the toast above the Timeline, fullscreen content,
-    // sticky table headers and the site's other stacking contexts.
-    if (typeof durationToastElement.showPopover === "function") {
-      try {
-        if (!durationToastElement.matches(":popover-open")) {
-          durationToastElement.showPopover();
-        }
-      } catch (error) {
-        // Retain the fixed-position fallback for browsers with partial support.
-      }
-    }
-
-    durationToastElement.classList.remove("is-visible");
-    void durationToastElement.offsetWidth;
-    durationToastElement.classList.add("is-visible");
-
-    if (durationToastTimer) window.clearTimeout(durationToastTimer);
-    durationToastTimer = window.setTimeout(function () {
-      if (!durationToastElement) return;
-      durationToastElement.classList.remove("is-visible");
-      if (typeof durationToastElement.hidePopover === "function") {
-        try {
-          if (durationToastElement.matches(":popover-open")) durationToastElement.hidePopover();
-        } catch (error) {}
-      }
-    }, 2000);
+    ensureInfoToastService().show(durationStatusText, {
+      variant: durationStatusText.indexOf("Duration incomplete") === 0 ? "warning" : "success",
+      duration: 2000
+    });
   }
 
   function renderTransitTableFromContext() {
@@ -2321,7 +2328,17 @@
         durationInfo.textContent = durationStatusText;
         durationInfo.classList.toggle("is-incomplete", missingDurationItems.length > 0);
       }
-      showDurationStatusToast();
+      var statusSignature = JSON.stringify({
+        evalMs: transitData && transitData.evalMs,
+        rows: expectedPlanets.map(function (planet) {
+          var row = durationRows.find(function (item) { return item && item.planet === planet; });
+          return [planet, row && row.signDuration, row && row.nakshatraDuration, row && row.navamsaDuration];
+        })
+      });
+      if (statusSignature !== durationStatusSignature) {
+        durationStatusSignature = statusSignature;
+        showDurationStatusToast();
+      }
       var moonRow = transitData && Array.isArray(transitData.rows)
         ? transitData.rows.find(function (row) { return row && row.planet === "Moon"; })
         : null;
@@ -2746,10 +2763,7 @@
       if (action === "theme") toggleTheme();
       if (action === "info") {
         showDurationStatusToast();
-        var infoPopover = windowEl.querySelector("[data-jtt-info-popover]");
-        var isOpen = infoPopover && infoPopover.hidden;
-        if (infoPopover) infoPopover.hidden = !isOpen;
-        actionButton.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        actionButton.setAttribute("aria-expanded", "false");
       }
       if (action === "export-toggle") {
         var exportMenu = windowEl.querySelector("[data-jtt-global-export-menu]");
