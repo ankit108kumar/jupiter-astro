@@ -33,7 +33,8 @@
     timer=window.setTimeout(function(){if(id===sequence&&Date.now()>=hideAt)hide(source);},duration);return true;
   }
   function relocate(){
-    if(!node||!node.classList.contains('is-visible'))return;
+    if(!node)return;
+    if(!node.classList.contains('is-visible')){if(infoButton){var target=host();if(infoButton.parentNode!==target)target.appendChild(infoButton);}return;}
     var remaining=Math.max(100,hideAt-Date.now()),source=activeSource,id=sequence;clearTimer();closeLayer();ensure();openLayer();
     window.requestAnimationFrame(function(){if(id!==sequence||!node)return;node.classList.add('is-visible');timer=window.setTimeout(function(){if(id===sequence)hide(source);},remaining);});
   }
