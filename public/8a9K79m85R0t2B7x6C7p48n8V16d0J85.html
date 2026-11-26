@@ -6503,6 +6503,7 @@ function getJupiterTransitTimelineRegistry() {
     if (!overlay) return;
     const titleEl = overlay.querySelector("[data-ja-lk-chart-title]");
     const selectEl = overlay.querySelector("[data-ja-lk-chart-select]");
+    if (!titleEl || !selectEl) return;
     const registry = window.JupiterTransitTimelineCharts;
     const charts = registry && typeof registry.getCharts === "function" ? registry.getCharts() : [];
     const activeId = registry && typeof registry.getActiveId === "function" ? registry.getActiveId() : "";
