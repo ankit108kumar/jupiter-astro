@@ -62,110 +62,69 @@
 
 <style id="ja-good-bad-analysis-styles">
 #jaGoodBadOverlay[hidden]{display:none!important}
-#jaGoodBadOverlay{
-  position:fixed;inset:0;z-index:2147483005;
-  display:flex;align-items:center;justify-content:center;
-  padding:16px;background:transparent;pointer-events:none;
-}
+#jaGoodBadOverlay{position:fixed;inset:0;z-index:2147483005;display:flex;align-items:center;justify-content:center;padding:14px;background:transparent;pointer-events:none}
 .ja-gb-window,.ja-gb-window *{box-sizing:border-box}
 .ja-gb-window{
-  --gb-bg:var(--paper,#F8FAFC);--gb-panel:var(--surface,#FFFFFF);
-  --gb-panel-alt:var(--surface-alt,#F1F5F9);--gb-ink:var(--ink,#0F172A);
-  --gb-muted:var(--muted,#64748B);--gb-line:var(--line,#E2E8F0);
-  --gb-line-strong:var(--line-strong,#CBD5E1);--gb-accent:var(--saffron,#EA580C);
+  --gb-bg:#F8F9FC;--gb-panel:#FFFFFF;--gb-panel-alt:#F2F4F8;--gb-ink:#252B3A;
+  --gb-muted:#737D90;--gb-line:#DDE2EA;--gb-line-strong:#C9D0DC;--gb-accent:#B78330;
   position:relative;pointer-events:auto;display:flex;flex-direction:column;
-  width:min(1440px,calc(100vw - 32px));height:min(820px,calc(100vh - 32px));
-  min-width:min(620px,calc(100vw - 16px));min-height:420px;
-  max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);
+  width:min(1240px,calc(100vw - 28px));height:min(700px,calc(100vh - 28px));
+  min-width:min(600px,calc(100vw - 20px));min-height:360px;max-width:calc(100vw - 20px);max-height:calc(100vh - 20px);
   overflow:hidden;resize:both;color:var(--gb-ink);background:var(--gb-bg);
-  border:1px solid var(--gb-line);border-radius:15px;
-  box-shadow:0 24px 80px rgba(0,0,0,.28),0 4px 18px rgba(0,0,0,.12);
-  font:16px/1.45 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  isolation:isolate;
+  border:1px solid var(--gb-line);border-radius:11px;
+  box-shadow:0 18px 58px rgba(27,35,52,.22),0 3px 12px rgba(27,35,52,.09);
+  font:14px/1.45 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;isolation:isolate
 }
-.ja-gb-window.is-maximized{
-  position:fixed;inset:10px;width:auto;height:auto;max-width:none;max-height:none;
-  min-width:0;min-height:0;transform:none;resize:none;border-radius:12px;
-}
-.ja-gb-titlebar{
-  height:48px;min-height:48px;display:flex;align-items:center;gap:12px;
-  padding:0 14px;color:var(--gb-ink);
-  background:linear-gradient(var(--gb-panel),var(--gb-panel-alt));
-  border-bottom:1px solid var(--gb-line);cursor:grab;user-select:none;touch-action:none;
-}
+.ja-gb-window.is-maximized{position:fixed;inset:8px;width:auto;height:auto;max-width:none;max-height:none;min-width:0;min-height:0;transform:none;resize:none;border-radius:10px}
+.ja-gb-titlebar{height:43px;min-height:43px;display:flex;align-items:center;gap:12px;padding:0 13px;color:var(--gb-ink);background:#F1F3F7;border-bottom:1px solid var(--gb-line);cursor:grab;user-select:none;touch-action:none}
 .ja-gb-titlebar:active{cursor:grabbing}
-.ja-gb-window-controls{display:flex;align-items:center;gap:8px;flex:0 0 auto}
-.ja-gb-dot{
-  position:relative;width:12px;height:12px;padding:0;border:0;border-radius:50%;
-  cursor:pointer;box-shadow:inset 0 0 0 1px rgba(0,0,0,.10);
+.ja-gb-window-controls{display:flex!important;align-items:center;gap:8px;flex:0 0 auto;min-width:52px;visibility:visible!important;opacity:1!important}
+.ja-gb-window-controls .ja-gb-dot{
+  appearance:none!important;-webkit-appearance:none!important;display:block!important;visibility:visible!important;opacity:1!important;
+  position:relative!important;flex:0 0 12px!important;width:12px!important;min-width:12px!important;height:12px!important;min-height:12px!important;
+  margin:0!important;padding:0!important;border:0!important;border-radius:50%!important;cursor:pointer!important;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)!important
 }
-.ja-gb-dot.close{background:#FF6058}.ja-gb-dot.minimize{background:#FFBD2E}.ja-gb-dot.maximize{background:#28C840}
+.ja-gb-window-controls .ja-gb-dot.close{background:#FF6058!important}
+.ja-gb-window-controls .ja-gb-dot.minimize{background:#FFBD2E!important}
+.ja-gb-window-controls .ja-gb-dot.maximize{background:#28C840!important}
 .ja-gb-dot:focus-visible{outline:2px solid var(--gb-accent);outline-offset:4px}
-.ja-gb-window-title{
-  flex:1;min-width:0;text-align:center;color:var(--gb-ink);
-  font-size:15px;font-weight:650;letter-spacing:.15px;pointer-events:none;
-}
-.ja-gb-titlebar-tools{display:flex;align-items:center;justify-content:flex-end;flex:0 0 auto;gap:8px;min-width:64px}
-.ja-gb-shortcut{
-  display:inline-flex;align-items:center;gap:5px;padding:5px 8px;
-  border:1px solid var(--gb-line-strong);border-radius:7px;
-  color:var(--gb-muted);background:var(--gb-panel);font-size:11px;
-}
-.ja-gb-shortcut kbd{font:600 11px Inter, sans-serif;color:var(--gb-ink)}
-.ja-gb-main{min-height:0;flex:1;overflow:auto;padding:22px 24px 24px;background:var(--gb-bg)}
-.ja-gb-heading-row{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:18px}
-.ja-gb-heading-copy{min-width:0}
-.ja-gb-eyebrow{margin-bottom:5px;color:var(--gb-accent);font-size:11px;font-weight:800;letter-spacing:1.15px;text-transform:uppercase}
-.ja-gb-title{margin:0;color:var(--gb-ink);font-size:clamp(23px,2vw,31px);font-weight:700;line-height:1.2;letter-spacing:-.45px}
-.ja-gb-subtitle{margin:6px 0 0;color:var(--gb-muted);font-size:13px}
-.ja-gb-columns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
-.ja-gb-column{min-width:0;overflow:hidden;border:1px solid var(--gb-line);border-radius:12px;background:var(--gb-panel)}
-.ja-gb-column-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 15px;border-bottom:1px solid var(--gb-line);background:linear-gradient(var(--gb-panel),var(--gb-panel-alt))}
-.ja-gb-column-head h3{display:flex;align-items:center;gap:9px;margin:0;color:var(--gb-ink);font-size:13px;letter-spacing:.08em}
-.ja-gb-dot-indicator{width:8px;height:8px;flex:none;border-radius:50%;background:#26966d}
-.ja-gb-column.bad .ja-gb-dot-indicator{background:#cf6268}
-.ja-gb-column-head small{color:var(--gb-muted);font-size:11px}
-.ja-gb-category{margin:0 12px;border-bottom:1px solid var(--gb-line)}
+.ja-gb-window-title{flex:1;min-width:0;text-align:center;color:#303748;font-size:14px;font-weight:650;letter-spacing:.1px;pointer-events:none}
+.ja-gb-titlebar-tools{display:flex;align-items:center;justify-content:flex-end;flex:0 0 52px;min-width:52px}
+.ja-gb-main{min-height:0;flex:1;overflow:auto;padding:14px;background:#F8F9FC}
+.ja-gb-columns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:13px;align-items:start}
+.ja-gb-column{min-width:0;overflow:hidden;border:1px solid var(--gb-line);border-radius:9px;background:var(--gb-panel)}
+.ja-gb-column-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;border-bottom:1px solid var(--gb-line);background:#F3F5F8}
+.ja-gb-column-head h3{display:flex;align-items:center;gap:9px;margin:0;color:#303748;font-size:12px;letter-spacing:.08em}
+.ja-gb-dot-indicator{width:8px;height:8px;flex:none;border-radius:50%;background:#26966D}
+.ja-gb-column.bad .ja-gb-dot-indicator{background:#C9656B}
+.ja-gb-column-head small{color:#737D90;font-size:10.5px}
+.ja-gb-category{margin:0 11px;border-bottom:1px solid #E8EBF0}
 .ja-gb-category:last-child{border-bottom:0}
-.ja-gb-category summary{
-  display:flex;align-items:center;gap:9px;min-height:48px;padding:10px 5px;
-  cursor:pointer;list-style:none;user-select:none;
-}
+.ja-gb-category summary{display:flex;align-items:center;gap:9px;min-height:44px;padding:9px 5px;cursor:pointer;list-style:none;user-select:none}
 .ja-gb-category summary::-webkit-details-marker{display:none}
-.ja-gb-category summary:after{content:"＋";margin-left:auto;color:var(--gb-muted);font-size:15px}
+.ja-gb-category summary:after{content:"＋";margin-left:auto;color:#737D90;font-size:14px}
 .ja-gb-category[open] summary:after{content:"−"}
-.ja-gb-cat-name{color:var(--gb-ink);font-size:13px;font-weight:650}
-.ja-gb-count{
-  display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:20px;
-  padding:0 6px;border-radius:20px;background:var(--gb-panel-alt);color:var(--gb-muted);
-  font-size:10px;font-variant-numeric:tabular-nums;
-}
-.ja-gb-items{padding:0 5px 12px 24px}
-.ja-gb-empty{margin:0;padding:10px 11px;border:1px dashed var(--gb-line-strong);border-radius:8px;background:var(--gb-panel-alt);color:var(--gb-muted);font-size:12px;line-height:1.5}
-.ja-gb-observation{margin:0 0 7px;padding:10px 11px;border-left:2px solid #65a98e;border-radius:0 7px 7px 0;background:rgba(38,150,109,.055);color:var(--gb-ink);font-size:12px;line-height:1.55;overflow-wrap:anywhere}
-.ja-gb-column.bad .ja-gb-observation{border-left-color:#cf777c;background:rgba(207,98,104,.055)}
-.ja-gb-foot{
-  display:flex;justify-content:space-between;gap:12px;padding:10px 18px;
-  border-top:1px solid var(--gb-line);background:var(--gb-panel-alt);
-  color:var(--gb-muted);font-size:10.5px;
-}
+.ja-gb-cat-name{color:#303748;font-size:12.5px;font-weight:650}
+.ja-gb-count{display:inline-flex;align-items:center;justify-content:center;min-width:21px;height:19px;padding:0 6px;border-radius:20px;background:#F0F2F6;color:#737D90;font-size:10px;font-variant-numeric:tabular-nums}
+.ja-gb-items{padding:0 5px 10px 23px}
+.ja-gb-empty{margin:0;padding:9px 10px;border:1px dashed #D5DAE3;border-radius:7px;background:#F7F8FA;color:#7B8494;font-size:11.5px;line-height:1.5}
+.ja-gb-observation{margin:0 0 7px;padding:9px 10px;border-left:2px solid #65A98E;border-radius:0 6px 6px 0;background:rgba(38,150,109,.055);color:#303748;font-size:11.5px;line-height:1.55;overflow-wrap:anywhere}
+.ja-gb-column.bad .ja-gb-observation{border-left-color:#CF777C;background:rgba(207,98,104,.055)}
+.ja-gb-foot{display:flex;justify-content:space-between;gap:12px;padding:7px 14px;border-top:1px solid #DDE2EA;background:#F1F3F7;color:#737D90;font-size:10px}
 #jaGoodBadMinimized[hidden]{display:none!important}
-#jaGoodBadMinimized{
-  position:fixed;right:22px;bottom:22px;z-index:2147483006;display:flex;align-items:center;gap:9px;
-  padding:11px 15px;border:1px solid var(--line-strong,#CBD5E1);border-radius:12px;
-  color:var(--ink,#0F172A);background:var(--surface,#FFFFFF);
-  box-shadow:0 8px 28px rgba(0,0,0,.20);font:650 13px Inter,-apple-system,sans-serif;cursor:pointer;
-}
-#jaGoodBadMinimized:before{content:"";width:8px;height:8px;border-radius:50%;background:#d5a04b}
-#jaGoodBadMinimized:hover{background:var(--surface-alt,#F1F5F9)}
-#jaGoodBadMinimized:focus-visible{outline:2px solid var(--saffron,#EA580C);outline-offset:3px}
+#jaGoodBadMinimized{position:fixed;right:22px;bottom:22px;z-index:2147483006;display:flex;align-items:center;gap:9px;padding:10px 14px;border:1px solid #C9D0DC;border-radius:9px;color:#303748;background:#FFFFFF;box-shadow:0 7px 24px rgba(0,0,0,.18);font:650 12px Inter,-apple-system,sans-serif;cursor:pointer}
+#jaGoodBadMinimized:before{content:"";width:8px;height:8px;border-radius:50%;background:#B78330}
+#jaGoodBadMinimized:hover{background:#F2F4F8}
+#jaGoodBadMinimized:focus-visible{outline:2px solid #B78330;outline-offset:3px}
 @media(max-width:760px){
-  #jaGoodBadOverlay{padding:6px}
-  .ja-gb-window{width:calc(100vw - 12px);height:calc(100vh - 12px);min-width:0;min-height:320px;max-width:calc(100vw - 12px);max-height:calc(100vh - 12px);border-radius:11px;resize:none}
-  .ja-gb-main{padding:15px 12px 18px}
-  .ja-gb-heading-row{align-items:flex-start;flex-direction:column}
-  .ja-gb-columns{grid-template-columns:1fr;gap:12px}
-  .ja-gb-foot{padding:9px 12px}
+ #jaGoodBadOverlay{padding:5px}
+ .ja-gb-window{width:calc(100vw - 10px);height:calc(100vh - 10px);min-width:0;min-height:300px;max-width:calc(100vw - 10px);max-height:calc(100vh - 10px);border-radius:9px;resize:none}
+ .ja-gb-main{padding:9px}
+ .ja-gb-columns{grid-template-columns:1fr;gap:9px}
+ .ja-gb-titlebar{padding:0 10px}
+ .ja-gb-window-title{font-size:12px}
+ .ja-gb-foot{padding:7px 10px}
 }
 @media(prefers-reduced-motion:reduce){.ja-gb-window *{transition:none!important;animation:none!important}}
 </style>
@@ -9181,21 +9140,14 @@ const result = section === 'planets'
   <section class="ja-gb-window" role="dialog" aria-modal="false" aria-labelledby="jaGoodBadTitle">
     <header class="ja-gb-titlebar" data-ja-gb-drag-handle>
       <div class="ja-gb-window-controls" aria-label="Window controls">
-        <button class="ja-gb-dot close" type="button" data-ja-gb-action="close" title="Close Good &amp; Bad Analysis" aria-label="Close"></button>
-        <button class="ja-gb-dot minimize" type="button" data-ja-gb-action="minimize" title="Minimize Good &amp; Bad Analysis" aria-label="Minimize"></button>
-        <button class="ja-gb-dot maximize" type="button" data-ja-gb-action="maximize" title="Maximize or restore Good &amp; Bad Analysis" aria-label="Maximize"></button>
+        <button class="ja-gb-dot close" type="button" data-ja-gb-action="close" title="Close Good vs Bad" aria-label="Close"></button>
+        <button class="ja-gb-dot minimize" type="button" data-ja-gb-action="minimize" title="Minimize Good vs Bad" aria-label="Minimize"></button>
+        <button class="ja-gb-dot maximize" type="button" data-ja-gb-action="maximize" title="Maximize or restore Good vs Bad" aria-label="Maximize"></button>
       </div>
-      <div class="ja-gb-window-title">Jupiter Astro · Good &amp; Bad Analysis</div>
-      <div class="ja-gb-titlebar-tools"><span class="ja-gb-shortcut">Shortcut <kbd>G</kbd></span></div>
+      <div class="ja-gb-window-title" id="jaGoodBadTitle">Jupiter Astrology · Good vs Bad</div>
+      <div class="ja-gb-titlebar-tools" aria-hidden="true"></div>
     </header>
     <main class="ja-gb-main">
-      <div class="ja-gb-heading-row">
-        <div class="ja-gb-heading-copy">
-          <div class="ja-gb-eyebrow">JupiterAstro · Life Analysis</div>
-          <h2 class="ja-gb-title" id="jaGoodBadTitle">Good &amp; Bad Analysis</h2>
-          <p class="ja-gb-subtitle">A consolidated view across the four astrological dimensions</p>
-        </div>
-      </div>
       <div class="ja-gb-columns">
         <section class="ja-gb-column good" aria-label="Good indications">
           <div class="ja-gb-column-head"><h3><span class="ja-gb-dot-indicator"></span> GOOD</h3><small id="jaGoodTotal">0 observations</small></div>
@@ -9210,7 +9162,7 @@ const result = section === 'planets'
     <footer class="ja-gb-foot"><span>Independent positive and challenging indications; no combined score.</span><span>Press Esc to minimize</span></footer>
   </section>
 </div>
-<button id="jaGoodBadMinimized" type="button" hidden aria-label="Restore Good and Bad Analysis">Good &amp; Bad Analysis</button>
+<button id="jaGoodBadMinimized" type="button" hidden aria-label="Restore Good and Bad Analysis">Good vs Bad</button>
 <script id="ja-good-bad-analysis-controller">
 (function(){
   "use strict";
