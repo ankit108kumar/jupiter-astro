@@ -3184,12 +3184,12 @@ s += `<text data-layout-house="${h}" data-layout-type="sav" x="${g.sav[0]}" y="$
             ? `<tspan font-size="${Math.max(7, fs - 4)}" dy="-3" fill="${C.muted}">${hasDeg ? it.deg : ''}${marksStr}</tspan><tspan dy="3"></tspan>` 
             : '';
 
-          let itemColor = it.asc ? C.sa : it.al ? C.al : C.ink;
+          let itemColor = it.asc ? C.sa : (it.al || it.kl) ? C.al : C.ink;
           if (it.p && PLANET_COLORS[it.p]) {
             itemColor = PLANET_COLORS[it.p];
           }
 
-          return `<tspan data-p="${it.p || ''}" fill="${itemColor}" font-weight="${it.asc || it.al ? 700 : 500}">${esc(it.t)}</tspan>${combinedSup}`;
+          return `<tspan data-p="${it.p || ''}" fill="${itemColor}" font-weight="${it.asc || it.al || it.kl ? 700 : 500}">${esc(it.t)}</tspan>${combinedSup}`;
         }).join(' ');
         
 s += `<text data-layout-house="${h}" data-layout-type="planet-row" x="${g.c[0]}" y="${y0 + r * 14}" text-anchor="middle" dominant-baseline="central" font-size="${fs}">${str}</text>`;
@@ -4601,6 +4601,20 @@ function jaMiscTabMarkup(k,prefix){
 const RenderTabs = {
   overview(k, prefix) {
     const d1 = getVargaItems(k, 1);
+    // Karakamsa Lagna (KL): place the Navamsa sign occupied by the natal
+    // Atmakaraka into the D1 Rashi chart, using the same definition shown
+    // in the Overview metadata. This is a chart marker, not a planet.
+    const atmakaraka = Array.isArray(k.karakas) ? k.karakas[0] : null;
+    const atmakarakaPosition = atmakaraka && k.ch && k.ch.planets
+      ? k.ch.planets[atmakaraka.planet]
+      : null;
+    if (atmakarakaPosition) {
+      d1.items = d1.items.concat([{
+        t: 'KL',
+        sign: navamsaOfPosition(atmakarakaPosition),
+        kl: true
+      }]);
+    }
     const secKey = window.overviewSecChartKey && window.overviewSecChartKey[prefix] ? window.overviewSecChartKey[prefix] : 'D9';
     const secChart = getSecondaryChart(k, secKey);
     const avk = avkahada(k.ch.planets.Moon.lon);
