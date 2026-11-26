@@ -2243,6 +2243,7 @@
 
   function showDurationStatusToast() {
     window.JAInfoToast.show(durationStatusText, {
+      source: "transit-timeline", priority: 1,
       variant: durationStatusText.indexOf("Duration incomplete") === 0 ? "warning" : "success",
       duration: 2000
     });
