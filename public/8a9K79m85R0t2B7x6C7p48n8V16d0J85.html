@@ -29,6 +29,22 @@
 <!-- Panchang popup CSS is loaded on first card interaction. -->
 <link rel="stylesheet" href="/css/detailed-dasha-overview.css">
 <link rel="stylesheet" href="/css/lal-kitab-popup.css">
+<script>
+/* Load Lal Kitab fundamental placement classifications for the compact popup table. */
+window.JA_LK_FUNDAMENTAL_RULES_PROMISE = window.JA_LK_FUNDAMENTAL_RULES_PROMISE || fetch('/data/lal-kitab-fundamental-rules.json', { cache: 'force-cache' })
+  .then(response => {
+    if (!response.ok) throw new Error('Unable to load Lal Kitab fundamental rules');
+    return response.json();
+  })
+  .then(data => {
+    window.JA_LK_FUNDAMENTAL_RULES = data;
+    return data;
+  })
+  .catch(error => {
+    console.warn('[Lal Kitab] Fundamental placement rules unavailable:', error);
+    return null;
+  });
+</script>
 <link rel="stylesheet" href="/window/library-window.css">
 <link rel="stylesheet" href="/window/transit-timeline.css">
 <link rel="stylesheet" href="/css/ja-info-toast.css">
@@ -5750,14 +5766,22 @@ const activeYear = (typeof window.trSelectedLkYear === 'number' && window.trSele
     }).join('');
 
     if (compact) {
+      const placementRules = window.JA_LK_FUNDAMENTAL_RULES?.planetary_placement || {};
+      const placementClass = (planet, house) => {
+        const rule = placementRules[planet];
+        if (!rule) return '';
+        if (rule.normally_good_houses?.includes(Number(house))) return ' is-good';
+        if (rule.normally_bad_houses?.includes(Number(house))) return ' is-bad';
+        return '';
+      };
       const placementRows = PL.map(([planet]) => {
         const natalHouse = natalPlanetHouses[planet];
         const varshHouse = varshPlanetHouses[planet];
         return `
           <tr>
             <th scope="row">${planet}</th>
-            <td>${natalHouse}H</td>
-            <td>${varshHouse}H</td>
+            <td class="ja-lk-house${placementClass(planet, natalHouse)}">${natalHouse}H</td>
+            <td class="ja-lk-house${placementClass(planet, varshHouse)}">${varshHouse}H</td>
           </tr>
         `;
       }).join('');
@@ -5767,8 +5791,7 @@ const activeYear = (typeof window.trSelectedLkYear === 'number' && window.trSele
           <div class="ja-lk-chart-switcher ja-lk-header-chart-switcher"><span class="ja-lk-chart-name" data-ja-lk-chart-title></span><select class="ja-lk-chart-select" data-ja-lk-chart-select aria-label="Select open chart" hidden></select></div>
           <div class="ja-lk-compact-control-group">
             <div class="field ja-lk-year-field">
-              <label for="${prefix}-lkYearSelect">Select Varshphal Year</label>
-              <select id="${prefix}-lkYearSelect">
+              <select id="${prefix}-lkYearSelect" aria-label="Select Varshphal Year">
                 ${yearOptions}
               </select>
             </div>
