@@ -6195,7 +6195,7 @@ function getJupiterTransitTimelineRegistry() {
     if (!window.firebaseAuth || !window.firebaseAuth.currentUser) return;
     if (open()) {
       event.preventDefault();
-      event.stopPropagation();
+      event.stopImmediatePropagation();
     }
   }, true);
 
