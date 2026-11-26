@@ -113,10 +113,17 @@
 .ja-gb-column.bad .ja-gb-observation{border-left-color:#CF777C;background:rgba(207,98,104,.055)}
 
 #jaGoodBadMinimized[hidden]{display:none!important}
-#jaGoodBadMinimized{position:fixed;right:22px;bottom:22px;z-index:2147483006;display:flex;align-items:center;gap:9px;padding:10px 14px;border:1px solid #C9D0DC;border-radius:9px;color:#303748;background:#FFFFFF;box-shadow:0 7px 24px rgba(0,0,0,.18);font:650 12px Inter,-apple-system,sans-serif;cursor:pointer}
-#jaGoodBadMinimized:before{content:"";width:8px;height:8px;border-radius:50%;background:#B78330}
-#jaGoodBadMinimized:hover{background:#F2F4F8}
-#jaGoodBadMinimized:focus-visible{outline:2px solid #B78330;outline-offset:3px}
+#jaGoodBadMinimized{position:fixed;right:22px;bottom:22px;z-index:2147483006;display:flex;align-items:center;gap:9px;padding:0;border:1px solid var(--line-strong,#CBD5E1);border-radius:12px;color:var(--ink,#0F172A);background:var(--surface,#FFFFFF);box-shadow:0 8px 28px rgba(0,0,0,.20);font:inherit;cursor:pointer;overflow:hidden}
+#jaGoodBadMinimized{padding:11px 15px;font:700 13px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+#jaGoodBadMinimized:before{content:"";width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:#B78330}
+#jaGoodBadMinimized:hover{background:var(--surface-alt,#F1F5F9)}
+#jaGoodBadMinimized:focus-visible{outline:2px solid var(--saffron,#EA580C);outline-offset:3px}
+/* Stack minimized windows vertically in one bottom-right tray. */
+body:has(#jaGoodBadMinimized:not([hidden])) #ja-transit-timeline-launcher.visible{bottom:82px!important}
+body:has(#jaGoodBadMinimized:not([hidden])) #ja-panchang-minimized-launcher.visible{bottom:142px!important}
+body:has(#ja-transit-timeline-launcher.visible) #ja-panchang-minimized-launcher.visible{bottom:82px!important}
+body:has(#jaGoodBadMinimized:not([hidden])):has(#ja-transit-timeline-launcher.visible) #ja-panchang-minimized-launcher.visible{bottom:142px!important}
+@media(max-width:760px){#jaGoodBadMinimized{right:12px;bottom:12px}body:has(#jaGoodBadMinimized:not([hidden])) #ja-transit-timeline-launcher.visible{bottom:72px!important}body:has(#jaGoodBadMinimized:not([hidden])) #ja-panchang-minimized-launcher.visible{bottom:132px!important}body:has(#ja-transit-timeline-launcher.visible) #ja-panchang-minimized-launcher.visible{bottom:72px!important}body:has(#jaGoodBadMinimized:not([hidden])):has(#ja-transit-timeline-launcher.visible) #ja-panchang-minimized-launcher.visible{bottom:132px!important}}
 .ja-gb-titlebar-tools{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex:0 0 auto;min-width:154px;position:relative}
 .ja-gb-tool-button{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;padding:0;border:1px solid rgba(220,226,237,.52);border-radius:50%;background:rgba(255,255,255,.78);color:#526078;box-shadow:0 3px 12px rgba(31,43,67,.07);font:600 15px/1 Inter,sans-serif;cursor:pointer}
 .ja-gb-tool-button:hover,.ja-gb-tool-button[aria-expanded="true"]{background:rgba(255,255,255,.98);color:#26334A;border-color:rgba(190,201,219,.85);box-shadow:0 4px 15px rgba(31,43,67,.11)}
