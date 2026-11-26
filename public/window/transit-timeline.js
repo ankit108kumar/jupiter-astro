@@ -2238,6 +2238,30 @@
     });
   }
 
+  var durationToastElement = null;
+  var durationToastTimer = null;
+  var durationStatusText = "Duration updated for all planets";
+
+  function showDurationStatusToast() {
+    if (!durationToastElement) {
+      durationToastElement = document.createElement("div");
+      durationToastElement.className = "jtt-duration-toast";
+      durationToastElement.setAttribute("role", "status");
+      durationToastElement.setAttribute("aria-live", "polite");
+      document.body.appendChild(durationToastElement);
+    }
+    durationToastElement.textContent = durationStatusText;
+    durationToastElement.classList.toggle("is-incomplete", durationStatusText.indexOf("Duration incomplete") === 0);
+    durationToastElement.classList.remove("is-visible");
+    // Restart the entrance transition even when the same status is shown again.
+    void durationToastElement.offsetWidth;
+    durationToastElement.classList.add("is-visible");
+    if (durationToastTimer) window.clearTimeout(durationToastTimer);
+    durationToastTimer = window.setTimeout(function () {
+      if (durationToastElement) durationToastElement.classList.remove("is-visible");
+    }, 2000);
+  }
+
   function renderTransitTableFromContext() {
     if (!windowEl) return;
     var host = windowEl.querySelector("[data-jtt-table-scroll]");
@@ -2265,13 +2289,15 @@
           }
         });
       });
+      durationStatusText = missingDurationItems.length
+        ? "Duration incomplete — missing: " + missingDurationItems.join(", ")
+        : "Duration updated for all planets";
       if (durationInfo) {
-        durationInfo.hidden = false;
-        durationInfo.textContent = missingDurationItems.length
-          ? "Duration incomplete — missing: " + missingDurationItems.join(", ")
-          : "Duration updated for all planets";
+        durationInfo.hidden = true;
+        durationInfo.textContent = durationStatusText;
         durationInfo.classList.toggle("is-incomplete", missingDurationItems.length > 0);
       }
+      showDurationStatusToast();
       var moonRow = transitData && Array.isArray(transitData.rows)
         ? transitData.rows.find(function (row) { return row && row.planet === "Moon"; })
         : null;
@@ -2695,6 +2721,7 @@
       if (action === "fullscreen") toggleFullscreen();
       if (action === "theme") toggleTheme();
       if (action === "info") {
+        showDurationStatusToast();
         var infoPopover = windowEl.querySelector("[data-jtt-info-popover]");
         var isOpen = infoPopover && infoPopover.hidden;
         if (infoPopover) infoPopover.hidden = !isOpen;
