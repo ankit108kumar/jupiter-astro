@@ -6158,7 +6158,8 @@ function getJupiterTransitTimelineRegistry() {
       const id = event.target.value;
       const registry = window.JupiterTransitTimelineCharts;
       if (!registry || !registry.setActive(id, false)) return;
-      const chartEl = document.querySelector('[data-ja-transit-chart-prefix="' + CSS.escape(id) + '"]');
+      const chartEl = Array.from(document.querySelectorAll("[data-ja-transit-chart-prefix]"))
+        .find(el => el.getAttribute("data-ja-transit-chart-prefix") === id);
       activeContext = chartEl && chartEl.__jaLkPopupContext ? chartEl.__jaLkPopupContext : null;
       if (activeContext) render(activeContext);
       syncChartSelector();
@@ -6400,7 +6401,7 @@ function getJupiterTransitTimelineRegistry() {
     const win = overlay.querySelector(".ja-lk-popup-window");
     const handle = overlay.querySelector("[data-ja-lk-drag-handle]");
     handle.addEventListener("pointerdown", event => {
-      if (event.button !== 0 || event.target.closest("button, .ja-lk-titlebar-tools")) return;
+      if (event.button !== 0 || event.target.closest("button, select, input, .ja-lk-titlebar-tools")) return;
       if (maximized) toggleMaximize();
       const rect = win.getBoundingClientRect();
       win.style.transform = "none";
@@ -6529,7 +6530,22 @@ function getJupiterTransitTimelineRegistry() {
     if (detail.source !== "popup") render(activeContext);
   });
 
-  window.addEventListener("ja-transit-charts-changed", syncChartSelector);
+  window.addEventListener("ja-transit-charts-changed", () => {
+    const registry = window.JupiterTransitTimelineCharts;
+    const charts = registry && typeof registry.getCharts === "function" ? registry.getCharts() : [];
+    const activeId = registry && typeof registry.getActiveId === "function" ? registry.getActiveId() : "";
+    if (activeId && (!activeContext || activeContext.prefix !== activeId)) {
+      const chartEl = Array.from(document.querySelectorAll("[data-ja-transit-chart-prefix]"))
+        .find(el => el.getAttribute("data-ja-transit-chart-prefix") === activeId);
+      if (chartEl && chartEl.__jaLkPopupContext) {
+        activeContext = chartEl.__jaLkPopupContext;
+        if (overlay && !overlay.hidden) render(activeContext);
+      }
+    } else if (!charts.length) {
+      activeContext = null;
+    }
+    syncChartSelector();
+  });
 
   document.addEventListener("keydown", event => {
     const key = String(event.key || "").toLowerCase();
