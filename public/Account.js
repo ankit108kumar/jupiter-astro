@@ -56,18 +56,11 @@
   }
 
   function showAuthToast(message, kind) {
-    const toast = document.getElementById(kind === 'login' ? 'loginToast' : 'logoutToast');
-    if (!toast) {
-      console.warn(kind + ' succeeded, but its confirmation toast was not found.');
+    if (!window.JAInfoToast || typeof window.JAInfoToast.show !== 'function') {
+      console.warn(kind + ' succeeded, but the shared notification controller is unavailable.');
       return;
     }
-
-    toast.textContent = message;
-    toast.classList.add('show');
-    window.clearTimeout(toast._jaToastTimer);
-    toast._jaToastTimer = window.setTimeout(function () {
-      toast.classList.remove('show');
-    }, 3500);
+    window.JAInfoToast.show(message, {source:'account',priority:2,variant:'success',duration:3500});
   }
 
   // Keep every account view mutually exclusive. All navigation paths use

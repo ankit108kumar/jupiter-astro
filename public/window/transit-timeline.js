@@ -2238,6 +2238,17 @@
     });
   }
 
+  var durationStatusText = "Duration updated for all planets";
+  var durationStatusSignature = null;
+
+  function showDurationStatusToast() {
+    window.JAInfoToast.show(durationStatusText, {
+      source: "transit-timeline", priority: 1,
+      variant: durationStatusText.indexOf("Duration incomplete") === 0 ? "warning" : "success",
+      duration: 2000
+    });
+  }
+
   function renderTransitTableFromContext() {
     if (!windowEl) return;
     var host = windowEl.querySelector("[data-jtt-table-scroll]");
@@ -2252,6 +2263,38 @@
     try {
       removeDurationTooltip();
       var transitData = context.getTransitTableData();
+      var durationInfo = windowEl.querySelector("[data-jtt-duration-update-info]");
+      var expectedPlanets = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+      var durationRows = transitData && Array.isArray(transitData.rows) ? transitData.rows : [];
+      var missingDurationItems = [];
+      expectedPlanets.forEach(function (planet) {
+        var row = durationRows.find(function (item) { return item && item.planet === planet; });
+        ["Sign", "Nakshatra", "Navamsa"].forEach(function (division) {
+          var field = division.toLowerCase() + "Duration";
+          if (!row || !row[field] || !row[field].startText || !row[field].endText) {
+            missingDurationItems.push(planet + " (" + division + ")");
+          }
+        });
+      });
+      durationStatusText = missingDurationItems.length
+        ? "Duration incomplete — missing: " + missingDurationItems.join(", ")
+        : "Duration updated for all planets";
+      if (durationInfo) {
+        durationInfo.hidden = true;
+        durationInfo.textContent = durationStatusText;
+        durationInfo.classList.toggle("is-incomplete", missingDurationItems.length > 0);
+      }
+      var statusSignature = JSON.stringify({
+        evalMs: transitData && transitData.evalMs,
+        rows: expectedPlanets.map(function (planet) {
+          var row = durationRows.find(function (item) { return item && item.planet === planet; });
+          return [planet, row && row.signDuration, row && row.nakshatraDuration, row && row.navamsaDuration];
+        })
+      });
+      if (statusSignature !== durationStatusSignature) {
+        durationStatusSignature = statusSignature;
+        showDurationStatusToast();
+      }
       var moonRow = transitData && Array.isArray(transitData.rows)
         ? transitData.rows.find(function (row) { return row && row.planet === "Moon"; })
         : null;
@@ -2441,10 +2484,7 @@
         '<div class="jtt-window-title">Jupiter Astro · Transit Timeline</div>' +
         '<div class="jtt-titlebar-tools">' +
           '<div class="jtt-info-wrap">' +
-            '<button class="jtt-info-button" type="button" data-jtt-action="info" title="Transit Timeline information" aria-label="Transit Timeline information" aria-expanded="false" aria-controls="jtt-info-popover">i</button>' +
-            '<div class="jtt-info-popover" id="jtt-info-popover" data-jtt-info-popover hidden role="note">' +
-              'Connected to the active Research Kundali. Date and time changes are shared with Planetary Transits.' +
-            '</div>' +
+            '<button class="jtt-info-button" type="button" data-jtt-action="info" title="Transit Timeline information" aria-label="Transit Timeline information" aria-expanded="false">i</button>' +
           '</div>' +
           '<div class="jtt-global-export-wrap">' +
             '<button class="jtt-global-export-button" type="button" data-jtt-action="export-toggle" title="Copy or export planetary table" aria-label="Copy or export planetary table" aria-expanded="false" aria-controls="jtt-global-export-menu">' +
@@ -2500,6 +2540,7 @@
           '</div>' +
         '</section>' +
         '<div class="jtt-notice" role="status" aria-live="polite" hidden></div>' +
+        '<div class="jtt-duration-update-info" data-jtt-duration-update-info role="status" aria-live="polite" hidden>Duration updated for all planets</div>' +
         '<section class="jtt-table-panel" data-jtt-transit-table aria-label="Core planetary transit table">' +
           '<div class="jtt-table-scroll" data-jtt-table-scroll>' +
             '<div class="jtt-table-empty">Open or select a Research Kundali to populate the planetary transit table.</div>' +
@@ -2659,9 +2700,7 @@
 
     var infoWrap = event.target.closest(".jtt-info-wrap");
     if (!infoWrap) {
-      var existingInfo = windowEl.querySelector("[data-jtt-info-popover]");
       var existingInfoButton = windowEl.querySelector('[data-jtt-action="info"]');
-      if (existingInfo) existingInfo.hidden = true;
       if (existingInfoButton) existingInfoButton.setAttribute("aria-expanded", "false");
     }
 
@@ -2674,10 +2713,8 @@
       if (action === "fullscreen") toggleFullscreen();
       if (action === "theme") toggleTheme();
       if (action === "info") {
-        var infoPopover = windowEl.querySelector("[data-jtt-info-popover]");
-        var isOpen = infoPopover && infoPopover.hidden;
-        if (infoPopover) infoPopover.hidden = !isOpen;
-        actionButton.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        showDurationStatusToast();
+        actionButton.setAttribute("aria-expanded", "false");
       }
       if (action === "export-toggle") {
         var exportMenu = windowEl.querySelector("[data-jtt-global-export-menu]");

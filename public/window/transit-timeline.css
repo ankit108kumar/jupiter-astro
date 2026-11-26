@@ -2754,3 +2754,25 @@ body.jtt-window-open{overflow:hidden!important;overscroll-behavior:none!importan
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+
+
+/* Quiet confirmation that Sign, Nakshatra and Navamsa durations are available for all nine planets. */
+#ja-transit-timeline-window .jtt-duration-update-info {
+  margin: 4px 14px 0;
+  padding: 2px 4px;
+  color: var(--jtt-muted, #7b8190);
+  font: 450 10.5px/1.35 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: .01em;
+  opacity: .78;
+  pointer-events: none;
+}
+#ja-transit-timeline-window .jtt-duration-update-info[hidden] {
+  display: none !important;
+}
+
+#ja-transit-timeline-window .jtt-duration-update-info.is-incomplete {
+  color: var(--jtt-warning, #9a6b32);
+  opacity: .9;
+}
+
+

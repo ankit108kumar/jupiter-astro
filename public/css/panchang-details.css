@@ -2,7 +2,7 @@
 .panchang-item.ja-panchang-clickable{cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
 .panchang-item.ja-panchang-clickable:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(70,80,110,.13);border-color:var(--accent,#c58b36)!important}
 .panchang-item.ja-panchang-clickable:focus-visible{outline:2px solid var(--accent,#c58b36)!important;outline-offset:3px}
-.ja-panchang-modal[hidden]{display:none!important}.ja-panchang-modal{position:fixed;inset:0;z-index:100500;display:grid;place-items:center;padding:22px;font-family:inherit;color:var(--ink,#1c2434)}
+.ja-panchang-modal[hidden]{display:none!important}.ja-panchang-modal{position:fixed;inset:0;z-index:2147483003;display:grid;place-items:center;padding:22px;font-family:inherit;color:var(--ink,#1c2434)}
 .ja-panchang-backdrop{position:absolute;inset:0;background:rgba(22,27,40,.48);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
 .ja-panchang-dialog{position:relative;z-index:1;width:min(1120px,96vw);max-height:min(88vh,900px);display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--line,rgba(100,110,130,.2));border-radius:20px;background:var(--surface,#fff);box-shadow:0 24px 80px rgba(20,28,45,.25);animation:jaPanchangIn .2s ease-out}
 @keyframes jaPanchangIn{from{opacity:0;transform:translateY(10px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
@@ -606,7 +606,7 @@ html,body,*{scrollbar-width:thin;scrollbar-color:#c9c6d0 transparent}
 .ja-panchang-actions .ja-panchang-action svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .ja-panchang-actions .ja-panchang-theme-toggle svg{width:22px;height:22px}
 .ja-panchang-actions [data-copied="true"]{color:#43865b!important}
-.ja-panchang-info-popover{position:absolute;right:0;top:calc(100% + 10px);z-index:10020;min-width:245px;max-width:min(320px,80vw);padding:13px 15px;border:1px solid rgba(130,120,150,.16);border-radius:12px;background:rgba(255,255,255,.97);box-shadow:0 10px 30px rgba(40,34,55,.13);color:#484456;font-size:12px;line-height:1.55}
+.ja-panchang-info-popover{position:absolute;right:0;top:calc(100% + 10px);z-index:3;min-width:245px;max-width:min(320px,80vw);padding:13px 15px;border:1px solid rgba(130,120,150,.16);border-radius:12px;background:rgba(255,255,255,.97);box-shadow:0 10px 30px rgba(40,34,55,.13);color:#484456;font-size:12px;line-height:1.55}
 .ja-panchang-info-popover[hidden]{display:none!important}
 .ja-panchang-info-popover strong,.ja-panchang-info-popover span{display:block;margin-bottom:4px}
 .ja-panchang-dialog.is-maximized{position:fixed!important;inset:10px!important;width:auto!important;height:auto!important;max-width:none!important;max-height:none!important;margin:0!important;border-radius:14px!important;transform:none!important}
@@ -615,7 +615,7 @@ html,body,*{scrollbar-width:thin;scrollbar-color:#c9c6d0 transparent}
 .ja-panchang-dialog.is-maximized .ja-panchang-dialog-body{max-height:calc(100vh - 150px);overflow:auto}
 @media(max-width:600px){.ja-panchang-actions.ja-panchang-title-tools{gap:5px}.ja-panchang-actions .ja-panchang-action{width:34px;height:34px;min-width:34px}.ja-panchang-actions .ja-panchang-action svg{width:18px;height:18px}}
 
-.ja-panchang-title-tools.ja-panchang-actions{position:relative;z-index:2147483000;overflow:visible}.ja-panchang-info-wrap,.ja-panchang-export-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center;overflow:visible}.ja-panchang-info-popover{position:absolute!important;z-index:2147483647!important;top:calc(100% + 9px)!important;right:-82px!important;width:min(340px,calc(100vw - 36px))!important;max-width:min(340px,calc(100vw - 36px))!important;overflow:visible!important}.ja-panchang-export-menu{position:absolute!important;z-index:2147483646!important;top:calc(100% + 8px)!important;right:0!important;width:190px!important}.ja-panchang-info-popover[hidden],.ja-panchang-export-menu[hidden]{display:none!important}.ja-panchang-dialog,.ja-panchang-titlebar{overflow:visible!important}
+.ja-panchang-title-tools.ja-panchang-actions{position:relative;z-index:2;overflow:visible}.ja-panchang-info-wrap,.ja-panchang-export-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center;overflow:visible}.ja-panchang-info-popover[hidden],.ja-panchang-export-menu[hidden]{display:none!important}.ja-panchang-dialog{overflow:hidden!important}.ja-panchang-titlebar{overflow:visible!important}
 
 /* Normalize all four Panchang toolbar controls to the same Transit Timeline-sized hit area. */
 .ja-panchang-title-tools.ja-panchang-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:10px!important;min-width:0;overflow:visible!important}
@@ -694,3 +694,4 @@ html,body,*{scrollbar-width:thin;scrollbar-color:#c9c6d0 transparent}
 .ja-panchang-dialog .ja-panchang-period-section tr.ja-panchang-period-inauspicious .ja-panchang-duration{color:#e53935!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;text-shadow:none!important}
 .ja-panchang-dialog .ja-panchang-period-section tr.ja-panchang-period-auspicious .ja-panchang-slot-main{color:#16a34a!important;font-weight:650!important}
 .ja-panchang-dialog .ja-panchang-period-section tr.ja-panchang-period-auspicious .ja-panchang-duration{color:#16a34a!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;text-shadow:none!important}
+
