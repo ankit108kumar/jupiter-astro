@@ -1,0 +1,194 @@
+{
+  "title": "Lal Kitab Fundamental Rule — Planetary Placement",
+  "schema_version": "1.0.0",
+  "source": "User-provided reference image titled “Placement of Planet”.",
+  "principle": "The house occupied by a planet indicates its normal tendency in the chart: placement in a house listed as normally bad is normally unfavourable for that planet, while placement in a house listed as normally good is normally favourable. This is a baseline condition of the planet, not an absolute or standalone final judgement.",
+  "application": [
+    "Use this as a fundamental baseline when assessing a planet's condition in Lal Kitab house-wise analysis.",
+    "Use this as a fundamental baseline when assessing a planet's condition in Lal Kitab Varshphal analysis."
+  ],
+  "interpretation_examples": [
+    {
+      "placement": "Sun in the 6th House",
+      "normal_condition": "bad",
+      "meaning": "Sun is normally bad in the 6th House."
+    },
+    {
+      "placement": "Sun in the 1st House",
+      "normal_condition": "good",
+      "meaning": "Sun is normally good in the 1st House."
+    }
+  ],
+  "planetary_placement": {
+    "Jupiter": {
+      "normally_bad_houses": [
+        6,
+        7,
+        10
+      ],
+      "normally_good_houses": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        8,
+        9,
+        11,
+        12
+      ]
+    },
+    "Sun": {
+      "normally_bad_houses": [
+        6,
+        7,
+        10
+      ],
+      "normally_good_houses": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        8,
+        9,
+        11,
+        12
+      ]
+    },
+    "Moon": {
+      "normally_bad_houses": [
+        6,
+        8,
+        10,
+        11,
+        12
+      ],
+      "normally_good_houses": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        7,
+        9
+      ]
+    },
+    "Venus": {
+      "normally_bad_houses": [
+        1,
+        6,
+        9
+      ],
+      "normally_good_houses": [
+        2,
+        3,
+        4,
+        5,
+        8,
+        10,
+        11,
+        12
+      ],
+      "source_markers": {
+        "6": "*"
+      },
+      "source_marker_note": "The source image marks Venus in the 6th House with an asterisk; no explanation for the asterisk is visible in the supplied image."
+    },
+    "Mars": {
+      "normally_bad_houses": [
+        4,
+        8
+      ],
+      "normally_good_houses": [
+        1,
+        2,
+        3,
+        5,
+        6,
+        7,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    "Mercury": {
+      "normally_bad_houses": [
+        3,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "normally_good_houses": [
+        1,
+        2,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    "Saturn": {
+      "normally_bad_houses": [
+        1,
+        4,
+        5,
+        6
+      ],
+      "normally_good_houses": [
+        2,
+        3,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    "Rahu": {
+      "normally_bad_houses": [
+        1,
+        2,
+        5,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "normally_good_houses": [
+        3,
+        4,
+        6
+      ]
+    },
+    "Ketu": {
+      "normally_bad_houses": [
+        3,
+        4,
+        5,
+        6,
+        8
+      ],
+      "normally_good_houses": [
+        1,
+        2,
+        7,
+        9,
+        10,
+        11,
+        12
+      ]
+    }
+  },
+  "data_semantics": {
+    "normally_bad_houses": "House placements where the planet is normally considered bad/unfavourable according to this fundamental rule.",
+    "normally_good_houses": "House placements where the planet is normally considered good/favourable according to this fundamental rule.",
+    "not_listed": "A house not listed in either array is not classified by the supplied reference; do not infer a classification."
+  }
+}
