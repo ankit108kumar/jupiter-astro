@@ -6127,21 +6127,23 @@ function getJupiterTransitTimelineRegistry() {
           <div class="ja-lk-window-title">${TITLE}</div>
           <div class="ja-lk-titlebar-tools">
             <div class="ja-lk-info-wrap">
-              <button class="ja-lk-tool-button" type="button" data-ja-lk-action="info" title="About this popup" aria-label="About this popup" aria-expanded="false">i</button>
+              <button class="ja-lk-info-button" type="button" data-ja-lk-action="info" title="Lal Kitab Birthchart / Varshphal information" aria-label="Lal Kitab Birthchart / Varshphal information" aria-expanded="false">i</button>
               <div class="ja-lk-info-popover" hidden>Displays the natal Lal Kitab chart, selected Varshphal progression chart and planetary house placements for the selected birthday-to-birthday year.</div>
             </div>
-            <div class="ja-lk-export-wrap">
-              <button class="ja-lk-tool-button" type="button" data-ja-lk-action="export-toggle" title="Copy or export planet placements" aria-label="Copy or export planet placements" aria-expanded="false">⇩</button>
-              <div class="ja-lk-export-menu" data-ja-lk-export-menu hidden>
-                <div class="ja-lk-export-heading">Planet Placements</div>
-                <button type="button" data-ja-lk-export="copy">Copy table <kbd>TSV</kbd></button>
-                <button type="button" data-ja-lk-export="csv">Download CSV <kbd>.csv</kbd></button>
-                <button type="button" data-ja-lk-export="tsv">Download TSV <kbd>.tsv</kbd></button>
-                <button type="button" data-ja-lk-export="pdf">Export PDF <kbd>.pdf</kbd></button>
+            <div class="ja-lk-global-export-wrap">
+              <button class="ja-lk-global-export-button" type="button" data-ja-lk-action="export-toggle" title="Copy or export planetary placements" aria-label="Copy or export planetary placements" aria-expanded="false" aria-controls="ja-lk-global-export-menu">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path></svg>
+              </button>
+              <div class="ja-lk-global-export-menu" id="ja-lk-global-export-menu" data-ja-lk-export-menu hidden>
+                <div class="ja-lk-global-export-heading">Planetary Placements</div>
+                <button type="button" data-ja-lk-export="copy"><span>Copy table</span><kbd>TSV</kbd></button>
+                <button type="button" data-ja-lk-export="csv"><span>Download CSV</span><kbd>.csv</kbd></button>
+                <button type="button" data-ja-lk-export="tsv"><span>Download TSV</span><kbd>.tsv</kbd></button>
+                <button type="button" data-ja-lk-export="pdf"><span>Export PDF</span><kbd>.pdf</kbd></button>
               </div>
             </div>
             <button class="ja-lk-tool-button" type="button" data-ja-lk-action="fullscreen" title="Enter full screen" aria-label="Enter full screen">⛶</button>
-            <button class="ja-lk-tool-button ja-lk-theme-button" type="button" data-ja-lk-action="theme" title="Switch appearance" aria-label="Switch appearance" aria-pressed="false">◐</button>
+            <button class="ja-lk-theme-toggle" type="button" data-ja-lk-action="theme" title="Switch appearance" aria-label="Switch appearance" aria-pressed="false"></button>
           </div>
         </header>
         <div class="ja-lk-popup-content"></div>
@@ -6372,7 +6374,7 @@ function getJupiterTransitTimelineRegistry() {
       const infoButton = overlay.querySelector('[data-ja-lk-action="info"]');
       if (infoButton) infoButton.setAttribute("aria-expanded", "false");
     }
-    if (!event.target.closest(".ja-lk-export-wrap")) {
+    if (!event.target.closest(".ja-lk-global-export-wrap")) {
       const menu = overlay.querySelector("[data-ja-lk-export-menu]");
       if (menu) menu.hidden = true;
       const exportButton = overlay.querySelector('[data-ja-lk-action="export-toggle"]');
