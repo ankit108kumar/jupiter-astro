@@ -2255,11 +2255,23 @@
       var durationInfo = windowEl.querySelector("[data-jtt-duration-update-info]");
       var expectedPlanets = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
       var durationRows = transitData && Array.isArray(transitData.rows) ? transitData.rows : [];
-      var durationUpdatedForAll = expectedPlanets.every(function (planet) {
+      var missingDurationItems = [];
+      expectedPlanets.forEach(function (planet) {
         var row = durationRows.find(function (item) { return item && item.planet === planet; });
-        return !!(row && row.signDuration && row.nakshatraDuration && row.navamsaDuration);
+        ["Sign", "Nakshatra", "Navamsa"].forEach(function (division) {
+          var field = division.toLowerCase() + "Duration";
+          if (!row || !row[field] || !row[field].startText || !row[field].endText) {
+            missingDurationItems.push(planet + " (" + division + ")");
+          }
+        });
       });
-      if (durationInfo) durationInfo.hidden = !durationUpdatedForAll;
+      if (durationInfo) {
+        durationInfo.hidden = false;
+        durationInfo.textContent = missingDurationItems.length
+          ? "Duration incomplete — missing: " + missingDurationItems.join(", ")
+          : "Duration updated for all planets";
+        durationInfo.classList.toggle("is-incomplete", missingDurationItems.length > 0);
+      }
       var moonRow = transitData && Array.isArray(transitData.rows)
         ? transitData.rows.find(function (row) { return row && row.planet === "Moon"; })
         : null;
