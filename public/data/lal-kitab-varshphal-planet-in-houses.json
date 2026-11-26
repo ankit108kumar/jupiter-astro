@@ -1225,5 +1225,34 @@
         "impact": "makes 'Moon' bad."
       }
     ]
-  }
+  },
+  "special_aspects": [
+    {
+      "id": "4h-planet-moon-behaviour-saturn-result",
+      "title": "Any planet in the 4th House",
+      "house": 4,
+      "rule": "4H Planet (any) will behave like Moon in the Chart, But the result will be as per Saturn placement.",
+      "interpretation": "4H Planet will give result as per the Moon (whether Good or Bad) in the Chart and throw its result at Saturn placement.",
+      "behaviour_reference": "Moon",
+      "result_delivery_house": "Saturn's house placement"
+    },
+    {
+      "id": "11h-planet-saturn-behaviour-jupiter-result",
+      "title": "Any planet in the 11th House",
+      "house": 11,
+      "rule": "11H Planet (any) will behave like Saturn in the Chart, But the result will be as per Jupiter placement.",
+      "interpretation": "11H Planet will give result as per the Saturn (whether Good or Bad) in the Chart and throw its result at Jupiter Placement.",
+      "behaviour_reference": "Saturn",
+      "result_delivery_house": "Jupiter's house placement"
+    },
+    {
+      "id": "2h-planet-lucky-but-sleeping-if-10h-empty",
+      "title": "Any planet in the 2nd House",
+      "house": 2,
+      "rule": "2H Planet (any) will become lucky planet, BUT if 10H is empty, it will be sleeping.",
+      "interpretation": "2H Planet is very lucky, but if 10H is empty, it will not give good result as it will be sleeping. It will have to be activated for getting its good result.",
+      "status": "Sleeping when the 10th House is empty",
+      "activation_required_when_sleeping": true
+    }
+  ]
 }
