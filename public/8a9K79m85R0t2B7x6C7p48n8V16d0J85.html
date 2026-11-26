@@ -6147,7 +6147,7 @@ function getJupiterTransitTimelineRegistry() {
         <div class="ja-lk-popup-content"></div>
       </section>
     `;
-    overlay.querySelector('[data-ja-lk-action="close"]').addEventListener("click", close);
+    overlay.querySelector(".ja-lk-window-controls").addEventListener("click", handleToolClick);
     overlay.addEventListener("click", event => {
       if (event.target === overlay) close();
     });
@@ -6183,7 +6183,13 @@ function getJupiterTransitTimelineRegistry() {
     if (!overlay || overlay.hidden) return;
     overlay.hidden = true;
     overlay.setAttribute("aria-hidden", "true");
-    overlay.querySelector(".ja-lk-popup-window").classList.remove("ja-lk-maximized");
+    const win = overlay.querySelector(".ja-lk-popup-window");
+    win.classList.remove("ja-lk-maximized");
+    win.style.left = "";
+    win.style.top = "";
+    win.style.width = "";
+    win.style.height = "";
+    win.style.transform = "";
     document.body.classList.remove("ja-lk-popup-open");
     if (launcher) launcher.classList.remove("visible");
     maximized = false;
