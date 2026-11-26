@@ -277,6 +277,75 @@
       "from_house": "The house casting the aspect.",
       "to_house": "The receiving house.",
       "strength": "The aspect strength category as labelled in the source."
+    },
+    "reverse_aspects": {
+      "title": "Special Reverse Aspect Rules — Mercury and Saturn",
+      "scope": "Always considered for the Lagna chart.",
+      "rules": [
+        {
+          "id": "mercury-12h-reverse-aspects",
+          "planet": "Mercury",
+          "placement_house": 12,
+          "aspects": [
+            {
+              "receiving_house": 6,
+              "effect": "Ruins the planet placed in the 6th House."
+            },
+            {
+              "receiving_house": 3,
+              "effect": "Gives bad results to the 3rd House and its planet."
+            },
+            {
+              "receiving_house": 4,
+              "effect": "Gives bad results to the 4th House and its planet."
+            }
+          ],
+          "overall_note": "Mercury in the 12th House is very bad."
+        },
+        {
+          "id": "mercury-9h-reverse-aspect",
+          "planet": "Mercury",
+          "placement_house": 9,
+          "aspects": [
+            {
+              "receiving_house": 3,
+              "effect": "Ruins the planet placed in the 3rd House."
+            }
+          ],
+          "overall_note": "Mercury in the 9th House is very bad."
+        },
+        {
+          "id": "saturn-6h-reverse-aspect",
+          "planet": "Saturn",
+          "placement_house": 6,
+          "aspects": [
+            {
+              "receiving_house": 2,
+              "effect": "Ruins the planet placed in the 2nd House."
+            }
+          ]
+        }
+      ],
+      "exceptions": [
+        {
+          "id": "mercury-9h-mars-3h-exception",
+          "condition": "Mercury in the 9th House and Mars in the 3rd House.",
+          "result": "Mercury is not much bad. Mars saves itself as well as Mercury; both Mars and Mercury are good."
+        },
+        {
+          "id": "saturn-6h-jupiter-2h-exception",
+          "condition": "Saturn in the 6th House and Jupiter in the 2nd House.",
+          "result": "Saturn is good; Jupiter saves Saturn in the 6th House.",
+          "varshphal_application": {
+            "use": "For Saturn in the 6th House in Varshphal, bring in Jupiter in the 2nd House as the remedy reference for Saturn in the 6th House.",
+            "remedy": "Offering Chana Dal in the temple on Thursday."
+          }
+        }
+      ],
+      "notes": [
+        "These are special reverse aspect rules attributed to Mercury and Saturn.",
+        "Apply these rules in the Lagna chart as specified by the user."
+      ]
     }
   }
 }
