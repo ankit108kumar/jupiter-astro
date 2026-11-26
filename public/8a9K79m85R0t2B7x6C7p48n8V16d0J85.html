@@ -6173,8 +6173,13 @@ function getJupiterTransitTimelineRegistry() {
     if (overlay) overlay.querySelector(".ja-lk-popup-window").setAttribute("data-ja-lk-theme", themeMode);
     const button = overlay && overlay.querySelector('[data-ja-lk-action="theme"]');
     if (button) {
-      button.setAttribute("aria-pressed", themeMode === "apple" ? "true" : "false");
-      button.title = themeMode === "apple" ? "Switch to website appearance" : "Switch to Apple appearance";
+      const appleActive = themeMode === "apple";
+      button.innerHTML = appleActive
+        ? '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.6"></circle><path d="M12 2v2.1M12 19.9V22M4.93 4.93l1.48 1.48m11.18 11.18 1.48 1.48M2 12h2.1m15.8 0H22M4.93 19.07l1.48-1.48M17.59 6.41l1.48-1.48"></path></svg>'
+        : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"></rect><path d="M3 8h18M7 6h.01M10 6h.01M7 12h10M7 15.5h7"></path></svg>';
+      button.title = appleActive ? "Apple Light is active · Switch to website theme" : "Following website theme · Switch to Apple Light";
+      button.setAttribute("aria-label", appleActive ? "Switch to website theme" : "Switch to Apple Light mode");
+      button.setAttribute("aria-pressed", appleActive ? "true" : "false");
     }
     if (persist !== false) {
       try { localStorage.setItem("ja-lk-popup-theme", themeMode); } catch (error) {}
