@@ -1430,62 +1430,67 @@ if (jaLongitudeEngine) {
   jaSetLongitudeStatus("PCHIP module unavailable · original planetary calculation retained", "warning");
 }
 
+function jaApplyPchipLongitudeCorrections(planets, jd) {
+  const startedAt = performance.now();
+  const corrected = [];
+  const fallback = [];
+  if (!jaLongitudeReferenceReady || !jaLongitudeEngine) {
+    Object.keys(planets).forEach(function (planet) { fallback.push(planet); });
+    return { corrected, fallback, elapsedMs: performance.now() - startedAt, ready: false };
+  }
+  try {
+    const result = jaLongitudeEngine.calculateAll({
+      timestamp: jdToMs(jd),
+      ephemerisLongitudeAt: jaSiderealLongitudeAt
+    });
+    Object.keys(planets).forEach(function (planet) {
+      const item = result.results && result.results[planet];
+      if (item && item.calibration &&
+          item.calibration.method !== "unanchored-ephemeris-fallback" &&
+          Number.isFinite(item.reconstructedLongitude) &&
+          Math.abs(item.correctionDegrees) <= 2) {
+        planets[planet].rawLon = planets[planet].lon;
+        planets[planet].lon = item.reconstructedLongitude;
+        planets[planet].longitudeCorrection = item.correctionDegrees;
+        planets[planet].longitudeMode = "pchip";
+        planets[planet].longitudeReference = item.calibration;
+        corrected.push(planet);
+      } else {
+        planets[planet].longitudeMode = "fallback";
+        planets[planet].longitudeFallbackReason = result.errors && result.errors[planet]
+          ? result.errors[planet].message
+          : "No valid in-range PCHIP correction";
+        fallback.push(planet);
+      }
+    });
+  } catch (error) {
+    console.warn("PCHIP longitude reconciliation failed; native ephemeris retained.", error);
+    Object.keys(planets).forEach(function (planet) {
+      planets[planet].longitudeMode = "fallback";
+      planets[planet].longitudeFallbackReason = error.message;
+      fallback.push(planet);
+    });
+  }
+  return { corrected, fallback, elapsedMs: performance.now() - startedAt, ready: true };
+}
+
 function computeChart({ y, m, d, hh, mm, ss, tz, lat, lon }) {
   const jd = julianDay(y, m, d, hh + mm / 60 + ss / 3600 - tz);
   const { aya, planets } = siderealAt(jd);
-  if (jaLongitudeReferenceReady && jaLongitudeEngine) {
-    const startedAt = performance.now();
-    const corrected = [];
-    const fallback = [];
-    try {
-      const result = jaLongitudeEngine.calculateAll({
-        timestamp: jdToMs(jd),
-        ephemerisLongitudeAt: jaSiderealLongitudeAt
-      });
-      Object.keys(planets).forEach(function (planet) {
-        const item = result.results && result.results[planet];
-        if (item && item.calibration &&
-            item.calibration.method !== "unanchored-ephemeris-fallback" &&
-            Number.isFinite(item.reconstructedLongitude) &&
-            Math.abs(item.correctionDegrees) <= 2) {
-          planets[planet].rawLon = planets[planet].lon;
-          planets[planet].lon = item.reconstructedLongitude;
-          planets[planet].longitudeCorrection = item.correctionDegrees;
-          planets[planet].longitudeMode = "pchip";
-          planets[planet].longitudeReference = item.calibration;
-          corrected.push(planet);
-        } else {
-          planets[planet].longitudeMode = "fallback";
-          planets[planet].longitudeFallbackReason = result.errors && result.errors[planet]
-            ? result.errors[planet].message
-            : "No valid in-range PCHIP correction";
-          fallback.push(planet);
-        }
-      });
-    } catch (error) {
-      console.warn("PCHIP longitude reconciliation failed; native ephemeris retained.", error);
-      Object.keys(planets).forEach(function (planet) {
-        planets[planet].longitudeMode = "fallback";
-        planets[planet].longitudeFallbackReason = error.message;
-        fallback.push(planet);
-      });
-    }
-    const elapsed = (performance.now() - startedAt).toFixed(1);
+  const verification = jaApplyPchipLongitudeCorrections(planets, jd);
+  if (verification.ready) {
     const localStamp = new Date(jdToMs(jd)).toLocaleString();
-    const status = corrected.length
-      ? "Planetary longitudes verified and updated · PCHIP: " + corrected.join(", ") +
-        (fallback.length ? " · Fallback: " + fallback.join(", ") : "") +
-        " · " + elapsed + " ms · " + localStamp
+    const status = verification.corrected.length
+      ? "Planetary longitudes verified and updated · PCHIP: " + verification.corrected.join(", ") +
+        (verification.fallback.length ? " · Fallback: " + verification.fallback.join(", ") : "") +
+        " · " + verification.elapsedMs.toFixed(1) + " ms · " + localStamp
       : "PCHIP correction unavailable · original calculation retained" +
-        (fallback.length ? " · " + fallback.join(", ") : "") +
-        " · " + elapsed + " ms · " + localStamp;
-    jaSetLongitudeStatus(status, corrected.length ? (fallback.length ? "warning" : "success") : "warning");
+        (verification.fallback.length ? " · " + verification.fallback.join(", ") : "") +
+        " · " + verification.elapsedMs.toFixed(1) + " ms · " + localStamp;
+    jaSetLongitudeStatus(status, verification.corrected.length ? (verification.fallback.length ? "warning" : "success") : "warning");
   } else {
-    jaSetLongitudeStatus(
-      "Original planetary calculation active · PCHIP reference " +
-      (jaLongitudeReferenceError ? "unavailable" : "loading"),
-      "warning"
-    );
+    jaSetLongitudeStatus("Original planetary calculation active · PCHIP reference " +
+      (jaLongitudeReferenceError ? "unavailable" : "loading"), "warning");
   }
   return { jd, aya, asc: rev(ascendant(jd, lat, lon) - aya), planets };
 }
@@ -1679,7 +1684,9 @@ function getTransitPlanetPositions(evalMs) {
   const key = Math.trunc(Number(evalMs));
   if (TRANSIT_POSITION_CACHE.has(key)) return TRANSIT_POSITION_CACHE.get(key);
 
-  const positions = siderealAt(msToJd(key)).planets;
+  const jd = msToJd(key);
+  const positions = siderealAt(jd).planets;
+  jaApplyPchipLongitudeCorrections(positions, jd);
   TRANSIT_POSITION_CACHE.set(key, positions);
   while (TRANSIT_POSITION_CACHE.size > 32) {
     TRANSIT_POSITION_CACHE.delete(TRANSIT_POSITION_CACHE.keys().next().value);
