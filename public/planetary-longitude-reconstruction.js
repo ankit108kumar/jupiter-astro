@@ -47,6 +47,8 @@ const SIGN_SPAN=30, NAK_SPAN=360/27, NAV_SPAN=360/108;
 const MODAL_START=[0,9,6,3];
 const EPS=1e-9;
 const anchorCache=new WeakMap();
+const pchipModelCache=new WeakMap();
+const anchorDiagnosticsCache=new WeakMap();
 const fail=(message,code)=>Object.assign(new Error(message),{code:code||'JA_LONGITUDE_ERROR'});
 const isObject=x=>!!x&&typeof x==='object'&&!Array.isArray(x);
 const mod=x=>((x%360)+360)%360;
@@ -208,39 +210,53 @@ function collectAnchors(planet,series,ephemerisLongitudeAt,options){
  }
  return grouped.map(g=>Object.assign({},g.anchor,{observations:g.observations}));
 }
+function buildPchipModel(anchors){
+ let cached=pchipModelCache.get(anchors);
+ if(cached)return cached;
+ const n=anchors.length;
+ if(!n)return null;
+ const x=anchors.map(q=>q.timestamp),y=new Array(n);
+ y[0]=anchors[0].residual;
+ for(let k=1;k<n;k++)y[k]=y[k-1]+signedDelta(y[k-1],anchors[k].residual);
+ const width=new Array(Math.max(0,n-1)),delta=new Array(Math.max(0,n-1));
+ for(let k=0;k<n-1;k++){width[k]=x[k+1]-x[k];delta[k]=width[k]>0?(y[k+1]-y[k])/width[k]:0;}
+ const slopes=new Array(n);
+ const endpoint=(h0,h1,d0,d1)=>{let m=((2*h0+h1)*d0-h0*d1)/(h0+h1);if(Math.sign(m)!==Math.sign(d0))m=0;else if(Math.sign(d0)!==Math.sign(d1)&&Math.abs(m)>Math.abs(3*d0))m=3*d0;return m;};
+ for(let k=0;k<n;k++){
+  if(k===0){slopes[k]=n>2?endpoint(width[0],width[1],delta[0],delta[1]):delta[0];continue;}
+  if(k===n-1){slopes[k]=n>2?endpoint(width[n-2],width[n-3],delta[n-2],delta[n-3]):delta[n-2];continue;}
+  const d0=delta[k-1],d1=delta[k],h0=width[k-1],h1=width[k];
+  if(d0===0||d1===0||Math.sign(d0)!==Math.sign(d1)){slopes[k]=0;continue;}
+  const w1=2*h1+h0,w2=h1+2*h0;
+  slopes[k]=(w1+w2)/(w1/d0+w2/d1);
+ }
+ cached={x,y,width,delta,slopes};
+ pchipModelCache.set(anchors,cached);
+ return cached;
+}
 function interpolateResidual(anchors,t){
  let lo=0,hi=anchors.length;
  while(lo<hi){const mid=(lo+hi)>>>1;if(anchors[mid].timestamp<t)lo=mid+1;else hi=mid;}
  if(lo<anchors.length&&anchors[lo].timestamp===t)return{residual:anchors[lo].residual,mode:'exact-reference-anchor',left:lo,right:lo};
  if(lo===0||lo===anchors.length)return null;
- const i=lo-1,a=anchors[i],b=anchors[i+1],h=b.timestamp-a.timestamp;
+ const model=buildPchipModel(anchors),i=lo-1,a=anchors[i],b=anchors[i+1],h=model.width[i];
  if(h<=0)return{residual:a.residual,mode:'duplicate-anchor-timestamp',left:i,right:i+1};
- const f=(t-a.timestamp)/h;
- // Shape-preserving PCHIP interpolation of angular residuals. Unwrap residuals
- // locally before calculating slopes so a ±180° representation boundary does
- // not create a false discontinuity.
- const n=anchors.length;
- const y=new Array(n);y[0]=anchors[0].residual;
- for(let k=1;k<n;k++)y[k]=y[k-1]+signedDelta(y[k-1],anchors[k].residual);
- const x=anchors.map(q=>q.timestamp);
- const delta=new Array(n-1),width=new Array(n-1);
- for(let k=0;k<n-1;k++){width[k]=x[k+1]-x[k];delta[k]=width[k]>0?(y[k+1]-y[k])/width[k]:0;}
- const endpoint=(h0,h1,d0,d1)=>{let m=((2*h0+h1)*d0-h0*d1)/(h0+h1);if(Math.sign(m)!==Math.sign(d0))m=0;else if(Math.sign(d0)!==Math.sign(d1)&&Math.abs(m)>Math.abs(3*d0))m=3*d0;return m;};
- const slope=k=>{
-  if(k===0)return n>2?endpoint(width[0],width[1],delta[0],delta[1]):delta[0];
-  if(k===n-1)return n>2?endpoint(width[n-2],width[n-3],delta[n-2],delta[n-3]):delta[n-2];
-  const d0=delta[k-1],d1=delta[k],h0=width[k-1],h1=width[k];
-  if(d0===0||d1===0||Math.sign(d0)!==Math.sign(d1))return 0;
-  const w1=2*h1+h0,w2=h1+2*h0;
-  return(w1+w2)/(w1/d0+w2/d1);
- };
- const m0=slope(i),m1=slope(i+1),f2=f*f,f3=f2*f;
- let value=(2*f3-3*f2+1)*y[i]+(f3-2*f2+f)*h*m0+(-2*f3+3*f2)*y[i+1]+(f3-f2)*h*m1;
- // PCHIP is shape-preserving; this final guard protects against floating-point
- // overshoot on nearly flat intervals.
- const low=Math.min(y[i],y[i+1]),high=Math.max(y[i],y[i+1]);
+ const f=(t-a.timestamp)/h,f2=f*f,f3=f2*f;
+ let value=(2*f3-3*f2+1)*model.y[i]+(f3-2*f2+f)*h*model.slopes[i]+(-2*f3+3*f2)*model.y[i+1]+(f3-f2)*h*model.slopes[i+1];
+ const low=Math.min(model.y[i],model.y[i+1]),high=Math.max(model.y[i],model.y[i+1]);
  value=Math.max(low,Math.min(high,value));
- return{residual:value,mode:'shape-preserving-pchip-residual',left:i,right:i+1,fraction:f,intervalResidualChangeDegrees:y[i+1]-y[i],interpolationSlopeDegreesPerMs:(value-y[i])/h};
+ return{residual:value,mode:'shape-preserving-pchip-residual',left:i,right:i+1,fraction:f,intervalResidualChangeDegrees:model.y[i+1]-model.y[i],interpolationSlopeDegreesPerMs:(value-model.y[i])/h};
+}
+function getAnchorDiagnostics(anchors){
+ let cached=anchorDiagnosticsCache.get(anchors);
+ if(!cached){
+  cached={
+   anchorResiduals:anchors.map(a=>({timestamp:a.timestamp,division:a.division,label:a.label,anchorCorrectionDegrees:a.residual,absoluteCorrectionDegrees:a.anchorDistanceDeg,direction:a.direction})),
+   maxAbsoluteAnchorCorrectionDegrees:Math.max(...anchors.map(a=>a.anchorDistanceDeg))
+  };
+  anchorDiagnosticsCache.set(anchors,cached);
+ }
+ return cached;
 }
 function directionAt(fn,planet,t,raw,epsilon,sampleMs){
  const a=raw,b=Number(fn(planet,t+sampleMs));
@@ -305,14 +321,14 @@ function create(config){
   const warnings=[];
   if(interpolation&&Math.abs(residual)>2)warnings.push('Interpolated correction exceeds 2 degrees; inspect ephemeris model and reference alignment.');
   if(interpolation&&Math.abs(residual)>cfg.maxAnchorCorrectionDeg)warnings.push('Correction exceeds configured safety threshold.');
-  const anchorResiduals=anchors.map(a=>({timestamp:a.timestamp,division:a.division,label:a.label,anchorCorrectionDegrees:a.residual,absoluteCorrectionDegrees:a.anchorDistanceDeg,direction:a.direction}));
+  const anchorDiagnostics=getAnchorDiagnostics(anchors);
   const observations=nearest?[...(nearest.before.observations||[nearest.before]),...(nearest.after.observations||[nearest.after])]:[];
   const consistency=observations.map(a=>({division:a.division,label:a.label,anchorLongitude:a.boundaryLongitude,correctionDegrees:a.residual}));
   return{
    engineVersion:VERSION,planet,timestamp:t,timestampISO:new Date(t).toISOString(),referenceVersion:state.version,
    rawEphemerisLongitude:rawLongitude,correctionDegrees:residual,reconstructedLongitude:details.longitude,
    position:details,motion,calibration:interpolation?{method:interpolation.mode,referenceAnchorCount:anchors.length,anchorBefore:nearest.before.timestamp,anchorAfter:nearest.after.timestamp,fraction:interpolation.fraction??0,anchorBeforeDivision:nearest.before.division,anchorAfterDivision:nearest.after.division,observedAnchorCorrections:consistency}: {method:'unanchored-ephemeris-fallback',referenceAnchorCount:anchors.length},
-   diagnostics:{warnings,referenceCoverage:{start:anchors[0].timestamp,end:anchors[anchors.length-1].timestamp},maxAbsoluteAnchorCorrectionDegrees:Math.max(...anchors.map(a=>a.anchorDistanceDeg)),anchorResiduals}
+   diagnostics:{warnings,referenceCoverage:{start:anchors[0].timestamp,end:anchors[anchors.length-1].timestamp},maxAbsoluteAnchorCorrectionDegrees:anchorDiagnostics.maxAbsoluteAnchorCorrectionDegrees,anchorResiduals:anchorDiagnostics.anchorResiduals}
   };
  }
  function calculateAll(input){
