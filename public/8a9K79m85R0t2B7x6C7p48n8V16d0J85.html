@@ -9135,9 +9135,7 @@ const result = section === 'planets'
   overlay.dataset.ready='1';
   const minimized=document.getElementById('jaGoodBadMinimized');
   const categories=[['dasha','Dasha'],['transit','Transit'],['varshphal','Varshphal'],['panchang','Panchang']];
-  const mac=/Mac|iPhone|iPad|iPod/i.test(navigator.platform||navigator.userAgent);
-  const shortcut=mac?'⌘ Command':'Ctrl';
-  document.getElementById('jaGoodBadShortcutLabel').textContent=shortcut;
+  document.getElementById('jaGoodBadShortcutLabel').textContent='G';
   let lastFocus=null;
   const normalize=value=>Array.isArray(value)?value:[];
   function renderSide(side,data){
@@ -9186,7 +9184,12 @@ const result = section === 'planets'
   minimized.addEventListener('click',open);
   document.addEventListener('keydown',function(e){
     const key=String(e.key||'').toLowerCase();
-    if((e.ctrlKey||e.metaKey)&&e.shiftKey&&key==='g'&&!e.altKey){
+    const target=e.target;
+    const editable=target && (
+      target.isContentEditable ||
+      (target.closest && target.closest('[contenteditable="true"],[role="textbox"],input,textarea,select'))
+    );
+    if(key==='g'&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.shiftKey&&!e.repeat&&!e.isComposing&&!editable){
       e.preventDefault();e.stopPropagation();toggle();return;
     }
     if(key==='escape'&&!overlay.hidden){e.preventDefault();e.stopPropagation();minimize();}
