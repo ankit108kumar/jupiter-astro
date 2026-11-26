@@ -2248,8 +2248,16 @@
       durationToastElement.className = "jtt-duration-toast";
       durationToastElement.setAttribute("role", "status");
       durationToastElement.setAttribute("aria-live", "polite");
-      document.body.appendChild(durationToastElement);
     }
+
+    // Native fullscreen content is promoted to the browser's top layer.
+    // A body-level sibling cannot paint above it, regardless of z-index.
+    // Keep the toast inside the fullscreen Timeline when fullscreen is active.
+    var toastHost = document.fullscreenElement === windowEl ? windowEl : document.body;
+    if (durationToastElement.parentNode !== toastHost) {
+      toastHost.appendChild(durationToastElement);
+    }
+
     durationToastElement.textContent = durationStatusText;
     durationToastElement.classList.toggle("is-incomplete", durationStatusText.indexOf("Duration incomplete") === 0);
     durationToastElement.classList.remove("is-visible");
