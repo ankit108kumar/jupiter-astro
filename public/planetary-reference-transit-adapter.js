@@ -45,7 +45,7 @@ function dateLabel(ms){
 }
 function showLatestStatus(){
  if(!latestStatus||!root.JAInfoToast||typeof root.JAInfoToast.show!=='function')return;
- root.JAInfoToast.show(latestStatus.message,{source:'planetary-verification',priority:3,duration:5500,variant:latestStatus.state==='warning'?'warning':'success',position:'bottom'});
+ root.JAInfoToast.show(latestStatus.message,{source:'planetary-verification',priority:3,duration:5500,variant:latestStatus.state==='warning'?'warning':'success',position:'bottom',remember:true});
 }
 function showStatus(result,elapsed,scope){
  const durations=Array.from(new Set([...(result.timelineUpdated||[]),...timelineUpdated])).sort();
