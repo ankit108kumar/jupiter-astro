@@ -1,10 +1,10 @@
-/* JupiterAstro planetary reference adapter — global natal + transit reconciliation.
- * Existing ephemeris longitudes are retained unchanged. JSON/hybrid references
- * supply corrected Sign, Nakshatra, Navamsa classifications and intervals.
+/* JupiterAstro planetary reference adapter — all-nine-planet natal + transit reconciliation.
+ * Existing ephemeris longitudes remain unchanged. Each division uses reference data
+ * only when that exact planet/date/division is covered; otherwise the live engine is retained.
  */
 (function(root){
 'use strict';
-const PLANETS=['Saturn','Jupiter','Rahu','Ketu'];
+const PLANETS=['Saturn','Jupiter','Rahu','Ketu','Mars','Mercury','Venus','Sun','Moon'];
 const DIVISIONS=['Sign','Nakshatra','Navamsa'];
 const SIGNS=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
 const NAK=['Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu','Pushya','Ashlesha','Magha','Purva Phalguni','Uttara Phalguni','Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha','Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishta','Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'];
@@ -77,9 +77,10 @@ function showStatus(result,elapsed,scope){
   Transit:latestByScope.Transit||null
  };
  const labelList=(items)=>items&&items.length?items.join(', '):'—';
+ const fallbackList=(map)=>Object.entries(map||{}).map(([planet,divisions])=>planet+' ('+divisions.join('/')+')').join(', ')||'—';
  const contextLine=(name,item)=>{
   if(!item)return name+': pending';
-  return name+' — Verified: '+labelList(item.verified)+' · Updated: '+labelList(item.updated)+' · No data: '+labelList(item.unavailable)+(item.partial&&item.partial.length?' · Partial: '+labelList(item.partial):'');
+  return name+' — Verified: '+labelList(item.verified)+' · Updated: '+labelList(item.updated)+' · No data: '+labelList(item.unavailable)+(item.partial&&item.partial.length?' · Partial: '+labelList(item.partial):'')+' · Engine fallback: '+fallbackList(item.fallbackByPlanet);
  };
  const hasContexts=!!(contexts.Natal||contexts.Transit);
  const errors=result.errors||[];
@@ -87,7 +88,7 @@ function showStatus(result,elapsed,scope){
  const firstLine=hasContexts?heading+' · '+contextLine('Natal',contexts.Natal):heading+' · '+(scope||'Chart');
  const secondLine=hasContexts
   ? contextLine('Transit',contexts.Transit)+' · Timeline durations: '+labelList(durations)+' · '+Math.max(0,elapsed).toFixed(1)+' ms · Checked: '+dateLabel(Date.now())
-  : 'Verified: '+labelList(result.verified)+' · Updated: '+labelList(result.updated)+' · No data: '+labelList(result.unavailable)+(result.partial&&result.partial.length?' · Partial: '+labelList(result.partial):'')+' · Timeline durations: '+labelList(durations)+' · '+Math.max(0,elapsed).toFixed(1)+' ms · Checked: '+dateLabel(Date.now());
+  : 'Verified: '+labelList(result.verified)+' · Updated: '+labelList(result.updated)+' · No data: '+labelList(result.unavailable)+(result.partial&&result.partial.length?' · Partial: '+labelList(result.partial):'')+' · Engine fallback: '+fallbackList(result.fallbackByPlanet)+' · Timeline durations: '+labelList(durations)+' · '+Math.max(0,elapsed).toFixed(1)+' ms · Checked: '+dateLabel(Date.now());
  const warning=errors.length||(result.unavailable||[]).length||(result.partial||[]).length;
  latestStatus={state:warning?'warning':'ready',title:firstLine+'\n'+secondLine,html:'<span class="ja-pr-line"><strong>'+escapeHtml(firstLine)+'</strong></span><span class="ja-pr-line">'+escapeHtml(secondLine)+'</span>'};
  lastStatusModel={result,elapsed,scope};
@@ -110,20 +111,28 @@ async function getEngine(){
 function makePositions(positions,results){
  const out={};for(const p of Object.keys(positions||{})){
   const original=positions[p],copy=Object.assign({},original);
-  const item=results&&results[p],labels={},indices={},intervals={};
+  const item=results&&results[p],labels={},indices={},intervals={},divisionStatus={};
   if(item){
    for(const d of DIVISIONS){
     const row=item.divisions&&item.divisions[d.toLowerCase()];
     const label=row&&row.reference?row.final:null;
+    divisionStatus[d]={
+     verified:!!(label&&(row.status==='covered'||row.status==='coverage-open-ended')),
+     fallback:!label,
+     source:row&&row.referenceSource||null,
+     reason:row&&row.fallbackReason||(!label&&row&&row.status)||null
+    };
     if(label){labels[d]=label;intervals[d]=row;
      if(d==='Sign')indices.sign=signIndex(label);
      if(d==='Nakshatra'){const q=nakInfo(label);if(q){indices.nakshatra=q.i;indices.pada=q.pada;}}
      if(d==='Navamsa')indices.navamsa=signIndex(label);
     }
    }
+   if(Number.isInteger(indices.nakshatra)&&Number.isInteger(indices.navamsa)&&!Number.isInteger(indices.pada))indices.pada=padaFromNakshatraAndNavamsa(indices.nakshatra,indices.navamsa);
+   const verifiedDivisions=DIVISIONS.filter(d=>divisionStatus[d].verified);
+   const fallbackDivisions=DIVISIONS.filter(d=>divisionStatus[d].fallback);
+   copy.jaReference={labels,indices,intervals,divisionStatus,verified:verifiedDivisions.length===DIVISIONS.length,verifiedDivisions,fallbackDivisions};
   }
-  if(Number.isInteger(indices.nakshatra)&&Number.isInteger(indices.navamsa)&&!Number.isInteger(indices.pada))indices.pada=padaFromNakshatraAndNavamsa(indices.nakshatra,indices.navamsa);
-  if(Object.keys(labels).length)copy.jaReference={labels,indices,intervals,verified:true};
   out[p]=copy;
  }
  return out;
@@ -139,28 +148,30 @@ async function reconcilePositions(positions,timestamp,scope,options){
   if(!payload){
    const calculated={};
    PLANETS.forEach(p=>{if(positions[p]&&Number.isFinite(positions[p].lon))calculated[p]=currentLabels(p,positions[p].lon);});
-   const result={results:{},errors:{}};await Promise.all(PLANETS.map(async p=>{try{result.results[p]=await e.verify({planet:p,timestamp:at,calculated:calculated[p]||{},ephemerisLongitudeAt:longitudeAt,ephemerisVersion:EPHEMERIS_VERSION});}catch(error){result.errors[p]={code:error.code||'ERROR',message:error.message};}}));
-   const verified=[],updated=[],unavailable=[],partial=[],errors=[];
+   const result={results:{},errors:{}};await Promise.all(PLANETS.map(async p=>{try{result.results[p]=await e.verify({planet:p,timestamp:at,calculated:calculated[p]||{},ephemerisLongitudeAt:longitudeAt,ephemerisVersion:EPHEMERIS_VERSION,hybridNavamsa:p==='Sun'||p==='Moon'});}catch(error){result.errors[p]={code:error.code||'ERROR',message:error.message};}}));
+   const verified=[],updated=[],unavailable=[],partial=[],errors=[],fallbackByPlanet={};
    PLANETS.forEach(p=>{
     const item=result.results&&result.results[p];
-    if(!item){unavailable.push(p);errors.push((result.errors&&result.errors[p]&&result.errors[p].message)||p+' verification unavailable');return;}
+    if(!item){unavailable.push(p);fallbackByPlanet[p]=DIVISIONS.slice();errors.push((result.errors&&result.errors[p]&&result.errors[p].message)||p+' verification unavailable');return;}
     const supported=DIVISIONS.map(d=>item.divisions&&item.divisions[d.toLowerCase()]).filter(Boolean);
-    const covered=supported.filter(x=>x.reference&&x.status!=='coverage-open-ended');
+    const covered=supported.filter(x=>x.reference&&(x.status==='covered'||x.status==='coverage-open-ended'));
+    const missingDivisions=DIVISIONS.filter(d=>{const row=item.divisions&&item.divisions[d.toLowerCase()];return !row||!row.reference||(row.status!=='covered'&&row.status!=='coverage-open-ended');});
+    if(missingDivisions.length)fallbackByPlanet[p]=missingDivisions;
     if(covered.length===DIVISIONS.length)verified.push(p);
     else if(covered.length)partial.push(p);
     else unavailable.push(p);
     if(supported.some(x=>x.corrected))updated.push(p);
    });
-   payload={results:result.results||{},verified,updated,unavailable,partial,errors,version:e.getDiagnostics().version};
+   payload={results:result.results||{},verified,updated,unavailable,partial,fallbackByPlanet,errors,version:e.getDiagnostics().version};
    CACHE.set(cacheKey,payload);while(CACHE.size>40)CACHE.delete(CACHE.keys().next().value);
   }
   if(scope==='Natal'||scope==='Transit')latestByScope[scope]=payload;
   const out=makePositions(positions,payload.results),elapsed=nowMs()-start;
   if(token===requestSequence&&!options.silent)showStatus(payload,elapsed,scope);
-  return{positions:out,results:payload.results,verified:payload.verified.slice(),updated:payload.updated.slice(),unavailable:(payload.unavailable||[]).slice(),partial:(payload.partial||[]).slice(),errors:payload.errors.slice(),elapsedMs:elapsed,referenceVersion:payload.version};
+  return{positions:out,results:payload.results,verified:payload.verified.slice(),updated:payload.updated.slice(),unavailable:(payload.unavailable||[]).slice(),partial:(payload.partial||[]).slice(),fallbackByPlanet:Object.assign({},payload.fallbackByPlanet||{}),errors:payload.errors.slice(),elapsedMs:elapsed,referenceVersion:payload.version};
  }catch(error){
   const elapsed=nowMs()-start;
-  const failed={verified:[],updated:[],unavailable:PLANETS.slice(),partial:[],errors:[error.message]};
+  const failed={verified:[],updated:[],unavailable:PLANETS.slice(),partial:[],fallbackByPlanet:Object.fromEntries(PLANETS.map(p=>[p,DIVISIONS.slice()])),errors:[error.message]};
   if(scope==='Natal'||scope==='Transit')latestByScope[scope]=failed;
   if(token===requestSequence&&!options.silent)showStatus(failed,elapsed,scope);
   console.error('JupiterAstro planetary reference verification failed:',error);
@@ -172,7 +183,7 @@ function getInterval(planet,division,timestamp){
  const at=Number(timestamp);
  if(at!==timelineTimestamp){timelineTimestamp=at;timelineUpdated.clear();scheduleTimelineStatusRefresh();}
  try{
-  const q=engine.getTransitReference(planet,division,at,longitudeAt,EPHEMERIS_VERSION);
+  const q=engine.getTransitReference(planet,division,at,longitudeAt,EPHEMERIS_VERSION,{hybridNavamsa:division==='Navamsa'&&(planet==='Sun'||planet==='Moon')});
   if(!q||q.startMs==null||q.endMs==null||!Number.isFinite(Number(q.startMs))||!Number.isFinite(Number(q.endMs)))return null;
   if(Number(q.startMs)>at||Number(q.endMs)<=at)return null;
   timelineUpdated.add(planet+' '+division);
@@ -181,7 +192,7 @@ function getInterval(planet,division,timestamp){
  }catch(e){return null;}
 }
 root.JAPlanetaryReconciliation=Object.freeze({
- version:'2.0.0',planets:PLANETS,divisions:DIVISIONS,init:getEngine,
+ version:'2.1.0',planets:PLANETS,divisions:DIVISIONS,init:getEngine,
  reconcilePositions,getInterval,showStatus:showStatus
 });
 })(window);
