@@ -77,7 +77,7 @@ function showStatus(result,elapsed,scope){
   Transit:latestByScope.Transit||null
  };
  const labelList=(items)=>items&&items.length?items.join(', '):'—';
- const correctionList=(items)=>items&&items.length?items.join(', '):'No correction required';
+ const correctionList=(items)=>items&&items.length?items.join(', '):'No change in Sign, Nakshatra or Navamsa required';
  const fallbackList=(map)=>Object.entries(map||{}).map(([planet,divisions])=>planet+' ('+divisions.join('/')+')').join(', ')||'—';
  const contextLine=(name,item)=>{
   if(!item)return name+': pending';
