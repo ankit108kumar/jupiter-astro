@@ -1253,6 +1253,13 @@
       "interpretation": "2H Planet is very lucky, but if 10H is empty, it will not give good result as it will be sleeping. It will have to be activated for getting its good result.",
       "status": "Sleeping when the 10th House is empty",
       "activation_required_when_sleeping": true
+    },
+    {
+      "id": "10h-planet-result-like-saturn-condition",
+      "title": "Any planet in the 10th House",
+      "house": 10,
+      "rule": "Planet in 10H will give result like 'condition of Saturn' in Varshphal / chart.",
+      "interpretation": "A planet placed in the 10th House will give its result according to the condition of Saturn in the Varshphal chart."
     }
   ]
 }
