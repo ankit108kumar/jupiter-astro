@@ -740,3 +740,6 @@ body:has(#ja-transit-timeline-launcher.visible) #ja-panchang-minimized-launcher 
 .ja-panchang-dot:hover::after, .ja-panchang-dot:focus-visible::after { opacity: .55; transform: scale(1.12); }
 .ja-panchang-dot:focus-visible { outline: 2px solid var(--saffron, #EA580C); outline-offset: 4px; }
 .ja-panchang-modal[hidden] { display: none !important; }
+
+/* Shared bottom-right minimized-window stack overrides. */
+#ja-panchang-minimized-launcher{z-index:2147483007}
