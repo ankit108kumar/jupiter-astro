@@ -96,19 +96,20 @@ function labelMatchesNavamsa(label,index){
  const wanted=signIndex(label);
  return wanted>=0&&wanted===navSignForSegment(index);
 }
-function longitudeForEvent(label,division,rawLongitude){
+function longitudeForEvent(label,division,rawLongitude,direction){
+ const retrograde=direction==='retrograde';
  if(division==='Sign'){
   const i=signIndex(label);
   if(i<0)throw fail('Unrecognized Sign label: '+label,'UNKNOWN_SIGN');
-  return i*SIGN_SPAN;
+  return mod((i+(retrograde?1:0))*SIGN_SPAN);
  }
  if(division==='Nakshatra'){
   const i=nakIndex(label);
   if(i<0)throw fail('Unrecognized Nakshatra label: '+label,'UNKNOWN_NAKSHATRA');
-  return i*NAK_SPAN;
+  return mod((i+(retrograde?1:0))*NAK_SPAN);
  }
  const candidates=[];
- for(let i=0;i<108;i++)if(labelMatchesNavamsa(label,i))candidates.push(i*NAV_SPAN);
+ for(let i=0;i<108;i++)if(labelMatchesNavamsa(label,i))candidates.push(mod((i+(retrograde?1:0))*NAV_SPAN));
  if(!candidates.length)throw fail('Unrecognized Navamsa sign label: '+label,'UNKNOWN_NAVAMSA');
  let best=candidates[0],distance=Infinity;
  for(const candidate of candidates){
@@ -170,6 +171,8 @@ function upperBound(events,t){
 }
 function collectAnchors(planet,series,ephemerisLongitudeAt,options){
  const all=[];
+ const directionSampleMs=options.directionSampleMs||60000;
+ const directionEpsilon=options.stationaryEpsilonDeg??1e-8;
  for(const division of DIVISIONS){
   const events=series[division]||[];
   for(const event of events){
@@ -177,10 +180,16 @@ function collectAnchors(planet,series,ephemerisLongitudeAt,options){
    try{raw=Number(ephemerisLongitudeAt(planet,event.enteredAtUTC));}catch(e){options.onWarning&&options.onWarning('Ephemeris failed at '+event.enteredAt+': '+e.message);continue;}
    if(!Number.isFinite(raw))continue;
    raw=mod(raw);
+   let direction='unknown';
    try{
-    const boundary=longitudeForEvent(event.label,division,raw);
+    const before=Number(ephemerisLongitudeAt(planet,event.enteredAtUTC-directionSampleMs));
+    const after=Number(ephemerisLongitudeAt(planet,event.enteredAtUTC+directionSampleMs));
+    if(Number.isFinite(before)&&Number.isFinite(after)){const movement=signedDelta(mod(before),mod(after));direction=Math.abs(movement)<=directionEpsilon?'stationary':movement<0?'retrograde':'direct';}
+   }catch(_){}
+   try{
+    const boundary=longitudeForEvent(event.label,division,raw,direction);
     const residual=signedDelta(raw,boundary);
-    all.push({timestamp:event.enteredAtUTC,rawLongitude:raw,boundaryLongitude:boundary,residual,division,label:event.label,source:'json',priority:division==='Sign'?3:division==='Nakshatra'?2:1,anchorDistanceDeg:Math.abs(residual),rowIndex:event.rowIndex});
+    all.push({timestamp:event.enteredAtUTC,rawLongitude:raw,boundaryLongitude:boundary,residual,division,label:event.label,direction,source:'json',priority:division==='Sign'?3:division==='Nakshatra'?2:1,anchorDistanceDeg:Math.abs(residual),rowIndex:event.rowIndex});
    }catch(e){options.onWarning&&options.onWarning(planet+'.'+division+': '+e.message);}
   }
  }
@@ -216,7 +225,7 @@ function directionAt(fn,planet,t,raw,epsilon,sampleMs){
 }
 function create(config){
  config=config||{};
- const cfg={url:config.url||'/data/Planetary%20Transit%20correction%20v4.json',cache:config.cache!==false,cacheKey:config.cacheKey||'JA_LONGITUDE_REFERENCE_V1',sampleMs:config.sampleMs||21600000,stationaryEpsilonDeg:config.stationaryEpsilonDeg??0.00001,maxAnchorCorrectionDeg:config.maxAnchorCorrectionDeg??15};
+ const cfg={url:config.url||'/data/Planetary%20Transit%20correction%20v4.json',cache:config.cache!==false,cacheKey:config.cacheKey||'JA_LONGITUDE_REFERENCE_V1',sampleMs:config.sampleMs||21600000,stationaryEpsilonDeg:config.stationaryEpsilonDeg??0.00001,maxAnchorCorrectionDeg:config.maxAnchorCorrectionDeg??15,directionSampleMs:config.directionSampleMs||60000};
  let database=null,state=null,loading=null;
  async function init(input){
   input=input||{};
@@ -251,7 +260,7 @@ function create(config){
   if(typeof input.ephemerisLongitudeAt!=='function')throw fail('Provide ephemerisLongitudeAt(planet, epochMs)','MISSING_EPHEMERIS_CALLBACK');
   const t=timestampMs(input.timestamp),series=state.index[planet];
   if(!series)throw fail('No reference series for '+planet,'MISSING_PLANET_SERIES');
-  const anchors=collectAnchors(planet,series,input.ephemerisLongitudeAt,{onWarning:input.onWarning});
+  const anchors=collectAnchors(planet,series,input.ephemerisLongitudeAt,{onWarning:input.onWarning,directionSampleMs:input.directionSampleMs||cfg.directionSampleMs,stationaryEpsilonDeg:cfg.stationaryEpsilonDeg});
   if(!anchors.length)throw fail('No usable angular anchors for '+planet,'NO_USABLE_ANCHORS');
   const interpolation=interpolateResidual(anchors,t);
   const raw=Number(input.ephemerisLongitudeAt(planet,t));
@@ -267,7 +276,7 @@ function create(config){
   const warnings=[];
   if(interpolation&&Math.abs(residual)>2)warnings.push('Interpolated correction exceeds 2 degrees; inspect ephemeris model and reference alignment.');
   if(interpolation&&Math.abs(residual)>cfg.maxAnchorCorrectionDeg)warnings.push('Correction exceeds configured safety threshold.');
-  const anchorResiduals=anchors.map(a=>({timestamp:a.timestamp,division:a.division,label:a.label,anchorCorrectionDegrees:a.residual,absoluteCorrectionDegrees:a.anchorDistanceDeg}));
+  const anchorResiduals=anchors.map(a=>({timestamp:a.timestamp,division:a.division,label:a.label,anchorCorrectionDegrees:a.residual,absoluteCorrectionDegrees:a.anchorDistanceDeg,direction:a.direction}));
   const observations=nearest?[...(nearest.before.observations||[nearest.before]),...(nearest.after.observations||[nearest.after])]:[];
   const consistency=observations.map(a=>({division:a.division,label:a.label,anchorLongitude:a.boundaryLongitude,correctionDegrees:a.residual}));
   return{
