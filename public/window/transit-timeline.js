@@ -11,51 +11,6 @@
   if (window.__JA_TRANSIT_TIMELINE_LOADED) return;
   window.__JA_TRANSIT_TIMELINE_LOADED = true;
 
-  function ensureInfoToastService() {
-    if (window.JAInfoToast && typeof window.JAInfoToast.show === "function") return window.JAInfoToast;
-    var node = null, timer = null;
-    function hide() {
-      if (timer) window.clearTimeout(timer);
-      timer = null;
-      if (!node) return;
-      node.classList.remove("is-visible");
-      if (typeof node.hidePopover === "function") {
-        try { if (node.matches(":popover-open")) node.hidePopover(); } catch (error) {}
-      }
-    }
-    function promote() {
-      if (!node || !node.classList.contains("is-visible") || typeof node.showPopover !== "function") return;
-      try { if (node.matches(":popover-open")) node.hidePopover(); node.showPopover(); } catch (error) {}
-    }
-    function show(message, options) {
-      options = options || {};
-      if (!node || !node.isConnected) {
-        node = document.createElement("div");
-        node.className = "ja-info-toast";
-        node.setAttribute("popover", "manual");
-        node.setAttribute("role", "status");
-        node.setAttribute("aria-live", "polite");
-        document.body.appendChild(node);
-      }
-      node.textContent = String(message || "");
-      node.classList.toggle("is-warning", options.variant === "warning");
-      node.classList.remove("is-visible");
-      if (typeof node.showPopover === "function") {
-        try { if (node.matches(":popover-open")) node.hidePopover(); node.showPopover(); } catch (error) {}
-      }
-      void node.offsetWidth;
-      node.classList.add("is-visible");
-      if (timer) window.clearTimeout(timer);
-      timer = window.setTimeout(hide, Math.max(500, Number(options.duration) || 2000));
-    }
-    document.addEventListener("fullscreenchange", function () {
-      if (node && node.classList.contains("is-visible")) window.requestAnimationFrame(promote);
-    });
-    window.addEventListener("pagehide", hide);
-    window.JAInfoToast = { show: show, hide: hide };
-    return window.JAInfoToast;
-  }
-
   var WINDOW_ID = "ja-transit-timeline-window";
   var LAUNCHER_ID = "ja-transit-timeline-launcher";
   var THEME_KEY = "ja-transit-timeline-theme-mode";
@@ -2287,7 +2242,7 @@
   var durationStatusSignature = null;
 
   function showDurationStatusToast() {
-    ensureInfoToastService().show(durationStatusText, {
+    window.JAInfoToast.show(durationStatusText, {
       variant: durationStatusText.indexOf("Duration incomplete") === 0 ? "warning" : "success",
       duration: 2000
     });
