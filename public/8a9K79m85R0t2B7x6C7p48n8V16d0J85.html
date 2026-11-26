@@ -1747,6 +1747,8 @@ function getTransitTimelineTableData(k, evalMs) {
     birthMs,
     isPrashnaChart: /prashna/i.test(String(chartTitle)),
     referenceMoonNakshatra: NAK[natalMoonNak][0],
+    // Reuse the exact natal Chara Karaka assignments rendered in the Overview P planet table.
+    charaKarakas: Object.fromEntries(k.karakas.map(item => [item.planet, item.code])),
     moonTransitCount: rows.find(row => row.planet === 'Moon')?.countFromJanmaNakshatra || null,
     chartTitle,
     rows
