@@ -770,6 +770,12 @@
         ? '<sup class="jtt-planet-markers">[' + row.markers.map(escapeTableText).join("][") + ']</sup>'
         : '';
       var nakshatraLord = abbreviations[row.nakshatraLord] || '';
+      var charaKarakaCode = data.charaKarakas && data.charaKarakas[row.planet];
+      var charaKarakaLabel = charaKarakaCode ? String(charaKarakaCode).slice(0, 2) : '';
+      charaKarakaLabel = charaKarakaLabel ? charaKarakaLabel.charAt(0).toUpperCase() + charaKarakaLabel.slice(1).toLowerCase() : '';
+      var charaKarakaMarkup = charaKarakaLabel
+        ? ' <span class="jtt-chara-karaka" title="' + escapeTableText(charaKarakaCode) + '">' + escapeTableText(charaKarakaLabel) + '</span>'
+        : '';
       var nakshatraName = normalizeLattaNakshatra(row.nakshatra);
       var lattaSources = nakshatraName ? (lattaHits[nakshatraName] || []) : [];
       var lattaMarker = lattaSources.length
@@ -789,7 +795,7 @@
       var navamsaNumber = Number.isFinite(Number(row.navamsaIndex)) ? Number(row.navamsaIndex) : '';
 
       return '<tr>' +
-        '<td class="jtt-planet-cell"><strong class="jtt-planet-signification-trigger" tabindex="0" role="button" aria-label="View ' + escapeTableText(row.planet) + ' signification">' + escapeTableText(row.planet) + '</strong>' + markers + '</td>' +
+        '<td class="jtt-planet-cell"><strong class="jtt-planet-signification-trigger" tabindex="0" role="button" aria-label="View ' + escapeTableText(row.planet) + ' signification">' + escapeTableText(row.planet) + '</strong>' + charaKarakaMarkup + markers + '</td>' +
         '<td class="jtt-sign-cell">' + renderDurationCell(row.signDuration, escapeTableText(row.sign), 'Sign duration') + '</td>' +
         '<td class="jtt-house-cell">' + houseScore(row.fromLagna, row.sav, 'sav', row.planet, 'lagna') + '</td>' +
         '<td class="jtt-house-cell">' + houseScore(row.fromMoon, row.bav, 'bav', row.planet, 'moon') + '</td>' +
