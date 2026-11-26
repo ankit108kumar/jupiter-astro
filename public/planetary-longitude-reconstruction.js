@@ -1,5 +1,5 @@
 /* JupiterAstro — Reference-Anchored Planetary Longitude Reconstruction
- * v1.0.0
+ * v1.2.0
  *
  * Reconstructs sidereal longitude using the timestamps in the Planetary Transit
  * correction v4 JSON database as angular anchors:
