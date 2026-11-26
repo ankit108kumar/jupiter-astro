@@ -2246,27 +2246,43 @@
     if (!durationToastElement) {
       durationToastElement = document.createElement("div");
       durationToastElement.className = "jtt-duration-toast";
+      durationToastElement.setAttribute("popover", "manual");
       durationToastElement.setAttribute("role", "status");
       durationToastElement.setAttribute("aria-live", "polite");
-    }
-
-    // Native fullscreen content is promoted to the browser's top layer.
-    // A body-level sibling cannot paint above it, regardless of z-index.
-    // Keep the toast inside the fullscreen Timeline when fullscreen is active.
-    var toastHost = document.fullscreenElement === windowEl ? windowEl : document.body;
-    if (durationToastElement.parentNode !== toastHost) {
-      toastHost.appendChild(durationToastElement);
+      document.body.appendChild(durationToastElement);
+    } else if (!durationToastElement.isConnected) {
+      document.body.appendChild(durationToastElement);
     }
 
     durationToastElement.textContent = durationStatusText;
     durationToastElement.classList.toggle("is-incomplete", durationStatusText.indexOf("Duration incomplete") === 0);
+
+    // A manual popover is promoted to the browser top layer. Unlike z-index,
+    // this reliably places the toast above the Timeline, fullscreen content,
+    // sticky table headers and the site's other stacking contexts.
+    if (typeof durationToastElement.showPopover === "function") {
+      try {
+        if (!durationToastElement.matches(":popover-open")) {
+          durationToastElement.showPopover();
+        }
+      } catch (error) {
+        // Retain the fixed-position fallback for browsers with partial support.
+      }
+    }
+
     durationToastElement.classList.remove("is-visible");
-    // Restart the entrance transition even when the same status is shown again.
     void durationToastElement.offsetWidth;
     durationToastElement.classList.add("is-visible");
+
     if (durationToastTimer) window.clearTimeout(durationToastTimer);
     durationToastTimer = window.setTimeout(function () {
-      if (durationToastElement) durationToastElement.classList.remove("is-visible");
+      if (!durationToastElement) return;
+      durationToastElement.classList.remove("is-visible");
+      if (typeof durationToastElement.hidePopover === "function") {
+        try {
+          if (durationToastElement.matches(":popover-open")) durationToastElement.hidePopover();
+        } catch (error) {}
+      }
     }, 2000);
   }
 
