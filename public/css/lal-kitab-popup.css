@@ -677,3 +677,42 @@ body.ja-lk-popup-open { overflow: hidden; }
   align-items: center;
   gap: 8px;
 }
+
+
+/* Pin the macOS window controls to the true left edge, independent of flex ordering. */
+.ja-lk-popup-titlebar {
+  position: relative;
+}
+.ja-lk-popup-titlebar > .ja-lk-window-controls {
+  position: absolute !important;
+  left: 14px !important;
+  right: auto !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 3;
+  margin: 0 !important;
+}
+.ja-lk-popup-titlebar > .ja-lk-window-title {
+  position: absolute !important;
+  left: 50% !important;
+  right: auto !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: max-content;
+  max-width: calc(100% - 300px);
+  z-index: 1;
+}
+.ja-lk-popup-titlebar > .ja-lk-titlebar-tools {
+  position: absolute !important;
+  right: 14px !important;
+  left: auto !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 3;
+  margin: 0 !important;
+}
+@media (max-width: 760px) {
+  .ja-lk-popup-titlebar > .ja-lk-window-controls { left: 9px !important; }
+  .ja-lk-popup-titlebar > .ja-lk-titlebar-tools { right: 9px !important; }
+  .ja-lk-popup-titlebar > .ja-lk-window-title { max-width: calc(100% - 230px); }
+}
