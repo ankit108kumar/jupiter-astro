@@ -1,0 +1,536 @@
+{
+  "title": "Remedies of Planet in Houses (Lal Kitab)",
+  "source_file": "Pasted markdown(20261126-151642).md",
+  "schema_version": "1.0.0",
+  "column_semantics": {
+    "precautions_symptoms": "Combined source column 'Precaution/Symptoms'; intentionally kept as one field.",
+    "remedies": "Source column 'Remedy'."
+  },
+  "preservation_notes": "Cell contents retain their original Markdown/HTML formatting and wording. Planet-level notes outside the 1H–12H rows are stored in additional_notes.",
+  "planets": {
+    "jupiter": {
+      "houses": {
+        "1H": {
+          "precautions_symptoms": "Father and Native - Very **Intelligent**.<br>   (Wise, Thyroid problems, Chubby, Liver problem, Weight issue, Good   Consultant, Turmoil every 8 year)",
+          "remedies": "a). Frame your Degree OR Marksheet and hang on **Eastern**   Wall. [East 1H]<br>   b). **Wear Gold   Chain** and Apply Kesar Tilak."
+        },
+        "2H": {
+          "precautions_symptoms": "**Avoid non-Veg food and Liquor.**<br>   (Lives in Joint Family, Sweet talker/Sycophant, not on ground floor; Liar, in   Nuclear Family when Jupiter bad; Piggybank, Shankh, Swing, Shellfish etc. in   house; Liver/Stomach disease - expenses shoot up; Sewer line/Seepage problem,   around house)",
+          "remedies": "a). Patisha Square (of Yellow colour) **not** made of milk,   offer to a female *who* *has been married for less than forty (40)   days*. [Venus] <br>[Less than 40 days = female not pregnant]<br>[Pregnant Female = Moon]"
+        },
+        "3H": {
+          "precautions_symptoms": "a). **Broken Umbrella at home. Remove it**.<br>   b). Minimum three (03) pressure cookers at home.<br>   c). Large Brass Vessels at home which are **not** used.<br>**(Use   it or throw it)**<br>   d). School / Education Institute / Tuition Centre near home (within 1 km).<br>   (Never do enmity with Ju 3/3H native, 3 doors/windows/cookers; Heart attack,   paralysis and brain stroke in family).<br>   What is the Signification of Breaking Down of Umbrella? Should Large Brass   Vessels be thrown out of house? Yes.",
+          "remedies": "a). Recite **DURGA CHALISA**.<br>   b). Gift **Besan Laddoo** to Young Girls (Mercury) less than twelve (12)   years old, if someone loses focus and efforts even when Jupiter in 3H."
+        },
+        "4H": {
+          "precautions_symptoms": "a). **Never donate Books / Spiritual Books.**<br>As Jupiter exalted in 4&#x48;**)**<br>   b). Their house at least has a **big hall** (garden/lawn etc.).<br>   c). Native likes Big house and Big vehicles.<br>   (Checks out the girls/women and judges own partner, Avoid Non-Veg, Liquor;   wear specs; Mother and Wife dont' go together; notices figures naturally)<br>",
+          "remedies": "a). If **10H is empty**. Wear RED VEST (Baniyan). If not   possible, put a red nail paint dot on the inner side of Vest.<br>   b). As Chest is 4H, so you are putting Mars in 4H to activate Jupiter. This   will make your Career amazingly good.<br>   c). **When Jupiter 4H and Rahu 12H** - Special Remedy - Take four (4) Square   pieces of LEAD and flow it in running water."
+        },
+        "5H": {
+          "precautions_symptoms": "**Distribute Prasad**   or Gifts in Temple, preferably every Tuesday.<br>   (Wish fulfilled by God, never collect money in name of Temple nor seek   anything even Prasad without giving anything in exchange; Lucky in Lottery,   Yellow Teeth)",
+          "remedies": "Offer five (05) Kgs of **Bundi Laddoo** (Ma + Ju + Me) in   Temple on Tuesday to Lord Hanuman and distribute them."
+        },
+        "6H": {
+          "precautions_symptoms": "There should be **no** **temple** at home. [6H, 7H, 10H]<br>   (Native gets insulted publicly, at least once; Skin Allergy, Breathing   Issues, Theft / Loss of Gold.)",
+          "remedies": "Wear Gold Band in little Finger of Left Hand. <br>*If friendly planets in 2H, 5H, 9H, 12H, Gold   will **not** be lost but Crisis will arrive*."
+        },
+        "7H": {
+          "precautions_symptoms": "a). There should be **no** **temple** at home. <br>(Idols - it ruins sex life)<br>   b). **Never go for adoption of a Child**. <br>If Jupiter in 7H, Partner is egoistic. <br>   c). They should **not** keep religious books at home.<br>   d). Do not donate for construction of Temple or for Temple.<br>   e). Do not buy yellow clothes in the Year when it comes in 7H in yearly   chart.<br>   (Native receives God Photos as Gift, which not be accepted. Don't keep Idols,   only photo. Donating Yellow Dhoti to Brahmin (as it will bring problems /   much troubles in your life).",
+          "remedies": "a). Ketu in 6H when Rahu in 12H and Jupiter in 7H then **Ketu will protect Jupiter**   to a large extent. [*Ketu in preceding house protects Jupiter*]<br>   b). Keep dried Red Chillies with stem in a yellow unstitched cloth, fold it   and keep it in home temple or Almirah.<br>   c). If you have done cloth donation, (place) offer 2Kg Chana Dal in temple   (only if Rahu is **not** in 2H)."
+        },
+        "8H": {
+          "precautions_symptoms": "a). Difficult to get Love and Affection of Grand Father.<br>   b). Relationship challenges. c). Long Disease.<br>(which doesn't affect longevity).<br>   (Jupiter gives blessing to native, Jupiter 8H solves problems of life, God   saves in time of crisis, don't fall into another's   problems while trying to save them, Money gets stuck with others; Lives separately   from father / or differences. If Miser, will be sad.)",
+          "remedies": "800 Grams Chana Dal or, Turmeric Roots in Temple. [or 8 pieces   of Turmeric Roots]"
+        },
+        "9H": {
+          "precautions_symptoms": "**Never donate books / spiritual books**.<br>   (Luck favours, follower of father; Living with father gives disagreement,   Don't keep Piggybank, Shellfish, Shankh, Swing etc. in home, Don't fall in   trap of Sadhu/Pandit) 9H – Own house of Jupiter, MT",
+          "remedies": "**Ganga Snan** every month. Dip   in Holi water."
+        },
+        "10H": {
+          "precautions_symptoms": "a). There should be **no** temple at home.<br>   b). **Native should never visit temple**.<br>   c). They should adopt smart ways and leave noble ways and behaviour.<br>   d). Even if they worship, never mix religion with profession.<br>   e). If ***Moon in 4H or 5H, One should not donate food&#x20;***&#x69;n Temple /   Gurudwara / Sadhu / Pandit / Pujari.<br>   (People exploit/misuse you at workplace, Don't keep God's photo at workplace;   Help and Forget; Don't beg anything anywhere including temple premises,   without giving anything in exchange - Else you will fall into Court Case;   Don't Collect Gold, Peepal tree nearby your house, give water to it except on   Sunday; Invest in property for Wealth creation).",
+          "remedies": "Ten (10) Copper Coins and Ten (10) pieces of Jaggery in River /   Canal [4H].<br> <br>(*Remedy for Sun 10H as well*)"
+        },
+        "11H": {
+          "precautions_symptoms": "a). 32 Teeth. Kali Juban.<br>   b). **If they curse someone, the curse comes true**.<br>   c). They see a lot of dead bodies on roads. (Ambulances).<br>   d). There is a temple / spiritual place near to their house.<br>   (Remedy required for full result, death away from home. Dead body was brought   to home. Peepal nearby house, water it except on Sunday)",
+          "remedies": "a). **Wear   a Gold chain**.<br>   b). Apply Kesar Tilak on forehead, tongue, neck and navel.<br>   c). Offer White Covering to an unclaimed dead body."
+        },
+        "12H": {
+          "precautions_symptoms": "**Do not wear any mala in neck or bracelet of   crystals etc. in hand.**<br>**&#x20; &#x20;**(Lots of unplanned expenditure, native never miser, spiderwebs   in house; Vastu Dosh in Main Gate / Windows, noise while opening/closing;   Throw away Copper utensils; Heart ailment / attack; Keep Bed in Good   shape / clean it well)",
+          "remedies": "a). **Wear   a Gold chain.**<br>   b). Apply Kesar Tilak on forehead, tongue, neck and navel."
+        }
+      },
+      "additional_notes": [
+        {
+          "source_label": "**&#xA0;**",
+          "precautions_symptoms": "**Jupiter 4H / 9H&#x20;**–   Never donate books / spiritual books.    [As Jupiter very good in this placement]<br>**Jupiter 6H / 7H/ 10H –&#x20;**&#x44;on’t   keep Temple (idols) at home. (10H – Never visit Temple)<br>**Jupiter 1H / 11H / 12H –&#x20;**&#x57;ear   Gold Chain.<br>KESAR TILAK – Jupiter in 12H / 11H / 1H",
+          "remedies": ""
+        },
+        {
+          "source_label": "**&#xA0;**",
+          "precautions_symptoms": "**JUPITER&#x20;**– Yellow colour,   Gold, Chana, Books (spiritual), Banana (+Ke),",
+          "remedies": ""
+        }
+      ]
+    },
+    "sun": {
+      "houses": {
+        "1H": {
+          "precautions_symptoms": "**Avoid SALT at   least on Sunday.** <br>   (Govt. Job to native, Family; related work/govt. tender/connection etc.,   powerful father, Baldness, arrogant, trouble/struggle in father's life; death   of father in early age). Sun – significator of 1H.",
+          "remedies": "***No   remedy is required.***<br> <br>(Person   can wear **Gold Chain**\\*)"
+        },
+        "2H": {
+          "precautions_symptoms": "**RAJ YOGA**<br>**&#x20; &#x20;**&#x42;ut afflicts Venus. Therefore, Saturn brought to 2H to help   Venus become good.<br>   (Good Wealth Yoga, Govt Job in family, pensioner etc., income from Govt.,   Powerful Father/Grandfather, Relationship challenges to native)",
+          "remedies": "Offer One (01) hand full of **Almonds** (Saturn) in Temple."
+        },
+        "3H": {
+          "precautions_symptoms": "**Maintain   Good relations with your Siblings (brother and sister)**.   Career challenges will go away.<br>   <br>   (Very powerful, Self-made person, Self-Dependent, creates empire / gets   success on own, people **don’t'** support native. He/she **starts something new**,   **not** same as father, family. Bold Decisions in life, Courageous).",
+          "remedies": "*If any planet is bad, because of Sun 3H, do   the remedy of that planet.*"
+        },
+        "4H": {
+          "precautions_symptoms": "They should always **serve their mothers**. Normally they are   away from mother. The more they serve, more money they earn. It will become a   complete Raj Yoga. <br>   <br>   (Native **not** live with parents, away from them, doesn't serve them   much. Health issues in Chest region, Lungs, Heart etc., when afflicted. Miser   like Caterpillar lives life as Miser and will leave good amount of wealth /   inheritance for progeny.)",
+          "remedies": "Donate Jaggery (or Sweets made up of Jaggery) to Bua's Son. [\\*Su   4*H – Bua’s Son*]"
+        },
+        "5H": {
+          "precautions_symptoms": "a). Either they are **Eldest** in the same Gender or **behaves**   like Eldest. <br>   b). Sudden break in Studies. WHY?<br>   c). Mark on Forehead - normally where we apply Tilak, Tilak by God.<br>   (Powerful, Wealth Yoga, OSI, Big Stomach, gets Stone/hair in food, Acidity)",
+          "remedies": "a). **Gud-Chana (roasted) to Red-faced Monkey on Sunday.**  [**Su 5H** = Red faced monkey]<br>   b). Put a picture of Red-faced Monkey on the opposite wall (if 9H is empty)."
+        },
+        "6H": {
+          "precautions_symptoms": "a). In **Neighbourhood** or Family, there is a **mentally   challenged / retarded person**.<br>   b). Su + Me, in 6H, can also make you a teacher/professor.<br>   (Su, Me, Ke afflicted in Chart; Mars good. Angry/Aggressive, Back Pain / Leg   Pain)",
+          "remedies": "a). **Steal a Coin from   'Temple' and keep it in your Almirah.** (*Please elaborate?*)<br>   b). Donate Money to Trans-Genders."
+        },
+        "7H": {
+          "precautions_symptoms": "**a). Avoid   Love Marriage, else Challenges will be even more.**<br>**&#x20;  b). Avoid Sex in daytime.**<br>**&#x20;  c). Do not eat Jaggery in daytime.**<br>**&#x20;  d). Do not donate in Evening as it will give losses.**<br>**&#x20; &#x20;**&#x65;). **Donate around NOON**.<br>   (Sun debilitated, Aggressive/Angry, Relationship trouble; Ego clash with   partner)",
+          "remedies": "Seven (07) Square Copper pieces stacked and buried in Garden   (7H) where Grass is there.<br> <br>(*Burying   = Burying negative energy, Planet stops giving result*)"
+        },
+        "8H": {
+          "precautions_symptoms": "a). **Never donate in Early Morning OR in the Evening**.<br>   <br>   (Death **not** happen in presence of native, as Sun - Soul karaka;   Medication given by native heals faster)",
+          "remedies": "Eight (08) Kilograms Jaggery in running water (River or Canal)"
+        },
+        "9H": {
+          "precautions_symptoms": "**a). Never take Silver items in Gift.**<br>**&#x20;  b). Do not keep Silver coin in pocket / locker.**<br>   (Very good yoga; Father big name / powerful; Luck favours; Good Jupiter;   Struggle to Father, Trouble with Boss).<br>",
+          "remedies": "a). Hang a Copper Sun at the centre (9H) of the house. <br>   b). Donate / Gift Silver to someone.\\*"
+        },
+        "10H": {
+          "precautions_symptoms": "a). **Do not colour your hairs.**<br>**&#x20; &#x20;**&#x62;). If it is necessary, do **not** use black.<br>   c). Use brown colour.<br>   <br>   (Career challenges, Ego clash at workplace; Outshine in Career, Government   Job)",
+          "remedies": "Ten (10) Copper coins (without hole) and Ten (10) pieces of   Jaggery in Running water."
+        },
+        "11H": {
+          "precautions_symptoms": "Take Care of Parental Health (Father / Father-in-Law).<br>   <br>   (Avoid Non-Veg, Liquor to prevent troubles from Government side. Wear Gold).",
+          "remedies": "**Copper Vessel full of Wheat and Jaggery offer   in Temple on Sunday.**<br>**&#xA0;**<br>(Remedy   for Ketu 11H/12H; Ra 1H, as well)"
+        },
+        "12H": {
+          "precautions_symptoms": "Sun is Good but Weak.",
+          "remedies": ""
+        }
+      },
+      "additional_notes": [
+        {
+          "source_label": "**&#xA0;**",
+          "precautions_symptoms": "**SUN –&#x20;**&#x43;opper, Wheat, Jaggery, Red faced   Monkey [Su 5H], White Umbrella\\*",
+          "remedies": ""
+        }
+      ]
+    },
+    "moon": {
+      "houses": {
+        "1H": {
+          "precautions_symptoms": "**Eating Green Vegetables, Wearing Green Colour clothes   will spoil Moon.**   (In the **Varshphal**)<br>   (Salon, Barber, Dry Clean shop, washerman shop etc. nearby the person lives.   Selfish, Consumes Pornography a lot, native quarrels with mother).",
+          "remedies": "Claypot filled with Honey, Bury in a lonely place. (Lonely place   – 8H)"
+        },
+        "2H": {
+          "precautions_symptoms": "**Avoid Bell, Conch, Swing**   etc. at home.<br>   [Moon exalted in 2H]<br>   (‘Shankh, Bells, Shellfish, Swings’ found in House. Not live on Ground floor   else invites troubles in life, Good bank balance, wealth etc.)",
+          "remedies": "Donate unstitched clothes of Green in colour to 43 young girls   on Monday. (Mercury)<br> <br>*Unstitched Clothes – Moon.*"
+        },
+        "3H": {
+          "precautions_symptoms": "**They should not   select Education Sector as their Career.**<br>   <br>   (Superstitious, Mother dominates in household , otherwise father short-lived,   Mother courageous)",
+          "remedies": "Offer Burfi (Sweet) to Young Girls (Plain white Mawa Burfi)."
+        },
+        "4H": {
+          "precautions_symptoms": "**Lots of Spending.**<br>   <br>   (Craving for Vehicle, House; Good Earning, Torn undergarments / vests in   house)",
+          "remedies": "Cut one (01) piece of Burfi into four (04) pieces (OR, Take four   square burfis) and offer one by one to running water for four (04) continuous   days."
+        },
+        "5H": {
+          "precautions_symptoms": "**School near your house**.<br>   <br>   (School / College nearby house, Good education to self / child; Native gives   much attention to Children and bothers them a lot)",
+          "remedies": "Distribute Milk products to kids OR Distribute Stationery to   Kids."
+        },
+        "6H": {
+          "precautions_symptoms": "**Never donate Water, someone in Family or Self   will face severe Health issues.**<br>   (Either Native's education OR mother's health will be good. Both **not**   good at the same time. Never donate Silver, Rice, Milk, Water etc. **Never   Teach anyone**.)",
+          "remedies": "Saunf (Fennel Seeds), **Jaggery** (Su) and Saffron - Donate in Temple (Six   Consecutive days)"
+        },
+        "7H": {
+          "precautions_symptoms": "**Never Donate Water/Milk/Pearls to Anyone.**<br>   <br>   (Nearby house – salon, dry cleaner, barber, beauty parlour etc.; Native   watches Porn a lot; Extra Marital Affairs)",
+          "remedies": "Offer Plain White Burfi to newly Married Woman (*less than 40   day of Marriage*) OR, <br>   Distribute Burfi to Young Girls."
+        },
+        "8H": {
+          "precautions_symptoms": "**Always wear Bathroom Sleepers while taking   Shower.**<br>   <br>   (Break in Education, Lots of Travel, Education till Graduation **not**   useful in Earning)",
+          "remedies": "a). If 2H empty - Offer eight (08) litres of Milk in Temple.<br>   b). If 2H has a planet, go to a Crematorium and fill a bottle of water from   tap. (Please elaborate)<br>   c). Keep it anywhere in your house."
+        },
+        "9H": {
+          "precautions_symptoms": "**Education after 24 years of age will give   good results, will help in earning.**<br>   (Failure in Exam / Change of Subject)",
+          "remedies": "Take bath with **Gangajal** for nine (09) consecutive days."
+        },
+        "10H": {
+          "precautions_symptoms": "Health issues to Mother / Self - Eyes and Joint Pain, Financial   Crisis.<br>   (Serious Disease - cancer etc. in Maternal side; Problems or pain in Joints,   Arthritis; Eyes/ Knee surgery to Mother / Native)",
+          "remedies": "Collect of Milk of plant (AANK/MADAR/Giant Calotrope plant (4-5   drops) and flow it in running water for four consecutive days."
+        },
+        "11H": {
+          "precautions_symptoms": "a). Do **not** consume   Milk at night.<br>   b). If you have to drink - mix something to change colour from white to   other.<br>   (Serious disease in maternal side; Problems in Eyes, Joints to Self / Mother;   Financial Crisis, Big Friend Circle)",
+          "remedies": "a). Buy One (01) Kilogram x 11 Packets of Milk.<br>   b). Donate to Labourers. OR, **Offer** to Bhairon Mandir on Monday."
+        },
+        "12H": {
+          "precautions_symptoms": "a). One should **NOT** donate food to Sadhu/Sanyasi/ Priest.<br>   b). One should **NOT** impart free education to children. Else Life will   become very tough till death.<br>   (Education of Native away from home/birthplace. Distant School.)",
+          "remedies": "a). Store Rainwater on roof top open to Sky.<br>   b). Wear Pearl in Silver in right hand for male and left hand for female in   little finger.<br>   c). **Offer Milk to Shiv Mandir every Monday**."
+        }
+      },
+      "additional_notes": []
+    },
+    "mars": {
+      "houses": {
+        "1H": {
+          "precautions_symptoms": "**Donate Sweets, Mars will give good results**.   <br>   <br>   (Elder or Only Male/Female; Responsible; Courageous, Aggressive; Medicine in   house)",
+          "remedies": "**No Remedy** is required.   Keep Red Handkerchief in Pocket."
+        },
+        "2H": {
+          "precautions_symptoms": "a). Lots of Guests come to their home.<br>   b). Kitchen is always operational. Even Family members will have *different*   food tastes.<br>   c). They love sweets or someone in family has a sweet tooth.<br>   d). Talks Straight. Sometimes Abusive.<br>   e). Kitchen is always operational and something or other is always being   cooked in Kitchen.<br>The day this stop, there are financial downfall.<br>   f). Someone in the Family screams a lot OR talks in a *crooked* manner.<br>   (Harsh tone, problems in teeth, gums etc.; Bitter tongue).",
+          "remedies": "a). Distribute food in public.<br>   <br>   <br>b). Prepare ‘Sweet Yellow’ Rice and distribute it in Temple.??"
+        },
+        "3H": {
+          "precautions_symptoms": "Take care of Siblings.        [afflicts Mercury]<br>   <br>   (Courageous, Fearless, Rebel, Bold BAD Decisions in life, Younger in   Siblings\\*)",
+          "remedies": "a). Do the **remedy of Mercury**   wherever it is in Chart. [*As Mars 3H afflicts Mercury in chart*]<br>   b). Keep a Square piece of Silver in pocket."
+        },
+        "4H": {
+          "precautions_symptoms": "Mother's / Self health is Challenge. [Financial issues]<br>   <br>   (Brings Poverty, Blood related disease, Digestion related issues, 3/4+ years   age gap between siblings)",
+          "remedies": "a). Square piece of Silver always in pocket.<br>   b). 400 Grams Sugar throw in River / Canal on Tuesday."
+        },
+        "5H": {
+          "precautions_symptoms": "**Neem Tree near Home**.   Sharp Minded. <br>Good Analytical Skills.<br>   <br>   (Sharp, Logical, Analytical, Fast Mind; Give wealth to future two   generations, Boss steals your credit).",
+          "remedies": "**Plant a Neem Tree**,   and water it for **40** days - in a public park."
+        },
+        "6H": {
+          "precautions_symptoms": "**Avoid Sweet   distribution, Avoid Celebration**.<br>   <br>   (Me, Ke, Sa - Bad; **Sun exalted**;   Ego, Anger, Aggression; Never give party to Friends)",
+          "remedies": "Do the **Remedy of Saturn** wherever 'Saturn' is in the Chart."
+        },
+        "7H": {
+          "precautions_symptoms": "Aggressive Partner. <br>   *Mars 7H – makes Venus good and Mercury bad*.<br>   (Takes responsibility of whole world; People exploit, misuse the native; EMA)",
+          "remedies": "Invite sister (Me) at home and offer her Sugar (Ma) mixed with   Curd (Ve)."
+        },
+        "8H": {
+          "precautions_symptoms": "**Fire Incidence,**   Ups & Downs in Career.<br>   <br>   (Disease Yoga, Financial Crisis, Drive Vehicle carefully, Fiery stomach /   Digestive issues, avoid spices).",
+          "remedies": "800 Grams 'Gud ki Rewari' in running water on Tuesday."
+        },
+        "9H": {
+          "precautions_symptoms": "When they boil Milk, it spills and that is followed by Financial   Losses.<br>   (Father powerful man; Lots of Plots of Land/Property; Courageous)",
+          "remedies": "Wear 'Red Colour Thread'   in your hand.<br>(*It   brings ‘Mars in 3H’ – powerful/significator*)"
+        },
+        "10H": {
+          "precautions_symptoms": "**Never put your Gold as collateral else you will   not be able to repay**. Although, you can sell Gold. When you sell,   buy immediately 1% with the same money. Whole 100% will come back.<br>   <br>   (Outshine in Career, Career changes 3-4 times - sector as well, Challenges in   career)",
+          "remedies": "Keep   a **Brass deer** at home. (\\~ Ve 4H\\*).<br>Brass   = Copper + Zinc"
+        },
+        "11H": {
+          "precautions_symptoms": "Death / Marriage in Family.",
+          "remedies": "Distribute food standing below the   tent. Three sides and Head should be covered in tent. Outside temple   preferably."
+        },
+        "12H": {
+          "precautions_symptoms": "Someone in the Family is a Doctor / Medical profession. Even   they have good knowledge of Medicine.<br>   (Hospital nearby house, Medicines in house, Struggle in life of sibling, Visiting   Hospital for health issues)",
+          "remedies": "a). Distribute Meetha Halwa equal to body weight or little more   than that OR one tenth of body weight.<br>b).   Offer 12 ‘Batashe’ in Temple every Tuesday for twelve (12) weeks."
+        }
+      },
+      "additional_notes": [
+        {
+          "source_label": "**&#xA0;**",
+          "precautions_symptoms": "**Mars 3H/4H&#x20;**– Square silver   in pocket.   **Mars 3H&#x20;**– Remedy of   ‘**Mercury’** wherever placed. <br>Mars 1H – Distribute sweets. No remedy. **Mars 6H&#x20;**– Remedy   of ‘**Saturn’** wherever placed.<br>Batashe = Mars 12H.",
+          "remedies": ""
+        }
+      ]
+    },
+    "mercury": {
+      "houses": {
+        "1H": {
+          "precautions_symptoms": "Ups & Downs in Career.<br>   *As Mercury 1H afflicts ‘Mars’ in the Chart.*<br>   (17th or 34th year of native, difficult year for 'Father'. Native fond of   green vegetables, Throat issues persistent)",
+          "remedies": "Hire a dark-complexioned servant - Driver or Male Servant."
+        },
+        "2H": {
+          "precautions_symptoms": "Avoid Over Speaking. **Raj   Yoga**.<br>   <br>   (Raj Yoga, Wealth Yoga. Good Consultant).",
+          "remedies": "Offer   Milk and Rice in Temple. <br>[**‘Mo   + Me’**‘Wealth Yoga’ in 2H/4H.]"
+        },
+        "3H": {
+          "precautions_symptoms": "Never Keep parrot or birds at home. Do **not**   stay in South facing house.<br>   <br>   (Blunders/Wrong decisions in life, Yellow Teeth, Teeth disease/pain)",
+          "remedies": "Bury 3 Plash Leaves (after washing it with raw milk) and cover   it with stone, *Avoid 9H or 11H planet colour*. [Colors related   to different Planets?]"
+        },
+        "4H": {
+          "precautions_symptoms": "**Suicidal Thoughts**.<br>   <br>   (Good income; Foreign income, Addiction)",
+          "remedies": "Take 101 Plash Leafs - Wash with Raw Milk - Throw in River - One   by one."
+        },
+        "5H": {
+          "precautions_symptoms": "**Avoid Tulsi and   Money Plant (remove them).**",
+          "remedies": "Wear **‘Copper Coin with hole’** in neck in white OR khaki   thread (color of police uniform)"
+        },
+        "6H": {
+          "precautions_symptoms": "a). **Never** donate Pen/Pencils/Stationery. <br>   b). Never stay in North facing house.<br>   *Mercury exalted in 6H.*<br><br>   (Don't use Green colours on wall, Bad Ketu\\*)",
+          "remedies": "a). Wear **Gold Ring** in left hand.<br>   b). If Moon is bad then take a glass bottle and fill with Milk and bury it in   a farm land.<br>   c). If Venus is bad, then instead of Milk, use Gangajal. The Cap of bottle   should also be of glass.<br>   d). If both Mo and Ve are bad, do remedy with Milk."
+        },
+        "7H": {
+          "precautions_symptoms": "**Never** donate   Pen/Pencils/Stationery.<br>   (*Mercury 7H is usually good in chart - Significator*)<br>   (Funny, Jovial, Sense of humour, Younger looking; Good for business,   Consultancy)",
+          "remedies": "Satalu (Peach fruit)' seed - fill 'surma' inside it and bury   four seeds in park having grass."
+        },
+        "8H": {
+          "precautions_symptoms": "Avoid Over Speaking. <br>Avoid Tulsi, Money Plant etc. at home.<br>   <br>   (Photo of Aggressive Lion in house; PUMA products, Visit Male God preferably;   Torn undergarments)",
+          "remedies": "a). Raw Sugar in Kulhar (Earthen Pot) and Bury it in a lonely   place. OR, <br>   b). To dilute Mercury, flow eight (08) Kilograms of Whole Green Lentils in   running water."
+        },
+        "9H": {
+          "precautions_symptoms": "Pitri Dosh. <br>   <br>   (Lives in Tension, into Litigation, visiting Hospital etc.; Trouble in life   of Father)",
+          "remedies": "Mushroom in Claypot and donate in Temple for the number of days   depending on which house Venus is there. For example - If Venus in 4H then 04   days consecutive."
+        },
+        "10H": {
+          "precautions_symptoms": "Avoid Non-Veg and Liquor.<br>   <br>   (Stopped Watches in the house of Native)",
+          "remedies": "Do   ‘**remedy of Saturn’** wherever it is."
+        },
+        "11H": {
+          "precautions_symptoms": "They talk a lot and give advices.<br>   <br>   (Native likes to eat Chicken, Eggs etc.)",
+          "remedies": "‘**Copper   coin with hole’**, wear in neck with preferably yellow thread OR red   thread. <br>   NOT any other colour."
+        },
+        "12H": {
+          "precautions_symptoms": "a). Fitkari (Alum) used in Cleaning Teeth. <br>   b). Do **not** keep Tulsi or money plant on Terrace (open part) or parrot   on terrace.<br>   c). Remove clutter from terrace.<br>   <br>   (Challenges in Career and Relationship. (Brain related Diseases,   Psychological/Mental issues; Mental Issues. Wrong Decisions in Life. Sleep   issue / Disturbance. Epilepsy, Autism, Depression, Psychological issue. The   native visits Psychiatrist. Has to take Sleeping pills. Stopped watch in the   House. )",
+          "remedies": "a). Ring of Steel in middle or little finger.<br>   b). Keep ‘Black and White dog’ at home. OR, <br>   c). Wear Pukhraj (**Yellow Sapphire**).<br>*‘Yellow Sapphire’ is a costly gem (1.5l+).*"
+        }
+      },
+      "additional_notes": []
+    },
+    "venus": {
+      "houses": {
+        "1H": {
+          "precautions_symptoms": "**Avoid Love Marriage** else Challenges will be even more.<br>   <br>   (Multiple affairs, before + after Marriage; Attractive; Good Looking, Health   challenges to native – Sun afflicted by Venus 1H; Support of Mars – Venus 1H)",
+          "remedies": "Seven types of 'Ananj' - Keep it in unstitched 'White Silk   Cloth' - 600 gm each and offer it in flowing water (River/Canal). Wheat,   Rice, Lal Masur, Moong Dal, Kali Dal, Jau, Kala Til, Saphed Jwar, Chana Dal (Those   planets in own house or exalted in Varsh Kundali),   **don'** take that 'Anaj'."
+        },
+        "2H": {
+          "precautions_symptoms": "**Never gift Perfumes, Flowers and Cosmetics**.<br><br>   (Work related to Soil/Earth ruins, Sex life in phased manner)",
+          "remedies": "Two   (**02) Kilograms Potato** (without unpeeling) and make it **yellow**   with Turmeric, and Offer it to Black or Brown Cow."
+        },
+        "3H": {
+          "precautions_symptoms": "**Do not stay with Sister-in-Law OR   Brother-in-Law in same house.**<br>**&#x20; &#x20;**<br>   (Multiple Relationships; Strong//Aggressive partners; Don’t engage with   Sister-IL or Brother-IL respectively, Strong, very supportive partner; Much   interested in Romance / Sex). WEALTH YOGA",
+          "remedies": "Peach Fruit SEEDS - Fill 'Surma' inside - and bury four (04)   seeds in some lonely place."
+        },
+        "4H": {
+          "precautions_symptoms": "Two (02) Marriage Yoga.<br>   <br>   (Long and Hidden affair; Good Health and Wealth; Big Vehicle/House, Comfort   life, Manipulative for affairs)",
+          "remedies": "Wear **'Yellow Sapphire**'"
+        },
+        "5H": {
+          "precautions_symptoms": "**Avoid Extra Marital Affairs.**<br>   <br>   (Kati Patang, too much into Romance/ Sex, Native's child in other's family   and vice-versa; Womanizer)",
+          "remedies": "One (01) Kilogram Wheat Flour in Temple for Five (05)   consecutive days."
+        },
+        "6H": {
+          "precautions_symptoms": "Very poor sex life; person goes in control of in-laws.<br> <br>(Sick Partner/ Or in Dispute, Disease problems in private parts,   very poor sex life, don’t be much choosy in selection of partner, has   blessings of God)",
+          "remedies": "a). Keep Six (06) Camphor (Kapur) in Temple on Six (06)   Consecutive Fridays.<br>   b). Partner should **not** walk bare foot, or there will be financial   troubles."
+        },
+        "7H": {
+          "precautions_symptoms": "**Never gift Perfumes, Flowers and Cosmetics.&#x20;**<br>**Never donate / gift clothes.**<br>   <br>   (Fortunate after Marriage, Partner – Lucky, Luxury provider to Native)",
+          "remedies": "Offer Camphor and Curd (Venus) in Temple."
+        },
+        "8H": {
+          "precautions_symptoms": "**Don't** fight with Partner.<br>   <br>   (Much possessive partner, Controlling, (speaking like crows). Partner Surgery   / Relationship Trouble. <br>   Death of Relationship in worst case. Much involved into Secret Relationship.)",
+          "remedies": "Offer 800 gm Black Carrrots, or, 800 gm jimmikant (Yam Fruit) in   Temple."
+        },
+        "9H": {
+          "precautions_symptoms": "Do **not** donate / sponsor an orphan's education. <br>Do **not** adopt a child, else it will result in major   financial losses.<br>   (Long Distance Relationship, Partner from Different City, Living away from   Partner, LDR more than Ve 12)",
+          "remedies": "One (01) Square piece of Silver, bury it in the trunk of Neem   tree at shoulder height.<br>   If there are more planets in 9H then those many square pieces."
+        },
+        "10H": {
+          "precautions_symptoms": "If the partner takes medicines to reduce weight, there will be   financial crisis within a month of taking pills.<br>   <br>   (Weight gain to Partner)",
+          "remedies": "Take   a stone of White Marble. Apply White Chandan Tilak on the same stone for ten   (10) consecutive days and on 10th day after applying 'Tilak' flow this stone   in running water."
+        },
+        "11H": {
+          "precautions_symptoms": "Lots of Expenditure.&#x20;",
+          "remedies": "Offer   Mustard oil in 'Shani Mandir' every Saturday after sunset."
+        },
+        "12H": {
+          "precautions_symptoms": "Never Marry someone who has Venus in 12H.<br>   <br>   (Illegitimate Relationship, Dispute with partner, Irregular Sex Life,   Marriage in known circle, mutual)",
+          "remedies": "Red Color filled with 'Fennel Seeds' and tie it and keep below   pillow."
+        }
+      },
+      "additional_notes": [
+        {
+          "source_label": "**&#xA0;**",
+          "precautions_symptoms": "Venus 2H / 7H – Never donate / gift ‘Perfume, Flower, Cosmetics,   Clothes etc.’.",
+          "remedies": ""
+        },
+        {
+          "source_label": "<br>**&#x20; &#x20;**<br>House",
+          "precautions_symptoms": "Precaution/Symptoms",
+          "remedies": "Remedy"
+        }
+      ]
+    },
+    "saturn": {
+      "houses": {
+        "1H": {
+          "precautions_symptoms": "Do not donate **copper utensils** or coins to beggars. [*Copper   – Sun; Coin – Moon, Beggar – Saturn*]<br>   <br>   (Health Challenges, Sadness, Health issues to Father, Negative Thinker)",
+          "remedies": "a). 50 Gram Black Surma (Kohl) and bury it in a lonely place.<br>   b). Sweet Kaccha Milk - offer to Bargad Tree, and **Tilak of 'Gili Mitti'**   (*\\~ Bringing Venus 1H*)<br>*Milk – Moon, Sugar – Mars, Bargad – Jupiter*<br>*Mo + Ma + Ju 1H – Very good in 1H*."
+        },
+        "2H": {
+          "precautions_symptoms": "**Avoid Mustard Oil especially do not apply on   head**.<br>   <br>   (Money gets stuck when lent, never work on Credit; when he/she builds/buys   house, in-laws' house gets sold.)",
+          "remedies": "a).   They should avoid Oil in Head. <br>   b). **Put Tilak of Raw   Milk between eyebrows**.<br>   c). Sweep and Mop the floor of Temple. [*Cleaning activity – Saturn – in   Temple*]"
+        },
+        "3H": {
+          "precautions_symptoms": "If 3rd House is empty, Problems in Legs to someone near your   house.<br>   <br>   (Vastu Dosh in North-East of house)",
+          "remedies": "Buy **three (03) figurines of Dogs&#x20;**&#x69;n Standing Position and   Keep anywhere. Made of Clay."
+        },
+        "4H": {
+          "precautions_symptoms": "Do **not** do property business.<br>   <br>   (Joint Pain, Eyes issues, Wearing Glasses; Mother / Self sick; Health   issues.)",
+          "remedies": "Whole **'Urad Dal' 400 Grams** in running water and during   this time, one should **not drink** that year."
+        },
+        "5H": {
+          "precautions_symptoms": "Relationship challenges / career related challenges.<br>   <br>   (Digestive health issues, Break-up, Separation, Failure in Exam, Difficulty   in getting male child)",
+          "remedies": "a). Take ten (10) pieces of Almonds. Keep them in temple.<br>   b). Take five (05) pieces from them. Tie in a white unstitched cloth and keep   at home.<br>   c). At the end of the birth year, flow them in running water if in yearly   chart. **(One by one?)**"
+        },
+        "6H": {
+          "precautions_symptoms": "Avoid Leather Shoes / buying/receiving   leather items.<br>   (Lives in Corner house / T – Junction / Y- Junction / Closed Street. Vastu   Dosh, Property Dispute; Good for Loan repayment)",
+          "remedies": "a). **Donate Leather items**.<br>   b). Six (06) pair of leather chappals/shoes, donate these to six (06)   different labourers in same day."
+        },
+        "7H": {
+          "precautions_symptoms": "**Never donate Liquor**.<br>   <br>   (Pain/Misery from Relationship, Good for Property, Saturn exalted in 7H,   friend of both Ve & Me)",
+          "remedies": "a). Keep honey in a vessel pot at home.<br>   b). If Lagna Empty - Take a Black Flute, put some **'Khand'** and bury in   lonely place.<br>   c). If Lagna is **not** empty - fill black flute with **sugar** and   bury in a lonely place."
+        },
+        "8H": {
+          "precautions_symptoms": "**Do not donate money for a Dharmshala**,   else he will lose his own house.<br>   (Lives in Corner house / T – Junction / Y- Junction / Closed Street. Vastu   Dosh, Property Dispute; Good for Loan repayment)",
+          "remedies": "Whole '**Urad Dal' 800 Grams** in running water."
+        },
+        "9H": {
+          "precautions_symptoms": "**Remove Clutter and   Coals at the Roof**. <br>Do **not** buy fourth property - Severe health issues.<br>   (Father struggle / Hard work / pain / troubles.)",
+          "remedies": "Take bathe with Holy water for ten (10) consecutive days."
+        },
+        "10H": {
+          "precautions_symptoms": "They should **not** buy property till 48 years of age and   stay in rented house. Else chances of Financial Losses are more. Native can   stay in parental house or joint ownership with parents and children.",
+          "remedies": "**No Remedy is required.**"
+        },
+        "11H": {
+          "precautions_symptoms": "They should **never gift liquor**.   If they have done consider that they have gifted their own   property to someone. *That means your chances of property has nullified but   the opposite person will make a property.*<br>   (House of the native never gets completed (should leave a bit unfinished as   remedy).",
+          "remedies": "a).   Pour Mustard Oil in soil before sunrise every day. b). Keep it in right hand.   <br>   c). Come out of house, pour from right hand towards left hand."
+        },
+        "12H": {
+          "precautions_symptoms": "**Avoid** Drinking.<br>Good   time for buying / constructing a property.",
+          "remedies": "Offer 'Almonds' to fishes."
+        }
+      },
+      "additional_notes": [
+        {
+          "source_label": "**&#xA0;**",
+          "precautions_symptoms": "Saturn 1H – Bring Venus in Lagna (Mitti ka Tilak) \\| Saturn 2H –   No mustard oil.<br>Saturn 7H and 11H – Never donate Liquor.             \\| Saturn 6H – Don’t   buy / receive Leather shoes / items.<br>**Saturn 10H – No   remedy required.                         \\| Saturn 8H :&#x20;**&#x44;on’t donate money   to Dharmashala.",
+          "remedies": ""
+        }
+      ]
+    },
+    "rahu": {
+      "houses": {
+        "1H": {
+          "precautions_symptoms": "For these people, **Cat   crossing their path is bad**. For all others it is **not**   of any consequence.<br>*Makes ‘Sun’ bad in chart.*<br><br>   (Struggle in life of Father, Ups and downs in Career, not good for   relationship)",
+          "remedies": "a). One (01) Black Umbrella + (04) Bundi Laddoo gift to Sweeper   (Ra\\*), *who sweeps road or cleans public toilet.&#x20;*<br>b). Wear ‘Silver chain’ in neck. [Mo]<br>c).   Copper Vessel full of Wheat and Jaggery offer in   Temple on Sunday [Makes Sun good]."
+        },
+        "2H": {
+          "precautions_symptoms": "a). Do **not** accept Electrical goods in Dowry (in-laws). <br>   b). Do **not** keep Swings in house.<br>   c). **Never** stay in ground floor, else a lot of career issues.<br>   d). **Don't** keep Ghanti, Conch, Shankh etc. at home.<br>   <br>   (Death in family, **not** live on ground floor, financial   instability, Bad food habit)",
+          "remedies": "a).   Always keep a 5-6 grams Silver Ball with you OR <br>b).   saffron to be kept in Square silver box and keep with you."
+        },
+        "3H": {
+          "precautions_symptoms": "a). Police Station near house, or police presence.<br>   b). Barricading, Theft near house.<br>   c). Police visits neighbourhood.<br>d). Bad events in life of sibling, neighborhood; Theft/ Crime in   neighborhood.\\*\\*<br>   <br>   (Electric pole, Power Line, Culvert, Sewer, Police barricade/Police nearby;   Good for Competition)",
+          "remedies": "a). Wear **Silver jewellery**.   Feed birds. (Good Me)<br>   b). Take three (03) seenk wali (with sticks) brooms. Remove the plastic case   and tie it with jute-role (Sutli). Do this all for three brooms. Offer in   River / Canal, one by one on Saturday."
+        },
+        "4H": {
+          "precautions_symptoms": "Native doesn’t Repair Washroom.<br>Close people conspire against you.<br>   <br>   (People conspire against you / backbiting, Mercury related career, Extreme   Wealth)",
+          "remedies": "a). Take a white cloth unstitched and put 4 silver balls. Tie   the cloth and always keep with you.<br>   b). 400 Grams whole dry Coriander seeds in River / Canal."
+        },
+        "5H": {
+          "precautions_symptoms": "Do **not** stay in SOUTH facing house.<br>   <br>   (Miscarriage, Disturbed Menstrual Cycle, Stomach **health issue**,   Problems in Romance, Difficulty in connecting with anyone, Rahu\\* things   nearby)",
+          "remedies": "a). Remarry with the same wife (partner) after changing the   name.<br>   b). If in yearly chart - **5 kg barley wash with raw milk and flow in River   / Canal.**<br>   c). Minimum 60 grams (2-3 gms above is OK but not less) solid silver elephant   with right leg forward."
+        },
+        "6H": {
+          "precautions_symptoms": "Those who keep a photo or model of Taj Mahal (or any graveyard)   and Photo . Have Liver issues, Education issues, Tauji (Uncle) / Grand-Father   in trouble. [*Due to Afflicted Jupiter*]<br>   (Troubles enemies, Goes to other religion worship place, Trouble in   life of Father)",
+          "remedies": "a). Make a ball of Lead and keep in pocket. Make sure you put   some black colour on ball.<br>   b). **Feed Sugarcane to elephants**."
+        },
+        "7H": {
+          "precautions_symptoms": "**Career starts with Job, Finally shifts into   business**<br>   (Cheating in Relationship, Business, Profession; Turmoil in Marital life;   Cheating in Promotion)",
+          "remedies": "Seven (07) Shreephal नारियल    in River / Canal one by one on   Wednesday / Saturday."
+        },
+        "8H": {
+          "precautions_symptoms": "People are jealous of you. Problems in parental property.<br>   <br>   (Extremely bad; Pain from in-laws, Sudden bad events)",
+          "remedies": "a). Four (04) Kilograms Lead + Four (04) Shriphal नारियल    in River / Canal.<br>   i). Take 344 Coins of Lead make eight (08) packets (in paper bags) of 43   coins each.<br>   ii). And flow each packet one by one in river."
+        },
+        "9H": {
+          "precautions_symptoms": "a). They should ensure cleanliness in house and discipline in   life.<br>   b). They should **not** keep any **soft toys** at   home (Teddy bears etc.)<br>   c). As soon as they have one brought to the house, their life gets spoiled.<br>   d). Two Marriages in Family.<br>   e). Remove any hanging dolls, soft toys and face masks from house.",
+          "remedies": "a). Nine (09) kgs Barley, wash with raw milk and throw in river   / canal.<br>   b). 'Kesar ka Tilak'"
+        },
+        "10H": {
+          "precautions_symptoms": "a). Cover your head with white cap / turban.<br>   b). Don't colour your hairs.",
+          "remedies": "four   (04) kgs desi khand (brown sugar) in River / Canal."
+        },
+        "11H": {
+          "precautions_symptoms": "**Create problems in   Grand-Father's life**<br>**&#x20; &#x20;**<br>   (No Love of Grandfather, Lives away till 8 years of age OR Death of   Grandfather; in some cases, even before father's marriage)",
+          "remedies": "Four   (04) kgs Lead + Four (04) shreephal नारियल    in River / Canal, Kesar Tilak, Gold   Chain in Neck"
+        },
+        "12H": {
+          "precautions_symptoms": "Disturbed   Sleep<br>   <br>   (Lots of Expenditure, Scary dreams in night)",
+          "remedies": "a). Eight (08) kgs Kaccha Coal in dirty water, nallah.<br>   b). If Sleep issues, colour the bedroom in pink / remove blue / used red bedsheets.<br>   c). **Eat food in kitchen only**."
+        }
+      },
+      "additional_notes": [
+        {
+          "source_label": "**&#xA0;**",
+          "precautions_symptoms": "Rahu 5H – 5 Kg Barley<br>Rahu 9H – 9 Kg Barley",
+          "remedies": ""
+        }
+      ]
+    },
+    "ketu": {
+      "houses": {
+        "1H": {
+          "precautions_symptoms": "Head injury / **Lot of Tensions**<br><br>   (Wrong Decisions/Blunders, Surgery, Trouble related to stone - Kidney, Gall   bladder etc.)",
+          "remedies": "Always use Red Handkerchief."
+        },
+        "2H": {
+          "precautions_symptoms": "**Never take Pickle / Sour / Papad etc. from   anyone**<br><br>   (Dental issues, Skin disease, Family troubles)",
+          "remedies": "400   gm of Chana Daal (**Jupiter**) in Temple once."
+        },
+        "3H": {
+          "precautions_symptoms": "**Lots of Travel.**",
+          "remedies": "400 Grams of Chana Daal (**Jupiter**)   in Temple for Four (04) consecutive days."
+        },
+        "4H": {
+          "precautions_symptoms": "Health issues to Self / Mother - Surgery Yoga, <br>Change of Place.",
+          "remedies": "400 Grams of Chana Daal (**Jupiter**),   flow in River / Canal, for four (04) consecutive days."
+        },
+        "5H": {
+          "precautions_symptoms": "**Health issues to Father / Child**.<br>   (Stomach related issues, Disturbed menstrual cycle, Miscarriage likely,   Talented in Languages)",
+          "remedies": "500 Grams **Yellow** **Lemon**   (Ke\\*) in River / Canal."
+        },
+        "6H": {
+          "precautions_symptoms": "**Dog Biting.**<br><br>   (Urinary related issues, Problems / Disease in private parts, Pain problems   in Feet / Spine)",
+          "remedies": "a). Wear Gold band in left hand.<br>   b). Donate **Black and White Woolen Blanket** in Temple.<br>   c). If B & W is **not** available, any three (03) color woolen blanket   can be donated.<br>   d). Keep a dog a pet."
+        },
+        "7H": {
+          "precautions_symptoms": "**Male Child**. <br>   (Uterus Removal / Surgery to Wife / Partner, Divorce Yoga, Thirst/High desire   for Sex)",
+          "remedies": "**Feed Dogs.**"
+        },
+        "8H": {
+          "precautions_symptoms": "Dog follows you while driving.<br><br>   (Surgery to Self/Mother - multiple times, Pain in Waist/Feet Lower back)",
+          "remedies": "a). 400 Grams Black Sesame seeds flow in River / Canal for four   (04) consecutive days. OR,<br>   b). Donate one (01) black and white blanket in Temple."
+        },
+        "9H": {
+          "precautions_symptoms": "Obedient Child.<br>   (Surgery to Father)",
+          "remedies": "a). If they are **not** rising in life, make a 21 gm Gold   Brick, wash with Gangajal & keep at home.<br>   b). The edge of the Brick (Rectangle) should be sharp and not rounded.<br>   c). If in yearly chart, bathe with Gangajal for nine (09) consecutive days."
+        },
+        "10H": {
+          "precautions_symptoms": "Change of Job / Profile / Work place.",
+          "remedies": "**Do remedy of Saturn wherever it is.**"
+        },
+        "11H": {
+          "precautions_symptoms": "Lots of Expenditure.<br>   (Spends like King)",
+          "remedies": "a).   Three (03) legged white Marble Chakla / or Wooden with three (03) legs. It   should not be broken or wobbly.<br>   b). Take eleven (11) reddish with leaves, keep it below the bed on Friday   night. <br>   c). Next morning after taking a bath, rotate all 11 reddish around your head   once and offer it in temple. (HOW TO DO SO?)"
+        },
+        "12H": {
+          "precautions_symptoms": "Health   / Wealth related challenges.<br>   (Change and Growth / Growth and Change, Bad Moon)",
+          "remedies": "a). Take raw milk in a bowl (katori). <br>   b). Put your thumb in the bowl and suck the milk every 12 times a day for 12   days."
+        }
+      },
+      "additional_notes": []
+    }
+  },
+  "unparsed_source_rows": []
+}
