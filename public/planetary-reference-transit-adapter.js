@@ -10,7 +10,7 @@ const SIGNS=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio',
 const NAK=['Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu','Pushya','Ashlesha','Magha','Purva Phalguni','Uttara Phalguni','Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha','Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishta','Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'];
 const ORD=['First','Second','Third','Fourth'];
 const CACHE=new Map();
-let enginePromise=null,engine=null,requestSequence=0,statusHideTimer=null,latestStatus=null,latestByScope={},timelineTimestamp=null,timelineUpdated=new Set(),timelineRefreshTimer=null,lastStatusModel=null;
+let enginePromise=null,engine=null,requestSequence=0,latestStatus=null,latestByScope={},timelineTimestamp=null,timelineUpdated=new Set(),timelineRefreshTimer=null,lastStatusModel=null;
 const EPHEMERIS_VERSION='JupiterAstro-existing-sidereal-ephemeris';
 function nowMs(){return root.performance&&typeof root.performance.now==='function'?root.performance.now():Date.now();}
 function msToJd(ms){return Number(ms)/86400000+2440587.5;}
@@ -43,57 +43,23 @@ function dateLabel(ms){
  try{return new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true}).format(new Date(ms))+' IST';}
  catch(_){return new Date(ms).toISOString();}
 }
-function ensureStrip(){
- let el=document.getElementById('ja-planetary-verification-strip');
- if(el)return el;
- const style=document.createElement('style');
- style.id='ja-planetary-verification-style';
- style.textContent='#ja-planetary-verification-strip{position:fixed!important;left:50%!important;bottom:10px!important;transform:translateX(-50%);z-index:100600;width:min(1120px,calc(100vw - 24px));box-sizing:border-box;padding:5px 12px;border:1px solid rgba(117,104,139,.3);border-radius:8px;background:color-mix(in srgb,var(--surface,#fff) 30%,transparent);backdrop-filter:blur(12px);box-shadow:0 3px 14px rgba(40,32,54,.09);color:#514b5e;font:500 11px/1.3 Inter,system-ui,sans-serif;pointer-events:none;opacity:1!important;visibility:visible!important;animation:none!important;transition:none!important}#ja-planetary-verification-strip[hidden]{display:none!important}#ja-planetary-verification-strip .ja-pr-line{display:block;overflow:visible;white-space:normal;overflow-wrap:anywhere;text-overflow:clip;max-width:100%}#ja-planetary-verification-strip strong{font-weight:700;color:#34303d}#ja-planetary-verification-strip[data-state="error"],#ja-planetary-verification-strip[data-state="warning"]{color:#a23d3d}#ja-planetary-verification-info{position:fixed!important;left:30px!important;bottom:72px!important;z-index:100001!important;width:25px;height:25px;min-width:25px;padding:0;border:1px solid rgba(100,91,115,.24);border-radius:50%;background:color-mix(in srgb,var(--surface,#fff) 35%,transparent);color:var(--muted,#766f82);font:600 13px/1 Inter,system-ui,sans-serif;opacity:.52;cursor:pointer;box-shadow:0 2px 8px rgba(30,25,40,.10);backdrop-filter:blur(8px);transition:opacity .16s ease,transform .16s ease}#ja-planetary-verification-info:hover,#ja-planetary-verification-info:focus-visible{opacity:.95;transform:translateY(-1px)}#ja-planetary-verification-info[hidden]{display:none!important}';
- document.head.appendChild(style);
- el=document.createElement('div');el.id='ja-planetary-verification-strip';el.setAttribute('role','status');el.setAttribute('aria-live','polite');el.dataset.state='loading';el.hidden=true;document.body.appendChild(el);
- const info=document.createElement('button');info.id='ja-planetary-verification-info';info.type='button';info.textContent='i';info.setAttribute('aria-label','Show latest planetary verification status');info.title='Show latest planetary verification status for 1 second';info.hidden=true;info.addEventListener('click',showLatestStatus);document.body.appendChild(info);
- return el;
-}
-function displayStatusForOneSecond(){
- const el=ensureStrip();
- el.hidden=false;el.style.display='block';
- const info=document.getElementById('ja-planetary-verification-info');
- if(info)info.hidden=false;
- if(statusHideTimer!==null)root.clearTimeout(statusHideTimer);
- statusHideTimer=root.setTimeout(()=>{el.hidden=true;statusHideTimer=null;},2500);
-}
 function showLatestStatus(){
- if(!latestStatus)return;
- const el=ensureStrip();
- el.dataset.state=latestStatus.state;
- el.title=latestStatus.title;
- el.innerHTML=latestStatus.html;
- displayStatusForOneSecond();
+ if(!latestStatus||!root.JAInfoToast||typeof root.JAInfoToast.show!=='function')return;
+ root.JAInfoToast.show(latestStatus.message,{source:'planetary-verification',priority:3,duration:5500,variant:latestStatus.state==='warning'?'warning':'success',position:'bottom'});
 }
 function showStatus(result,elapsed,scope){
  const durations=Array.from(new Set([...(result.timelineUpdated||[]),...timelineUpdated])).sort();
- const contexts=result.contexts||{
-  Natal:latestByScope.Natal||null,
-  Transit:latestByScope.Transit||null
- };
+ const contexts=result.contexts||{Natal:latestByScope.Natal||null,Transit:latestByScope.Transit||null};
  const labelList=(items)=>items&&items.length?items.join(', '):'—';
  const correctionList=(items)=>items&&items.length?items.join(', '):'No change in Sign, Nakshatra or Navamsa required';
  const fallbackList=(map)=>Object.entries(map||{}).map(([planet,divisions])=>planet+' ('+divisions.join('/')+')').join(', ')||'—';
- const contextLine=(name,item)=>{
-  if(!item)return name+': pending';
-  return name+' — Verified: '+labelList(item.verified)+' · Updated: '+correctionList(item.updated)+' · No data: '+labelList(item.unavailable)+(item.partial&&item.partial.length?' · Partial: '+labelList(item.partial):'')+' · Engine fallback: '+fallbackList(item.fallbackByPlanet);
- };
- const hasContexts=!!(contexts.Natal||contexts.Transit);
- const errors=result.errors||[];
+ const contextLine=(name,item)=>{if(!item)return name+': pending';return name+' — Verified: '+labelList(item.verified)+' · Updated: '+correctionList(item.updated)+' · No data: '+labelList(item.unavailable)+(item.partial&&item.partial.length?' · Partial: '+labelList(item.partial):'')+' · Engine fallback: '+fallbackList(item.fallbackByPlanet);};
+ const hasContexts=!!(contexts.Natal||contexts.Transit),errors=result.errors||[];
  const heading=errors.length?'Reference check incomplete':(result.unavailable||[]).length?'Reference coverage incomplete':(result.updated||[]).length?'Reference check · corrections applied':'Reference check complete';
  const firstLine=hasContexts?heading+' · '+contextLine('Natal',contexts.Natal):heading+' · '+(scope||'Chart');
- const secondLine=hasContexts
-  ? contextLine('Transit',contexts.Transit)+' · Timeline durations: '+labelList(durations)+' · '+Math.max(0,elapsed).toFixed(1)+' ms · Checked: '+dateLabel(Date.now())
-  : 'Verified: '+labelList(result.verified)+' · Updated: '+correctionList(result.updated)+' · No data: '+labelList(result.unavailable)+(result.partial&&result.partial.length?' · Partial: '+labelList(result.partial):'')+' · Engine fallback: '+fallbackList(result.fallbackByPlanet)+' · Timeline durations: '+labelList(durations)+' · '+Math.max(0,elapsed).toFixed(1)+' ms · Checked: '+dateLabel(Date.now());
+ const secondLine=hasContexts?contextLine('Transit',contexts.Transit)+' · Timeline durations: '+labelList(durations)+' · '+Math.max(0,elapsed).toFixed(1)+' ms · Checked: '+dateLabel(Date.now()):'Verified: '+labelList(result.verified)+' · Updated: '+correctionList(result.updated)+' · No data: '+labelList(result.unavailable)+(result.partial&&result.partial.length?' · Partial: '+labelList(result.partial):'')+' · Engine fallback: '+fallbackList(result.fallbackByPlanet)+' · Timeline durations: '+labelList(durations)+' · '+Math.max(0,elapsed).toFixed(1)+' ms · Checked: '+dateLabel(Date.now());
  const warning=errors.length||(result.unavailable||[]).length||(result.partial||[]).length;
- latestStatus={state:warning?'warning':'ready',title:firstLine+'\n'+secondLine,html:'<span class="ja-pr-line"><strong>'+escapeHtml(firstLine)+'</strong></span><span class="ja-pr-line">'+escapeHtml(secondLine)+'</span>'};
- lastStatusModel={result,elapsed,scope};
- showLatestStatus();
+ latestStatus={state:warning?'warning':'ready',message:firstLine+'\\n'+secondLine};lastStatusModel={result,elapsed,scope};showLatestStatus();
 }
 function scheduleTimelineStatusRefresh(){
  if(!lastStatusModel||timelineRefreshTimer!==null)return;
