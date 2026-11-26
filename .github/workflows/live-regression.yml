@@ -1,0 +1,38 @@
+name: JupiterAstro Live Browser Regression
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "qa/live-playwright-regression" ]
+
+permissions:
+  contents: read
+
+jobs:
+  live-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm install --save-dev @playwright/test
+          npx playwright install --with-deps chromium
+      - name: Run live JupiterAstro regression
+        env:
+          JUPITERASTRO_URL: https://www.jupiterastrology108.com/8a9K79m85R0t2B7x6C7p48n8V16d0J85.html
+        run: npx playwright test tests/live-regression.spec.js --reporter=list
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jupiterastro-live-regression
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
+          retention-days: 14
