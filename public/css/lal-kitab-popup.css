@@ -401,3 +401,122 @@ body.ja-lk-popup-open { overflow: hidden; }
   .ja-lk-compact-charts { grid-template-columns: 1fr; }
   .ja-lk-window-title { text-align: left; }
 }
+
+
+/* Match the four right-side titlebar controls to Transit Timeline. */
+.ja-lk-titlebar-tools {
+  gap: 8px;
+}
+.ja-lk-titlebar-tools .ja-lk-tool-button,
+.ja-lk-titlebar-tools .ja-lk-theme-toggle,
+.ja-lk-titlebar-tools .ja-lk-global-export-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  padding: 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 50%;
+  color: #334155;
+  background: #fff;
+  cursor: pointer;
+  transition: transform 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+.ja-lk-titlebar-tools .ja-lk-tool-button:hover,
+.ja-lk-titlebar-tools .ja-lk-theme-toggle:hover,
+.ja-lk-titlebar-tools .ja-lk-global-export-button:hover,
+.ja-lk-titlebar-tools .ja-lk-info-button:hover,
+.ja-lk-titlebar-tools .ja-lk-info-button[aria-expanded="true"] {
+  color: #4f78bb;
+  border-color: #8ba8d5;
+  transform: translateY(-1px);
+}
+.ja-lk-titlebar-tools .ja-lk-info-wrap {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 34px;
+  align-items: center;
+  justify-content: center;
+}
+.ja-lk-titlebar-tools .ja-lk-info-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 50%;
+  color: #718096;
+  background: #fff;
+  font: 700 14px/1 Georgia, serif;
+  cursor: pointer;
+  transition: transform 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+.ja-lk-titlebar-tools .ja-lk-global-export-wrap { position: relative; }
+.ja-lk-titlebar-tools .ja-lk-global-export-button svg,
+.ja-lk-titlebar-tools .ja-lk-theme-toggle svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ja-lk-titlebar-tools .ja-lk-global-export-menu {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 9px);
+  right: 0;
+  width: 210px;
+  padding: 7px;
+  border: 1px solid #dbe3ee;
+  border-radius: 10px;
+  background: #fff;
+  color: #334155;
+  box-shadow: 0 10px 30px rgba(0,0,0,.14);
+}
+.ja-lk-titlebar-tools .ja-lk-global-export-menu[hidden] { display: none !important; }
+.ja-lk-titlebar-tools .ja-lk-global-export-heading {
+  padding: 5px 8px 8px;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.ja-lk-titlebar-tools .ja-lk-global-export-menu button {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #1e293b;
+  text-align: left;
+  font-size: 12px;
+  cursor: pointer;
+}
+.ja-lk-titlebar-tools .ja-lk-global-export-menu button:hover { background: #f1f5f9; }
+.ja-lk-titlebar-tools .ja-lk-global-export-menu kbd {
+  padding: 2px 5px;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  color: #64748b;
+  font-size: 9px;
+  background: #f8fafc;
+}
+.ja-lk-popup-window[data-ja-lk-theme="apple"] .ja-lk-titlebar-tools .ja-lk-tool-button,
+.ja-lk-popup-window[data-ja-lk-theme="apple"] .ja-lk-titlebar-tools .ja-lk-theme-toggle,
+.ja-lk-popup-window[data-ja-lk-theme="apple"] .ja-lk-titlebar-tools .ja-lk-info-button,
+.ja-lk-popup-window[data-ja-lk-theme="apple"] .ja-lk-titlebar-tools .ja-lk-global-export-button {
+  background: rgba(255,255,255,.48);
+  border-color: rgba(255,255,255,.70);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 3px 10px rgba(35,45,70,.055);
+  backdrop-filter: blur(14px) saturate(155%);
+}
