@@ -2789,3 +2789,5 @@ body.jtt-window-open{overflow:hidden!important;overscroll-behavior:none!importan
   vertical-align:baseline;
   white-space:nowrap;
 }
+
+/* Minimized launcher position is coordinated by the shared window stack rules. */
