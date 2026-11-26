@@ -6166,11 +6166,16 @@ function getJupiterTransitTimelineRegistry() {
   function register(kData, prefix, targetEl) {
     if (!kData || !targetEl) return;
     const context = { kData, prefix, targetEl };
-    if (!activeContext) activeContext = context;
-    const activate = () => { activeContext = context; };
-    targetEl.addEventListener("pointerdown", activate, true);
-    targetEl.addEventListener("focusin", activate, true);
-    targetEl.addEventListener("click", activate, true);
+    targetEl.__jaLkPopupContext = context;
+    if (!targetEl.__jaLkPopupContextBound) {
+      const activate = () => {
+        if (targetEl.__jaLkPopupContext) activeContext = targetEl.__jaLkPopupContext;
+      };
+      targetEl.addEventListener("pointerdown", activate, true);
+      targetEl.addEventListener("focusin", activate, true);
+      targetEl.addEventListener("click", activate, true);
+      targetEl.__jaLkPopupContextBound = true;
+    }
     // The latest mounted chart becomes the initial active chart; interacting with
     // another chart makes that chart the shortcut target.
     activeContext = context;
