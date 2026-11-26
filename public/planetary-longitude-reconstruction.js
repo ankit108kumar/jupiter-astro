@@ -242,7 +242,7 @@ function create(config){
   })();
   try{return await loading;}finally{loading=null;}
  }
- function getDiagnostics(){return{ready:!!state,version:state&&state.version||null,timezone:state&&state.timezone||null,utcOffsetMinutes:state&&state.offset??null,validationWarnings:state&&state.warnings||[],validationErrors:state&&state.errors||[],engineVersion:VERSION};}
+ function getDiagnostics(){return{ready:!!state,version:state&&state.version||null,timezone:state&&state.timezone||null,utcOffsetMinutes:state?state.offset:null,validationWarnings:state&&state.warnings||[],validationErrors:state&&state.errors||[],engineVersion:VERSION};}
  function calculate(input){
   if(!state)throw fail('Call init() before calculate()','NOT_INITIALIZED');
   if(!isObject(input))throw fail('calculate expects an object','INVALID_ARGUMENT');
