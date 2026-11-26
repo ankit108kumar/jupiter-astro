@@ -5750,11 +5750,23 @@ const activeYear = (typeof window.trSelectedLkYear === 'number' && window.trSele
     }).join('');
 
     if (compact) {
+      const placementRows = PL.map(([planet]) => {
+        const natalHouse = natalPlanetHouses[planet];
+        const varshHouse = varshPlanetHouses[planet];
+        return `
+          <tr>
+            <th scope="row">${planet}</th>
+            <td>${natalHouse}H</td>
+            <td>${varshHouse}H</td>
+          </tr>
+        `;
+      }).join('');
+
       return `
         <div class="ja-lk-compact-controls">
           <div class="ja-lk-compact-control-group">
             <div class="field ja-lk-year-field">
-              <label>Select Varshphal Year</label>
+              <label for="${prefix}-lkYearSelect">Select Varshphal Year</label>
               <select id="${prefix}-lkYearSelect">
                 ${yearOptions}
               </select>
@@ -5767,20 +5779,38 @@ const activeYear = (typeof window.trSelectedLkYear === 'number' && window.trSele
           </div>
           <div class="ja-lk-period">Period: <b>${dateRangeStr}</b></div>
         </div>
-        <div class="two ja-lk-compact-charts">
-          <article class="card kchart">
-            <header><h3>Lal Kitab · Natal Chart</h3></header>
-            <div>${drawNorthChart(k.ascSign, natalLkItems, 'Natal Lal Kitab')}</div>
-            <p class="ja-lk-chart-caption">Natal Grahas in Rashi Chart</p>
-          </article>
-          <article class="card kchart">
-            <header>
-              <h3>Lal Kitab · Varshphal (Year ${activeYear})</h3>
-              <span class="ja-lk-age">Age: ${activeYear - 1}–${activeYear}</span>
-            </header>
-            <div>${drawNorthChart(0, varshItems, 'Varshphal Year ' + activeYear)}</div>
-            <p class="ja-lk-chart-caption">Lal Kitab Progressions (House Movements)</p>
-          </article>
+        <div class="ja-lk-compact-workspace">
+          <section class="ja-lk-compact-chart-area" aria-label="Natal and Varshphal charts">
+            <div class="ja-lk-compact-charts">
+              <article class="card kchart">
+                <header><h3>Lal Kitab · Natal Chart</h3></header>
+                <div>${drawNorthChart(k.ascSign, natalLkItems, 'Natal Lal Kitab')}</div>
+                <p class="ja-lk-chart-caption">Natal Grahas in Rashi Chart</p>
+              </article>
+              <article class="card kchart">
+                <header>
+                  <h3>Lal Kitab · Varshphal (Year ${activeYear})</h3>
+                  <span class="ja-lk-age">Age: ${activeYear - 1}–${activeYear}</span>
+                </header>
+                <div>${drawNorthChart(0, varshItems, 'Varshphal Year ' + activeYear)}</div>
+                <p class="ja-lk-chart-caption">Lal Kitab Progressions (House Movements)</p>
+              </article>
+            </div>
+          </section>
+          <aside class="ja-lk-placement-panel" aria-label="Natal and selected Varshphal planet placements">
+            <div class="ja-lk-placement-heading">
+              <h3>Planet Placements</h3>
+              <span>House position</span>
+            </div>
+            <div class="ja-lk-placement-table-wrap">
+              <table class="ja-lk-placement-table">
+                <thead>
+                  <tr><th>Planet</th><th>Natal</th><th>Varshphal</th></tr>
+                </thead>
+                <tbody>${placementRows}</tbody>
+              </table>
+            </div>
+          </aside>
         </div>
       `;
     }
@@ -6070,9 +6100,15 @@ function getJupiterTransitTimelineRegistry() {
 (function initJALalKitabPopup() {
   if (window.JALalKitabPopup) return;
 
+  const TITLE = "Jupiter Astro · Lal Kitab Birthchart / Varshphal";
   let activeContext = null;
   let overlay = null;
+  let launcher = null;
+  let maximized = false;
+  let previousBounds = null;
+  let dragState = null;
   let lastFocus = null;
+  let themeMode = "website";
 
   function ensureOverlay() {
     if (overlay) return overlay;
@@ -6081,31 +6117,291 @@ function getJupiterTransitTimelineRegistry() {
     overlay.hidden = true;
     overlay.setAttribute("aria-hidden", "true");
     overlay.innerHTML = `
-      <section class="ja-lk-popup-window" role="dialog" aria-modal="true"
-        aria-label="Jupiter Astro Lal Kitab Birthchart and Varshphal">
-        <header class="ja-lk-popup-titlebar">
-          <h2>Jupiter Astro · Lal Kitab Birthchart / Varshphal</h2>
-          <button type="button" class="ja-lk-popup-close" aria-label="Close popup" title="Close">×</button>
+      <section class="ja-lk-popup-window" role="dialog" aria-modal="true" aria-label="${TITLE}">
+        <header class="ja-lk-popup-titlebar" data-ja-lk-drag-handle>
+          <div class="ja-lk-window-controls" aria-label="Window controls">
+            <button class="ja-lk-dot close" type="button" data-ja-lk-action="close" title="Close Lal Kitab popup" aria-label="Close"></button>
+            <button class="ja-lk-dot minimize" type="button" data-ja-lk-action="minimize" title="Minimize Lal Kitab popup" aria-label="Minimize"></button>
+            <button class="ja-lk-dot maximize" type="button" data-ja-lk-action="maximize" title="Maximize or restore Lal Kitab popup" aria-label="Maximize"></button>
+          </div>
+          <div class="ja-lk-window-title">${TITLE}</div>
+          <div class="ja-lk-titlebar-tools">
+            <div class="ja-lk-info-wrap">
+              <button class="ja-lk-tool-button" type="button" data-ja-lk-action="info" title="About this popup" aria-label="About this popup" aria-expanded="false">i</button>
+              <div class="ja-lk-info-popover" hidden>Displays the natal Lal Kitab chart, selected Varshphal progression chart and planetary house placements for the selected birthday-to-birthday year.</div>
+            </div>
+            <div class="ja-lk-export-wrap">
+              <button class="ja-lk-tool-button" type="button" data-ja-lk-action="export-toggle" title="Copy or export planet placements" aria-label="Copy or export planet placements" aria-expanded="false">⇩</button>
+              <div class="ja-lk-export-menu" data-ja-lk-export-menu hidden>
+                <div class="ja-lk-export-heading">Planet Placements</div>
+                <button type="button" data-ja-lk-export="copy">Copy table <kbd>TSV</kbd></button>
+                <button type="button" data-ja-lk-export="csv">Download CSV <kbd>.csv</kbd></button>
+                <button type="button" data-ja-lk-export="tsv">Download TSV <kbd>.tsv</kbd></button>
+                <button type="button" data-ja-lk-export="pdf">Export PDF <kbd>.pdf</kbd></button>
+              </div>
+            </div>
+            <button class="ja-lk-tool-button" type="button" data-ja-lk-action="fullscreen" title="Enter full screen" aria-label="Enter full screen">⛶</button>
+            <button class="ja-lk-tool-button ja-lk-theme-button" type="button" data-ja-lk-action="theme" title="Switch appearance" aria-label="Switch appearance" aria-pressed="false">◐</button>
+          </div>
         </header>
         <div class="ja-lk-popup-content"></div>
       </section>
     `;
-    overlay.querySelector(".ja-lk-popup-close").addEventListener("click", close);
+    overlay.querySelector('[data-ja-lk-action="close"]').addEventListener("click", close);
     overlay.addEventListener("click", event => {
       if (event.target === overlay) close();
     });
+    overlay.querySelector(".ja-lk-titlebar-tools").addEventListener("click", handleToolClick);
+    overlay.addEventListener("click", handleExportClick);
+    enableDragging();
     document.body.appendChild(overlay);
+
+    launcher = document.createElement("button");
+    launcher.type = "button";
+    launcher.className = "ja-lk-restore-launcher";
+    launcher.textContent = "Restore Lal Kitab";
+    launcher.addEventListener("click", restore);
+    document.body.appendChild(launcher);
+    applyTheme(themeMode, false);
     return overlay;
+  }
+
+  function applyTheme(mode, persist) {
+    themeMode = mode === "apple" ? "apple" : "website";
+    if (overlay) overlay.querySelector(".ja-lk-popup-window").setAttribute("data-ja-lk-theme", themeMode);
+    const button = overlay && overlay.querySelector('[data-ja-lk-action="theme"]');
+    if (button) {
+      button.setAttribute("aria-pressed", themeMode === "apple" ? "true" : "false");
+      button.title = themeMode === "apple" ? "Switch to website appearance" : "Switch to Apple appearance";
+    }
+    if (persist !== false) {
+      try { localStorage.setItem("ja-lk-popup-theme", themeMode); } catch (error) {}
+    }
   }
 
   function close() {
     if (!overlay || overlay.hidden) return;
     overlay.hidden = true;
     overlay.setAttribute("aria-hidden", "true");
+    overlay.querySelector(".ja-lk-popup-window").classList.remove("ja-lk-maximized");
     document.body.classList.remove("ja-lk-popup-open");
-    if (lastFocus && typeof lastFocus.focus === "function" && lastFocus.isConnected) {
-      lastFocus.focus();
+    if (launcher) launcher.classList.remove("visible");
+    maximized = false;
+    if (lastFocus && typeof lastFocus.focus === "function" && lastFocus.isConnected) lastFocus.focus();
+  }
+
+  function minimize() {
+    if (!overlay || overlay.hidden) return;
+    overlay.hidden = true;
+    overlay.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("ja-lk-popup-open");
+    if (launcher) launcher.classList.add("visible");
+  }
+
+  function restore() {
+    if (!overlay || !activeContext) return false;
+    if (!window.firebaseAuth || !window.firebaseAuth.currentUser) return false;
+    overlay.hidden = false;
+    overlay.setAttribute("aria-hidden", "false");
+    document.body.classList.add("ja-lk-popup-open");
+    if (launcher) launcher.classList.remove("visible");
+    return true;
+  }
+
+  function toggleMaximize() {
+    if (!overlay) return;
+    const win = overlay.querySelector(".ja-lk-popup-window");
+    if (!maximized) {
+      const rect = win.getBoundingClientRect();
+      previousBounds = { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
+      win.style.left = "";
+      win.style.top = "";
+      win.style.width = "";
+      win.style.height = "";
+      win.style.transform = "";
+      win.classList.add("ja-lk-maximized");
+      maximized = true;
+    } else {
+      win.classList.remove("ja-lk-maximized");
+      maximized = false;
+      if (previousBounds) {
+        win.style.left = previousBounds.left + "px";
+        win.style.top = previousBounds.top + "px";
+        win.style.width = previousBounds.width + "px";
+        win.style.height = previousBounds.height + "px";
+        win.style.transform = "none";
+      }
     }
+  }
+
+  function toggleFullscreen() {
+    const win = overlay && overlay.querySelector(".ja-lk-popup-window");
+    if (!win) return;
+    if (document.fullscreenElement === win) {
+      if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+    } else if (typeof win.requestFullscreen === "function") {
+      win.requestFullscreen({ navigationUI: "hide" }).catch(() => {});
+    }
+  }
+
+  function syncFullscreenButton() {
+    const button = overlay && overlay.querySelector('[data-ja-lk-action="fullscreen"]');
+    if (!button) return;
+    const active = document.fullscreenElement === overlay.querySelector(".ja-lk-popup-window");
+    button.textContent = active ? "⤢" : "⛶";
+    button.title = active ? "Exit full screen" : "Enter full screen";
+    button.setAttribute("aria-label", button.title);
+  }
+
+  function handleToolClick(event) {
+    const button = event.target.closest("[data-ja-lk-action]");
+    if (!button) return;
+    const action = button.getAttribute("data-ja-lk-action");
+    if (action === "close") close();
+    if (action === "minimize") minimize();
+    if (action === "maximize") toggleMaximize();
+    if (action === "fullscreen") toggleFullscreen();
+    if (action === "theme") applyTheme(themeMode === "website" ? "apple" : "website", true);
+    if (action === "info") {
+      const panel = overlay.querySelector(".ja-lk-info-popover");
+      const willOpen = panel.hidden;
+      panel.hidden = !willOpen;
+      button.setAttribute("aria-expanded", willOpen ? "true" : "false");
+    }
+    if (action === "export-toggle") {
+      const menu = overlay.querySelector("[data-ja-lk-export-menu]");
+      const willOpen = menu.hidden;
+      menu.hidden = !willOpen;
+      button.setAttribute("aria-expanded", willOpen ? "true" : "false");
+    }
+    event.stopPropagation();
+  }
+
+  function getPlacementMatrix() {
+    const table = overlay && overlay.querySelector(".ja-lk-placement-table");
+    if (!table) return [];
+    return Array.from(table.querySelectorAll("tr")).map(row =>
+      Array.from(row.querySelectorAll("th,td")).map(cell => cell.textContent.trim())
+    );
+  }
+
+  function delimited(matrix, separator) {
+    return matrix.map(row => row.map(value => {
+      const text = String(value == null ? "" : value);
+      return separator === "," ? '"' + text.replace(/"/g, '""') + '"' : text.replace(/\t/g, " ");
+    }).join(separator)).join("\n");
+  }
+
+  function downloadText(text, mime, extension) {
+    const blob = new Blob([text], { type: mime + ";charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "lal-kitab-planet-placements." + extension;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  async function exportPlacementTable(format) {
+    const matrix = getPlacementMatrix();
+    if (!matrix.length) return;
+    if (format === "copy") {
+      const text = delimited(matrix, "\t");
+      if (navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(text);
+      else {
+        const temp = document.createElement("textarea");
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        temp.remove();
+      }
+    } else if (format === "csv") {
+      downloadText(delimited(matrix, ","), "text/csv", "csv");
+    } else if (format === "tsv") {
+      downloadText(delimited(matrix, "\t"), "text/tab-separated-values", "tsv");
+    } else if (format === "pdf") {
+      if (typeof window.downloadPlanetaryTablePDF !== "function") {
+        window.print();
+        return;
+      }
+      const temp = document.createElement("div");
+      temp.style.position = "fixed";
+      temp.style.left = "-10000px";
+      const table = document.createElement("table");
+      const head = document.createElement("thead");
+      const body = document.createElement("tbody");
+      matrix.forEach((row, index) => {
+        const tr = document.createElement("tr");
+        row.forEach(value => {
+          const cell = document.createElement(index === 0 ? "th" : "td");
+          cell.textContent = value;
+          tr.appendChild(cell);
+        });
+        (index === 0 ? head : body).appendChild(tr);
+      });
+      table.append(head, body);
+      temp.appendChild(table);
+      document.body.appendChild(temp);
+      try { await window.downloadPlanetaryTablePDF(temp); }
+      finally { temp.remove(); }
+    }
+    const menu = overlay.querySelector("[data-ja-lk-export-menu]");
+    if (menu) menu.hidden = true;
+  }
+
+  function handleExportClick(event) {
+    const option = event.target.closest("[data-ja-lk-export]");
+    if (option) {
+      exportPlacementTable(option.getAttribute("data-ja-lk-export")).catch(error => {
+        console.error("Lal Kitab placement export failed:", error);
+      });
+      return;
+    }
+    if (!event.target.closest(".ja-lk-info-wrap")) {
+      const info = overlay.querySelector(".ja-lk-info-popover");
+      if (info) info.hidden = true;
+      const infoButton = overlay.querySelector('[data-ja-lk-action="info"]');
+      if (infoButton) infoButton.setAttribute("aria-expanded", "false");
+    }
+    if (!event.target.closest(".ja-lk-export-wrap")) {
+      const menu = overlay.querySelector("[data-ja-lk-export-menu]");
+      if (menu) menu.hidden = true;
+      const exportButton = overlay.querySelector('[data-ja-lk-action="export-toggle"]');
+      if (exportButton) exportButton.setAttribute("aria-expanded", "false");
+    }
+  }
+
+  function enableDragging() {
+    const win = overlay.querySelector(".ja-lk-popup-window");
+    const handle = overlay.querySelector("[data-ja-lk-drag-handle]");
+    handle.addEventListener("pointerdown", event => {
+      if (event.button !== 0 || event.target.closest("button, .ja-lk-titlebar-tools")) return;
+      if (maximized) toggleMaximize();
+      const rect = win.getBoundingClientRect();
+      win.style.transform = "none";
+      win.style.left = rect.left + "px";
+      win.style.top = rect.top + "px";
+      dragState = { pointerId:event.pointerId, startX:event.clientX, startY:event.clientY, left:rect.left, top:rect.top };
+      handle.setPointerCapture(event.pointerId);
+      event.preventDefault();
+    });
+    handle.addEventListener("pointermove", event => {
+      if (!dragState || event.pointerId !== dragState.pointerId) return;
+      const rect = win.getBoundingClientRect();
+      const left = Math.max(0, Math.min(window.innerWidth - rect.width, dragState.left + event.clientX - dragState.startX));
+      const top = Math.max(0, Math.min(window.innerHeight - 48, dragState.top + event.clientY - dragState.startY));
+      win.style.left = left + "px";
+      win.style.top = top + "px";
+    });
+    const endDrag = event => {
+      if (!dragState || event.pointerId !== dragState.pointerId) return;
+      dragState = null;
+    };
+    handle.addEventListener("pointerup", endDrag);
+    handle.addEventListener("pointercancel", endDrag);
   }
 
   function bindYearControls(context, popupPrefix) {
@@ -6114,12 +6410,10 @@ function getJupiterTransitTimelineRegistry() {
     const prev = root.querySelector("#" + popupPrefix + "-lkPrevYr");
     const next = root.querySelector("#" + popupPrefix + "-lkNextYr");
     const current = root.querySelector("#" + popupPrefix + "-lkNowYr");
-
     const update = year => {
       window.trSelectedLkYear = year == null ? null : Math.max(1, Math.min(120, Number(year) || 1));
       render(context);
     };
-
     if (select) select.addEventListener("change", () => update(parseInt(select.value, 10)));
     if (prev) prev.addEventListener("click", () => update((parseInt(select && select.value, 10) || 1) - 1));
     if (next) next.addEventListener("click", () => update((parseInt(select && select.value, 10) || 1) + 1));
@@ -6135,26 +6429,22 @@ function getJupiterTransitTimelineRegistry() {
   }
 
   function open() {
-    if (!activeContext) return false;
-    // The shortcut is deliberately gated by the live Firebase authentication state.
-    if (!window.firebaseAuth || !window.firebaseAuth.currentUser) return false;
-
+    if (!activeContext || !window.firebaseAuth || !window.firebaseAuth.currentUser) return false;
     lastFocus = document.activeElement;
     ensureOverlay();
     render(activeContext);
     overlay.hidden = false;
     overlay.setAttribute("aria-hidden", "false");
     document.body.classList.add("ja-lk-popup-open");
-    const closeButton = overlay.querySelector(".ja-lk-popup-close");
+    if (launcher) launcher.classList.remove("visible");
+    const closeButton = overlay.querySelector('[data-ja-lk-action="close"]');
     if (closeButton) closeButton.focus();
     return true;
   }
 
   function isEditableTarget(target) {
-    return !!(target && (
-      target.isContentEditable ||
-      (target.closest && target.closest('input, textarea, select, [contenteditable="true"], [role="textbox"]'))
-    ));
+    return !!(target && (target.isContentEditable ||
+      (target.closest && target.closest('input, textarea, select, [contenteditable="true"], [role="textbox"]'))));
   }
 
   function hasOpenDropdown() {
@@ -6176,14 +6466,13 @@ function getJupiterTransitTimelineRegistry() {
       targetEl.addEventListener("click", activate, true);
       targetEl.__jaLkPopupContextBound = true;
     }
-    // The latest mounted chart becomes the initial active chart; interacting with
-    // another chart makes that chart the shortcut target.
     activeContext = context;
   }
 
   document.addEventListener("keydown", event => {
     const key = String(event.key || "").toLowerCase();
     if (key === "escape" && overlay && !overlay.hidden) {
+      if (document.fullscreenElement) return;
       event.preventDefault();
       event.stopPropagation();
       close();
@@ -6199,7 +6488,19 @@ function getJupiterTransitTimelineRegistry() {
     }
   }, true);
 
-  window.JALalKitabPopup = { register, open, close, isOpen: () => !!(overlay && !overlay.hidden) };
+  document.addEventListener("fullscreenchange", syncFullscreenButton);
+  window.addEventListener("ja-auth-state-changed", event => {
+    const user = event && event.detail && Object.prototype.hasOwnProperty.call(event.detail, "user")
+      ? event.detail.user : (window.firebaseAuth && window.firebaseAuth.currentUser);
+    if (!user) close();
+  });
+
+  try {
+    const savedTheme = localStorage.getItem("ja-lk-popup-theme");
+    if (savedTheme === "apple" || savedTheme === "website") themeMode = savedTheme;
+  } catch (error) {}
+
+  window.JALalKitabPopup = { register, open, close, minimize, restore, isOpen: () => !!(overlay && !overlay.hidden) };
 })();
 
 /* ================= FULL UI COMPONENT CONTROLLER ================= */
