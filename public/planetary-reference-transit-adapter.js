@@ -77,10 +77,11 @@ function showStatus(result,elapsed,scope){
   Transit:latestByScope.Transit||null
  };
  const labelList=(items)=>items&&items.length?items.join(', '):'—';
+ const correctionList=(items)=>items&&items.length?items.join(', '):'No correction required';
  const fallbackList=(map)=>Object.entries(map||{}).map(([planet,divisions])=>planet+' ('+divisions.join('/')+')').join(', ')||'—';
  const contextLine=(name,item)=>{
   if(!item)return name+': pending';
-  return name+' — Verified: '+labelList(item.verified)+' · Updated: '+labelList(item.updated)+' · No data: '+labelList(item.unavailable)+(item.partial&&item.partial.length?' · Partial: '+labelList(item.partial):'')+' · Engine fallback: '+fallbackList(item.fallbackByPlanet);
+  return name+' — Verified: '+labelList(item.verified)+' · Updated: '+correctionList(item.updated)+' · No data: '+labelList(item.unavailable)+(item.partial&&item.partial.length?' · Partial: '+labelList(item.partial):'')+' · Engine fallback: '+fallbackList(item.fallbackByPlanet);
  };
  const hasContexts=!!(contexts.Natal||contexts.Transit);
  const errors=result.errors||[];
@@ -88,7 +89,7 @@ function showStatus(result,elapsed,scope){
  const firstLine=hasContexts?heading+' · '+contextLine('Natal',contexts.Natal):heading+' · '+(scope||'Chart');
  const secondLine=hasContexts
   ? contextLine('Transit',contexts.Transit)+' · Timeline durations: '+labelList(durations)+' · '+Math.max(0,elapsed).toFixed(1)+' ms · Checked: '+dateLabel(Date.now())
-  : 'Verified: '+labelList(result.verified)+' · Updated: '+labelList(result.updated)+' · No data: '+labelList(result.unavailable)+(result.partial&&result.partial.length?' · Partial: '+labelList(result.partial):'')+' · Engine fallback: '+fallbackList(result.fallbackByPlanet)+' · Timeline durations: '+labelList(durations)+' · '+Math.max(0,elapsed).toFixed(1)+' ms · Checked: '+dateLabel(Date.now());
+  : 'Verified: '+labelList(result.verified)+' · Updated: '+correctionList(result.updated)+' · No data: '+labelList(result.unavailable)+(result.partial&&result.partial.length?' · Partial: '+labelList(result.partial):'')+' · Engine fallback: '+fallbackList(result.fallbackByPlanet)+' · Timeline durations: '+labelList(durations)+' · '+Math.max(0,elapsed).toFixed(1)+' ms · Checked: '+dateLabel(Date.now());
  const warning=errors.length||(result.unavailable||[]).length||(result.partial||[]).length;
  latestStatus={state:warning?'warning':'ready',title:firstLine+'\n'+secondLine,html:'<span class="ja-pr-line"><strong>'+escapeHtml(firstLine)+'</strong></span><span class="ja-pr-line">'+escapeHtml(secondLine)+'</span>'};
  lastStatusModel={result,elapsed,scope};
