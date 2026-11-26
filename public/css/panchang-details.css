@@ -695,3 +695,48 @@ html,body,*{scrollbar-width:thin;scrollbar-color:#c9c6d0 transparent}
 .ja-panchang-dialog .ja-panchang-period-section tr.ja-panchang-period-auspicious .ja-panchang-slot-main{color:#16a34a!important;font-weight:650!important}
 .ja-panchang-dialog .ja-panchang-period-section tr.ja-panchang-period-auspicious .ja-panchang-duration{color:#16a34a!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;text-shadow:none!important}
 
+
+/* Panchang minimized-window launcher: match the Transit Timeline tray. */
+#ja-panchang-minimized-launcher {
+  position: fixed;
+  z-index: 2147483004;
+  right: 22px;
+  bottom: 22px;
+  display: none;
+  padding: 0;
+  border: 1px solid var(--line-strong, #CBD5E1);
+  border-radius: 12px;
+  color: var(--ink, #0F172A);
+  background: var(--surface, #FFFFFF);
+  box-shadow: 0 8px 28px rgba(0,0,0,.20);
+  font-family: inherit;
+}
+#ja-panchang-minimized-launcher.visible { display: block; }
+#ja-panchang-minimized-launcher button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 15px;
+  border: 0;
+  border-radius: 12px;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+#ja-panchang-minimized-launcher button:hover { background: var(--surface-alt, #F1F5F9); }
+#ja-transit-timeline-launcher.visible ~ #ja-panchang-minimized-launcher,
+body:has(#ja-transit-timeline-launcher.visible) #ja-panchang-minimized-launcher { bottom: 78px; }
+@media (max-width: 760px) {
+  #ja-panchang-minimized-launcher { right: 12px; bottom: 12px; }
+  body:has(#ja-transit-timeline-launcher.visible) #ja-panchang-minimized-launcher { bottom: 68px; }
+}
+
+/* Consistent, independently clickable macOS-style window controls. */
+.ja-panchang-window-controls { position: relative; z-index: 2; }
+.ja-panchang-dot { position: relative; flex: 0 0 12px; width: 12px; height: 12px; min-width: 12px; min-height: 12px; display: inline-block; opacity: 1; pointer-events: auto; }
+.ja-panchang-dot::after { content: ""; position: absolute; inset: -4px; border: 1px solid currentColor; border-radius: 50%; opacity: 0; transform: scale(.82); transition: opacity .16s ease, transform .16s ease; pointer-events: none; }
+.ja-panchang-dot:hover::after, .ja-panchang-dot:focus-visible::after { opacity: .55; transform: scale(1.12); }
+.ja-panchang-dot:focus-visible { outline: 2px solid var(--saffron, #EA580C); outline-offset: 4px; }
+.ja-panchang-modal[hidden] { display: none !important; }

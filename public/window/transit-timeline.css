@@ -2776,3 +2776,16 @@ body.jtt-window-open{overflow:hidden!important;overscroll-behavior:none!importan
 }
 
 
+
+
+/* Chara Karaka labels reuse the natal assignments from the Overview P planet table. */
+#ja-transit-timeline-window .jtt-chara-karaka{
+  display:inline-block;
+  margin-left:6px;
+  color:#6B86A8;
+  font-size:.78em;
+  font-weight:550;
+  letter-spacing:.01em;
+  vertical-align:baseline;
+  white-space:nowrap;
+}

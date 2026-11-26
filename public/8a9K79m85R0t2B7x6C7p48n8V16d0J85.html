@@ -59,6 +59,45 @@
 @media(max-width:620px){.ja-special-points-overlay{padding:10px}.ja-special-points-modal{width:100%;max-height:88vh;padding:14px;border-radius:13px}}
 </style>
 <style id="ja-misc-sensitive-styles">.ja-misc-sensitive-card{margin:0 0 14px;min-width:0}.ja-misc-sensitive-card header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.ja-misc-sensitive-card h3{margin:0}.ja-misc-sensitive-card .sub{margin:4px 0 0}.ja-misc-reference-label{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.82rem;font-weight:600}.ja-misc-reference-label select{min-width:145px;padding:7px 10px;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);color:var(--text)}.ja-misc-sensitive-card table{width:100%;border-collapse:collapse}.ja-misc-sensitive-card th,.ja-misc-sensitive-card td{padding:9px 11px;text-align:left;border-bottom:1px solid var(--line)}.ja-misc-sensitive-card th{font-size:.76rem;color:var(--muted);font-weight:650}.ja-misc-sensitive-card td{font-size:.86rem;font-weight:400}.ja-misc-sensitive-card td small{display:block;color:var(--muted);font-size:.73rem;margin-top:3px}.ja-misc-sensitive-card .num{font-variant-numeric:tabular-nums;white-space:nowrap}.ja-misc-formula{font-size:.76rem;line-height:1.55;margin:10px 2px 0}.ja-misc-accuracy{margin:12px 0;padding:10px 12px;border-radius:9px;background:#fff8e9;color:#916d31;font-size:.8rem;line-height:1.5}</style>
+
+<style id="ja-good-bad-analysis-styles">
+#jaGoodBadOverlay[hidden]{display:none!important}
+#jaGoodBadOverlay{position:fixed;inset:0;z-index:100700;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(28,25,38,.38);backdrop-filter:blur(7px)}
+.ja-gb-window{width:min(1080px,96vw);max-height:min(88vh,900px);display:flex;flex-direction:column;overflow:hidden;background:#fff;border:1px solid rgba(255,255,255,.9);border-radius:19px;box-shadow:0 24px 80px rgba(30,24,44,.24);color:#292638}
+.ja-gb-head{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:20px 24px 16px;border-bottom:1px solid #efedf2}
+.ja-gb-eyebrow{font-size:10px;font-weight:750;letter-spacing:.13em;text-transform:uppercase;color:#9a8cae}
+.ja-gb-title{margin:4px 0 0;font:650 22px/1.2 Inter,system-ui,sans-serif;letter-spacing:-.035em}
+.ja-gb-subtitle{margin:5px 0 0;color:#898596;font-size:12px}
+.ja-gb-shortcut{flex:none;padding:7px 10px;border:1px solid #e9e5ef;border-radius:9px;background:#faf9fc;color:#777184;font:500 11px/1.2 Inter,system-ui,sans-serif}
+.ja-gb-shortcut kbd{font:600 11px/1.2 Inter,system-ui,sans-serif;color:#50485e}
+.ja-gb-body{overflow:auto;padding:18px 22px 22px}
+.ja-gb-columns{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ja-gb-column{min-width:0;border:1px solid #eeebf1;border-radius:14px;overflow:hidden;background:#fff}
+.ja-gb-column-head{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;border-bottom:1px solid #efedf2}
+.ja-gb-column-head h3{display:flex;align-items:center;gap:9px;margin:0;font-size:13px;letter-spacing:.08em}
+.ja-gb-dot{width:8px;height:8px;border-radius:50%;background:#55a58a}
+.ja-gb-column.bad .ja-gb-dot{background:#cf777c}
+.ja-gb-column-head small{color:#938d9d;font-size:10px}
+.ja-gb-category{margin:0 11px;border-bottom:1px solid #f0edf3}
+.ja-gb-category:last-child{border-bottom:0}
+.ja-gb-category summary{display:flex;align-items:center;gap:9px;min-height:49px;padding:10px 5px;cursor:pointer;list-style:none;user-select:none}
+.ja-gb-category summary::-webkit-details-marker{display:none}
+.ja-gb-category summary:after{content:'＋';margin-left:auto;color:#a19aaa;font-size:15px}
+.ja-gb-category[open] summary:after{content:'−'}
+.ja-gb-cat-name{font-size:12px;font-weight:650;color:#403b4d}
+.ja-gb-count{display:inline-flex;align-items:center;justify-content:center;min-width:21px;height:19px;padding:0 6px;border-radius:20px;background:#f2f0f5;color:#827b8d;font-size:10px;font-variant-numeric:tabular-nums}
+.ja-gb-items{padding:0 5px 12px 24px}
+.ja-gb-empty{margin:0;padding:9px 10px;border-radius:8px;background:#faf9fb;color:#9a95a2;font-size:11px;line-height:1.5}
+.ja-gb-observation{margin:0 0 7px;padding:9px 10px;border-left:2px solid #83b7a2;border-radius:0 7px 7px 0;background:#f7fbf9;color:#514d5b;font-size:11px;line-height:1.5}
+.ja-gb-column.bad .ja-gb-observation{border-left-color:#d58b90;background:#fdf8f8}
+.ja-gb-foot{padding:11px 22px;border-top:1px solid #efedf2;color:#96909f;font-size:10px;display:flex;justify-content:space-between;gap:12px}
+#jaGoodBadMinimized[hidden]{display:none!important}
+#jaGoodBadMinimized{position:fixed;right:16px;bottom:104px;z-index:100701;display:flex;align-items:center;gap:9px;padding:11px 15px;border:1px solid #e8e2ee;border-radius:12px;background:rgba(255,255,255,.97);box-shadow:0 8px 28px rgba(38,30,52,.17);color:#51485e;font:650 12px/1 Inter,system-ui,sans-serif;cursor:pointer;backdrop-filter:blur(12px)}
+#jaGoodBadMinimized:before{content:'';width:7px;height:7px;border-radius:50%;background:#a58bc2}
+#jaGoodBadMinimized:hover{transform:translateY(-2px);box-shadow:0 11px 32px rgba(38,30,52,.2)}
+#jaGoodBadMinimized:focus-visible{outline:2px solid #9c7ac0;outline-offset:3px}
+@media(max-width:700px){#jaGoodBadOverlay{padding:8px}.ja-gb-window{width:100%;max-height:94vh;border-radius:14px}.ja-gb-head{padding:16px}.ja-gb-title{font-size:19px}.ja-gb-body{padding:12px}.ja-gb-columns{grid-template-columns:1fr;gap:12px}.ja-gb-shortcut{font-size:0}.ja-gb-shortcut kbd{font-size:10px}.ja-gb-foot{padding:10px 14px}}
+</style>
 </head>
 
 <body class="ja-page-loading">
@@ -1747,6 +1786,8 @@ function getTransitTimelineTableData(k, evalMs) {
     birthMs,
     isPrashnaChart: /prashna/i.test(String(chartTitle)),
     referenceMoonNakshatra: NAK[natalMoonNak][0],
+    // Reuse the exact natal Chara Karaka assignments rendered in the Overview P planet table.
+    charaKarakas: Object.fromEntries(k.karakas.map(item => [item.planet, item.code])),
     moonTransitCount: rows.find(row => row.planet === 'Moon')?.countFromJanmaNakshatra || null,
     chartTitle,
     rows
@@ -3182,12 +3223,12 @@ s += `<text data-layout-house="${h}" data-layout-type="sav" x="${g.sav[0]}" y="$
             ? `<tspan font-size="${Math.max(7, fs - 4)}" dy="-3" fill="${C.muted}">${hasDeg ? it.deg : ''}${marksStr}</tspan><tspan dy="3"></tspan>` 
             : '';
 
-          let itemColor = it.asc ? C.sa : it.al ? C.al : C.ink;
+          let itemColor = it.asc ? C.sa : (it.al || it.kl) ? C.al : C.ink;
           if (it.p && PLANET_COLORS[it.p]) {
             itemColor = PLANET_COLORS[it.p];
           }
 
-          return `<tspan data-p="${it.p || ''}" fill="${itemColor}" font-weight="${it.asc || it.al ? 700 : 500}">${esc(it.t)}</tspan>${combinedSup}`;
+          return `<tspan data-p="${it.p || ''}" fill="${itemColor}" font-weight="${it.asc || it.al || it.kl ? 700 : 500}">${esc(it.t)}</tspan>${combinedSup}`;
         }).join(' ');
         
 s += `<text data-layout-house="${h}" data-layout-type="planet-row" x="${g.c[0]}" y="${y0 + r * 14}" text-anchor="middle" dominant-baseline="central" font-size="${fs}">${str}</text>`;
@@ -4599,6 +4640,20 @@ function jaMiscTabMarkup(k,prefix){
 const RenderTabs = {
   overview(k, prefix) {
     const d1 = getVargaItems(k, 1);
+    // Karakamsa Lagna (KL): place the Navamsa sign occupied by the natal
+    // Atmakaraka into the D1 Rashi chart, using the same definition shown
+    // in the Overview metadata. This is a chart marker, not a planet.
+    const atmakaraka = Array.isArray(k.karakas) ? k.karakas[0] : null;
+    const atmakarakaPosition = atmakaraka && k.ch && k.ch.planets
+      ? k.ch.planets[atmakaraka.planet]
+      : null;
+    if (atmakarakaPosition) {
+      d1.items = d1.items.concat([{
+        t: 'KL',
+        sign: navamsaOfPosition(atmakarakaPosition),
+        kl: true
+      }]);
+    }
     const secKey = window.overviewSecChartKey && window.overviewSecChartKey[prefix] ? window.overviewSecChartKey[prefix] : 'D9';
     const secChart = getSecondaryChart(k, secKey);
     const avk = avkahada(k.ch.planets.Moon.lon);
@@ -9048,6 +9103,101 @@ const result = section === 'planets'
     shownAt = performance.now();
     maybeReveal();
   }));
+})();
+</script>
+
+<div id="jaGoodBadOverlay" hidden aria-hidden="true">
+  <section class="ja-gb-window" role="dialog" aria-modal="true" aria-labelledby="jaGoodBadTitle">
+    <header class="ja-gb-head">
+      <div><div class="ja-gb-eyebrow">JupiterAstro · Life Analysis</div><h2 class="ja-gb-title" id="jaGoodBadTitle">Good &amp; Bad</h2><p class="ja-gb-subtitle">A consolidated view across the four astrological dimensions</p></div>
+      <div class="ja-gb-shortcut" aria-label="Keyboard shortcut"><kbd id="jaGoodBadShortcutLabel">Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>G</kbd></div>
+    </header>
+    <div class="ja-gb-body">
+      <div class="ja-gb-columns">
+        <section class="ja-gb-column good" aria-label="Good indications">
+          <div class="ja-gb-column-head"><h3><span class="ja-gb-dot"></span> GOOD</h3><small id="jaGoodTotal">0 observations</small></div>
+          <div id="jaGoodCategories"></div>
+        </section>
+        <section class="ja-gb-column bad" aria-label="Challenging indications">
+          <div class="ja-gb-column-head"><h3><span class="ja-gb-dot"></span> BAD</h3><small id="jaBadTotal">0 observations</small></div>
+          <div id="jaBadCategories"></div>
+        </section>
+      </div>
+    </div>
+    <footer class="ja-gb-foot"><span>Independent positive and challenging indications; no combined score.</span><span>Press Esc to close</span></footer>
+  </section>
+</div>
+<button id="jaGoodBadMinimized" type="button" hidden aria-label="Restore Good and Bad Analysis">Good &amp; Bad Analysis</button>
+<script id="ja-good-bad-analysis-controller">
+(function(){
+  const overlay=document.getElementById('jaGoodBadOverlay');
+  if(!overlay || overlay.dataset.ready==='1') return;
+  overlay.dataset.ready='1';
+  const minimized=document.getElementById('jaGoodBadMinimized');
+  const categories=[['dasha','Dasha'],['transit','Transit'],['varshphal','Varshphal'],['panchang','Panchang']];
+  document.getElementById('jaGoodBadShortcutLabel').textContent='G';
+  let lastFocus=null;
+  const normalize=value=>Array.isArray(value)?value:[];
+  function renderSide(side,data){
+    const host=document.getElementById(side==='good'?'jaGoodCategories':'jaBadCategories');
+    let total=0;
+    host.replaceChildren();
+    categories.forEach(([key,label])=>{
+      const items=normalize(data&&data[key]); total+=items.length;
+      const details=document.createElement('details');details.className='ja-gb-category';details.dataset.category=key;
+      const summary=document.createElement('summary');
+      const name=document.createElement('span');name.className='ja-gb-cat-name';name.textContent=label;
+      const count=document.createElement('span');count.className='ja-gb-count';count.textContent=String(items.length);
+      summary.append(name,count);details.append(summary);
+      const list=document.createElement('div');list.className='ja-gb-items';
+      if(!items.length){const empty=document.createElement('p');empty.className='ja-gb-empty';empty.textContent='No observations available yet.';list.append(empty);}
+      else items.forEach(item=>{
+        const p=document.createElement('p');p.className='ja-gb-observation';
+        p.textContent=typeof item==='string'?item:(item&&item.text?String(item.text):'');
+        if(p.textContent)list.append(p);
+      });
+      details.append(list);host.append(details);
+    });
+    document.getElementById(side==='good'?'jaGoodTotal':'jaBadTotal').textContent=total+' observation'+(total===1?'':'s');
+  }
+  function setData(data){data=data||{};renderSide('good',data.good||{});renderSide('bad',data.bad||{});}
+  function open(){
+    lastFocus=document.activeElement;
+    minimized.hidden=true;
+    overlay.hidden=false;overlay.setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';
+    const first=overlay.querySelector('summary');if(first)first.focus();
+  }
+  function minimize(){
+    if(overlay.hidden)return;
+    overlay.hidden=true;overlay.setAttribute('aria-hidden','true');
+    minimized.hidden=false;
+    document.body.style.overflow='';
+  }
+  function close(){
+    if(!overlay.hidden){overlay.hidden=true;overlay.setAttribute('aria-hidden','true');}
+    minimized.hidden=true;
+    document.body.style.overflow='';
+    if(lastFocus&&typeof lastFocus.focus==='function')lastFocus.focus();
+  }
+  function toggle(){(overlay.hidden&&minimized.hidden)?open():(!overlay.hidden?minimize():open());}
+  minimized.addEventListener('click',open);
+  document.addEventListener('keydown',function(e){
+    const key=String(e.key||'').toLowerCase();
+    const target=e.target;
+    const editable=target && (
+      target.isContentEditable ||
+      (target.closest && target.closest('[contenteditable="true"],[role="textbox"],input,textarea,select'))
+    );
+    if(key==='g'&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.shiftKey&&!e.repeat&&!e.isComposing&&!editable){
+      e.preventDefault();e.stopPropagation();toggle();return;
+    }
+    if(key==='escape'&&!overlay.hidden){e.preventDefault();e.stopPropagation();minimize();}
+  },true);
+  overlay.addEventListener('click',e=>{if(e.target===overlay)close();});
+  document.addEventListener('ja-good-bad-analysis-data',e=>setData(e.detail));
+  window.JAGoodBadAnalysis={open,close,minimize,toggle,setData};
+  setData({});
 })();
 </script>
 </body>
