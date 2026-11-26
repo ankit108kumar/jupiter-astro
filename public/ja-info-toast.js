@@ -28,7 +28,7 @@
     if(node&&node.classList.contains('is-visible')&&priority<activePriority)return false;
     var id=++sequence,el=ensure(),duration=Math.max(500,Number(options.duration)||2500);
     activeSource=source;activePriority=priority;hideAt=Date.now()+duration;el.textContent=String(message==null?'':message);if(options.remember){remembered={message:el.textContent,options:{source:source,priority:priority,duration:duration,variant:options.variant,position:options.position}};ensureInfoButton();}
-    el.dataset.position=options.position==='bottom'?'bottom':'top';el.classList.toggle('is-warning',options.variant==='warning');el.classList.toggle('is-success',options.variant==='success');
+    el.dataset.position='bottom';el.classList.toggle('is-warning',options.variant==='warning');el.classList.toggle('is-success',options.variant==='success');
     el.classList.remove('is-visible');openLayer();void el.offsetWidth;el.classList.add('is-visible');clearTimer();
     timer=window.setTimeout(function(){if(id===sequence&&Date.now()>=hideAt)hide(source);},duration);return true;
   }
