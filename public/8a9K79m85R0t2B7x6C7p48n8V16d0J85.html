@@ -6119,12 +6119,12 @@ function getJupiterTransitTimelineRegistry() {
     overlay.innerHTML = `
       <section class="ja-lk-popup-window" role="dialog" aria-modal="true" aria-label="${TITLE}">
         <header class="ja-lk-popup-titlebar" data-ja-lk-drag-handle>
+          <div class="ja-lk-chart-switcher"><span class="ja-lk-window-title" data-ja-lk-chart-title>${TITLE}</span><select class="ja-lk-chart-select" data-ja-lk-chart-select aria-label="Select open chart" hidden></select></div>
           <div class="ja-lk-window-controls" aria-label="Window controls">
             <button class="ja-lk-dot close" type="button" data-ja-lk-action="close" title="Close Lal Kitab popup" aria-label="Close"></button>
             <button class="ja-lk-dot minimize" type="button" data-ja-lk-action="minimize" title="Minimize Lal Kitab popup" aria-label="Minimize"></button>
             <button class="ja-lk-dot maximize" type="button" data-ja-lk-action="maximize" title="Maximize or restore Lal Kitab popup" aria-label="Maximize"></button>
           </div>
-          <div class="ja-lk-window-title">${TITLE}</div>
           <div class="ja-lk-titlebar-tools">
             <div class="ja-lk-info-wrap">
               <button class="ja-lk-info-button" type="button" data-ja-lk-action="info" title="Lal Kitab Birthchart / Varshphal information" aria-label="Lal Kitab Birthchart / Varshphal information" aria-expanded="false">i</button>
@@ -6154,6 +6154,15 @@ function getJupiterTransitTimelineRegistry() {
       if (event.target === overlay) close();
     });
     overlay.querySelector(".ja-lk-titlebar-tools").addEventListener("click", handleToolClick);
+    overlay.querySelector("[data-ja-lk-chart-select]").addEventListener("change", event => {
+      const id = event.target.value;
+      const registry = window.JupiterTransitTimelineCharts;
+      if (!registry || !registry.setActive(id, false)) return;
+      const chartEl = document.querySelector('[data-ja-transit-chart-prefix="' + CSS.escape(id) + '"]');
+      activeContext = chartEl && chartEl.__jaLkPopupContext ? chartEl.__jaLkPopupContext : null;
+      if (activeContext) render(activeContext);
+      syncChartSelector();
+    });
     overlay.addEventListener("click", handleExportClick);
     enableDragging();
     document.body.appendChild(overlay);
@@ -6425,6 +6434,10 @@ function getJupiterTransitTimelineRegistry() {
     const current = root.querySelector("#" + popupPrefix + "-lkNowYr");
     const update = year => {
       window.trSelectedLkYear = year == null ? null : Math.max(1, Math.min(120, Number(year) || 1));
+      window.dispatchEvent(new CustomEvent("ja-lk-year-changed", {
+        detail: { prefix: context.prefix, year: window.trSelectedLkYear, source: "popup" }
+      }));
+      if (typeof context.syncLkYear === "function") context.syncLkYear();
       render(context);
     };
     if (select) select.addEventListener("change", () => update(parseInt(select.value, 10)));
@@ -6439,6 +6452,7 @@ function getJupiterTransitTimelineRegistry() {
     const root = overlay.querySelector(".ja-lk-popup-content");
     root.innerHTML = RenderTabs.lalkitab(context.kData, popupPrefix, Date.now(), true);
     bindYearControls(context, popupPrefix);
+    syncChartSelector();
   }
 
   function open() {
@@ -6466,9 +6480,9 @@ function getJupiterTransitTimelineRegistry() {
     );
   }
 
-  function register(kData, prefix, targetEl) {
+  function register(kData, prefix, targetEl, chartTitle) {
     if (!kData || !targetEl) return;
-    const context = { kData, prefix, targetEl };
+    const context = { kData, prefix, targetEl, title: chartTitle || prefix };
     targetEl.__jaLkPopupContext = context;
     if (!targetEl.__jaLkPopupContextBound) {
       const activate = () => {
@@ -6480,7 +6494,42 @@ function getJupiterTransitTimelineRegistry() {
       targetEl.__jaLkPopupContextBound = true;
     }
     activeContext = context;
+    syncChartSelector();
   }
+
+  function syncChartSelector() {
+    if (!overlay) return;
+    const titleEl = overlay.querySelector("[data-ja-lk-chart-title]");
+    const selectEl = overlay.querySelector("[data-ja-lk-chart-select]");
+    const registry = window.JupiterTransitTimelineCharts;
+    const charts = registry && typeof registry.getCharts === "function" ? registry.getCharts() : [];
+    const activeId = registry && typeof registry.getActiveId === "function" ? registry.getActiveId() : "";
+    if (charts.length > 1) {
+      titleEl.hidden = true;
+      selectEl.hidden = false;
+      selectEl.replaceChildren();
+      charts.forEach(chart => {
+        const option = document.createElement("option");
+        option.value = chart.id;
+        option.textContent = chart.title || chart.id;
+        selectEl.appendChild(option);
+      });
+      selectEl.value = activeId || (activeContext && activeContext.prefix) || charts[0].id;
+    } else {
+      selectEl.hidden = true;
+      titleEl.hidden = false;
+      titleEl.textContent = charts.length === 1 ? (charts[0].title || charts[0].id) : (activeContext && activeContext.title) || TITLE;
+    }
+  }
+
+  document.addEventListener("ja-lk-year-changed", event => {
+    if (!overlay || overlay.hidden || !activeContext) return;
+    const detail = event.detail || {};
+    if (detail.prefix && detail.prefix !== activeContext.prefix) return;
+    if (detail.source !== "popup") render(activeContext);
+  });
+
+  window.addEventListener("ja-transit-charts-changed", syncChartSelector);
 
   document.addEventListener("keydown", event => {
     const key = String(event.key || "").toLowerCase();
@@ -6520,7 +6569,7 @@ function getJupiterTransitTimelineRegistry() {
 async function renderKundaliComponent(
   targetEl, kData, prefix, title, subtitle, recordId = ''
 ) {
-  if (window.JALalKitabPopup) window.JALalKitabPopup.register(kData, prefix, targetEl);
+  if (window.JALalKitabPopup) window.JALalKitabPopup.register(kData, prefix, targetEl, title + (recordId ? ' (' + recordId + ')' : ''));
   let nk = nakOfPosition(kData.ch.planets.Moon);
   const nowMs = Date.now();
   const dNow = kData.chain.length
@@ -6556,6 +6605,9 @@ async function renderKundaliComponent(
     activate: () => {
       updateDashaHeader();
       openTab('transit');
+    },
+    syncLkYear: () => {
+      if (activeTabKey === 'lalkitab') openTab('lalkitab');
     },
     setEvaluationTime: ms => {
       const timestamp = Number(ms);
@@ -7205,6 +7257,9 @@ if (offsetInput) {
 
       const updateLkView = (yr) => {
         window.trSelectedLkYear = yr ? Math.max(1, Math.min(120, yr)) : null;
+        window.dispatchEvent(new CustomEvent('ja-lk-year-changed', {
+          detail: { prefix, year: window.trSelectedLkYear, source: 'tab' }
+        }));
         openTab('lalkitab');
       };
 
