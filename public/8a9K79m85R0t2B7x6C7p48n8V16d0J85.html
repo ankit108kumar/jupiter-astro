@@ -685,6 +685,7 @@ body:has(#jaGoodBadMinimized:not([hidden])):has(#ja-transit-timeline-launcher.vi
 </footer>
 
 
+<script src="/planetary-longitude-reconstruction.js"></script>
 <script>
 
 /* ================= THEME CONTROLLER ================= */
@@ -1366,9 +1367,126 @@ function siderealAt(jd) {
   }
   return { aya, planets };
 }
+/* ================= PCHIP LONGITUDE RECONCILIATION =================
+   The native ephemeris remains authoritative fallback. PCHIP is an optional
+   post-calculation correction and never blocks chart generation. */
+let jaLongitudeReferenceReady = false;
+let jaLongitudeReferenceError = null;
+let jaLongitudeStatusNode = null;
+const jaLongitudeEngine = window.JAPlanetaryLongitude
+  ? window.JAPlanetaryLongitude.create({
+      url: "/data/Planetary%20Transit%20correction%20v4.json",
+      cache: true,
+      maxAnchorCorrectionDeg: 2
+    })
+  : null;
+
+function jaSiderealLongitudeAt(planet, epochMs) {
+  const jd = msToJd(epochMs);
+  const d = jd - 2451543.5;
+  const sun = sunPos(d);
+  let tropical;
+  if (planet === "Sun") tropical = sun.lon;
+  else if (planet === "Moon") tropical = moonLon(d, sun);
+  else if (planet === "Rahu") tropical = nodeLon(jd);
+  else if (planet === "Ketu") tropical = rev(nodeLon(jd) + 180);
+  else if (ELEM[planet]) tropical = planetLon(planet, d, sun);
+  else throw new Error("Unsupported planet: " + planet);
+  return rev(tropical - lahiri(jd));
+}
+
+function jaSetLongitudeStatus(message, mode) {
+  if (!document.body) return;
+  if (!jaLongitudeStatusNode) {
+    jaLongitudeStatusNode = document.createElement("div");
+    jaLongitudeStatusNode.id = "JA_LONGITUDE_STATUS_STRIP";
+    jaLongitudeStatusNode.style.cssText = "position:fixed;left:12px;bottom:12px;z-index:9997;max-width:min(560px,calc(100vw - 24px));padding:7px 11px;border:1px solid rgba(100,116,139,.22);border-radius:9px;background:rgba(255,255,255,.94);color:#334155;box-shadow:0 3px 14px rgba(15,23,42,.10);font:500 11px/1.45 Inter,system-ui,sans-serif;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);";
+    document.body.appendChild(jaLongitudeStatusNode);
+  }
+  jaLongitudeStatusNode.textContent = message;
+  jaLongitudeStatusNode.style.borderLeft = mode === "success"
+    ? "3px solid #16a36a"
+    : mode === "warning" ? "3px solid #d97706" : "3px solid #64748b";
+  jaLongitudeStatusNode.title = "Planetary longitude reconciliation status";
+}
+
+if (jaLongitudeEngine) {
+  jaLongitudeEngine.init().then(function (diagnostics) {
+    jaLongitudeReferenceReady = !!diagnostics.ready;
+    jaSetLongitudeStatus(
+      jaLongitudeReferenceReady
+        ? "Planetary reference database ready · PCHIP correction will be applied on the next chart calculation"
+        : "Planetary reference database unavailable · original ephemeris retained",
+      jaLongitudeReferenceReady ? "success" : "warning"
+    );
+  }).catch(function (error) {
+    jaLongitudeReferenceError = error;
+    jaLongitudeReferenceReady = false;
+    console.warn("JupiterAstro PCHIP longitude reference unavailable; native ephemeris remains active.", error);
+    jaSetLongitudeStatus("PCHIP reference unavailable · original planetary calculation retained", "warning");
+  });
+} else {
+  jaLongitudeReferenceError = new Error("PCHIP reconstruction module did not load.");
+  jaSetLongitudeStatus("PCHIP module unavailable · original planetary calculation retained", "warning");
+}
+
 function computeChart({ y, m, d, hh, mm, ss, tz, lat, lon }) {
   const jd = julianDay(y, m, d, hh + mm / 60 + ss / 3600 - tz);
   const { aya, planets } = siderealAt(jd);
+  if (jaLongitudeReferenceReady && jaLongitudeEngine) {
+    const startedAt = performance.now();
+    const corrected = [];
+    const fallback = [];
+    try {
+      const result = jaLongitudeEngine.calculateAll({
+        timestamp: jdToMs(jd),
+        ephemerisLongitudeAt: jaSiderealLongitudeAt
+      });
+      Object.keys(planets).forEach(function (planet) {
+        const item = result.results && result.results[planet];
+        if (item && item.calibration &&
+            item.calibration.method !== "unanchored-ephemeris-fallback" &&
+            Number.isFinite(item.reconstructedLongitude) &&
+            Math.abs(item.correctionDegrees) <= 2) {
+          planets[planet].rawLon = planets[planet].lon;
+          planets[planet].lon = item.reconstructedLongitude;
+          planets[planet].longitudeCorrection = item.correctionDegrees;
+          planets[planet].longitudeMode = "pchip";
+          planets[planet].longitudeReference = item.calibration;
+          corrected.push(planet);
+        } else {
+          planets[planet].longitudeMode = "fallback";
+          planets[planet].longitudeFallbackReason = result.errors && result.errors[planet]
+            ? result.errors[planet].message
+            : "No valid in-range PCHIP correction";
+          fallback.push(planet);
+        }
+      });
+    } catch (error) {
+      console.warn("PCHIP longitude reconciliation failed; native ephemeris retained.", error);
+      Object.keys(planets).forEach(function (planet) {
+        planets[planet].longitudeMode = "fallback";
+        planets[planet].longitudeFallbackReason = error.message;
+        fallback.push(planet);
+      });
+    }
+    const elapsed = (performance.now() - startedAt).toFixed(1);
+    const localStamp = new Date(jdToMs(jd)).toLocaleString();
+    const status = corrected.length
+      ? "Planetary longitudes verified and updated · PCHIP: " + corrected.join(", ") +
+        (fallback.length ? " · Fallback: " + fallback.join(", ") : "") +
+        " · " + elapsed + " ms · " + localStamp
+      : "PCHIP correction unavailable · original calculation retained" +
+        (fallback.length ? " · " + fallback.join(", ") : "") +
+        " · " + elapsed + " ms · " + localStamp;
+    jaSetLongitudeStatus(status, corrected.length ? (fallback.length ? "warning" : "success") : "warning");
+  } else {
+    jaSetLongitudeStatus(
+      "Original planetary calculation active · PCHIP reference " +
+      (jaLongitudeReferenceError ? "unavailable" : "loading"),
+      "warning"
+    );
+  }
   return { jd, aya, asc: rev(ascendant(jd, lat, lon) - aya), planets };
 }
 function saturnSid(jd) { const d = jd - 2451543.5; return rev(planetLon('Saturn', d, sunPos(d)) - lahiri(jd)); }
