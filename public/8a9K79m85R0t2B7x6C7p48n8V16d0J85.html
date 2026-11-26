@@ -1410,91 +1410,86 @@ function jaSetLongitudeStatus(message, mode) {
   jaLongitudeStatusNode.title = "Planetary longitude reconciliation status";
 }
 
-if (jaLongitudeEngine) {
-  jaLongitudeEngine.init().then(function (diagnostics) {
-    jaLongitudeReferenceReady = !!diagnostics.ready;
-    if (jaLongitudeReferenceReady && typeof TRANSIT_POSITION_CACHE !== "undefined") {
-      TRANSIT_POSITION_CACHE.clear();
-    }
-    jaSetLongitudeStatus(
-      jaLongitudeReferenceReady
-        ? "Planetary reference database ready · PCHIP correction will be applied on the next chart/transit calculation"
-        : "Planetary reference database unavailable · original ephemeris retained",
-      jaLongitudeReferenceReady ? "success" : "warning"
-    );
-  }).catch(function (error) {
-    jaLongitudeReferenceError = error;
-    jaLongitudeReferenceReady = false;
-    console.warn("JupiterAstro PCHIP longitude reference unavailable; native ephemeris remains active.", error);
-    jaSetLongitudeStatus("PCHIP reference unavailable · original planetary calculation retained", "warning");
-  });
-} else {
-  jaLongitudeReferenceError = new Error("PCHIP reconstruction module did not load.");
-  jaSetLongitudeStatus("PCHIP module unavailable · original planetary calculation retained", "warning");
-}
+const jaLongitudeReferencePromise = jaLongitudeEngine
+  ? jaLongitudeEngine.init().then(function (diagnostics) {
+      jaLongitudeReferenceReady = !!diagnostics.ready;
+      if (jaLongitudeReferenceReady && typeof TRANSIT_POSITION_CACHE !== "undefined") TRANSIT_POSITION_CACHE.clear();
+      if (!jaLongitudeReferenceReady) throw new Error("Reference database did not become ready.");
+      jaSetLongitudeStatus("Planetary reference database ready · Step 2 enabled", "success");
+      return diagnostics;
+    }).catch(function (error) {
+      jaLongitudeReferenceError = error;
+      jaLongitudeReferenceReady = false;
+      console.warn("PCHIP reference database unavailable; retaining native ephemeris.", error);
+      jaSetLongitudeStatus("PCHIP reference unavailable · original planetary calculation retained", "warning");
+      return null;
+    })
+  : Promise.resolve().then(function () {
+      jaLongitudeReferenceError = new Error("PCHIP reconstruction module did not load.");
+      jaSetLongitudeStatus("PCHIP module unavailable · original planetary calculation retained", "warning");
+      return null;
+    });
 
-function jaApplyPchipLongitudeCorrections(planets, jd) {
+async function jaApplyPchipLongitudeCorrections(planets, jd) {
   const startedAt = performance.now();
-  const corrected = [];
-  const fallback = [];
-  if (!jaLongitudeReferenceReady || !jaLongitudeEngine) {
-    Object.keys(planets).forEach(function (planet) { fallback.push(planet); });
-    return { corrected, fallback, elapsedMs: performance.now() - startedAt, ready: false };
+  const corrected = [], noReference = [], errors = [];
+  // Step 1 has already completed. Step 2 waits for reference database readiness.
+  const diagnostics = await jaLongitudeReferencePromise;
+  if (!diagnostics || !jaLongitudeEngine || !jaLongitudeReferenceReady) {
+    Object.keys(planets).forEach(planet => noReference.push(planet));
+    return { corrected, noReference, errors, elapsedMs: performance.now() - startedAt, ready: false };
   }
+  let result;
   try {
-    const result = jaLongitudeEngine.calculateAll({
-      timestamp: jdToMs(jd),
-      ephemerisLongitudeAt: jaSiderealLongitudeAt
-    });
-    Object.keys(planets).forEach(function (planet) {
-      const item = result.results && result.results[planet];
-      if (item && item.calibration &&
-          item.calibration.method !== "unanchored-ephemeris-fallback" &&
-          Number.isFinite(item.reconstructedLongitude) &&
-          Math.abs(item.correctionDegrees) <= 2) {
-        planets[planet].rawLon = planets[planet].lon;
-        planets[planet].lon = item.reconstructedLongitude;
-        planets[planet].longitudeCorrection = item.correctionDegrees;
-        planets[planet].longitudeMode = "pchip";
-        planets[planet].longitudeReference = item.calibration;
-        corrected.push(planet);
-      } else {
-        planets[planet].longitudeMode = "fallback";
-        planets[planet].longitudeFallbackReason = result.errors && result.errors[planet]
-          ? result.errors[planet].message
-          : "No valid in-range PCHIP correction";
-        fallback.push(planet);
-      }
-    });
+    result = jaLongitudeEngine.calculateAll({ timestamp: jdToMs(jd), ephemerisLongitudeAt: jaSiderealLongitudeAt });
   } catch (error) {
-    console.warn("PCHIP longitude reconciliation failed; native ephemeris retained.", error);
-    Object.keys(planets).forEach(function (planet) {
-      planets[planet].longitudeMode = "fallback";
-      planets[planet].longitudeFallbackReason = error.message;
-      fallback.push(planet);
-    });
+    Object.keys(planets).forEach(planet => errors.push({ planet, reason: error.message }));
+    return { corrected, noReference, errors, elapsedMs: performance.now() - startedAt, ready: true };
   }
-  return { corrected, fallback, elapsedMs: performance.now() - startedAt, ready: true };
+  Object.keys(planets).forEach(planet => {
+    const item = result.results && result.results[planet];
+    if (item && item.calibration && item.calibration.method !== "unanchored-ephemeris-fallback" &&
+        Number.isFinite(item.reconstructedLongitude) && Number.isFinite(item.correctionDegrees) &&
+        Math.abs(item.correctionDegrees) <= 2) {
+      planets[planet].rawLon = planets[planet].lon;
+      planets[planet].lon = item.reconstructedLongitude;
+      planets[planet].longitudeCorrection = item.correctionDegrees;
+      planets[planet].longitudeMode = "pchip";
+      planets[planet].longitudeReference = item.calibration;
+      corrected.push(planet);
+    } else {
+      const failure = result.errors && result.errors[planet];
+      const reason = failure ? failure.message : "No reference event covering this timestamp";
+      planets[planet].longitudeMode = "fallback";
+      planets[planet].longitudeFallbackReason = reason;
+      if (failure && ["MISSING_PLANET_SERIES","NO_USABLE_ANCHORS","OUTSIDE_REFERENCE_COVERAGE"].includes(failure.code)) noReference.push(planet);
+      else if (!failure && item && item.calibration && item.calibration.method === "unanchored-ephemeris-fallback") noReference.push(planet);
+      else errors.push({ planet, reason });
+    }
+  });
+  return { corrected, noReference, errors, elapsedMs: performance.now() - startedAt, ready: true };
+}
+function jaShowLongitudeUpdate(v, context, timestamp) {
+  const updated = v.corrected || [], missing = v.noReference || [], errors = v.errors || [];
+  const parts = [];
+  if (updated.length) parts.push(updated.length + " updated: " + updated.join(", "));
+  if (missing.length) parts.push(missing.length + " no reference/data: " + missing.join(", "));
+  if (errors.length) parts.push(errors.length + " error: " + errors.map(x => x.planet).join(", "));
+  if (!parts.length) parts.push("No longitude corrections required");
+  const message = parts.join(" · ") + " · " + v.elapsedMs.toFixed(1) + " ms" + (timestamp ? " · " + new Date(timestamp).toLocaleString() : "");
+  jaSetLongitudeStatus(message, errors.length || missing.length ? "warning" : "success");
+  if (window.JAInfoToast && typeof window.JAInfoToast.show === "function") {
+    window.JAInfoToast.show(message, { source: "pchip-longitude", priority: 1, variant: errors.length || missing.length ? "warning" : "success", duration: 3500 });
+  }
 }
 
-function computeChart({ y, m, d, hh, mm, ss, tz, lat, lon }) {
+async function computeChart({ y, m, d, hh, mm, ss, tz, lat, lon }) {
   const jd = julianDay(y, m, d, hh + mm / 60 + ss / 3600 - tz);
+  // STEP 1: existing ephemeris calculation.
   const { aya, planets } = siderealAt(jd);
-  const verification = jaApplyPchipLongitudeCorrections(planets, jd);
-  if (verification.ready) {
-    const localStamp = new Date(jdToMs(jd)).toLocaleString();
-    const status = verification.corrected.length
-      ? "Planetary longitudes verified and updated · PCHIP: " + verification.corrected.join(", ") +
-        (verification.fallback.length ? " · Fallback: " + verification.fallback.join(", ") : "") +
-        " · " + verification.elapsedMs.toFixed(1) + " ms · " + localStamp
-      : "PCHIP correction unavailable · original calculation retained" +
-        (verification.fallback.length ? " · " + verification.fallback.join(", ") : "") +
-        " · " + verification.elapsedMs.toFixed(1) + " ms · " + localStamp;
-    jaSetLongitudeStatus(status, verification.corrected.length ? (verification.fallback.length ? "warning" : "success") : "warning");
-  } else {
-    jaSetLongitudeStatus("Original planetary calculation active · PCHIP reference " +
-      (jaLongitudeReferenceError ? "unavailable" : "loading"), "warning");
-  }
+  // STEP 2: wait for reference JSON readiness and reconcile.
+  const verification = await jaApplyPchipLongitudeCorrections(planets, jd);
+  jaShowLongitudeUpdate(verification, "Natal", jdToMs(jd));
   return { jd, aya, asc: rev(ascendant(jd, lat, lon) - aya), planets };
 }
 function saturnSid(jd) { const d = jd - 2451543.5; return rev(planetLon('Saturn', d, sunPos(d)) - lahiri(jd)); }
@@ -1683,7 +1678,7 @@ function calculateRahuBav(pos1, ascSign) {
 const TRANSIT_POSITION_CACHE = new Map();
 const TRANSIT_TIMELINE_DATA_CACHE = new WeakMap();
 
-function getTransitPlanetPositions(evalMs) {
+async function getTransitPlanetPositions(evalMs) {
   const key = Math.trunc(Number(evalMs));
   const jd = msToJd(key);
   if (TRANSIT_POSITION_CACHE.has(key)) {
@@ -1701,17 +1696,11 @@ function getTransitPlanetPositions(evalMs) {
     return cached;
   }
 
+  // STEP 1: calculate raw transit positions using the existing ephemeris.
   const positions = siderealAt(jd).planets;
-  const verification = jaApplyPchipLongitudeCorrections(positions, jd);
-  jaSetLongitudeStatus(
-    verification.corrected.length
-      ? "Planetary transit longitudes verified · PCHIP: " + verification.corrected.join(", ") +
-        (verification.fallback.length ? " · Fallback: " + verification.fallback.join(", ") : "") +
-        " · " + verification.elapsedMs.toFixed(1) + " ms · " + new Date(key).toLocaleString()
-      : "Planetary transit using original calculation · PCHIP fallback · " +
-        verification.elapsedMs.toFixed(1) + " ms · " + new Date(key).toLocaleString(),
-    verification.corrected.length ? (verification.fallback.length ? "warning" : "success") : "warning"
-  );
+  // STEP 2: wait for the shared reference database readiness promise.
+  const verification = await jaApplyPchipLongitudeCorrections(positions, jd);
+  jaShowLongitudeUpdate(verification, "Transit", key);
   TRANSIT_POSITION_CACHE.set(key, positions);
   while (TRANSIT_POSITION_CACHE.size > 32) {
     TRANSIT_POSITION_CACHE.delete(TRANSIT_POSITION_CACHE.keys().next().value);
@@ -1900,7 +1889,7 @@ function transitPlanetStatusMarkers(planet, position, sign, transitPositions) {
   return markers;
 }
 
-function getTransitTimelineTableData(k, evalMs) {
+async function getTransitTimelineTableData(k, evalMs) {
   let chartCache = TRANSIT_TIMELINE_DATA_CACHE.get(k);
   if (!chartCache) {
     chartCache = new Map();
@@ -1910,7 +1899,7 @@ function getTransitTimelineTableData(k, evalMs) {
   const cacheKey = Math.trunc(Number(evalMs));
   if (chartCache.has(cacheKey)) return chartCache.get(cacheKey);
 
-  const transitPositions = getTransitPlanetPositions(cacheKey);
+  const transitPositions = await getTransitPlanetPositions(cacheKey);
   const natalMoonNak = nakOfPosition(k.ch.planets.Moon).i;
   const natalPlanets = PL.map(([name]) => name);
   const matchingPlanets = predicate => natalPlanets
@@ -2584,7 +2573,7 @@ function findTransitionTime(startJd, targetDeg, isNakshatra = false) {
   return jdToMs((low + high) / 2);
 }
 
-function updatePrashnaLivePanchang() {
+async function updatePrashnaLivePanchang() {
   try {
     let y, m, d, hh, mm, ss, lat, lon, tz;
 
@@ -2739,7 +2728,7 @@ const nextSunriseMs =
       : sunsetMs;
 
     // Chart and Panchang limb calculations.
-    const ch = computeChart({
+    const ch = await computeChart({
       y, m, d, hh, mm, ss,
       tz: activeTz,
       lat,
@@ -4463,8 +4452,9 @@ function bundleFromChart(ch, input, offsetDays = 0, natalReconciliation = null) 
   kBundle.lp = lifePromisesEngine(kBundle);
   return kBundle;
 }
-function buildCompleteKundali(input, offsetDays = 0) {
-  return bundleFromChart(computeChart(input), input, offsetDays);
+async function buildCompleteKundali(input, offsetDays = 0) {
+  const chart = await computeChart(input);
+  return bundleFromChart(chart, input, offsetDays);
 }
 function schedulePlanetaryReferenceUpdate(kData, targetEl, prefix, getEvalMs, getActiveTab, refreshRenderedChart) {
   const token = (targetEl.__jaPlanetaryUpdateToken || 0) + 1;
@@ -4473,7 +4463,7 @@ function schedulePlanetaryReferenceUpdate(kData, targetEl, prefix, getEvalMs, ge
   return loadPlanetaryReferenceAdapter().then(async adapter => {
     if (!targetEl.isConnected || targetEl.__jaPlanetaryUpdateToken !== token) return;
     const evalMs = Number(getEvalMs());
-    const rawTransit = getTransitPlanetPositions(evalMs);
+    const rawTransit = await getTransitPlanetPositions(evalMs);
     const [natalResult, transitResult] = await Promise.all([
       adapter.reconcilePositions(kData.ch.planets, kData.birthMs, 'Natal', { silent: true }),
       adapter.reconcilePositions(rawTransit, evalMs, 'Transit', { silent: true })
@@ -5253,7 +5243,7 @@ dasha(k, prefix, evalMs = Date.now()) {
     // 1. Generate Natal D1 Birth Chart data
     const d1 = getVargaItems(k, 1);
     const evalJd = msToJd(evalMs);
-    const calculatedTransitPositions = getTransitPlanetPositions(evalMs);
+    const calculatedTransitPositions = await getTransitPlanetPositions(evalMs);
     const transitCheck = window.JAPlanetaryReconciliation
       ? await window.JAPlanetaryReconciliation.reconcilePositions(calculatedTransitPositions, evalMs, 'Transit')
       : { positions: calculatedTransitPositions, verified: [], updated: [], errors: ['Reference adapter unavailable; using calculated positions.'], elapsedMs: 0 };
@@ -6051,7 +6041,7 @@ async function renderKundaliComponent(
   // Render with the existing ephemeris immediately; reference reconciliation is deferred.
   let currentEvalMs = Date.now();
   let activeTabKey = 'overview';
-  const initialTransitPositions = getTransitPlanetPositions(currentEvalMs);
+  const initialTransitPositions = await getTransitPlanetPositions(currentEvalMs);
   TRANSIT_POSITION_CACHE.set(Math.trunc(Number(currentEvalMs)), initialTransitPositions);
 
   const timelineContext = {
