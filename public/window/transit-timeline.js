@@ -2255,10 +2255,12 @@
     });
   }
 
-  function renderTransitTableFromContext() {
+  var transitRenderToken = 0;
+  async function renderTransitTableFromContext() {
     if (!windowEl) return;
     var host = windowEl.querySelector("[data-jtt-table-scroll]");
     if (!host) return;
+    var renderToken = ++transitRenderToken;
 
     var context = window.JupiterTransitTimelineContext;
     if (!context || typeof context.getTransitTableData !== "function") {
@@ -2268,7 +2270,8 @@
 
     try {
       removeDurationTooltip();
-      var transitData = context.getTransitTableData();
+      var transitData = await context.getTransitTableData();
+      if (renderToken !== transitRenderToken || !windowEl || !host.isConnected) return;
       var durationInfo = windowEl.querySelector("[data-jtt-duration-update-info]");
       var expectedPlanets = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
       var durationRows = transitData && Array.isArray(transitData.rows) ? transitData.rows : [];
