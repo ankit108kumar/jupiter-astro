@@ -598,3 +598,34 @@ body.ja-lk-popup-open { overflow: hidden; }
   .ja-lk-popup-titlebar { gap: 7px; padding-inline: 9px; }
   .ja-lk-year-buttons { flex-wrap: wrap; }
 }
+
+
+/* Keep chart selection in the content header, not the draggable title bar. */
+.ja-lk-header-chart-switcher {
+  flex: 0 0 auto;
+  width: 205px;
+  max-width: 24%;
+  min-width: 145px;
+  align-self: center;
+}
+.ja-lk-header-chart-switcher .ja-lk-chart-name {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ja-lk-header-chart-switcher .ja-lk-chart-select {
+  min-width: 0;
+  width: 100%;
+  height: 38px;
+}
+.ja-lk-header-chart-switcher [hidden] { display: none !important; }
+.ja-lk-compact-controls { justify-content: flex-start; }
+.ja-lk-compact-controls .ja-lk-period { margin-left: auto; }
+@media (max-width: 760px) {
+  .ja-lk-header-chart-switcher { width: 145px; min-width: 110px; max-width: 100%; }
+}
