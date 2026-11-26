@@ -91,6 +91,11 @@
 .ja-gb-observation{margin:0 0 7px;padding:9px 10px;border-left:2px solid #83b7a2;border-radius:0 7px 7px 0;background:#f7fbf9;color:#514d5b;font-size:11px;line-height:1.5}
 .ja-gb-column.bad .ja-gb-observation{border-left-color:#d58b90;background:#fdf8f8}
 .ja-gb-foot{padding:11px 22px;border-top:1px solid #efedf2;color:#96909f;font-size:10px;display:flex;justify-content:space-between;gap:12px}
+#jaGoodBadMinimized[hidden]{display:none!important}
+#jaGoodBadMinimized{position:fixed;right:16px;bottom:104px;z-index:100701;display:flex;align-items:center;gap:9px;padding:11px 15px;border:1px solid #e8e2ee;border-radius:12px;background:rgba(255,255,255,.97);box-shadow:0 8px 28px rgba(38,30,52,.17);color:#51485e;font:650 12px/1 Inter,system-ui,sans-serif;cursor:pointer;backdrop-filter:blur(12px)}
+#jaGoodBadMinimized:before{content:'';width:7px;height:7px;border-radius:50%;background:#a58bc2}
+#jaGoodBadMinimized:hover{transform:translateY(-2px);box-shadow:0 11px 32px rgba(38,30,52,.2)}
+#jaGoodBadMinimized:focus-visible{outline:2px solid #9c7ac0;outline-offset:3px}
 @media(max-width:700px){#jaGoodBadOverlay{padding:8px}.ja-gb-window{width:100%;max-height:94vh;border-radius:14px}.ja-gb-head{padding:16px}.ja-gb-title{font-size:19px}.ja-gb-body{padding:12px}.ja-gb-columns{grid-template-columns:1fr;gap:12px}.ja-gb-shortcut{font-size:0}.ja-gb-shortcut kbd{font-size:10px}.ja-gb-foot{padding:10px 14px}}
 </style>
 </head>
@@ -9122,11 +9127,13 @@ const result = section === 'planets'
     <footer class="ja-gb-foot"><span>Independent positive and challenging indications; no combined score.</span><span>Press Esc to close</span></footer>
   </section>
 </div>
+<button id="jaGoodBadMinimized" type="button" hidden aria-label="Restore Good and Bad Analysis">Good &amp; Bad Analysis</button>
 <script id="ja-good-bad-analysis-controller">
 (function(){
   const overlay=document.getElementById('jaGoodBadOverlay');
   if(!overlay || overlay.dataset.ready==='1') return;
   overlay.dataset.ready='1';
+  const minimized=document.getElementById('jaGoodBadMinimized');
   const categories=[['dasha','Dasha'],['transit','Transit'],['varshphal','Varshphal'],['panchang','Panchang']];
   const mac=/Mac|iPhone|iPad|iPod/i.test(navigator.platform||navigator.userAgent);
   const shortcut=mac?'⌘ Command':'Ctrl';
@@ -9158,27 +9165,35 @@ const result = section === 'planets'
   function setData(data){data=data||{};renderSide('good',data.good||{});renderSide('bad',data.bad||{});}
   function open(){
     lastFocus=document.activeElement;
+    minimized.hidden=true;
     overlay.hidden=false;overlay.setAttribute('aria-hidden','false');
     document.body.style.overflow='hidden';
     const first=overlay.querySelector('summary');if(first)first.focus();
   }
-  function close(){
+  function minimize(){
     if(overlay.hidden)return;
     overlay.hidden=true;overlay.setAttribute('aria-hidden','true');
+    minimized.hidden=false;
+    document.body.style.overflow='';
+  }
+  function close(){
+    if(!overlay.hidden){overlay.hidden=true;overlay.setAttribute('aria-hidden','true');}
+    minimized.hidden=true;
     document.body.style.overflow='';
     if(lastFocus&&typeof lastFocus.focus==='function')lastFocus.focus();
   }
-  function toggle(){overlay.hidden?open():close();}
+  function toggle(){(overlay.hidden&&minimized.hidden)?open():(!overlay.hidden?minimize():open());}
+  minimized.addEventListener('click',open);
   document.addEventListener('keydown',function(e){
     const key=String(e.key||'').toLowerCase();
     if((e.ctrlKey||e.metaKey)&&e.shiftKey&&key==='g'&&!e.altKey){
       e.preventDefault();e.stopPropagation();toggle();return;
     }
-    if(key==='escape'&&!overlay.hidden){e.preventDefault();e.stopPropagation();close();}
+    if(key==='escape'&&!overlay.hidden){e.preventDefault();e.stopPropagation();minimize();}
   },true);
   overlay.addEventListener('click',e=>{if(e.target===overlay)close();});
   document.addEventListener('ja-good-bad-analysis-data',e=>setData(e.detail));
-  window.JAGoodBadAnalysis={open,close,toggle,setData};
+  window.JAGoodBadAnalysis={open,close,minimize,toggle,setData};
   setData({});
 })();
 </script>
