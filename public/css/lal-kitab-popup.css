@@ -554,7 +554,10 @@ body.ja-lk-popup-open { overflow: hidden; }
   border-radius: 8px;
   color: #263248;
   background: #fff;
-  font: 600 12px/1.2 inherit;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
   cursor: pointer;
 }
 .ja-lk-chart-select[hidden] { display: none !important; }
