@@ -152,7 +152,7 @@ async function reconcilePositions(positions,timestamp,scope,options){
    const verified=[],updated=[],unavailable=[],partial=[],errors=[],fallbackByPlanet={};
    PLANETS.forEach(p=>{
     const item=result.results&&result.results[p];
-    if(!item){unavailable.push(p);errors.push((result.errors&&result.errors[p]&&result.errors[p].message)||p+' verification unavailable');return;}
+    if(!item){unavailable.push(p);fallbackByPlanet[p]=DIVISIONS.slice();errors.push((result.errors&&result.errors[p]&&result.errors[p].message)||p+' verification unavailable');return;}
     const supported=DIVISIONS.map(d=>item.divisions&&item.divisions[d.toLowerCase()]).filter(Boolean);
     const covered=supported.filter(x=>x.reference&&x.status==='covered');
     const missingDivisions=DIVISIONS.filter(d=>{const row=item.divisions&&item.divisions[d.toLowerCase()];return !row||!row.reference||row.status!=='covered';});
@@ -171,7 +171,7 @@ async function reconcilePositions(positions,timestamp,scope,options){
   return{positions:out,results:payload.results,verified:payload.verified.slice(),updated:payload.updated.slice(),unavailable:(payload.unavailable||[]).slice(),partial:(payload.partial||[]).slice(),fallbackByPlanet:Object.assign({},payload.fallbackByPlanet||{}),errors:payload.errors.slice(),elapsedMs:elapsed,referenceVersion:payload.version};
  }catch(error){
   const elapsed=nowMs()-start;
-  const failed={verified:[],updated:[],unavailable:PLANETS.slice(),partial:[],errors:[error.message]};
+  const failed={verified:[],updated:[],unavailable:PLANETS.slice(),partial:[],fallbackByPlanet:Object.fromEntries(PLANETS.map(p=>[p,DIVISIONS.slice()])),errors:[error.message]};
   if(scope==='Natal'||scope==='Transit')latestByScope[scope]=failed;
   if(token===requestSequence&&!options.silent)showStatus(failed,elapsed,scope);
   console.error('JupiterAstro planetary reference verification failed:',error);
