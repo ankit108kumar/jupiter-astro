@@ -2808,7 +2808,11 @@
     }
 
     if (event.key === "Escape" && !document.fullscreenElement && openState()) {
-      closeWindow();
+      var panchangModal = document.getElementById("jaPanchangDetailsModal");
+      if (panchangModal && !panchangModal.hidden) return;
+      event.preventDefault();
+      event.stopPropagation();
+      minimizeWindow();
     }
   }, true);
 
