@@ -5,3 +5,5 @@
 #ja-global-info-toast.is-success{color:#276749;border-color:rgba(72,150,110,.35);background:rgba(245,255,249,.98)}
 @media(max-width:600px){#ja-global-info-toast,#ja-global-info-toast:popover-open{width:calc(100vw - 20px);max-width:calc(100vw - 20px);padding:9px 12px;font-size:11px}}
 @media(prefers-reduced-motion:reduce){#ja-global-info-toast{transition:none}}
+
+#ja-global-info-recall{position:fixed!important;left:24px!important;bottom:22px!important;z-index:2147483647!important;width:25px;height:25px;min-width:25px;padding:0;border:1px solid rgba(100,91,115,.28);border-radius:50%;background:rgba(255,255,255,.78);color:#766f82;font:600 13px/1 Inter,system-ui,sans-serif;opacity:.58;cursor:pointer;box-shadow:0 2px 8px rgba(30,25,40,.10);backdrop-filter:blur(8px)}#ja-global-info-recall:hover,#ja-global-info-recall:focus-visible{opacity:1;outline:2px solid rgba(183,131,48,.5);outline-offset:2px}
