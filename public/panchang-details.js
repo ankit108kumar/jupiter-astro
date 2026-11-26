@@ -162,7 +162,23 @@ function renderChaughadiyaHora(which){
   for(var h=0;h<12;h++){var hs=start+h*hd,he=start+(h+1)*hd;var horaPlanet=planets[(seq+h)%7];horaSlots.push({start:hs,end:he,primary:planetMarkup(horaPlanet),trait:horaTraits[horaPlanet]||'',meta:(isDay?'DAY ':'NIGHT ')+(h+1)});}
  }
  addPeriod(sunrise,sunset,true);addPeriod(sunset,nextSunrise,false);
- var selected=table('Chaughadiya',chSlots)+table('Hora',horaSlots);var dayDate=new Date(sunrise+ctx.tz*3600000);subtitleNode.textContent=pad(dayDate.getUTCDate())+'/'+pad(dayDate.getUTCMonth()+1)+'/'+dayDate.getUTCFullYear()+' · '+fmtClock(sunrise,ctx.tz)+' – '+fmtClock(nextSunrise,ctx.tz)+' local chart time';bodyNode.innerHTML='<div class="ja-panchang-dual-grid">'+selected+'</div>';
+ var selected=table('Chaughadiya',chSlots)+table('Hora',horaSlots);
+ var dayDate=new Date(sunrise+ctx.tz*3600000),dayKey=pad(dayDate.getUTCDate())+'/'+pad(dayDate.getUTCMonth()+1)+'/'+dayDate.getUTCFullYear();
+ var rahuSlots=[8,2,7,5,6,4,3],gulikaSlots=[6,5,4,3,2,1,0],yamaSlots=[4,3,2,1,0,6,5],dayEighth=(sunset-sunrise)/8;
+ var kaalItems=[
+  {name:'Abhijit Muhurta',start:wd===3?null:sunrise+7*(sunset-sunrise)/15,end:wd===3?null:sunrise+8*(sunset-sunrise)/15,na:wd===3},
+  {name:'Rahu Kaal',start:sunrise+(rahuSlots[wd]-1)*dayEighth,end:sunrise+rahuSlots[wd]*dayEighth},
+  {name:'Gulika Kaal',start:sunrise+gulikaSlots[wd]*dayEighth,end:sunrise+(gulikaSlots[wd]+1)*dayEighth},
+  {name:'Yamaghanta',start:sunrise+yamaSlots[wd]*dayEighth,end:sunrise+(yamaSlots[wd]+1)*dayEighth}
+ ];
+ var kaalPanel='<section class="ja-panchang-muhurta-panel" aria-label="Muhurta and Kaal timings" style="grid-column:1/-1;margin-top:2px;padding:9px 12px;border:1px solid rgba(110,105,130,.15);border-radius:10px;background:rgba(255,255,255,.78)">'+
+  '<div style="display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap">'+
+  '<strong style="font-size:11px;font-weight:700;color:#454052;white-space:nowrap">Muhurta &amp; Kaal</strong>'+
+  '<div style="display:flex;align-items:center;gap:6px 14px;flex:1;min-width:0;flex-wrap:wrap">'+
+  kaalItems.map(function(item,i){var active=!item.na&&ctx.instant>=item.start&&ctx.instant<item.end;var time=item.na?'Not applicable':fmtClock(item.start,ctx.tz)+' – '+fmtClock(item.end,ctx.tz);var accent=i===0?'#9A762E':i===1?'#B75D61':i===2?'#A66C42':'#69758C';return '<span class="ja-panchang-muhurta-item" style="display:inline-flex;align-items:baseline;gap:5px;white-space:nowrap;font-size:10.5px;line-height:1.5;color:#4B4756"><strong style="font-weight:650;color:'+accent+'">'+item.name+'</strong><span style="font-weight:600;font-variant-numeric:tabular-nums">'+time+'</span>'+(active?'<em class="ja-panchang-now">Now</em>':'')+'</span>';}).join('')+
+  '</div></div></section>';
+ subtitleNode.textContent=dayKey+' · '+fmtClock(sunrise,ctx.tz)+' – '+fmtClock(nextSunrise,ctx.tz)+' local chart time';
+ bodyNode.innerHTML='<div class="ja-panchang-dual-grid">'+selected+kaalPanel+'</div>';
 }
 function renderInauspiciousWeek(){
  var w=bounds(),rahus=[8,2,7,5,6,4,3],guliks=[6,5,4,3,2,1,0],yamas=[4,3,2,1,0,6,5],rows='';

@@ -62,41 +62,89 @@
 
 <style id="ja-good-bad-analysis-styles">
 #jaGoodBadOverlay[hidden]{display:none!important}
-#jaGoodBadOverlay{position:fixed;inset:0;z-index:100700;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(28,25,38,.38);backdrop-filter:blur(7px)}
-.ja-gb-window{width:min(1080px,96vw);max-height:min(88vh,900px);display:flex;flex-direction:column;overflow:hidden;background:#fff;border:1px solid rgba(255,255,255,.9);border-radius:19px;box-shadow:0 24px 80px rgba(30,24,44,.24);color:#292638}
-.ja-gb-head{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:20px 24px 16px;border-bottom:1px solid #efedf2}
-.ja-gb-eyebrow{font-size:10px;font-weight:750;letter-spacing:.13em;text-transform:uppercase;color:#9a8cae}
-.ja-gb-title{margin:4px 0 0;font:650 22px/1.2 Inter,system-ui,sans-serif;letter-spacing:-.035em}
-.ja-gb-subtitle{margin:5px 0 0;color:#898596;font-size:12px}
-.ja-gb-shortcut{flex:none;padding:7px 10px;border:1px solid #e9e5ef;border-radius:9px;background:#faf9fc;color:#777184;font:500 11px/1.2 Inter,system-ui,sans-serif}
-.ja-gb-shortcut kbd{font:600 11px/1.2 Inter,system-ui,sans-serif;color:#50485e}
-.ja-gb-body{overflow:auto;padding:18px 22px 22px}
-.ja-gb-columns{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.ja-gb-column{min-width:0;border:1px solid #eeebf1;border-radius:14px;overflow:hidden;background:#fff}
-.ja-gb-column-head{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;border-bottom:1px solid #efedf2}
-.ja-gb-column-head h3{display:flex;align-items:center;gap:9px;margin:0;font-size:13px;letter-spacing:.08em}
-.ja-gb-dot{width:8px;height:8px;border-radius:50%;background:#55a58a}
-.ja-gb-column.bad .ja-gb-dot{background:#cf777c}
-.ja-gb-column-head small{color:#938d9d;font-size:10px}
-.ja-gb-category{margin:0 11px;border-bottom:1px solid #f0edf3}
+#jaGoodBadOverlay{position:fixed;inset:0;z-index:2147483005;display:flex;align-items:center;justify-content:center;padding:14px;background:transparent;pointer-events:none}
+.ja-gb-window,.ja-gb-window *{box-sizing:border-box}
+.ja-gb-window{
+  --gb-bg:#F8F9FC;--gb-panel:#FFFFFF;--gb-panel-alt:#F2F4F8;--gb-ink:#252B3A;
+  --gb-muted:#737D90;--gb-line:#DDE2EA;--gb-line-strong:#C9D0DC;--gb-accent:#B78330;
+  position:relative;pointer-events:auto;display:flex;flex-direction:column;
+  width:min(1240px,calc(100vw - 28px));height:min(700px,calc(100vh - 28px));
+  min-width:min(600px,calc(100vw - 20px));min-height:360px;max-width:calc(100vw - 20px);max-height:calc(100vh - 20px);
+  overflow:hidden;resize:both;color:var(--gb-ink);background:var(--gb-bg);
+  border:1px solid var(--gb-line);border-radius:11px;
+  box-shadow:0 18px 58px rgba(27,35,52,.22),0 3px 12px rgba(27,35,52,.09);
+  font:14px/1.45 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;isolation:isolate
+}
+.ja-gb-window.is-maximized{position:fixed;inset:8px;width:auto;height:auto;max-width:none;max-height:none;min-width:0;min-height:0;transform:none;resize:none;border-radius:10px}
+.ja-gb-titlebar{height:52px;min-height:52px;display:flex;align-items:center;gap:12px;padding:0 15px;color:var(--gb-ink);background:rgba(248,250,255,.76);border-bottom:1px solid rgba(210,218,231,.62);-webkit-backdrop-filter:blur(28px) saturate(175%);backdrop-filter:blur(28px) saturate(175%);cursor:grab;user-select:none;touch-action:none}
+.ja-gb-titlebar:active{cursor:grabbing}
+.ja-gb-window-controls{display:flex!important;align-items:center;gap:8px;flex:0 0 auto;min-width:64px;visibility:visible!important;opacity:1!important}
+.ja-gb-window-controls .ja-gb-dot{
+  appearance:none!important;-webkit-appearance:none!important;display:block!important;visibility:visible!important;opacity:1!important;
+  position:relative!important;flex:0 0 12px!important;width:12px!important;min-width:12px!important;height:12px!important;min-height:12px!important;
+  margin:0!important;padding:0!important;border:0!important;border-radius:50%!important;cursor:pointer!important;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)!important
+}
+.ja-gb-window-controls .ja-gb-dot.close{background:#FF6058!important}
+.ja-gb-window-controls .ja-gb-dot.minimize{background:#FFBD2E!important}
+.ja-gb-window-controls .ja-gb-dot.maximize{background:#28C840!important}
+.ja-gb-dot:focus-visible{outline:2px solid var(--gb-accent);outline-offset:4px}
+.ja-gb-window-title{flex:1;min-width:0;text-align:center;color:#172033;font-size:18px;font-weight:700;letter-spacing:.05px;pointer-events:none}
+.ja-gb-titlebar-tools{display:flex;align-items:center;justify-content:flex-end;flex:0 0 52px;min-width:52px}
+.ja-gb-main{min-height:0;flex:1;overflow:auto;padding:14px;background:#F8F9FC}
+.ja-gb-columns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:13px;align-items:start}
+.ja-gb-column{min-width:0;overflow:hidden;border:1px solid var(--gb-line);border-radius:9px;background:var(--gb-panel)}
+.ja-gb-column-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;border-bottom:1px solid var(--gb-line);background:#F3F5F8}
+.ja-gb-column-head h3{display:flex;align-items:center;gap:9px;margin:0;color:#303748;font-size:12px;letter-spacing:.08em}
+.ja-gb-dot-indicator{width:8px;height:8px;flex:none;border-radius:50%;background:#26966D}
+.ja-gb-column.bad .ja-gb-dot-indicator{background:#C9656B}
+.ja-gb-column-head small{color:#737D90;font-size:10.5px}
+.ja-gb-category{margin:0 11px;border-bottom:1px solid #E8EBF0}
 .ja-gb-category:last-child{border-bottom:0}
-.ja-gb-category summary{display:flex;align-items:center;gap:9px;min-height:49px;padding:10px 5px;cursor:pointer;list-style:none;user-select:none}
+.ja-gb-category summary{display:flex;align-items:center;gap:9px;min-height:44px;padding:9px 5px;cursor:pointer;list-style:none;user-select:none}
 .ja-gb-category summary::-webkit-details-marker{display:none}
-.ja-gb-category summary:after{content:'＋';margin-left:auto;color:#a19aaa;font-size:15px}
-.ja-gb-category[open] summary:after{content:'−'}
-.ja-gb-cat-name{font-size:12px;font-weight:650;color:#403b4d}
-.ja-gb-count{display:inline-flex;align-items:center;justify-content:center;min-width:21px;height:19px;padding:0 6px;border-radius:20px;background:#f2f0f5;color:#827b8d;font-size:10px;font-variant-numeric:tabular-nums}
-.ja-gb-items{padding:0 5px 12px 24px}
-.ja-gb-empty{margin:0;padding:9px 10px;border-radius:8px;background:#faf9fb;color:#9a95a2;font-size:11px;line-height:1.5}
-.ja-gb-observation{margin:0 0 7px;padding:9px 10px;border-left:2px solid #83b7a2;border-radius:0 7px 7px 0;background:#f7fbf9;color:#514d5b;font-size:11px;line-height:1.5}
-.ja-gb-column.bad .ja-gb-observation{border-left-color:#d58b90;background:#fdf8f8}
-.ja-gb-foot{padding:11px 22px;border-top:1px solid #efedf2;color:#96909f;font-size:10px;display:flex;justify-content:space-between;gap:12px}
+.ja-gb-category summary:after{content:"＋";margin-left:auto;color:#737D90;font-size:14px}
+.ja-gb-category[open] summary:after{content:"−"}
+.ja-gb-cat-name{color:#303748;font-size:12.5px;font-weight:650}
+.ja-gb-count{display:inline-flex;align-items:center;justify-content:center;min-width:21px;height:19px;padding:0 6px;border-radius:20px;background:#F0F2F6;color:#737D90;font-size:10px;font-variant-numeric:tabular-nums}
+.ja-gb-items{padding:0 5px 10px 23px}
+.ja-gb-empty{margin:0;padding:9px 10px;border:1px dashed #D5DAE3;border-radius:7px;background:#F7F8FA;color:#7B8494;font-size:11.5px;line-height:1.5}
+.ja-gb-observation{margin:0 0 7px;padding:9px 10px;border-left:2px solid #65A98E;border-radius:0 6px 6px 0;background:rgba(38,150,109,.055);color:#303748;font-size:11.5px;line-height:1.55;overflow-wrap:anywhere}
+.ja-gb-column.bad .ja-gb-observation{border-left-color:#CF777C;background:rgba(207,98,104,.055)}
+
 #jaGoodBadMinimized[hidden]{display:none!important}
-#jaGoodBadMinimized{position:fixed;right:16px;bottom:104px;z-index:100701;display:flex;align-items:center;gap:9px;padding:11px 15px;border:1px solid #e8e2ee;border-radius:12px;background:rgba(255,255,255,.97);box-shadow:0 8px 28px rgba(38,30,52,.17);color:#51485e;font:650 12px/1 Inter,system-ui,sans-serif;cursor:pointer;backdrop-filter:blur(12px)}
-#jaGoodBadMinimized:before{content:'';width:7px;height:7px;border-radius:50%;background:#a58bc2}
-#jaGoodBadMinimized:hover{transform:translateY(-2px);box-shadow:0 11px 32px rgba(38,30,52,.2)}
-#jaGoodBadMinimized:focus-visible{outline:2px solid #9c7ac0;outline-offset:3px}
-@media(max-width:700px){#jaGoodBadOverlay{padding:8px}.ja-gb-window{width:100%;max-height:94vh;border-radius:14px}.ja-gb-head{padding:16px}.ja-gb-title{font-size:19px}.ja-gb-body{padding:12px}.ja-gb-columns{grid-template-columns:1fr;gap:12px}.ja-gb-shortcut{font-size:0}.ja-gb-shortcut kbd{font-size:10px}.ja-gb-foot{padding:10px 14px}}
+#jaGoodBadMinimized{position:fixed;right:22px;bottom:22px;z-index:2147483006;display:flex;align-items:center;gap:9px;padding:10px 14px;border:1px solid #C9D0DC;border-radius:9px;color:#303748;background:#FFFFFF;box-shadow:0 7px 24px rgba(0,0,0,.18);font:650 12px Inter,-apple-system,sans-serif;cursor:pointer}
+#jaGoodBadMinimized:before{content:"";width:8px;height:8px;border-radius:50%;background:#B78330}
+#jaGoodBadMinimized:hover{background:#F2F4F8}
+#jaGoodBadMinimized:focus-visible{outline:2px solid #B78330;outline-offset:3px}
+.ja-gb-titlebar-tools{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex:0 0 auto;min-width:154px;position:relative}
+.ja-gb-tool-button{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;padding:0;border:1px solid rgba(220,226,237,.52);border-radius:50%;background:rgba(255,255,255,.78);color:#526078;box-shadow:0 3px 12px rgba(31,43,67,.07);font:600 15px/1 Inter,sans-serif;cursor:pointer}
+.ja-gb-tool-button:hover,.ja-gb-tool-button[aria-expanded="true"]{background:rgba(255,255,255,.98);color:#26334A;border-color:rgba(190,201,219,.85);box-shadow:0 4px 15px rgba(31,43,67,.11)}
+.ja-gb-tool-button:focus-visible{outline:2px solid #B78330;outline-offset:2px}
+.ja-gb-tool-button svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ja-gb-info-wrap,.ja-gb-export-wrap{position:relative;display:flex;align-items:center}
+.ja-gb-info-panel,.ja-gb-export-menu{position:absolute;z-index:20;right:0;top:calc(100% + 8px);width:260px;padding:11px;border:1px solid #DDE2EA;border-radius:9px;background:#FFF;box-shadow:0 10px 30px rgba(27,35,52,.16);color:#303748;font:11.5px/1.55 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.ja-gb-info-panel[hidden],.ja-gb-export-menu[hidden]{display:none!important}
+.ja-gb-info-panel strong{display:block;margin-bottom:5px;font-size:12px}
+.ja-gb-info-panel p{margin:0;color:#737D90}
+.ja-gb-export-menu{width:190px;padding:5px}
+.ja-gb-export-menu .heading{padding:6px 8px;color:#737D90;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.ja-gb-export-menu button{display:flex;align-items:center;justify-content:space-between;width:100%;padding:8px;border:0;border-radius:6px;background:transparent;color:#303748;text-align:left;font:500 11.5px Inter,sans-serif;cursor:pointer}
+.ja-gb-export-menu button:hover{background:#F2F4F8}
+.ja-gb-export-menu kbd{padding:2px 5px;border:1px solid #E0E4EB;border-radius:4px;background:#F7F8FA;color:#737D90;font:10px "IBM Plex Mono",monospace}
+.ja-gb-window:fullscreen{width:100vw;height:100vh;max-width:none;max-height:none;min-width:0;min-height:0;border:0;border-radius:0;resize:none}
+.ja-gb-window:fullscreen .ja-gb-main{flex:1}
+@media(max-width:760px){.ja-gb-titlebar-tools{min-width:0;gap:4px}.ja-gb-tool-button{width:26px;height:26px}.ja-gb-info-panel,.ja-gb-export-menu{right:0;top:calc(100% + 6px)}}
+@media(max-width:760px){
+ #jaGoodBadOverlay{padding:5px}
+ .ja-gb-window{width:calc(100vw - 10px);height:calc(100vh - 10px);min-width:0;min-height:300px;max-width:calc(100vw - 10px);max-height:calc(100vh - 10px);border-radius:9px;resize:none}
+ .ja-gb-main{padding:9px}
+ .ja-gb-columns{grid-template-columns:1fr;gap:9px}
+ .ja-gb-titlebar{padding:0 10px}
+ .ja-gb-window-title{font-size:12px}
+ 
+}
+@media(prefers-reduced-motion:reduce){.ja-gb-window *{transition:none!important;animation:none!important}}
 </style>
 </head>
 
@@ -9107,97 +9155,250 @@ const result = section === 'planets'
 </script>
 
 <div id="jaGoodBadOverlay" hidden aria-hidden="true">
-  <section class="ja-gb-window" role="dialog" aria-modal="true" aria-labelledby="jaGoodBadTitle">
-    <header class="ja-gb-head">
-      <div><div class="ja-gb-eyebrow">JupiterAstro · Life Analysis</div><h2 class="ja-gb-title" id="jaGoodBadTitle">Good &amp; Bad</h2><p class="ja-gb-subtitle">A consolidated view across the four astrological dimensions</p></div>
-      <div class="ja-gb-shortcut" aria-label="Keyboard shortcut"><kbd id="jaGoodBadShortcutLabel">Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>G</kbd></div>
+  <section class="ja-gb-window" role="dialog" aria-modal="false" aria-labelledby="jaGoodBadTitle">
+    <header class="ja-gb-titlebar" data-ja-gb-drag-handle>
+      <div class="ja-gb-window-controls" aria-label="Window controls">
+        <button class="ja-gb-dot close" type="button" data-ja-gb-action="close" title="Close Good vs Bad" aria-label="Close"></button>
+        <button class="ja-gb-dot minimize" type="button" data-ja-gb-action="minimize" title="Minimize Good vs Bad" aria-label="Minimize"></button>
+        <button class="ja-gb-dot maximize" type="button" data-ja-gb-action="maximize" title="Maximize or restore Good vs Bad" aria-label="Maximize"></button>
+      </div>
+      <div class="ja-gb-window-title" id="jaGoodBadTitle">Jupiter Astrology · Good vs Bad</div>
+      <div class="ja-gb-titlebar-tools">
+        <div class="ja-gb-info-wrap">
+          <button class="ja-gb-tool-button" type="button" data-ja-gb-action="info" title="Good vs Bad information" aria-label="Good vs Bad information" aria-expanded="false">i</button>
+          <div class="ja-gb-info-panel" data-ja-gb-info-panel hidden>
+            <strong>Good vs Bad Analysis</strong>
+            <p>Positive and challenging observations are listed independently under Dasha, Transit, Varshphal and Panchang. Both may appear together; no combined score is calculated. Press G to toggle this window and Esc to minimize.</p>
+          </div>
+        </div>
+        <div class="ja-gb-export-wrap">
+          <button class="ja-gb-tool-button" type="button" data-ja-gb-action="export-toggle" title="Copy or export observations" aria-label="Copy or export observations" aria-expanded="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path></svg>
+          </button>
+          <div class="ja-gb-export-menu" data-ja-gb-export-menu hidden>
+            <div class="heading">Good vs Bad observations</div>
+            <button type="button" data-ja-gb-export="copy"><span>Copy observations</span><kbd>TXT</kbd></button>
+            <button type="button" data-ja-gb-export="csv"><span>Download CSV</span><kbd>.csv</kbd></button>
+            <button type="button" data-ja-gb-export="tsv"><span>Download TSV</span><kbd>.tsv</kbd></button>
+          </div>
+        </div>
+        <button class="ja-gb-tool-button" type="button" data-ja-gb-action="fullscreen" title="Enter full screen" aria-label="Enter full screen">⛶</button>
+      </div>
     </header>
-    <div class="ja-gb-body">
+    <main class="ja-gb-main">
       <div class="ja-gb-columns">
         <section class="ja-gb-column good" aria-label="Good indications">
-          <div class="ja-gb-column-head"><h3><span class="ja-gb-dot"></span> GOOD</h3><small id="jaGoodTotal">0 observations</small></div>
+          <div class="ja-gb-column-head"><h3><span class="ja-gb-dot-indicator"></span> GOOD</h3><small id="jaGoodTotal">0 observations</small></div>
           <div id="jaGoodCategories"></div>
         </section>
         <section class="ja-gb-column bad" aria-label="Challenging indications">
-          <div class="ja-gb-column-head"><h3><span class="ja-gb-dot"></span> BAD</h3><small id="jaBadTotal">0 observations</small></div>
+          <div class="ja-gb-column-head"><h3><span class="ja-gb-dot-indicator"></span> BAD</h3><small id="jaBadTotal">0 observations</small></div>
           <div id="jaBadCategories"></div>
         </section>
       </div>
-    </div>
-    <footer class="ja-gb-foot"><span>Independent positive and challenging indications; no combined score.</span><span>Press Esc to close</span></footer>
+    </main>
+    
   </section>
 </div>
-<button id="jaGoodBadMinimized" type="button" hidden aria-label="Restore Good and Bad Analysis">Good &amp; Bad Analysis</button>
+<button id="jaGoodBadMinimized" type="button" hidden aria-label="Restore Good and Bad Analysis">Good vs Bad</button>
 <script id="ja-good-bad-analysis-controller">
 (function(){
-  const overlay=document.getElementById('jaGoodBadOverlay');
-  if(!overlay || overlay.dataset.ready==='1') return;
-  overlay.dataset.ready='1';
-  const minimized=document.getElementById('jaGoodBadMinimized');
-  const categories=[['dasha','Dasha'],['transit','Transit'],['varshphal','Varshphal'],['panchang','Panchang']];
-  document.getElementById('jaGoodBadShortcutLabel').textContent='G';
-  let lastFocus=null;
+  "use strict";
+  const overlay=document.getElementById("jaGoodBadOverlay");
+  if(!overlay || overlay.dataset.ready==="1") return;
+  overlay.dataset.ready="1";
+  const windowEl=overlay.querySelector(".ja-gb-window");
+  const minimized=document.getElementById("jaGoodBadMinimized");
+  const categories=[["dasha","Dasha"],["transit","Transit"],["varshphal","Varshphal"],["panchang","Panchang"]];
+  let lastFocus=null, maximized=false, previousBounds=null, dragState=null;
   const normalize=value=>Array.isArray(value)?value:[];
   function renderSide(side,data){
-    const host=document.getElementById(side==='good'?'jaGoodCategories':'jaBadCategories');
+    const host=document.getElementById(side==="good"?"jaGoodCategories":"jaBadCategories");
     let total=0;
     host.replaceChildren();
     categories.forEach(([key,label])=>{
       const items=normalize(data&&data[key]); total+=items.length;
-      const details=document.createElement('details');details.className='ja-gb-category';details.dataset.category=key;
-      const summary=document.createElement('summary');
-      const name=document.createElement('span');name.className='ja-gb-cat-name';name.textContent=label;
-      const count=document.createElement('span');count.className='ja-gb-count';count.textContent=String(items.length);
+      const details=document.createElement("details");details.className="ja-gb-category";details.dataset.category=key;
+      const summary=document.createElement("summary");
+      const name=document.createElement("span");name.className="ja-gb-cat-name";name.textContent=label;
+      const count=document.createElement("span");count.className="ja-gb-count";count.textContent=String(items.length);
       summary.append(name,count);details.append(summary);
-      const list=document.createElement('div');list.className='ja-gb-items';
-      if(!items.length){const empty=document.createElement('p');empty.className='ja-gb-empty';empty.textContent='No observations available yet.';list.append(empty);}
-      else items.forEach(item=>{
-        const p=document.createElement('p');p.className='ja-gb-observation';
-        p.textContent=typeof item==='string'?item:(item&&item.text?String(item.text):'');
+      const list=document.createElement("div");list.className="ja-gb-items";
+      if(!items.length){
+        const empty=document.createElement("p");empty.className="ja-gb-empty";empty.textContent="No observations available yet.";list.append(empty);
+      } else items.forEach(item=>{
+        const p=document.createElement("p");p.className="ja-gb-observation";
+        p.textContent=typeof item==="string"?item:(item&&item.text?String(item.text):"");
         if(p.textContent)list.append(p);
       });
       details.append(list);host.append(details);
     });
-    document.getElementById(side==='good'?'jaGoodTotal':'jaBadTotal').textContent=total+' observation'+(total===1?'':'s');
+    document.getElementById(side==="good"?"jaGoodTotal":"jaBadTotal").textContent=total+" observation"+(total===1?"":"s");
   }
-  function setData(data){data=data||{};renderSide('good',data.good||{});renderSide('bad',data.bad||{});}
+  function getExportRows(){
+    const rows=[["Status","Category","Observation"]];
+    ["good","bad"].forEach(side=>{
+      categories.forEach(([key,label])=>{
+        normalize(currentData&&currentData[side]&&currentData[side][key]).forEach(item=>{
+          const value=typeof item==="string"?item:(item&&item.text?String(item.text):"");
+          if(value)rows.push([side.toUpperCase(),label,value]);
+        });
+      });
+    });
+    return rows;
+  }
+  let currentData={};
+  function setAnalysisData(data){currentData=data||{};renderSide("good",currentData.good||{});renderSide("bad",currentData.bad||{});}
+  function exportText(){
+    return getExportRows().map(row=>row.join("\t")).join("\n");
+  }
+  function downloadExport(format){
+    const rows=getExportRows();
+    const delimiter=format==="csv"?",":"\t";
+    const content=rows.map(row=>row.map(value=>{
+      const text=String(value==null?"":value);
+      return format==="csv"?'"'+text.replace(/"/g,'""')+'"':text.replace(/\t/g," ").replace(/\r?\n/g," ");
+    }).join(delimiter)).join("\r\n");
+    const blob=new Blob(["\uFEFF",content],{type:format==="csv"?"text/csv;charset=utf-8":"text/tab-separated-values;charset=utf-8"});
+    const url=URL.createObjectURL(blob),link=document.createElement("a");
+    link.href=url;link.download="JupiterAstro-Good-Bad-Observations."+format;
+    document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+  async function copyObservations(){
+    const value=exportText();
+    if(navigator.clipboard&&navigator.clipboard.writeText)await navigator.clipboard.writeText(value);
+    else{
+      const field=document.createElement("textarea");field.value=value;field.style.position="fixed";field.style.opacity="0";
+      document.body.appendChild(field);field.select();
+      const ok=document.execCommand("copy");field.remove();
+      if(!ok)throw new Error("Clipboard access is unavailable.");
+    }
+    if(window.JAInfoToast&&typeof window.JAInfoToast.show==="function")window.JAInfoToast.show("Good vs Bad observations copied",{source:"good-bad-analysis",priority:1,variant:"success",duration:1800});
+  }
+  function toggleFullscreen(){
+    if(document.fullscreenElement===windowEl){if(document.exitFullscreen)document.exitFullscreen().catch(()=>{});return;}
+    if(typeof windowEl.requestFullscreen==="function")windowEl.requestFullscreen({navigationUI:"hide"}).catch(()=>{
+      if(window.JAInfoToast&&typeof window.JAInfoToast.show==="function")window.JAInfoToast.show("Full-screen mode is unavailable in this browser session.",{source:"good-bad-analysis",priority:1,variant:"warning"});
+    });
+  }
+  function syncFullscreenButton(){
+    const button=windowEl.querySelector('[data-ja-gb-action="fullscreen"]');
+    if(!button)return;
+    const active=document.fullscreenElement===windowEl;
+    button.textContent=active?"⤢":"⛶";
+    button.title=active?"Exit full screen":"Enter full screen";
+    button.setAttribute("aria-label",button.title);
+  }
   function open(){
     lastFocus=document.activeElement;
     minimized.hidden=true;
-    overlay.hidden=false;overlay.setAttribute('aria-hidden','false');
-    document.body.style.overflow='hidden';
-    const first=overlay.querySelector('summary');if(first)first.focus();
+    overlay.hidden=false;overlay.setAttribute("aria-hidden","false");
+    const first=overlay.querySelector("summary");if(first)first.focus();
   }
   function minimize(){
     if(overlay.hidden)return;
-    overlay.hidden=true;overlay.setAttribute('aria-hidden','true');
+    if(document.fullscreenElement===windowEl&&document.exitFullscreen)document.exitFullscreen().catch(()=>{});
+    overlay.hidden=true;overlay.setAttribute("aria-hidden","true");
     minimized.hidden=false;
-    document.body.style.overflow='';
   }
   function close(){
-    if(!overlay.hidden){overlay.hidden=true;overlay.setAttribute('aria-hidden','true');}
+    if(document.fullscreenElement===windowEl&&document.exitFullscreen)document.exitFullscreen().catch(()=>{});
+    overlay.hidden=true;overlay.setAttribute("aria-hidden","true");
     minimized.hidden=true;
-    document.body.style.overflow='';
-    if(lastFocus&&typeof lastFocus.focus==='function')lastFocus.focus();
+    windowEl.classList.remove("is-maximized");
+    maximized=false;previousBounds=null;
+    windowEl.style.left="";windowEl.style.top="";windowEl.style.width="";windowEl.style.height="";windowEl.style.transform="";
+    if(lastFocus&&typeof lastFocus.focus==="function")lastFocus.focus();
   }
-  function toggle(){(overlay.hidden&&minimized.hidden)?open():(!overlay.hidden?minimize():open());}
-  minimized.addEventListener('click',open);
-  document.addEventListener('keydown',function(e){
-    const key=String(e.key||'').toLowerCase();
-    const target=e.target;
-    const editable=target && (
-      target.isContentEditable ||
-      (target.closest && target.closest('[contenteditable="true"],[role="textbox"],input,textarea,select'))
-    );
-    if(key==='g'&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.shiftKey&&!e.repeat&&!e.isComposing&&!editable){
+  function toggle(){if(!overlay.hidden)minimize();else if(!minimized.hidden)open();else open();}
+  function toggleMaximize(){
+    if(!maximized){
+      const rect=windowEl.getBoundingClientRect();
+      previousBounds={left:rect.left,top:rect.top,width:rect.width,height:rect.height};
+      windowEl.style.left="";windowEl.style.top="";windowEl.style.width="";windowEl.style.height="";windowEl.style.transform="";
+      windowEl.classList.add("is-maximized");maximized=true;
+    }else{
+      windowEl.classList.remove("is-maximized");maximized=false;
+      if(previousBounds){
+        windowEl.style.left=previousBounds.left+"px";windowEl.style.top=previousBounds.top+"px";
+        windowEl.style.width=previousBounds.width+"px";windowEl.style.height=previousBounds.height+"px";
+        windowEl.style.transform="none";
+      }
+    }
+  }
+  minimized.addEventListener("click",open);
+  windowEl.addEventListener("click",function(event){
+    const infoWrap=event.target.closest(".ja-gb-info-wrap");
+    const exportWrap=event.target.closest(".ja-gb-export-wrap");
+    const infoPanel=windowEl.querySelector("[data-ja-gb-info-panel]");
+    const exportMenu=windowEl.querySelector("[data-ja-gb-export-menu]");
+    const infoButton=windowEl.querySelector('[data-ja-gb-action="info"]');
+    const exportButton=windowEl.querySelector('[data-ja-gb-action="export-toggle"]');
+    if(!infoWrap){infoPanel.hidden=true;infoButton.setAttribute("aria-expanded","false");}
+    if(!exportWrap){exportMenu.hidden=true;exportButton.setAttribute("aria-expanded","false");}
+    const button=event.target.closest("[data-ja-gb-action]");
+    if(button){
+      const action=button.getAttribute("data-ja-gb-action");
+      if(action==="close")close();
+      if(action==="minimize")minimize();
+      if(action==="maximize")toggleMaximize();
+      if(action==="fullscreen")toggleFullscreen();
+      if(action==="info"){
+        infoPanel.hidden=!infoPanel.hidden;
+        button.setAttribute("aria-expanded",String(!infoPanel.hidden));
+      }
+      if(action==="export-toggle"){
+        exportMenu.hidden=!exportMenu.hidden;
+        button.setAttribute("aria-expanded",String(!exportMenu.hidden));
+      }
+      return;
+    }
+    const exportAction=event.target.closest("[data-ja-gb-export]");
+    if(exportAction){
+      const format=exportAction.getAttribute("data-ja-gb-export");
+      exportMenu.hidden=true;exportButton.setAttribute("aria-expanded","false");
+      if(format==="copy")copyObservations().catch(error=>{
+        if(window.JAInfoToast&&typeof window.JAInfoToast.show==="function")window.JAInfoToast.show("Copy failed: "+error.message,{source:"good-bad-analysis",priority:2,variant:"warning"});
+      });
+      if(format==="csv"||format==="tsv")downloadExport(format);
+    }
+  });
+  document.addEventListener("fullscreenchange",syncFullscreenButton);
+  const dragHandle=windowEl.querySelector("[data-ja-gb-drag-handle]");
+  dragHandle.addEventListener("pointerdown",function(event){
+    if(event.button!==0 || event.target.closest("button"))return;
+    if(maximized)toggleMaximize();
+    const rect=windowEl.getBoundingClientRect();
+    windowEl.style.transform="none";windowEl.style.left=rect.left+"px";windowEl.style.top=rect.top+"px";
+    dragState={pointerId:event.pointerId,startX:event.clientX,startY:event.clientY,left:rect.left,top:rect.top};
+    dragHandle.setPointerCapture(event.pointerId);event.preventDefault();
+  });
+  dragHandle.addEventListener("pointermove",function(event){
+    if(!dragState||event.pointerId!==dragState.pointerId)return;
+    const width=windowEl.offsetWidth;
+    const left=dragState.left+(event.clientX-dragState.startX);
+    const top=dragState.top+(event.clientY-dragState.startY);
+    const maxLeft=Math.max(0,window.innerWidth-Math.min(100,width));
+    const maxTop=Math.max(0,window.innerHeight-48);
+    windowEl.style.left=Math.max(-width+100,Math.min(maxLeft,left))+"px";
+    windowEl.style.top=Math.max(0,Math.min(maxTop,top))+"px";
+  });
+  function stopDragging(event){if(dragState&&event.pointerId===dragState.pointerId)dragState=null;}
+  dragHandle.addEventListener("pointerup",stopDragging);
+  dragHandle.addEventListener("pointercancel",stopDragging);
+  document.addEventListener("keydown",function(e){
+    const key=String(e.key||"").toLowerCase(),target=e.target;
+    const editable=!!(target&&(target.isContentEditable||(target.closest&&target.closest('[contenteditable="true"],[role="textbox"],input,textarea,select'))));
+    if(key==="g"&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.shiftKey&&!e.repeat&&!e.isComposing&&!editable){
       e.preventDefault();e.stopPropagation();toggle();return;
     }
-    if(key==='escape'&&!overlay.hidden){e.preventDefault();e.stopPropagation();minimize();}
+    if(key==="escape"&&!overlay.hidden){
+      e.preventDefault();e.stopPropagation();minimize();
+    }
   },true);
-  overlay.addEventListener('click',e=>{if(e.target===overlay)close();});
-  document.addEventListener('ja-good-bad-analysis-data',e=>setData(e.detail));
-  window.JAGoodBadAnalysis={open,close,minimize,toggle,setData};
-  setData({});
+  document.addEventListener("ja-good-bad-analysis-data",e=>setAnalysisData(e.detail));
+  window.JAGoodBadAnalysis={open,close,minimize,toggle,setData:setAnalysisData,isOpen:()=>!overlay.hidden};
+  setAnalysisData({});
 })();
 </script>
 </body>
