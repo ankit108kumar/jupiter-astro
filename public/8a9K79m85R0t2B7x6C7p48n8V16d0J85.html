@@ -1413,9 +1413,12 @@ function jaSetLongitudeStatus(message, mode) {
 if (jaLongitudeEngine) {
   jaLongitudeEngine.init().then(function (diagnostics) {
     jaLongitudeReferenceReady = !!diagnostics.ready;
+    if (jaLongitudeReferenceReady && typeof TRANSIT_POSITION_CACHE !== "undefined") {
+      TRANSIT_POSITION_CACHE.clear();
+    }
     jaSetLongitudeStatus(
       jaLongitudeReferenceReady
-        ? "Planetary reference database ready · PCHIP correction will be applied on the next chart calculation"
+        ? "Planetary reference database ready · PCHIP correction will be applied on the next chart/transit calculation"
         : "Planetary reference database unavailable · original ephemeris retained",
       jaLongitudeReferenceReady ? "success" : "warning"
     );
@@ -1682,11 +1685,33 @@ const TRANSIT_TIMELINE_DATA_CACHE = new WeakMap();
 
 function getTransitPlanetPositions(evalMs) {
   const key = Math.trunc(Number(evalMs));
-  if (TRANSIT_POSITION_CACHE.has(key)) return TRANSIT_POSITION_CACHE.get(key);
-
   const jd = msToJd(key);
+  if (TRANSIT_POSITION_CACHE.has(key)) {
+    const cached = TRANSIT_POSITION_CACHE.get(key);
+    const corrected = Object.keys(cached).filter(function (planet) { return cached[planet].longitudeMode === "pchip"; });
+    const fallback = Object.keys(cached).filter(function (planet) { return cached[planet].longitudeMode !== "pchip"; });
+    jaSetLongitudeStatus(
+      corrected.length
+        ? "Planetary transit longitudes verified · PCHIP: " + corrected.join(", ") +
+          (fallback.length ? " · Fallback: " + fallback.join(", ") : "") +
+          " · Cached · " + new Date(key).toLocaleString()
+        : "Planetary transit using original calculation · PCHIP fallback · " + new Date(key).toLocaleString(),
+      corrected.length ? (fallback.length ? "warning" : "success") : "warning"
+    );
+    return cached;
+  }
+
   const positions = siderealAt(jd).planets;
-  jaApplyPchipLongitudeCorrections(positions, jd);
+  const verification = jaApplyPchipLongitudeCorrections(positions, jd);
+  jaSetLongitudeStatus(
+    verification.corrected.length
+      ? "Planetary transit longitudes verified · PCHIP: " + verification.corrected.join(", ") +
+        (verification.fallback.length ? " · Fallback: " + verification.fallback.join(", ") : "") +
+        " · " + verification.elapsedMs.toFixed(1) + " ms · " + new Date(key).toLocaleString()
+      : "Planetary transit using original calculation · PCHIP fallback · " +
+        verification.elapsedMs.toFixed(1) + " ms · " + new Date(key).toLocaleString(),
+    verification.corrected.length ? (verification.fallback.length ? "warning" : "success") : "warning"
+  );
   TRANSIT_POSITION_CACHE.set(key, positions);
   while (TRANSIT_POSITION_CACHE.size > 32) {
     TRANSIT_POSITION_CACHE.delete(TRANSIT_POSITION_CACHE.keys().next().value);
