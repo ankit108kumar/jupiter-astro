@@ -3909,42 +3909,7 @@ padding: 28px 30px;
   }
 }
 
-/* LOGOUT CONFIRMATION TOAST */
-
-#loginToast,
-#logoutToast {
-  position: fixed;
-  top: 90px;
-  left: 50%;
-  transform: translateX(-50%) translateY(-10px);
-
-  z-index: 2000000;
-
-  padding: 12px 22px;
-  border: 1px solid var(--good);
-  border-radius: 10px;
-
-  background: var(--surface);
-  color: var(--good);
-
-  font-size: 0.9rem;
-  font-weight: 700;
-
-  box-shadow: 0 6px 22px rgba(0,0,0,0.15);
-
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.25s ease;
-}
-
-#loginToast.show,
-#logoutToast.show {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(0);
-}
-
-
+public/8a9K79m85R0t2B7x6C7p48n8V16d0J85.html
 /* ==========================================
    COPY / EXPORT CONTROL
 ========================================== */
