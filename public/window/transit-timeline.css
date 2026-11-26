@@ -2769,3 +2769,8 @@ body.jtt-window-open{overflow:hidden!important;overscroll-behavior:none!importan
 #ja-transit-timeline-window .jtt-duration-update-info[hidden] {
   display: none !important;
 }
+
+#ja-transit-timeline-window .jtt-duration-update-info.is-incomplete {
+  color: var(--jtt-warning, #9a6b32);
+  opacity: .9;
+}
