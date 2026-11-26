@@ -117,7 +117,7 @@ function makePositions(positions,results){
     const row=item.divisions&&item.divisions[d.toLowerCase()];
     const label=row&&row.reference?row.final:null;
     divisionStatus[d]={
-     verified:!!(label&&row.status==='covered'),
+     verified:!!(label&&(row.status==='covered'||row.status==='coverage-open-ended')),
      fallback:!label,
      source:row&&row.referenceSource||null,
      reason:row&&row.fallbackReason||(!label&&row&&row.status)||null
@@ -154,8 +154,8 @@ async function reconcilePositions(positions,timestamp,scope,options){
     const item=result.results&&result.results[p];
     if(!item){unavailable.push(p);fallbackByPlanet[p]=DIVISIONS.slice();errors.push((result.errors&&result.errors[p]&&result.errors[p].message)||p+' verification unavailable');return;}
     const supported=DIVISIONS.map(d=>item.divisions&&item.divisions[d.toLowerCase()]).filter(Boolean);
-    const covered=supported.filter(x=>x.reference&&x.status==='covered');
-    const missingDivisions=DIVISIONS.filter(d=>{const row=item.divisions&&item.divisions[d.toLowerCase()];return !row||!row.reference||row.status!=='covered';});
+    const covered=supported.filter(x=>x.reference&&(x.status==='covered'||x.status==='coverage-open-ended'));
+    const missingDivisions=DIVISIONS.filter(d=>{const row=item.divisions&&item.divisions[d.toLowerCase()];return !row||!row.reference||(row.status!=='covered'&&row.status!=='coverage-open-ended');});
     if(missingDivisions.length)fallbackByPlanet[p]=missingDivisions;
     if(covered.length===DIVISIONS.length)verified.push(p);
     else if(covered.length)partial.push(p);
