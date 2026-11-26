@@ -171,13 +171,12 @@ function renderChaughadiyaHora(which){
   {name:'Gulika Kaal',start:sunrise+gulikaSlots[wd]*dayEighth,end:sunrise+(gulikaSlots[wd]+1)*dayEighth},
   {name:'Yamaghanta',start:sunrise+yamaSlots[wd]*dayEighth,end:sunrise+(yamaSlots[wd]+1)*dayEighth}
  ];
- var kaalPanel='<section class="ja-panchang-muhurta-panel" aria-label="Muhurta and Kaal timings" style="grid-column:1/-1;margin-top:2px;padding:13px 15px;border:1px solid rgba(110,105,130,.15);border-radius:12px;background:rgba(255,255,255,.78);box-shadow:0 2px 10px rgba(40,35,55,.035)">'+
-  '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px"><strong style="font-size:12px;font-weight:700;color:#454052;letter-spacing:.02em">Muhurta &amp; Kaal</strong><span style="font-size:10px;color:#898495">'+dayKey+' · Sunrise–Sunset</span></div>'+
-  '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px">'+
-  kaalItems.map(function(item,i){var active=!item.na&&ctx.instant>=item.start&&ctx.instant<item.end;var time=item.na?'Not applicable':fmtClock(item.start,ctx.tz)+' – '+fmtClock(item.end,ctx.tz);var accent=i===0?'#9A762E':i===1?'#B75D61':i===2?'#A66C42':'#69758C';return '<div class="ja-panchang-muhurta-item" style="min-width:0;padding:9px 10px;border:1px solid rgba(110,105,130,.12);border-radius:9px;background:'+(active?'#FFF7E8':'rgba(248,247,251,.82)')+'">'+
-   '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:5px"><span style="font-size:10.5px;font-weight:650;color:'+accent+'">'+item.name+'</span>'+(active?'<em class="ja-panchang-now">Now</em>':'')+'</div>'+
-   '<div style="font-size:12px;font-weight:600;color:#4B4756;font-variant-numeric:tabular-nums;white-space:nowrap">'+time+'</div></div>';}).join('')+
-  '</div></section>';
+ var kaalPanel='<section class="ja-panchang-muhurta-panel" aria-label="Muhurta and Kaal timings" style="grid-column:1/-1;margin-top:2px;padding:9px 12px;border:1px solid rgba(110,105,130,.15);border-radius:10px;background:rgba(255,255,255,.78)">'+
+  '<div style="display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap">'+
+  '<strong style="font-size:11px;font-weight:700;color:#454052;white-space:nowrap">Muhurta &amp; Kaal</strong>'+
+  '<div style="display:flex;align-items:center;gap:6px 14px;flex:1;min-width:0;flex-wrap:wrap">'+
+  kaalItems.map(function(item,i){var active=!item.na&&ctx.instant>=item.start&&ctx.instant<item.end;var time=item.na?'Not applicable':fmtClock(item.start,ctx.tz)+' – '+fmtClock(item.end,ctx.tz);var accent=i===0?'#9A762E':i===1?'#B75D61':i===2?'#A66C42':'#69758C';return '<span class="ja-panchang-muhurta-item" style="display:inline-flex;align-items:baseline;gap:5px;white-space:nowrap;font-size:10.5px;line-height:1.5;color:#4B4756"><strong style="font-weight:650;color:'+accent+'">'+item.name+'</strong><span style="font-weight:600;font-variant-numeric:tabular-nums">'+time+'</span>'+(active?'<em class="ja-panchang-now">Now</em>':'')+'</span>';}).join('')+
+  '</div></div></section>';
  subtitleNode.textContent=dayKey+' · '+fmtClock(sunrise,ctx.tz)+' – '+fmtClock(nextSunrise,ctx.tz)+' local chart time';
  bodyNode.innerHTML='<div class="ja-panchang-dual-grid">'+selected+kaalPanel+'</div>';
 }
