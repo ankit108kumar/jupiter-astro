@@ -6488,6 +6488,12 @@ function getJupiterTransitTimelineRegistry() {
     lastFocus = document.activeElement;
     ensureOverlay();
     render(activeContext);
+    const contextAtOpen = activeContext;
+    if (window.JA_LK_FUNDAMENTAL_RULES_PROMISE) {
+      window.JA_LK_FUNDAMENTAL_RULES_PROMISE.then(() => {
+        if (!overlay.hidden && activeContext === contextAtOpen) render(contextAtOpen);
+      });
+    }
     overlay.hidden = false;
     overlay.setAttribute("aria-hidden", "false");
     document.body.classList.add("ja-lk-popup-open");
