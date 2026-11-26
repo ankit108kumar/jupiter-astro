@@ -2799,14 +2799,27 @@
 
   document.addEventListener("keydown", function (event) {
     var isMac = isApplePlatform();
-    // Avoid Ctrl+Alt (AltGr) on Windows/Linux. Use the requested alphabet chord.
+    var target = event.target;
+    var isEditable = !!(target && (
+      target.isContentEditable ||
+      (target.closest && target.closest(
+        '[contenteditable="true"],[role="textbox"],input,textarea,select'
+      ))
+    ));
+
+    // Keep the existing modifier shortcut and add plain X as a quick opener.
+    // Plain X is ignored while typing in any editable field.
+    var isPlainX = event.code === "KeyX" &&
+      !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey &&
+      !event.repeat && !event.isComposing && !isEditable;
+
     var isTimelineShortcut = isMac
       ? event.code === "KeyT" && event.metaKey && event.altKey &&
         !event.ctrlKey && !event.shiftKey
       : event.code === "KeyX" && event.ctrlKey && event.shiftKey &&
         !event.altKey && !event.metaKey;
 
-    if (isTimelineShortcut) {
+    if (isTimelineShortcut || isPlainX) {
       event.preventDefault();
       event.stopPropagation();
       openWindow();
