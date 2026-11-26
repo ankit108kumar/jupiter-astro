@@ -629,3 +629,51 @@ body.ja-lk-popup-open { overflow: hidden; }
 @media (max-width: 760px) {
   .ja-lk-header-chart-switcher { width: 145px; min-width: 110px; max-width: 100%; }
 }
+
+
+/* Compact right-side placement list: clear classification colours and denser table spacing. */
+.ja-lk-placement-table {
+  font-size: .98rem;
+}
+.ja-lk-placement-table th,
+.ja-lk-placement-table td {
+  padding: 6px 5px;
+}
+.ja-lk-placement-table thead th {
+  font-size: .82rem;
+}
+.ja-lk-placement-table tbody th {
+  font-size: .94rem;
+}
+.ja-lk-placement-table tbody td {
+  font-size: 1rem;
+  font-weight: 750;
+}
+.ja-lk-placement-table tbody td.ja-lk-house.is-good {
+  color: #168447;
+  font-weight: 800;
+}
+.ja-lk-placement-table tbody td.ja-lk-house.is-bad {
+  color: #D12F35;
+  font-weight: 800;
+}
+/* Keep the year selector, but remove its label to make the content header compact. */
+.ja-lk-year-field {
+  min-width: 190px;
+  gap: 0;
+}
+.ja-lk-year-field label {
+  display: none;
+}
+.ja-lk-year-field select {
+  min-height: 38px;
+}
+.ja-lk-compact-controls {
+  padding: 7px 10px;
+  margin-bottom: 10px;
+  gap: 9px;
+}
+.ja-lk-compact-control-group {
+  align-items: center;
+  gap: 8px;
+}
