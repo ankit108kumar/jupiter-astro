@@ -6155,7 +6155,10 @@ function getJupiterTransitTimelineRegistry() {
       if (event.target === overlay) close();
     });
     overlay.querySelector(".ja-lk-titlebar-tools").addEventListener("click", handleToolClick);
-    overlay.querySelector("[data-ja-lk-chart-select]").addEventListener("change", event => {
+    // The chart selector lives inside .ja-lk-popup-content and is created by render().
+    // Delegate from the overlay so ensureOverlay() never queries a not-yet-rendered control.
+    overlay.addEventListener("change", event => {
+      if (!event.target.matches("[data-ja-lk-chart-select]")) return;
       const id = event.target.value;
       const registry = window.JupiterTransitTimelineCharts;
       if (!registry || !registry.setActive(id, false)) return;
