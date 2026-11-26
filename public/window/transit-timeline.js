@@ -2252,6 +2252,14 @@
     try {
       removeDurationTooltip();
       var transitData = context.getTransitTableData();
+      var durationInfo = windowEl.querySelector("[data-jtt-duration-update-info]");
+      var expectedPlanets = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+      var durationRows = transitData && Array.isArray(transitData.rows) ? transitData.rows : [];
+      var durationUpdatedForAll = expectedPlanets.every(function (planet) {
+        var row = durationRows.find(function (item) { return item && item.planet === planet; });
+        return !!(row && row.signDuration && row.nakshatraDuration && row.navamsaDuration);
+      });
+      if (durationInfo) durationInfo.hidden = !durationUpdatedForAll;
       var moonRow = transitData && Array.isArray(transitData.rows)
         ? transitData.rows.find(function (row) { return row && row.planet === "Moon"; })
         : null;
@@ -2500,6 +2508,7 @@
           '</div>' +
         '</section>' +
         '<div class="jtt-notice" role="status" aria-live="polite" hidden></div>' +
+        '<div class="jtt-duration-update-info" data-jtt-duration-update-info role="status" aria-live="polite" hidden>Duration updated for all planets</div>' +
         '<section class="jtt-table-panel" data-jtt-transit-table aria-label="Core planetary transit table">' +
           '<div class="jtt-table-scroll" data-jtt-table-scroll>' +
             '<div class="jtt-table-empty">Open or select a Research Kundali to populate the planetary transit table.</div>' +
