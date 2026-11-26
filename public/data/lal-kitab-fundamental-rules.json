@@ -190,5 +190,93 @@
     "normally_bad_houses": "House placements where the planet is normally considered bad/unfavourable according to this fundamental rule.",
     "normally_good_houses": "House placements where the planet is normally considered good/favourable according to this fundamental rule.",
     "not_listed": "A house not listed in either array is not classified by the supplied reference; do not infer a classification."
+  },
+  "aspects": {
+    "title": "Lal Kitab Aspects",
+    "classification": "Fundamental rule",
+    "source": "User-provided reference image.",
+    "principle": "Aspects are applied in priority order and as a sequence of events: 100% first, 50% second, and 25% third.",
+    "priority_order": [
+      {
+        "strength": "100%",
+        "priority": 1,
+        "label": "1st Priority",
+        "sequence": [
+          {
+            "from_house": 1,
+            "to_house": 7
+          },
+          {
+            "from_house": 4,
+            "to_house": 10
+          },
+          {
+            "from_house": 8,
+            "to_house": 2
+          }
+        ],
+        "source_wording": [
+          "Lagna (1H) aspects 7H.",
+          "House No. 4 aspects 10H.",
+          "8H aspect 2H."
+        ]
+      },
+      {
+        "strength": "50%",
+        "priority": 2,
+        "label": "2nd Priority",
+        "sequence": [
+          {
+            "from_house": 3,
+            "to_house": 11
+          },
+          {
+            "from_house": 3,
+            "to_house": 9
+          },
+          {
+            "from_house": 5,
+            "to_house": 9
+          }
+        ],
+        "source_wording": [
+          "House No. 3 aspects 9th House and 11th House.",
+          "House No. 5 aspects 9th House.",
+          "9th House is aspected by 3rd House and 5th House."
+        ]
+      },
+      {
+        "strength": "25%",
+        "priority": 3,
+        "label": "3rd Priority",
+        "sequence": [
+          {
+            "from_house": 2,
+            "to_house": 6
+          },
+          {
+            "from_house": 6,
+            "to_house": 12
+          },
+          {
+            "from_house": 8,
+            "to_house": 12
+          }
+        ],
+        "source_wording": [
+          "House No. 2 aspects 6th House.",
+          "House No. 6 aspects 12th House.",
+          "House No. 8 aspects 12th House.",
+          "12th House is aspected by 6th House and 8th House."
+        ]
+      }
+    ],
+    "operating_condition": "If there is no planet at the receiving house, the aspect does not work in that case.",
+    "event_sequence": "100%, 50%, 25% — this is the priority order and sequence of events.",
+    "data_semantics": {
+      "from_house": "The house casting the aspect.",
+      "to_house": "The receiving house.",
+      "strength": "The aspect strength category as labelled in the source."
+    }
   }
 }
