@@ -37,7 +37,7 @@
  */
 (function(root){
 'use strict';
-const VERSION='1.0.0';
+const VERSION='1.1.0';
 const PLANETS=['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn','Rahu','Ketu'];
 const DIVISIONS=['Sign','Nakshatra','Navamsa'];
 const SIGNS=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
@@ -212,10 +212,34 @@ function interpolateResidual(anchors,t){
  while(lo<hi){const mid=(lo+hi)>>>1;if(anchors[mid].timestamp<t)lo=mid+1;else hi=mid;}
  if(lo<anchors.length&&anchors[lo].timestamp===t)return{residual:anchors[lo].residual,mode:'exact-reference-anchor',left:lo,right:lo};
  if(lo===0||lo===anchors.length)return null;
- const a=anchors[lo-1],b=anchors[lo],span=b.timestamp-a.timestamp;
- if(span<=0)return{residual:a.residual,mode:'duplicate-anchor-timestamp',left:lo-1,right:lo};
- const f=(t-a.timestamp)/span;
- return{residual:a.residual+(b.residual-a.residual)*f,mode:'linear-interpolation-of-ephemeris-residual',left:lo-1,right:lo,fraction:f};
+ const i=lo-1,a=anchors[i],b=anchors[i+1],h=b.timestamp-a.timestamp;
+ if(h<=0)return{residual:a.residual,mode:'duplicate-anchor-timestamp',left:i,right:i+1};
+ const f=(t-a.timestamp)/h;
+ // Shape-preserving PCHIP interpolation of angular residuals. Unwrap residuals
+ // locally before calculating slopes so a ±180° representation boundary does
+ // not create a false discontinuity.
+ const n=anchors.length;
+ const y=new Array(n);y[0]=anchors[0].residual;
+ for(let k=1;k<n;k++)y[k]=y[k-1]+signedDelta(y[k-1],anchors[k].residual);
+ const x=anchors.map(q=>q.timestamp);
+ const delta=new Array(n-1),width=new Array(n-1);
+ for(let k=0;k<n-1;k++){width[k]=x[k+1]-x[k];delta[k]=width[k]>0?(y[k+1]-y[k])/width[k]:0;}
+ const endpoint=(h0,h1,d0,d1)=>{let m=((2*h0+h1)*d0-h0*d1)/(h0+h1);if(Math.sign(m)!==Math.sign(d0))m=0;else if(Math.sign(d0)!==Math.sign(d1)&&Math.abs(m)>Math.abs(3*d0))m=3*d0;return m;};
+ const slope=k=>{
+  if(k===0)return n>2?endpoint(width[0],width[1],delta[0],delta[1]):delta[0];
+  if(k===n-1)return n>2?endpoint(width[n-2],width[n-3],delta[n-2],delta[n-3]):delta[n-2];
+  const d0=delta[k-1],d1=delta[k],h0=width[k-1],h1=width[k];
+  if(d0===0||d1===0||Math.sign(d0)!==Math.sign(d1))return 0;
+  const w1=2*h1+h0,w2=h1+2*h0;
+  return(w1+w2)/(w1/d0+w2/d1);
+ };
+ const m0=slope(i),m1=slope(i+1),f2=f*f,f3=f2*f;
+ let value=(2*f3-3*f2+1)*y[i]+(f3-2*f2+f)*h*m0+(-2*f3+3*f2)*y[i+1]+(f3-f2)*h*m1;
+ // PCHIP is shape-preserving; this final guard protects against floating-point
+ // overshoot on nearly flat intervals.
+ const low=Math.min(y[i],y[i+1]),high=Math.max(y[i],y[i+1]);
+ value=Math.max(low,Math.min(high,value));
+ return{residual:value,mode:'shape-preserving-pchip-residual',left:i,right:i+1,fraction:f,intervalResidualChangeDegrees:y[i+1]-y[i],interpolationSlopeDegreesPerMs:(value-y[i])/h};
 }
 function directionAt(fn,planet,t,raw,epsilon,sampleMs){
  const a=raw,b=Number(fn(planet,t+sampleMs));
