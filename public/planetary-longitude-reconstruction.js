@@ -37,7 +37,7 @@
  */
 (function(root){
 'use strict';
-const VERSION='1.1.0';
+const VERSION='1.2.0';
 const PLANETS=['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn','Rahu','Ketu'];
 const DIVISIONS=['Sign','Nakshatra','Navamsa'];
 const SIGNS=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
@@ -46,6 +46,7 @@ const PADA=['First','Second','Third','Fourth'];
 const SIGN_SPAN=30, NAK_SPAN=360/27, NAV_SPAN=360/108;
 const MODAL_START=[0,9,6,3];
 const EPS=1e-9;
+const anchorCache=new WeakMap();
 const fail=(message,code)=>Object.assign(new Error(message),{code:code||'JA_LONGITUDE_ERROR'});
 const isObject=x=>!!x&&typeof x==='object'&&!Array.isArray(x);
 const mod=x=>((x%360)+360)%360;
@@ -284,7 +285,10 @@ function create(config){
   if(typeof input.ephemerisLongitudeAt!=='function')throw fail('Provide ephemerisLongitudeAt(planet, epochMs)','MISSING_EPHEMERIS_CALLBACK');
   const t=timestampMs(input.timestamp),series=state.index[planet];
   if(!series)throw fail('No reference series for '+planet,'MISSING_PLANET_SERIES');
-  const anchors=collectAnchors(planet,series,input.ephemerisLongitudeAt,{onWarning:input.onWarning,directionSampleMs:input.directionSampleMs||cfg.directionSampleMs,stationaryEpsilonDeg:cfg.stationaryEpsilonDeg});
+  let byPlanet=anchorCache.get(input.ephemerisLongitudeAt);
+  if(!byPlanet){byPlanet=new Map();anchorCache.set(input.ephemerisLongitudeAt,byPlanet);}
+  let anchors=byPlanet.get(planet);
+  if(!anchors){anchors=collectAnchors(planet,series,input.ephemerisLongitudeAt,{onWarning:input.onWarning,directionSampleMs:input.directionSampleMs||cfg.directionSampleMs,stationaryEpsilonDeg:cfg.stationaryEpsilonDeg});byPlanet.set(planet,anchors);}
   if(!anchors.length)throw fail('No usable angular anchors for '+planet,'NO_USABLE_ANCHORS');
   const interpolation=interpolateResidual(anchors,t);
   const raw=Number(input.ephemerisLongitudeAt(planet,t));
@@ -292,6 +296,7 @@ function create(config){
   const rawLongitude=mod(raw);
   if(!interpolation&&!input.allowUnanchoredFallback)throw fail('Timestamp is outside the time span covered by reference anchors','OUTSIDE_REFERENCE_COVERAGE');
   const residual=interpolation?interpolation.residual:0;
+  if(interpolation&&Math.abs(residual)>cfg.maxAnchorCorrectionDeg)throw fail('Interpolated correction exceeds the configured safety threshold; original ephemeris must be retained.','CORRECTION_THRESHOLD_EXCEEDED');
   const reconstructed=mod(rawLongitude+residual);
   const details=describeLongitude(reconstructed);
   const sampleMs=input.directionSampleMs||cfg.sampleMs;
