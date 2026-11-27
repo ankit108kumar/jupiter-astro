@@ -64,10 +64,26 @@
       #${ID} .sr-status{text-align:center;color:var(--muted,#777);padding:22px 8px;font-size:11px}
       #${ID} .sr-error{color:#b42318}
       #${ID} .sr-foot{display:none}
-      body.ja-saved-open>header.brand,body.ja-saved-open>main.wrap,body.ja-saved-open>#panchangCardBlock{width:calc(100% - var(--ja-saved-width));max-width:none;margin-left:var(--ja-saved-width);margin-right:0;transition:width .22s ease,margin-left .22s ease}
+      /* Keep the global website header fixed in its original full-width position.
+         Only the working content beneath it participates in the split-panel layout. */
+      body.ja-saved-open>main.wrap,
+      body.ja-saved-open>#panchangCardBlock{
+        width:calc(100% - var(--ja-saved-width));
+        max-width:none;
+        margin-left:var(--ja-saved-width);
+        margin-right:0;
+        transition:width .22s ease,margin-left .22s ease;
+      }
       body.ja-saved-open>main.wrap{padding-left:clamp(12px,1.8vw,26px);padding-right:clamp(12px,1.8vw,26px)}
-      @media(max-width:760px){:root{--ja-saved-width:100vw}#${ID}{width:100vw}body.ja-saved-open>header.brand,body.ja-saved-open>main.wrap,body.ja-saved-open>#panchangCardBlock{width:100%;margin-left:0;margin-right:0}body.ja-saved-open>header.brand{transform:translateX(100vw)}body.ja-saved-open>main.wrap{visibility:hidden}body.ja-saved-open>#panchangCardBlock{display:none}}
-      @media(prefers-reduced-motion:reduce){#${ID},body.ja-saved-open>header.brand,body.ja-saved-open>main.wrap{transition:none!important}}
+      @media(max-width:760px){
+        :root{--ja-saved-width:100vw}
+        #${ID}{width:100vw}
+        body.ja-saved-open>main.wrap,
+        body.ja-saved-open>#panchangCardBlock{width:100%;margin-left:0;margin-right:0}
+        body.ja-saved-open>main.wrap{visibility:hidden}
+        body.ja-saved-open>#panchangCardBlock{display:none}
+      }
+      @media(prefers-reduced-motion:reduce){#${ID},body.ja-saved-open>main.wrap,body.ja-saved-open>#panchangCardBlock{transition:none!important}}
     `;
     document.head.appendChild(style);
     panel = document.createElement("aside");
@@ -96,7 +112,10 @@
   function renderTags(){
     if(!panel)return;
     const host=panel.querySelector(".sr-tags"), tags=window.JA_SAVED_RECORD_TAGS;
-    host.innerHTML=tags.map(t=>`<button class="sr-tag" type="button" data-tag="${esc(t)}" aria-pressed="${activeTags.has(t)}">${esc(t)}</button>`).join("");
+    host.innerHTML=tags.map(t=>{
+      const compactLabel=txt(t).split(/\\s+/)[0];
+      return `<button class="sr-tag" type="button" data-tag="${esc(t)}" title="${esc(t)}" aria-label="${esc(t)}" aria-pressed="${activeTags.has(t)}">${esc(compactLabel)}</button>`;
+    }).join("");
   }
   function filtered(){
     const q=txt(panel.querySelector(".sr-search").value).toLocaleLowerCase();
