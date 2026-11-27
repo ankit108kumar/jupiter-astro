@@ -73,32 +73,37 @@ Jupiter Astro AI Assistant
   }
 
 
-  toggle.addEventListener("click", function () {
+  // Keyboard-only launcher: J opens/closes the assistant when the user
+  // is not typing in a field and no native/custom dropdown is open.
+  function isTypingTarget(target) {
+    return !!(target && (
+      target.isContentEditable ||
+      target.closest("input, textarea, select, [contenteditable='true'], [role='textbox']")
+    ));
+  }
 
-    if (windowBox.classList.contains("ai-open")) {
-
-      closeAssistant();
-
-    } else {
-
-      openAssistant();
-
-    }
-
-  });
-
+  function isDropdownOpen() {
+    return !!document.querySelector(
+      "select:focus, [role='listbox']:not([hidden]), [role='menu']:not([hidden]), " +
+      "[role='combobox'][aria-expanded='true'], [aria-haspopup='listbox'][aria-expanded='true'], " +
+      ".dropdown-menu.show, .select2-container--open, .choices.is-open, details[open]"
+    );
+  }
 
   close.addEventListener("click", closeAssistant);
 
-
   document.addEventListener("keydown", function (event) {
-
     if (event.key === "Escape") {
-
       closeAssistant();
-
+      return;
     }
 
+    if (event.key.toLowerCase() !== "j" || event.ctrlKey || event.altKey || event.metaKey) return;
+    if (event.repeat || event.isComposing || isTypingTarget(event.target) || isDropdownOpen()) return;
+
+    event.preventDefault();
+    if (windowBox.classList.contains("ai-open")) closeAssistant();
+    else openAssistant();
   });
 
 
