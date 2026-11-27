@@ -19,11 +19,24 @@
     if (panel) return panel;
     const style = document.createElement("style");
     style.id = "ja-saved-records-style";
+    // Keep the panel below the sticky website header instead of allowing the
+    // header to cover the top of the search controls.
+    const syncHeaderOffset = () => {
+      const header = document.querySelector("body>header.brand");
+      const height = header ? Math.ceil(header.getBoundingClientRect().height) : 90;
+      document.documentElement.style.setProperty("--ja-saved-header-height", height + "px");
+    };
+    syncHeaderOffset();
+    window.addEventListener("resize", syncHeaderOffset, { passive: true });
+    if (window.ResizeObserver) {
+      const header = document.querySelector("body>header.brand");
+      if (header) new ResizeObserver(syncHeaderOffset).observe(header);
+    }
     style.textContent = `
-      :root{--ja-saved-width:clamp(330px,31vw,420px)}
+      :root{--ja-saved-width:clamp(330px,31vw,420px);--ja-saved-header-height:90px}
       #${ID},#${ID} *{box-sizing:border-box}
       #${ID}[hidden]{display:none!important}
-      #${ID}{position:fixed;inset:0 auto 0 0;width:var(--ja-saved-width);max-width:100vw;z-index:1000;display:flex;flex-direction:column;color:var(--ink,#282536);background:linear-gradient(145deg,color-mix(in srgb,var(--surface,#fff) 94%,transparent),color-mix(in srgb,var(--paper,#f8fafc) 96%,transparent));border-right:1px solid var(--line-strong,#ddd8e8);box-shadow:18px 0 48px rgba(35,30,52,.12);backdrop-filter:blur(28px) saturate(160%);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+      #${ID}{position:fixed;inset:var(--ja-saved-header-height) auto 0 0;width:var(--ja-saved-width);max-width:100vw;z-index:1000;display:flex;flex-direction:column;color:var(--ink,#282536);background:linear-gradient(145deg,color-mix(in srgb,var(--surface,#fff) 94%,transparent),color-mix(in srgb,var(--paper,#f8fafc) 96%,transparent));border-right:1px solid var(--line-strong,#ddd8e8);box-shadow:18px 0 48px rgba(35,30,52,.12);backdrop-filter:blur(28px) saturate(160%);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
       #${ID} .sr-head{display:none}
       #${ID} .sr-headcopy{flex:1;min-width:0}#${ID} .sr-headcopy b{display:block;font-size:16px;font-weight:730}#${ID} .sr-headcopy small{display:block;color:var(--muted,#777386);font-size:10px;margin-top:3px}
       #${ID} .sr-close{position:absolute;top:28px;right:22px;z-index:5;width:13px;height:13px;min-width:13px;border:0;border-radius:50%;background:#ff6058;padding:0;cursor:pointer;box-shadow:inset 0 0 0 1px #0002}
