@@ -39,9 +39,7 @@
       #${ID}{position:fixed;inset:var(--ja-saved-header-height) auto 0 0;width:var(--ja-saved-width);max-width:100vw;z-index:1000;display:flex;flex-direction:column;color:var(--ink,#282536);background:linear-gradient(145deg,color-mix(in srgb,var(--surface,#fff) 94%,transparent),color-mix(in srgb,var(--paper,#f8fafc) 96%,transparent));border-right:1px solid var(--line-strong,#ddd8e8);box-shadow:18px 0 48px rgba(35,30,52,.12);backdrop-filter:blur(28px) saturate(160%);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
       #${ID} .sr-head{display:none}
       #${ID} .sr-headcopy{flex:1;min-width:0}#${ID} .sr-headcopy b{display:block;font-size:16px;font-weight:730}#${ID} .sr-headcopy small{display:block;color:var(--muted,#777386);font-size:10px;margin-top:3px}
-      #${ID} .sr-search{padding-right:42px}
-      #${ID} .sr-close-search{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:28px;height:28px;display:grid;place-items:center;border:0;border-radius:8px;background:transparent;color:var(--muted,#7b8490);font:400 20px/1 Inter,sans-serif;cursor:pointer;transition:background .15s,color .15s}
-      #${ID} .sr-close-search:hover{background:var(--surface-alt,#eef2f6);color:var(--ink,#283536)}
+      #${ID} .sr-search{padding-right:13px}
       #${ID} .sr-resizer{position:absolute;top:0;right:-4px;bottom:0;width:8px;z-index:10;cursor:col-resize;touch-action:none;background:transparent}
       #${ID} .sr-resizer::after{content:"";position:absolute;top:0;bottom:0;left:3px;width:2px;background:transparent;transition:background .15s}
       #${ID} .sr-resizer:hover::after,#${ID} .sr-resizer:focus-visible::after,#${ID}.sr-resizing .sr-resizer::after{background:var(--saffron,#d97706)}
@@ -85,7 +83,8 @@
       /* Keep the global website header fixed in its original full-width position.
          Only the working content beneath it participates in the split-panel layout. */
       body.ja-saved-open>main.wrap,
-      body.ja-saved-open>#panchangCardBlock{
+      body.ja-saved-open>#panchangCardBlock,
+      body.ja-saved-open>footer{
         width:calc(100% - var(--ja-saved-width));
         max-width:none;
         margin-left:var(--ja-saved-width);
@@ -93,6 +92,8 @@
         transition:width .22s ease,margin-left .22s ease;
       }
       body.ja-saved-open>main.wrap{padding-left:clamp(12px,1.8vw,26px);padding-right:clamp(12px,1.8vw,26px)}
+      body.ja-saved-open>footer{box-sizing:border-box}
+      body.ja-saved-open>footer>.wrap{width:100%;max-width:none;box-sizing:border-box;padding-left:clamp(12px,1.8vw,26px);padding-right:clamp(12px,1.8vw,26px)}
       @media(max-width:760px){
         :root{--ja-saved-width:100vw}
         #${ID}{width:100vw}
@@ -102,7 +103,7 @@
         body.ja-saved-open>main.wrap{visibility:hidden}
         body.ja-saved-open>#panchangCardBlock{display:none}
       }
-      @media(prefers-reduced-motion:reduce){#${ID},body.ja-saved-open>main.wrap,body.ja-saved-open>#panchangCardBlock{transition:none!important}}
+      @media(prefers-reduced-motion:reduce){#${ID},body.ja-saved-open>main.wrap,body.ja-saved-open>#panchangCardBlock,body.ja-saved-open>footer{transition:none!important}}
     `;
     document.head.appendChild(style);
     panel = document.createElement("aside");
@@ -110,13 +111,12 @@
     panel.innerHTML = `
       <div class="sr-resizer" role="separator" aria-orientation="vertical" aria-label="Resize Find sidebar" tabindex="0"></div>
       <div class="sr-body">
-        <div class="sr-searchwrap"><svg class="sr-searchicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input class="sr-search" type="search" placeholder="Search name, place, tags or notes…" aria-label="Search saved records" autocomplete="off"><button class="sr-close-search" type="button" title="Close Find sidebar" aria-label="Close Find sidebar">×</button></div>
+        <div class="sr-searchwrap"><svg class="sr-searchicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input class="sr-search" type="search" placeholder="Search name, place, tags or notes…" aria-label="Search saved records" autocomplete="off"></div>
         <section><div class="sr-label">Filter by tags</div><div class="sr-tags"><span class="sr-status">Loading tags…</span></div></section>
         <section class="sr-results"><div class="sr-list"><div class="sr-status">Sign in to load saved records.</div></div></section>
       </div>
       `;
     document.body.appendChild(panel);
-    panel.querySelector(".sr-close-search").addEventListener("click", closePanel);
     panel.querySelector(".sr-search").addEventListener("input", renderRecords);
     installResizer();
     restoreSidebarWidth();
@@ -141,10 +141,19 @@
     document.documentElement.style.setProperty("--ja-saved-width",next+"px");
     return next;
   }
+  function defaultSidebarWidth(){
+    const viewport=document.documentElement.clientWidth||window.innerWidth||1200;
+    return Math.max(264,Math.min(336,viewport*.248));
+  }
+  function resetSidebarWidth(){
+    document.documentElement.style.removeProperty("--ja-saved-width");
+    try{localStorage.removeItem(SIDEBAR_WIDTH_KEY);}catch(_){}
+  }
   function restoreSidebarWidth(){
     try{
       const saved=Number(localStorage.getItem(SIDEBAR_WIDTH_KEY));
       if(Number.isFinite(saved)&&saved>0)applySidebarWidth(saved);
+      else resetSidebarWidth();
     }catch(_){}
   }
   function installResizer(){
@@ -176,7 +185,12 @@
       window.addEventListener("pointercancel",finish);
       event.preventDefault();
     });
+    handle.addEventListener("dblclick",event=>{
+      event.preventDefault();
+      resetSidebarWidth();
+    });
     handle.addEventListener("keydown",event=>{
+      if(event.key==="Home"){event.preventDefault();resetSidebarWidth();return;}
       if(event.key!=="ArrowLeft"&&event.key!=="ArrowRight")return;
       event.preventDefault();
       const current=panel.getBoundingClientRect().width;
