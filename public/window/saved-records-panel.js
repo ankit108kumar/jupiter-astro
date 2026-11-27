@@ -113,7 +113,7 @@
     if(!panel)return;
     const host=panel.querySelector(".sr-tags"), tags=window.JA_SAVED_RECORD_TAGS;
     host.innerHTML=tags.map(t=>{
-      const compactLabel=txt(t).split(/\\s+/)[0];
+      const compactLabel=txt(t).split(/\s+/)[0];
       return `<button class="sr-tag" type="button" data-tag="${esc(t)}" title="${esc(t)}" aria-label="${esc(t)}" aria-pressed="${activeTags.has(t)}">${esc(compactLabel)}</button>`;
     }).join("");
   }
