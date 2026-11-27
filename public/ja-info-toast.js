@@ -40,5 +40,11 @@
   }
   document.addEventListener('fullscreenchange',relocate);
   window.addEventListener('pagehide',function(){hide();});
-  window.JAInfoToast={show:show,hide:hide,__sharedController:true};
+  function remember(message,options){
+    options=options||{};
+    remembered={message:String(message==null?"":message),options:{source:String(options.source||"general"),priority:Math.max(0,Number(options.priority)||0),duration:Math.max(500,Number(options.duration)||4500),variant:options.variant}};
+    ensureInfoButton();
+    return true;
+  }
+  window.JAInfoToast={show:show,hide:hide,remember:remember,__sharedController:true};
 })(window,document);

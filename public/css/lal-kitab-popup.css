@@ -2,7 +2,7 @@
 .ja-lk-popup-overlay {
   position: fixed;
   inset: 0;
-  z-index: 100800;
+  z-index: 2147483008;
   display: block;
   background: rgba(15, 23, 42, .38);
   backdrop-filter: blur(7px);

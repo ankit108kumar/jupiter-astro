@@ -1413,18 +1413,14 @@ function jaSiderealLongitudeAt(planet, epochMs) {
 }
 
 function jaSetLongitudeStatus(message, mode) {
-  if (!document.body) return;
-  if (!jaLongitudeStatusNode) {
-    jaLongitudeStatusNode = document.createElement("div");
-    jaLongitudeStatusNode.id = "JA_LONGITUDE_STATUS_STRIP";
-    jaLongitudeStatusNode.style.cssText = "position:fixed;left:12px;bottom:12px;z-index:9997;max-width:min(560px,calc(100vw - 24px));padding:7px 11px;border:1px solid rgba(100,116,139,.22);border-radius:9px;background:rgba(255,255,255,.94);color:#334155;box-shadow:0 3px 14px rgba(15,23,42,.10);font:500 11px/1.45 Inter,system-ui,sans-serif;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);";
-    document.body.appendChild(jaLongitudeStatusNode);
+  if (window.JAInfoToast && typeof window.JAInfoToast.remember === "function") {
+    window.JAInfoToast.remember(String(message || ""), {
+      source: "planetary-verification",
+      priority: 1,
+      variant: mode === "warning" ? "warning" : "success",
+      duration: 4500
+    });
   }
-  jaLongitudeStatusNode.textContent = message;
-  jaLongitudeStatusNode.style.borderLeft = mode === "success"
-    ? "3px solid #16a36a"
-    : mode === "warning" ? "3px solid #d97706" : "3px solid #64748b";
-  jaLongitudeStatusNode.title = "Planetary longitude reconciliation status";
 }
 
 const jaLongitudeReferencePromise = jaLongitudeEngine
@@ -1495,9 +1491,6 @@ function jaShowLongitudeUpdate(v, context, timestamp) {
   if (!parts.length) parts.push("No longitude corrections required");
   const message = parts.join(" · ") + " · " + v.elapsedMs.toFixed(1) + " ms" + (timestamp ? " · " + new Date(timestamp).toLocaleString() : "");
   jaSetLongitudeStatus(message, errors.length || missing.length ? "warning" : "success");
-  if (window.JAInfoToast && typeof window.JAInfoToast.show === "function") {
-    window.JAInfoToast.show(message, { source: "pchip-longitude", priority: 1, variant: errors.length || missing.length ? "warning" : "success", duration: 3500 });
-  }
 }
 
 async function computeChart({ y, m, d, hh, mm, ss, tz, lat, lon }) {
@@ -8870,6 +8863,16 @@ if (data.desc && data.desc.trim()) {
       `${data.dob} ${data.tob} (${lat.toFixed(2)}°, ${lon.toFixed(2)}°) · ${data.pob || 'Manual Coords'}`,
       sec.dataset.chartId || '' // <--- Passes the unique ID to render beside the name
     );
+
+    if (window.JASavedRecordsPanel && typeof window.JASavedRecordsPanel.trackOpened === "function") {
+      window.JASavedRecordsPanel.trackOpened({
+        id: sec.dataset.chartId || "",
+        name: data.name.trim() || `Chart ${n}`,
+        dob: data.dob, tob: data.tob, pob: data.pob || "Manual Coords",
+        lat: lat.toFixed(4), lon: lon.toFixed(4),
+        tags: Array.from(selectedTags), desc: data.desc || ""
+      });
+    }
 
 // Handle Save vs Update state post-generation
     const activeSaveBtn = sec.querySelector(`#saveBtn${n}`);

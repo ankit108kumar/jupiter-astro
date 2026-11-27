@@ -6,7 +6,7 @@
   right: auto !important;
   top: auto !important;
   bottom: max(14px, env(safe-area-inset-bottom, 0px) + 10px) !important;
-  z-index: 2147483647 !important;
+  z-index: 2147482501 !important;
   width: max-content;
   max-width: min(920px, calc(100vw - 32px));
   box-sizing: border-box;
@@ -47,7 +47,8 @@
 
 #ja-global-info-recall {
   position: fixed !important;
-  left: 30px !important;
+  right: 24px !important;
+  left: auto !important;
   bottom: 78px !important;
   z-index: 2147483647 !important;
   width: 25px;
@@ -81,7 +82,8 @@
     font-size: 11px;
   }
   #ja-global-info-recall {
-    left: 28px !important;
+    right: 24px !important;
+    left: auto !important;
     bottom: 78px !important;
   }
 }
