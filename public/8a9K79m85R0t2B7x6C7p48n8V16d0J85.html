@@ -47,8 +47,8 @@ window.JA_LK_FUNDAMENTAL_RULES_PROMISE = window.JA_LK_FUNDAMENTAL_RULES_PROMISE 
 </script>
 <link rel="stylesheet" href="/window/library-window.css">
 <link rel="stylesheet" href="/window/transit-timeline.css">
-<link rel="stylesheet" href="/css/ja-info-toast.css">
-<script src="/ja-info-toast.js"></script>
+<link rel="stylesheet" href="/css/ja-info-toast.css?v=20261127-7">
+<script src="/ja-info-toast.js?v=20261127-7"></script>
 <link rel="stylesheet" href="/window/library-preview.css">
 <link rel="stylesheet" href="/window/library-drive.css">
 
@@ -1412,34 +1412,21 @@ function jaSiderealLongitudeAt(planet, epochMs) {
   return rev(tropical - lahiri(jd));
 }
 
-function jaSetLongitudeStatus(message, mode) {
-  if (window.JAInfoToast && typeof window.JAInfoToast.remember === "function") {
-    window.JAInfoToast.remember(String(message || ""), {
-      source: "planetary-verification",
-      priority: 1,
-      variant: mode === "warning" ? "warning" : "success",
-      duration: 4500
-    });
-  }
-}
 
 const jaLongitudeReferencePromise = jaLongitudeEngine
   ? jaLongitudeEngine.init().then(function (diagnostics) {
       jaLongitudeReferenceReady = !!diagnostics.ready;
       if (jaLongitudeReferenceReady && typeof TRANSIT_POSITION_CACHE !== "undefined") TRANSIT_POSITION_CACHE.clear();
       if (!jaLongitudeReferenceReady) throw new Error("Reference database did not become ready.");
-      jaSetLongitudeStatus("Planetary reference database ready · Step 2 enabled", "success");
       return diagnostics;
     }).catch(function (error) {
       jaLongitudeReferenceError = error;
       jaLongitudeReferenceReady = false;
       console.warn("PCHIP reference database unavailable; retaining native ephemeris.", error);
-      jaSetLongitudeStatus("PCHIP reference unavailable · original planetary calculation retained", "warning");
       return null;
     })
   : Promise.resolve().then(function () {
       jaLongitudeReferenceError = new Error("PCHIP reconstruction module did not load.");
-      jaSetLongitudeStatus("PCHIP module unavailable · original planetary calculation retained", "warning");
       return null;
     });
 
@@ -1490,7 +1477,6 @@ function jaShowLongitudeUpdate(v, context, timestamp) {
   if (errors.length) parts.push(errors.length + " error: " + errors.map(x => x.planet).join(", "));
   if (!parts.length) parts.push("No longitude corrections required");
   const message = parts.join(" · ") + " · " + v.elapsedMs.toFixed(1) + " ms" + (timestamp ? " · " + new Date(timestamp).toLocaleString() : "");
-  jaSetLongitudeStatus(message, errors.length || missing.length ? "warning" : "success");
 }
 
 async function computeChart({ y, m, d, hh, mm, ss, tz, lat, lon }) {
@@ -1695,14 +1681,7 @@ async function getTransitPlanetPositions(evalMs) {
     const cached = TRANSIT_POSITION_CACHE.get(key);
     const corrected = Object.keys(cached).filter(function (planet) { return cached[planet].longitudeMode === "pchip"; });
     const fallback = Object.keys(cached).filter(function (planet) { return cached[planet].longitudeMode !== "pchip"; });
-    jaSetLongitudeStatus(
-      corrected.length
-        ? "Planetary transit longitudes verified · PCHIP: " + corrected.join(", ") +
-          (fallback.length ? " · Fallback: " + fallback.join(", ") : "") +
-          " · Cached · " + new Date(key).toLocaleString()
-        : "Planetary transit using original calculation · PCHIP fallback · " + new Date(key).toLocaleString(),
-      corrected.length ? (fallback.length ? "warning" : "success") : "warning"
-    );
+    // Verification is silent; calculation and correction continue normally.
     return cached;
   }
 

@@ -2244,17 +2244,6 @@
     });
   }
 
-  var durationStatusText = "Duration updated for all planets";
-  var durationStatusSignature = null;
-
-  function showDurationStatusToast() {
-    window.JAInfoToast.show(durationStatusText, {
-      source: "transit-timeline", priority: 1,
-      variant: durationStatusText.indexOf("Duration incomplete") === 0 ? "warning" : "success",
-      duration: 2000
-    });
-  }
-
   var transitRenderToken = 0;
   async function renderTransitTableFromContext() {
     if (!windowEl) return;
@@ -2300,11 +2289,7 @@
           return [planet, row && row.signDuration, row && row.nakshatraDuration, row && row.navamsaDuration];
         })
       });
-      if (statusSignature !== durationStatusSignature) {
-        durationStatusSignature = statusSignature;
-        showDurationStatusToast();
-      }
-      var moonRow = transitData && Array.isArray(transitData.rows)
+var moonRow = transitData && Array.isArray(transitData.rows)
         ? transitData.rows.find(function (row) { return row && row.planet === "Moon"; })
         : null;
       if (moonRow) {
@@ -2721,11 +2706,7 @@
       if (action === "maximize") toggleMaximize();
       if (action === "fullscreen") toggleFullscreen();
       if (action === "theme") toggleTheme();
-      if (action === "info") {
-        showDurationStatusToast();
-        actionButton.setAttribute("aria-expanded", "false");
-      }
-      if (action === "export-toggle") {
+if (action === "export-toggle") {
         var exportMenu = windowEl.querySelector("[data-jtt-global-export-menu]");
         var isExportOpen = exportMenu && exportMenu.hidden;
         if (exportMenu) exportMenu.hidden = !isExportOpen;

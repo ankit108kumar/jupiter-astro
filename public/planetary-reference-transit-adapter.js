@@ -10,7 +10,7 @@ const SIGNS=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio',
 const NAK=['Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu','Pushya','Ashlesha','Magha','Purva Phalguni','Uttara Phalguni','Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha','Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishta','Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'];
 const ORD=['First','Second','Third','Fourth'];
 const CACHE=new Map();
-let enginePromise=null,engine=null,requestSequence=0,latestStatus=null,latestByScope={},timelineTimestamp=null,timelineUpdated=new Set(),timelineRefreshTimer=null,lastStatusModel=null;
+let enginePromise=null,engine=null,requestSequence=0,latestByScope={},timelineTimestamp=null,timelineUpdated=new Set();
 const EPHEMERIS_VERSION='JupiterAstro-existing-sidereal-ephemeris';
 function nowMs(){return root.performance&&typeof root.performance.now==='function'?root.performance.now():Date.now();}
 function msToJd(ms){return Number(ms)/86400000+2440587.5;}
@@ -43,28 +43,7 @@ function dateLabel(ms){
  try{return new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true}).format(new Date(ms))+' IST';}
  catch(_){return new Date(ms).toISOString();}
 }
-function showLatestStatus(){
- if(!latestStatus||!root.JAInfoToast||typeof root.JAInfoToast.show!=='function')return;
- root.JAInfoToast.show(latestStatus.message,{source:'planetary-verification',priority:3,duration:5500,variant:latestStatus.state==='warning'?'warning':'success',position:'bottom',remember:true});
-}
-function showStatus(result,elapsed,scope){
- const durations=Array.from(new Set([...(result.timelineUpdated||[]),...timelineUpdated])).sort();
- const contexts=result.contexts||{Natal:latestByScope.Natal||null,Transit:latestByScope.Transit||null};
- const labelList=(items)=>items&&items.length?items.join(', '):'—';
- const correctionList=(items)=>items&&items.length?items.join(', '):'No change in Sign, Nakshatra or Navamsa required';
- const fallbackList=(map)=>Object.entries(map||{}).map(([planet,divisions])=>planet+' ('+divisions.join('/')+')').join(', ')||'—';
- const contextLine=(name,item)=>{if(!item)return name+': pending';return name+' — Verified: '+labelList(item.verified)+' · Updated: '+correctionList(item.updated)+' · No data: '+labelList(item.unavailable)+(item.partial&&item.partial.length?' · Partial: '+labelList(item.partial):'')+' · Engine fallback: '+fallbackList(item.fallbackByPlanet);};
- const hasContexts=!!(contexts.Natal||contexts.Transit),errors=result.errors||[];
- const heading=errors.length?'Reference check incomplete':(result.unavailable||[]).length?'Reference coverage incomplete':(result.updated||[]).length?'Reference check · corrections applied':'Reference check complete';
- const firstLine=hasContexts?heading+' · '+contextLine('Natal',contexts.Natal):heading+' · '+(scope||'Chart');
- const secondLine=hasContexts?contextLine('Transit',contexts.Transit)+' · Timeline durations: '+labelList(durations)+' · '+Math.max(0,elapsed).toFixed(1)+' ms · Checked: '+dateLabel(Date.now()):'Verified: '+labelList(result.verified)+' · Updated: '+correctionList(result.updated)+' · No data: '+labelList(result.unavailable)+(result.partial&&result.partial.length?' · Partial: '+labelList(result.partial):'')+' · Engine fallback: '+fallbackList(result.fallbackByPlanet)+' · Timeline durations: '+labelList(durations)+' · '+Math.max(0,elapsed).toFixed(1)+' ms · Checked: '+dateLabel(Date.now());
- const warning=errors.length||(result.unavailable||[]).length||(result.partial||[]).length;
- latestStatus={state:warning?'warning':'ready',message:firstLine+'\\n'+secondLine};lastStatusModel={result,elapsed,scope};showLatestStatus();
-}
-function scheduleTimelineStatusRefresh(){
- if(!lastStatusModel||timelineRefreshTimer!==null)return;
- timelineRefreshTimer=root.setTimeout(()=>{timelineRefreshTimer=null;if(lastStatusModel)showStatus(lastStatusModel.result,lastStatusModel.elapsed,lastStatusModel.scope);},40);
-}
+function showStatus(){ /* Planetary verification is intentionally silent. */ }
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 async function getEngine(){
  if(engine)return engine;
@@ -148,13 +127,13 @@ async function reconcilePositions(positions,timestamp,scope,options){
 function getInterval(planet,division,timestamp){
  if(!engine)return null;
  const at=Number(timestamp);
- if(at!==timelineTimestamp){timelineTimestamp=at;timelineUpdated.clear();scheduleTimelineStatusRefresh();}
+ if(at!==timelineTimestamp){timelineTimestamp=at;timelineUpdated.clear();}
  try{
   const q=engine.getTransitReference(planet,division,at,longitudeAt,EPHEMERIS_VERSION,{hybridNavamsa:division==='Navamsa'&&(planet==='Sun'||planet==='Moon')});
   if(!q||q.startMs==null||q.endMs==null||!Number.isFinite(Number(q.startMs))||!Number.isFinite(Number(q.endMs)))return null;
   if(Number(q.startMs)>at||Number(q.endMs)<=at)return null;
   timelineUpdated.add(planet+' '+division);
-  scheduleTimelineStatusRefresh();
+  
   return{label:q.label||null,startMs:Number(q.startMs),endMs:Number(q.endMs),source:q.referenceSource||'json',derived:!!q.derived};
  }catch(e){return null;}
 }
