@@ -98,19 +98,38 @@
       return `<article class="sr-record"><button type="button" data-record="${esc(id)}" aria-expanded="${isOpen}"><span>${esc(r.name||"Unnamed record")}<span class="sr-meta">${esc(meta)}</span></span><span aria-hidden="true">${isOpen?"⌃":"⌄"}</span></button>${isOpen?`<div class="sr-details">${details||"No additional details available."}</div>`:""}</article>`;
     }).join("");
   }
+  function normalizeProfile(row,index){
+    const pick=(...keys)=>{for(const key of keys){const value=row&&row[key];if(value!==undefined&&value!==null&&String(value).trim())return String(value).trim();}return "";};
+    return {
+      id:pick("id","ID","profileId","Profile ID")||("profile-"+index),
+      name:pick("name","Name","profileName","Profile Name"),
+      dob:pick("dob","DOB","dateOfBirth","Date of Birth"),
+      tob:pick("tob","TOB","timeOfBirth","Time of Birth"),
+      pob:pick("pob","POB","placeOfBirth","Place of Birth"),
+      lat:pick("lat","latitude","Latitude"),
+      lon:pick("lon","lng","longitude","Longitude"),
+      tz:pick("tz","timezone","timeZone","Timezone"),
+      tags:pick("tags","Tags","tag","Tag"),
+      desc:pick("desc","description","Description","notes","Notes","remark","Remarks"),
+      keywords:pick("keywords","Keywords")
+    };
+  }
   async function load(){
     if(!panel)return;
     const user=(window.firebaseAuth&&window.firebaseAuth.currentUser)||window.jaAuthUser;
     if(!user)return;
     const seq=++requestNo;
-    panel.querySelector(".sr-list").innerHTML='<div class="sr-status">Loading saved records from Google Sheets…</div>';
+    panel.querySelector(".sr-list").innerHTML='<div class="sr-status">Loading saved records…</div>';
     try{
-      const token=await user.getIdToken();
-      const response=await fetch("/api/saved-records",{headers:{Authorization:"Bearer "+token,Accept:"application/json"},cache:"no-store"});
-      const data=await response.json().catch(()=>({}));
-      if(!response.ok)throw new Error(data.error||"Saved Records request failed ("+response.status+").");
+      // Reuse JupiterAstro's existing saved-profiles provider and cache.
+      // It reads ja_saved_profiles_cache first and the page's 15-minute
+      // automatic sync refreshes that same cache in the background.
+      if(typeof window.fetchSavedProfiles!=="function"){
+        throw new Error("The existing saved-profiles cache is not available yet. Please reload the page.");
+      }
+      const profiles=await window.fetchSavedProfiles(false);
       if(seq!==requestNo)return;
-      records=Array.isArray(data.records)?data.records:[];
+      records=(Array.isArray(profiles)?profiles:[]).map(normalizeProfile).filter(r=>r.name);
       activeTags=new Set([...activeTags].filter(t=>records.some(r=>tagsOf(r).includes(t))));
       renderTags();renderRecords();
     }catch(error){
