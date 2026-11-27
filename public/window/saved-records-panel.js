@@ -257,21 +257,31 @@
       keywords:pick("keywords","Keywords")
     };
   }
+  function recentChartsStorageKey(){
+    const user=(window.firebaseAuth&&window.firebaseAuth.currentUser)||window.jaAuthUser;
+    const identity=user&&(user.uid||user.email);
+    return identity?RECENT_CHARTS_KEY+":"+encodeURIComponent(String(identity)):null;
+  }
   function persistRecentOpened(){
+    const key=recentChartsStorageKey();
+    if(!key)return;
     try{
-      localStorage.setItem(RECENT_CHARTS_KEY,JSON.stringify(recentOpened.slice(0,MAX_RECENT_CHARTS)));
+      localStorage.setItem(key,JSON.stringify(recentOpened.slice(0,MAX_RECENT_CHARTS)));
     }catch(_){}
   }
   function restoreRecentOpened(){
+    recentOpened=[];
+    const key=recentChartsStorageKey();
+    if(!key)return;
     try{
-      const raw=localStorage.getItem(RECENT_CHARTS_KEY);
+      const raw=localStorage.getItem(key);
       if(!raw)return;
       const parsed=JSON.parse(raw);
       if(!Array.isArray(parsed))return;
       recentOpened=parsed.slice(0,MAX_RECENT_CHARTS).map((row,index)=>normalizeProfile(row,index)).filter(item=>item.name);
     }catch(_){
       recentOpened=[];
-      try{localStorage.removeItem(RECENT_CHARTS_KEY);}catch(__){}
+      try{localStorage.removeItem(key);}catch(__){}
     }
   }
   function persistSidebarState(value){
@@ -323,7 +333,9 @@
   },true);
   window.addEventListener("ja-auth-state-changed",event=>{
     const user=event.detail&&Object.prototype.hasOwnProperty.call(event.detail,"user")?event.detail.user:(window.firebaseAuth&&window.firebaseAuth.currentUser);
-    if(!user){requestNo++;records=[];activeTags.clear();expanded=null;hide(false);if(panel){renderTags();renderRecords();}return;}
+    if(!user){requestNo++;records=[];recentOpened=[];activeTags.clear();expanded=null;hide(false);if(panel){renderTags();renderRecords();}return;}
+    restoreRecentOpened();
+    if(panel&&open)renderRecords();
     restoreSidebarState();
   });
   function trackOpened(record){
