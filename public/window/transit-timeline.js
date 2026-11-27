@@ -2274,7 +2274,7 @@
           }
         });
       });
-      durationStatusText = missingDurationItems.length
+      var durationStatusText = missingDurationItems.length
         ? "Duration incomplete — missing: " + missingDurationItems.join(", ")
         : "Duration updated for all planets";
       if (durationInfo) {
@@ -2289,7 +2289,7 @@
           return [planet, row && row.signDuration, row && row.nakshatraDuration, row && row.navamsaDuration];
         })
       });
-var moonRow = transitData && Array.isArray(transitData.rows)
+      var moonRow = transitData && Array.isArray(transitData.rows)
         ? transitData.rows.find(function (row) { return row && row.planet === "Moon"; })
         : null;
       if (moonRow) {
