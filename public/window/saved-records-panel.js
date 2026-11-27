@@ -319,6 +319,7 @@
   }
   function show(){
     if(!authenticated()){document.getElementById("accountOpenBtn")?.click();return;}
+    restoreStateAttempted=true;
     install();restoreSidebarWidth();panel.hidden=false;panel.setAttribute("aria-hidden","false");document.body.classList.add("ja-saved-open");open=true;persistSidebarState(true);load();
   }
   function hide(persist=true){
@@ -333,7 +334,7 @@
   },true);
   window.addEventListener("ja-auth-state-changed",event=>{
     const user=event.detail&&Object.prototype.hasOwnProperty.call(event.detail,"user")?event.detail.user:(window.firebaseAuth&&window.firebaseAuth.currentUser);
-    if(!user){requestNo++;records=[];recentOpened=[];activeTags.clear();expanded=null;hide(false);if(panel){renderTags();renderRecords();}return;}
+    if(!user){restoreStateAttempted=false;requestNo++;records=[];recentOpened=[];activeTags.clear();expanded=null;hide(false);if(panel){renderTags();renderRecords();}return;}
     restoreRecentOpened();
     if(panel&&open)renderRecords();
     restoreSidebarState();
