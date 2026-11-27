@@ -2868,8 +2868,8 @@ html[data-palette="cosmic"] .cosmic-glow {
   --ai-bg: var(--paper);
 
   position: fixed !important;
-  left: auto !important;
-  right: 20px !important;
+  left: 20px !important;
+  right: auto !important;
   bottom: 20px !important;
   z-index: 2147482500 !important;
   font-family: inherit;
@@ -2881,6 +2881,7 @@ html[data-palette="cosmic"] .cosmic-glow {
 ============================================ */
 
 #jupiter-ai-toggle {
+  display: none !important;
   position: relative;
   width: 46px;
   height: 46px;
@@ -2962,7 +2963,7 @@ html[data-palette="cosmic"] .cosmic-glow {
   position: absolute;
   left: 0 !important;
   right: auto !important;
-  bottom: 60px;
+  bottom: 0;
 
   width: 420px;
   max-width: calc(100vw - 36px);
@@ -3379,6 +3380,7 @@ html[data-palette="cosmic"] .cosmic-glow {
 
   #jupiter-ai-widget {
     left: 12px !important;
+    right: auto !important;
     bottom: 12px !important;
   }
 
