@@ -33,14 +33,19 @@
       if (header) new ResizeObserver(syncHeaderOffset).observe(header);
     }
     style.textContent = `
-      :root{--ja-saved-width:clamp(330px,31vw,420px);--ja-saved-header-height:90px}
+      :root{--ja-saved-width:clamp(264px,24.8vw,336px);--ja-saved-header-height:90px}
       #${ID},#${ID} *{box-sizing:border-box}
       #${ID}[hidden]{display:none!important}
       #${ID}{position:fixed;inset:var(--ja-saved-header-height) auto 0 0;width:var(--ja-saved-width);max-width:100vw;z-index:1000;display:flex;flex-direction:column;color:var(--ink,#282536);background:linear-gradient(145deg,color-mix(in srgb,var(--surface,#fff) 94%,transparent),color-mix(in srgb,var(--paper,#f8fafc) 96%,transparent));border-right:1px solid var(--line-strong,#ddd8e8);box-shadow:18px 0 48px rgba(35,30,52,.12);backdrop-filter:blur(28px) saturate(160%);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
       #${ID} .sr-head{display:none}
       #${ID} .sr-headcopy{flex:1;min-width:0}#${ID} .sr-headcopy b{display:block;font-size:16px;font-weight:730}#${ID} .sr-headcopy small{display:block;color:var(--muted,#777386);font-size:10px;margin-top:3px}
-      #${ID} .sr-close{position:absolute;top:28px;right:22px;z-index:5;width:13px;height:13px;min-width:13px;border:0;border-radius:50%;background:#ff6058;padding:0;cursor:pointer;box-shadow:inset 0 0 0 1px #0002}
       #${ID} .sr-search{padding-right:42px}
+      #${ID} .sr-close-search{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:28px;height:28px;display:grid;place-items:center;border:0;border-radius:8px;background:transparent;color:var(--muted,#7b8490);font:400 20px/1 Inter,sans-serif;cursor:pointer;transition:background .15s,color .15s}
+      #${ID} .sr-close-search:hover{background:var(--surface-alt,#eef2f6);color:var(--ink,#283536)}
+      #${ID} .sr-resizer{position:absolute;top:0;right:-4px;bottom:0;width:8px;z-index:10;cursor:col-resize;touch-action:none;background:transparent}
+      #${ID} .sr-resizer::after{content:"";position:absolute;top:0;bottom:0;left:3px;width:2px;background:transparent;transition:background .15s}
+      #${ID} .sr-resizer:hover::after,#${ID} .sr-resizer:focus-visible::after,#${ID}.sr-resizing .sr-resizer::after{background:var(--saffron,#d97706)}
+      #${ID}.sr-resizing{user-select:none}
       #${ID} .sr-body{min-height:0;flex:1;display:flex;flex-direction:column;gap:10px;padding:14px 16px;overflow:hidden}
       #${ID} .sr-searchwrap{height:42px;position:relative;flex:0 0 auto}
       #${ID} .sr-search{height:42px;width:100%;border:1px solid var(--line-strong,#d8dce5);border-radius:11px;padding:0 13px 0 39px;background:color-mix(in srgb,var(--surface-alt,#f1f5f9) 75%,transparent);color:var(--ink,#282536);font:500 13px Inter,sans-serif;outline:none}
@@ -91,6 +96,7 @@
       @media(max-width:760px){
         :root{--ja-saved-width:100vw}
         #${ID}{width:100vw}
+        #${ID} .sr-resizer{display:none}
         body.ja-saved-open>main.wrap,
         body.ja-saved-open>#panchangCardBlock{width:100%;margin-left:0;margin-right:0}
         body.ja-saved-open>main.wrap{visibility:hidden}
@@ -102,16 +108,18 @@
     panel = document.createElement("aside");
     panel.id = ID; panel.hidden = true; panel.setAttribute("aria-hidden","true"); panel.setAttribute("aria-label","Saved records");
     panel.innerHTML = `
-      <button class="sr-close" type="button" title="Close" aria-label="Close Saved records"></button>
+      <div class="sr-resizer" role="separator" aria-orientation="vertical" aria-label="Resize Find sidebar" tabindex="0"></div>
       <div class="sr-body">
-        <div class="sr-searchwrap"><svg class="sr-searchicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input class="sr-search" type="search" placeholder="Search name, place, tags or notes…" aria-label="Search saved records" autocomplete="off"></div>
+        <div class="sr-searchwrap"><svg class="sr-searchicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input class="sr-search" type="search" placeholder="Search name, place, tags or notes…" aria-label="Search saved records" autocomplete="off"><button class="sr-close-search" type="button" title="Close Find sidebar" aria-label="Close Find sidebar">×</button></div>
         <section><div class="sr-label">Filter by tags</div><div class="sr-tags"><span class="sr-status">Loading tags…</span></div></section>
         <section class="sr-results"><div class="sr-list"><div class="sr-status">Sign in to load saved records.</div></div></section>
       </div>
       `;
     document.body.appendChild(panel);
-    panel.querySelector(".sr-close").addEventListener("click", closePanel);
+    panel.querySelector(".sr-close-search").addEventListener("click", closePanel);
     panel.querySelector(".sr-search").addEventListener("input", renderRecords);
+    installResizer();
+    restoreSidebarWidth();
     panel.querySelector(".sr-tags").addEventListener("click", event => {
       const btn=event.target.closest("[data-tag]"); if(!btn)return;
       const tag=btn.dataset.tag; activeTags.has(tag)?activeTags.delete(tag):activeTags.add(tag); renderTags(); renderRecords();
@@ -121,6 +129,60 @@
       expanded=expanded===btn.dataset.record?null:btn.dataset.record; renderRecords();
     });
     return panel;
+  }
+  const SIDEBAR_WIDTH_KEY = "ja_saved_records_sidebar_width";
+  function widthLimits(){
+    const viewport = document.documentElement.clientWidth || window.innerWidth || 1200;
+    return {min:260,max:Math.max(260,Math.min(520,Math.round(viewport*.45)))};
+  }
+  function applySidebarWidth(width){
+    const limits=widthLimits();
+    const next=Math.round(Math.max(limits.min,Math.min(limits.max,width)));
+    document.documentElement.style.setProperty("--ja-saved-width",next+"px");
+    return next;
+  }
+  function restoreSidebarWidth(){
+    try{
+      const saved=Number(localStorage.getItem(SIDEBAR_WIDTH_KEY));
+      if(Number.isFinite(saved)&&saved>0)applySidebarWidth(saved);
+    }catch(_){}
+  }
+  function installResizer(){
+    const handle=panel.querySelector(".sr-resizer");
+    if(!handle||handle.dataset.ready)return;
+    handle.dataset.ready="1";
+    let startX=0,startWidth=0,pointerId=null;
+    const move=event=>{
+      if(pointerId===null||event.pointerId!==pointerId)return;
+      applySidebarWidth(startWidth+(event.clientX-startX));
+    };
+    const finish=event=>{
+      if(pointerId===null||(event&&event.pointerId!==pointerId))return;
+      try{localStorage.setItem(SIDEBAR_WIDTH_KEY,String(parseFloat(getComputedStyle(panel).width)||startWidth));}catch(_){}
+      if(handle.hasPointerCapture&&handle.hasPointerCapture(pointerId))handle.releasePointerCapture(pointerId);
+      pointerId=null;panel.classList.remove("sr-resizing");
+      window.removeEventListener("pointermove",move);
+      window.removeEventListener("pointerup",finish);
+      window.removeEventListener("pointercancel",finish);
+    };
+    handle.addEventListener("pointerdown",event=>{
+      if(event.button!==undefined&&event.button!==0)return;
+      pointerId=event.pointerId;startX=event.clientX;
+      startWidth=panel.getBoundingClientRect().width;
+      panel.classList.add("sr-resizing");
+      if(handle.setPointerCapture)handle.setPointerCapture(pointerId);
+      window.addEventListener("pointermove",move);
+      window.addEventListener("pointerup",finish);
+      window.addEventListener("pointercancel",finish);
+      event.preventDefault();
+    });
+    handle.addEventListener("keydown",event=>{
+      if(event.key!=="ArrowLeft"&&event.key!=="ArrowRight")return;
+      event.preventDefault();
+      const current=panel.getBoundingClientRect().width;
+      const next=applySidebarWidth(current+(event.key==="ArrowRight"?12:-12));
+      try{localStorage.setItem(SIDEBAR_WIDTH_KEY,String(next));}catch(_){}
+    });
   }
   function renderTags(){
     if(!panel)return;
@@ -203,7 +265,7 @@
   }
   function show(){
     if(!authenticated()){document.getElementById("accountOpenBtn")?.click();return;}
-    install();panel.hidden=false;panel.setAttribute("aria-hidden","false");document.body.classList.add("ja-saved-open");open=true;load();
+    install();restoreSidebarWidth();panel.hidden=false;panel.setAttribute("aria-hidden","false");document.body.classList.add("ja-saved-open");open=true;load();
   }
   function hide(){if(!panel||!open)return;panel.hidden=true;panel.setAttribute("aria-hidden","true");document.body.classList.remove("ja-saved-open");open=false;}
   function closePanel(){if(!panel)return;panel.querySelector(".sr-search").value="";activeTags.clear();expanded=null;renderTags();renderRecords();hide();}
