@@ -5,7 +5,7 @@
 
   window.JA_SAVED_RECORD_TAGS = ["Career","Finance & Wealth","Relationship & Marriage","Kundli Matching","Child & Progeny","Property & Real Estate","Health Concerns","Legal Matters & Litigation","Muhurta (Auspicious Timing)","Other"];
   const ID = "ja-saved-records-panel";
-  let panel = null, open = false, records = [], activeTags = new Set(), expanded = null, requestNo = 0;
+  let panel = null, open = false, records = [], recentOpened = [], activeTags = new Set(), expanded = null, requestNo = 0;
 
   const esc = value => String(value ?? "").trim().replace(/[&<>"']/g, c => ({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
@@ -23,29 +23,35 @@
       :root{--ja-saved-width:clamp(330px,31vw,420px)}
       #${ID},#${ID} *{box-sizing:border-box}
       #${ID}[hidden]{display:none!important}
-      #${ID}{position:fixed;inset:0 auto 0 0;width:var(--ja-saved-width);max-width:100vw;z-index:2147482500;display:flex;flex-direction:column;color:var(--ink,#282536);background:linear-gradient(145deg,color-mix(in srgb,var(--surface,#fff) 94%,transparent),color-mix(in srgb,var(--paper,#f8fafc) 96%,transparent));border-right:1px solid var(--line-strong,#ddd8e8);box-shadow:18px 0 48px rgba(35,30,52,.12);backdrop-filter:blur(28px) saturate(160%);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-      #${ID} .sr-head{height:66px;flex:0 0 auto;display:flex;align-items:center;padding:0 18px;gap:12px;border-bottom:1px solid var(--line,#e7e3ed);background:color-mix(in srgb,var(--surface,#fff) 80%,transparent)}
+      #${ID}{position:fixed;inset:0 auto 0 0;width:var(--ja-saved-width);max-width:100vw;z-index:2147482000;display:flex;flex-direction:column;color:var(--ink,#282536);background:linear-gradient(145deg,color-mix(in srgb,var(--surface,#fff) 94%,transparent),color-mix(in srgb,var(--paper,#f8fafc) 96%,transparent));border-right:1px solid var(--line-strong,#ddd8e8);box-shadow:18px 0 48px rgba(35,30,52,.12);backdrop-filter:blur(28px) saturate(160%);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+      #${ID} .sr-head{display:none}
       #${ID} .sr-headcopy{flex:1;min-width:0}#${ID} .sr-headcopy b{display:block;font-size:16px;font-weight:730}#${ID} .sr-headcopy small{display:block;color:var(--muted,#777386);font-size:10px;margin-top:3px}
       #${ID} .sr-close{width:13px;height:13px;min-width:13px;border:0;border-radius:50%;background:#ff6058;padding:0;cursor:pointer;box-shadow:inset 0 0 0 1px #0002}
-      #${ID} .sr-body{min-height:0;flex:1;display:flex;flex-direction:column;gap:15px;padding:17px;overflow:hidden}
-      #${ID} .sr-search{height:44px;width:100%;flex:0 0 auto;border:1px solid var(--line-strong,#d8dce5);border-radius:11px;padding:0 13px;background:color-mix(in srgb,var(--surface-alt,#f1f5f9) 75%,transparent);color:var(--ink,#282536);font:500 13px Inter,sans-serif;outline:none}
+      #${ID} .sr-body{min-height:0;flex:1;display:flex;flex-direction:column;gap:10px;padding:14px 16px;overflow:hidden}
+      #${ID} .sr-searchwrap{height:42px;position:relative;flex:0 0 auto}
+      #${ID} .sr-search{height:42px;width:100%;border:1px solid var(--line-strong,#d8dce5);border-radius:11px;padding:0 13px 0 39px;background:color-mix(in srgb,var(--surface-alt,#f1f5f9) 75%,transparent);color:var(--ink,#282536);font:500 13px Inter,sans-serif;outline:none}
+      #${ID} .sr-searchicon{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted,#8a8f98);pointer-events:none}
       #${ID} .sr-search:focus{border-color:var(--saffron,#d97706);box-shadow:0 0 0 3px color-mix(in srgb,var(--saffron,#d97706) 14%,transparent)}
       #${ID} .sr-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted,#777386);font-weight:750;margin-bottom:8px}
-      #${ID} .sr-tags{display:flex;flex-wrap:wrap;gap:7px;flex:0 0 auto;max-height:150px;overflow:auto}
-      #${ID} .sr-tag{border:1px solid var(--line-strong,#cbd5e1);border-radius:999px;padding:7px 11px;background:var(--paper,#f8fafc);color:var(--ink,#1e293b);font:650 11px Inter,sans-serif;cursor:pointer;transition:background .16s,border-color .16s,box-shadow .16s}
-      #${ID} .sr-tag::before{content:"+";display:inline-block;margin-right:5px;color:var(--ink,#1e293b);font-weight:800}
+      #${ID} .sr-tags{display:flex;flex-wrap:wrap;gap:5px;flex:0 0 auto;max-height:none;overflow:visible}
+      #${ID} .sr-tag{border:1px solid var(--line-strong,#cbd5e1);border-radius:999px;padding:5px 8px;background:var(--paper,#f8fafc);color:var(--ink,#1e293b);font:550 10px/1.2 Inter,sans-serif;cursor:pointer;transition:background .16s,border-color .16s,box-shadow .16s}
+      #${ID} .sr-tag::before{content:"+";display:inline-block;margin-right:4px;color:var(--ink,#1e293b);font-weight:650}
       #${ID} .sr-tag[aria-pressed="true"]{background:color-mix(in srgb,var(--saffron,#d97706) 17%,var(--surface,#fff));border-color:var(--saffron,#d97706);box-shadow:0 0 0 1px color-mix(in srgb,var(--saffron,#d97706) 15%,transparent)}
       #${ID} .sr-tag[aria-pressed="true"]::before{content:"✓";color:var(--saffron,#b45309)}
-      #${ID} .sr-results{min-height:0;flex:1;overflow:auto;border-top:1px solid var(--line,#e7e3ed)}
+      #${ID} .sr-results{min-height:0;flex:1;overflow:auto;border-top:1px solid var(--line,#e7e3ed);scrollbar-width:thin;scrollbar-color:#b8bec7 transparent}
+      #${ID} .sr-results::-webkit-scrollbar{width:7px}
+      #${ID} .sr-results::-webkit-scrollbar-thumb{background:#b8bec7;border-radius:8px}
+      #${ID} .sr-results::-webkit-scrollbar-track{background:transparent}
       #${ID} .sr-record{border-bottom:1px solid var(--line,#e7e3ed)}
       #${ID} .sr-record button{width:100%;display:flex;justify-content:space-between;gap:10px;text-align:left;padding:12px 3px;border:0;background:transparent;color:var(--ink,#282536);font:650 12px/1.4 Inter,sans-serif;cursor:pointer}
       #${ID} .sr-meta{display:block;margin-top:3px;color:var(--muted,#777);font:450 10px/1.4 Inter,sans-serif}
-      #${ID} .sr-details{padding:0 5px 12px;color:var(--muted,#777);font-size:10.5px;line-height:1.55}
-      #${ID} .sr-detail{display:grid;grid-template-columns:66px 1fr;gap:8px;padding:3px 0}
-      #${ID} .sr-detail b{color:var(--ink,#282536)}
+      #${ID} .sr-details{padding:0 5px 12px;color:var(--ink,#282536);font:400 11px/1.55 Inter,sans-serif}
+      #${ID} .sr-detail{display:grid;grid-template-columns:66px 1fr;gap:8px;padding:3px 0;font-weight:400}
+      #${ID} .sr-detail b{color:var(--ink,#282536);font-weight:500}
+      #${ID} .sr-detail span{font-weight:400;overflow-wrap:anywhere}
       #${ID} .sr-status{text-align:center;color:var(--muted,#777);padding:22px 8px;font-size:11px}
       #${ID} .sr-error{color:#b42318}
-      #${ID} .sr-foot{padding:10px 17px;border-top:1px solid var(--line,#e7e3ed);color:var(--muted,#777);font-size:10px}
+      #${ID} .sr-foot{display:none}
       body.ja-saved-open>header.brand,body.ja-saved-open>main.wrap,body.ja-saved-open>#panchangCardBlock{width:calc(100% - var(--ja-saved-width));max-width:none;margin-left:var(--ja-saved-width);margin-right:0;transition:width .22s ease,margin-left .22s ease}
       body.ja-saved-open>main.wrap{padding-left:clamp(12px,1.8vw,26px);padding-right:clamp(12px,1.8vw,26px)}
       @media(max-width:760px){:root{--ja-saved-width:100vw}#${ID}{width:100vw}body.ja-saved-open>header.brand,body.ja-saved-open>main.wrap,body.ja-saved-open>#panchangCardBlock{width:100%;margin-left:0;margin-right:0}body.ja-saved-open>header.brand{transform:translateX(100vw)}body.ja-saved-open>main.wrap{visibility:hidden}body.ja-saved-open>#panchangCardBlock{display:none}}
@@ -55,13 +61,13 @@
     panel = document.createElement("aside");
     panel.id = ID; panel.hidden = true; panel.setAttribute("aria-hidden","true"); panel.setAttribute("aria-label","Saved records");
     panel.innerHTML = `
-      <header class="sr-head"><div class="sr-headcopy"><b>Saved records</b><small>Your saved birth charts and notes</small></div><button class="sr-close" type="button" title="Close" aria-label="Close Saved records"></button></header>
+      <header class="sr-head"><button class="sr-close" type="button" title="Close" aria-label="Close Saved records"></button></header>
       <div class="sr-body">
-        <input class="sr-search" type="search" placeholder="Search name, place, tags or notes…" aria-label="Search saved records" autocomplete="off">
+        <div class="sr-searchwrap"><svg class="sr-searchicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input class="sr-search" type="search" placeholder="Search name, place, tags or notes…" aria-label="Search saved records" autocomplete="off"></div>
         <section><div class="sr-label">Filter by tags</div><div class="sr-tags"><span class="sr-status">Loading tags…</span></div></section>
         <section class="sr-results"><div class="sr-list"><div class="sr-status">Sign in to load saved records.</div></div></section>
       </div>
-      <footer class="sr-foot">Google Sheets · authenticated access · Press F to open · Esc to hide</footer>`;
+      `;
     document.body.appendChild(panel);
     panel.querySelector(".sr-close").addEventListener("click", closePanel);
     panel.querySelector(".sr-search").addEventListener("input", renderRecords);
@@ -82,20 +88,31 @@
   }
   function filtered(){
     const q=txt(panel.querySelector(".sr-search").value).toLocaleLowerCase();
-    return records.filter(r=>{
+    const source=(q||activeTags.size)?records:recentOpened;
+    return source.filter(r=>{
       const rt=tagsOf(r); if(activeTags.size&&![...activeTags].some(t=>rt.includes(t)))return false;
       return !q||[r.name,r.dob,r.tob,r.pob,r.tags,r.desc,r.notes,r.keywords].map(txt).join(" ").toLocaleLowerCase().includes(q);
     });
   }
-  function detail(label,value){return txt(value)?`<div class="sr-detail"><b>${esc(label)}</b><span>${esc(value)}</span></div>`:"";}
+  function plainNote(value){
+    const raw=String(value??"").trim(); if(!raw)return "";
+    if(!/[<][a-z!/]/i.test(raw))return raw;
+    try{
+      const doc=new DOMParser().parseFromString(raw,"text/html");
+      doc.querySelectorAll("br").forEach(node=>node.replaceWith("\n"));
+      doc.querySelectorAll("p,div,li").forEach(node=>node.append("\n"));
+      return (doc.body.textContent||"").replace(/[ \t]+\n/g,"\n").replace(/\n{3,}/g,"\n\n").trim();
+    }catch(_){return raw.replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim();}
+  }
+  function detail(label,value){const clean=label==="Notes"?plainNote(value):txt(value);return clean?("<div class=\"sr-detail\"><b>"+esc(label)+"</b><span>"+esc(clean)+"</span></div>"):"";}
   function renderRecords(){
     if(!panel)return;
     const host=panel.querySelector(".sr-list"), list=filtered();
-    if(!list.length){host.innerHTML='<div class="sr-status">No records match this search or tag filter.</div>';return;}
+    if(!list.length){host.innerHTML=(txt(panel.querySelector(".sr-search").value)||activeTags.size)?'<div class="sr-status">No records match this search or tag filter.</div>':'<div class="sr-status">Recently opened charts will appear here.</div>';return;}
     host.innerHTML=list.map((r,i)=>{
       const id=txt(r.id)||"record-"+i, isOpen=expanded===id, meta=[r.dob,r.pob].map(txt).filter(Boolean).join(" · ");
       const details=[detail("DOB",r.dob),detail("TOB",r.tob),detail("POB",r.pob),detail("Notes",r.desc||r.notes),detail("Tags",tagsOf(r).join(", ")),detail("Coordinates",[r.lat,r.lon].map(txt).filter(Boolean).join(", "))].join("");
-      return `<article class="sr-record"><button type="button" data-record="${esc(id)}" aria-expanded="${isOpen}"><span>${esc(r.name||"Unnamed record")}<span class="sr-meta">${esc(meta)}</span></span><span aria-hidden="true">${isOpen?"⌃":"⌄"}</span></button>${isOpen?`<div class="sr-details">${details||"No additional details available."}</div>`:""}</article>`;
+      return `<article class="sr-record"><button type="button" data-record="${esc(id)}" aria-expanded="${isOpen}"><span>${esc(r.name||"Unnamed record")}<span class="sr-meta">${esc(meta)}</span></span></button>${isOpen?`<div class="sr-details">${details||"No additional details available."}</div>`:""}</article>`;
     }).join("");
   }
   function normalizeProfile(row,index){
@@ -152,5 +169,6 @@
     const user=event.detail&&Object.prototype.hasOwnProperty.call(event.detail,"user")?event.detail.user:(window.firebaseAuth&&window.firebaseAuth.currentUser);
     if(!user){requestNo++;records=[];activeTags.clear();expanded=null;hide();if(panel){renderTags();renderRecords();}}
   });
-  window.JASavedRecordsPanel=Object.freeze({open:show,hide,close:closePanel,refresh:load,isOpen:()=>open});
+  function trackOpened(record){const item=normalizeProfile(record||{},0);if(!item.name)return;if(!record.id)item.id="recent-"+[item.name,item.dob,item.tob,item.pob].join("|");const key=item.id;recentOpened=[item,...recentOpened.filter(r=>r.id!==key)].slice(0,12);if(panel&&open)renderRecords();}
+  window.JASavedRecordsPanel=Object.freeze({open:show,hide,close:closePanel,refresh:load,isOpen:()=>open,trackOpened});
 })();
