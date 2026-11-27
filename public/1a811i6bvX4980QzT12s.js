@@ -12,7 +12,6 @@ Jupiter Astro AI Assistant
   widget.dataset.initialized = "true";
 
 
-  const toggle = document.getElementById("jupiter-ai-toggle");
   const close = document.getElementById("jupiter-ai-close");
   const windowBox = document.getElementById("jupiter-ai-window");
   const input = document.getElementById("jupiter-ai-input");
@@ -51,7 +50,6 @@ Jupiter Astro AI Assistant
 
     windowBox.setAttribute("aria-hidden", "false");
 
-    toggle.setAttribute("aria-expanded", "true");
 
     input.focus();
 
@@ -68,7 +66,6 @@ Jupiter Astro AI Assistant
 
     windowBox.setAttribute("aria-hidden", "true");
 
-    toggle.setAttribute("aria-expanded", "false");
 
   }
 
