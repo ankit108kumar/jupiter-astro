@@ -2310,8 +2310,16 @@ var moonRow = transitData && Array.isArray(transitData.rows)
       bindNakshatraStoryHover(host);
       ensurePlanetSignificationPanel();
     } catch (error) {
-      console.error("Transit Timeline could not render the planetary table.", error);
-      host.innerHTML = '<div class="jtt-table-empty is-error">Unable to load planetary transit data. Check the active Research Kundali.</div>';
+      var snapshot = readContextSnapshot() || {};
+      console.error("Transit Timeline could not render the planetary table.", {
+        chartId: context && context.id,
+        chartTitle: snapshot.chartTitle || "Unknown chart",
+        evaluationTime: snapshot.evalMs || null,
+        error: error
+      });
+      var detail = error && error.message ? error.message : String(error || "Unknown error");
+      host.innerHTML = '<div class="jtt-table-empty is-error"><strong>Transit data could not be prepared.</strong><br><span>' +
+        escapeTableText(detail) + '</span><br><small>See the browser console for chart and evaluation-time diagnostics.</small></div>';
     }
   }
 
@@ -2810,13 +2818,6 @@ if (action === "export-toggle") {
       return;
     }
 
-    if (event.key === "Escape" && !document.fullscreenElement && openState()) {
-      var panchangModal = document.getElementById("jaPanchangDetailsModal");
-      if (panchangModal && !panchangModal.hidden) return;
-      event.preventDefault();
-      event.stopPropagation();
-      minimizeWindow();
-    }
   }, true);
 
   document.addEventListener("fullscreenchange", syncFullscreenButton);

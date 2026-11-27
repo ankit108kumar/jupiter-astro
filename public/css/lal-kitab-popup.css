@@ -716,3 +716,19 @@ body.ja-lk-popup-open { overflow: hidden; }
   .ja-lk-popup-titlebar > .ja-lk-titlebar-tools { right: 9px !important; }
   .ja-lk-popup-titlebar > .ja-lk-window-title { max-width: calc(100% - 230px); }
 }
+
+/* Brighter green/red glow applies only to Planet Placements house values. */
+.ja-lk-placement-table tbody td.ja-lk-house.is-good{color:#16a34a!important;text-shadow:0 0 1px rgba(22,163,74,.55),0 0 8px rgba(34,197,94,.42),0 0 15px rgba(34,197,94,.22);filter:drop-shadow(0 0 2px rgba(34,197,94,.22))}
+.ja-lk-placement-table tbody td.ja-lk-house.is-bad{color:#dc2626!important;text-shadow:0 0 1px rgba(220,38,38,.55),0 0 8px rgba(239,68,68,.42),0 0 15px rgba(239,68,68,.22);filter:drop-shadow(0 0 2px rgba(239,68,68,.22))}
+.ja-lk-placement-table thead th:first-child,.ja-lk-placement-table tbody th{padding-left:22px!important}
+.ja-lk-compact-workspace{align-items:stretch!important}
+.ja-lk-compact-chart-area,.ja-lk-compact-charts{display:contents!important}
+.ja-lk-compact-workspace>.ja-lk-compact-charts>.card.kchart,.ja-lk-compact-workspace>.ja-lk-placement-panel{height:100%;min-height:0}
+.ja-lk-compact-charts .kchart>div{display:flex;align-items:center;justify-content:center;min-height:0}
+.ja-lk-compact-charts .kchart svg{max-height:min(49vh,560px)}
+.ja-lk-placement-panel{display:flex;flex-direction:column}
+.ja-lk-placement-table-wrap{flex:1 1 auto}
+.ja-lk-placement-table{height:100%}
+.ja-lk-placement-table tbody tr{height:calc((100% - 34px)/9)}
+@media(max-width:900px){.ja-lk-compact-workspace{grid-template-columns:repeat(2,minmax(0,1fr))}.ja-lk-compact-workspace>.ja-lk-placement-panel{grid-column:1/-1}}
+@media(max-width:600px){.ja-lk-compact-workspace{grid-template-columns:minmax(0,1fr)}.ja-lk-compact-workspace>.ja-lk-placement-panel{grid-column:auto}}

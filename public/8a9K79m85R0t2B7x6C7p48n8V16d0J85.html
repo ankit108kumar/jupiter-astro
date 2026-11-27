@@ -28,7 +28,7 @@
 <link rel="stylesheet" href="/css/main67g120kS63cY438.css">
 <!-- Panchang popup CSS is loaded on first card interaction. -->
 <link rel="stylesheet" href="/css/detailed-dasha-overview.css">
-<link rel="stylesheet" href="/css/lal-kitab-popup.css">
+<link rel="stylesheet" href="/css/lal-kitab-popup.css?v=20261127-5">
 <script>
 /* Load Lal Kitab fundamental placement classifications for the compact popup table. */
 window.JA_LK_FUNDAMENTAL_RULES_PROMISE = window.JA_LK_FUNDAMENTAL_RULES_PROMISE || fetch('/data/lal-kitab-fundamental-rules.json', { cache: 'force-cache' })
@@ -46,7 +46,7 @@ window.JA_LK_FUNDAMENTAL_RULES_PROMISE = window.JA_LK_FUNDAMENTAL_RULES_PROMISE 
   });
 </script>
 <link rel="stylesheet" href="/window/library-window.css">
-<link rel="stylesheet" href="/window/transit-timeline.css">
+<link rel="stylesheet" href="/window/transit-timeline.css?v=20261127-5">
 <link rel="stylesheet" href="/css/ja-info-toast.css?v=20261127-7">
 <script src="/ja-info-toast.js?v=20261127-7"></script>
 <link rel="stylesheet" href="/window/library-preview.css">
@@ -5781,7 +5781,6 @@ const activeYear = (typeof window.trSelectedLkYear === 'number' && window.trSele
               <article class="card kchart">
                 <header><h3>Lal Kitab · Natal Chart</h3></header>
                 <div>${drawNorthChart(k.ascSign, natalLkItems, 'Natal Lal Kitab')}</div>
-                <p class="ja-lk-chart-caption">Natal Grahas in Rashi Chart</p>
               </article>
               <article class="card kchart">
                 <header>
@@ -5789,14 +5788,12 @@ const activeYear = (typeof window.trSelectedLkYear === 'number' && window.trSele
                   <span class="ja-lk-age">Age: ${activeYear - 1}–${activeYear}</span>
                 </header>
                 <div>${drawNorthChart(0, varshItems, 'Varshphal Year ' + activeYear)}</div>
-                <p class="ja-lk-chart-caption">Lal Kitab Progressions (House Movements)</p>
               </article>
             </div>
           </section>
           <aside class="ja-lk-placement-panel" aria-label="Natal and selected Varshphal planet placements">
             <div class="ja-lk-placement-heading">
               <h3>Planet Placements</h3>
-              <span>House position</span>
             </div>
             <div class="ja-lk-placement-table-wrap">
               <table class="ja-lk-placement-table">
@@ -6555,13 +6552,6 @@ function getJupiterTransitTimelineRegistry() {
 
   document.addEventListener("keydown", event => {
     const key = String(event.key || "").toLowerCase();
-    if (key === "escape" && overlay && !overlay.hidden) {
-      if (document.fullscreenElement) return;
-      event.preventDefault();
-      event.stopPropagation();
-      close();
-      return;
-    }
     if (key !== "l" || event.ctrlKey || event.metaKey || event.altKey ||
         event.shiftKey || event.repeat || event.isComposing) return;
     if (isEditableTarget(event.target) || hasOpenDropdown()) return;
@@ -9797,7 +9787,7 @@ const result = section === 'planets'
 <script type="module" src="/Account.js"></script>
 <script type="module" src="/Email%20Verification.js"></script>
 <script src="/window/library-window.js"></script>
-<script src="/window/transit-timeline.js"></script>
+<script src="/window/transit-timeline.js?v=20261127-5"></script>
 <script src="/window/library-preview.js"></script>
 <script src="/window/library-drive.js"></script>
 	
@@ -10136,15 +10126,53 @@ const result = section === 'planets'
     if(key==="g"&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.shiftKey&&!e.repeat&&!e.isComposing&&!editable){
       e.preventDefault();e.stopPropagation();toggle();return;
     }
-    if(key==="escape"&&!overlay.hidden){
-      e.preventDefault();e.stopPropagation();minimize();
-    }
   },true);
   document.addEventListener("ja-good-bad-analysis-data",e=>setAnalysisData(e.detail));
   window.JAGoodBadAnalysis={open,close,minimize,toggle,setData:setAnalysisData,isOpen:()=>!overlay.hidden};
   setAnalysisData({});
 })();
 </script>
-  <script src="/window/saved-records-panel.js?v=20261127-4" defer></script>
+  <script>
+  (function installGlobalEscapeRouter(){
+    if(window.__JA_GLOBAL_ESCAPE_ROUTER__)return;
+    window.__JA_GLOBAL_ESCAPE_ROUTER__=true;
+    window.addEventListener("keydown",function(event){
+      if(event.key!=="Escape"||event.altKey||event.ctrlKey||event.metaKey||event.shiftKey||event.defaultPrevented)return;
+      var target=event.target;
+      if(target&&target.closest&&target.closest("input,textarea,select,[contenteditable='true'],[role='textbox']"))return;
+      if(document.fullscreenElement&&document.fullscreenElement!==document.body){
+        event.preventDefault();event.stopImmediatePropagation();
+        if(document.exitFullscreen)document.exitFullscreen().catch(function(){});
+        return;
+      }
+      if(window.JAHoverManager&&window.JAHoverManager.dismissLast()){
+        event.preventDefault();event.stopImmediatePropagation();return;
+      }
+      var active=[];
+      function add(api,element,method){
+        if(!api||!element||element.hidden)return;
+        var z=Number.parseInt(getComputedStyle(element).zIndex,10);
+        active.push({api:api,method:method,z:Number.isFinite(z)?z:0});
+      }
+      var timeline=document.getElementById("ja-transit-timeline-window");
+      if(window.JupiterTransitTimeline&&window.JupiterTransitTimeline.isOpen())add(window.JupiterTransitTimeline,timeline,"minimize");
+      var lkOverlay=document.querySelector(".ja-lk-popup-overlay");
+      if(window.JALalKitabPopup&&window.JALalKitabPopup.isOpen())add(window.JALalKitabPopup,lkOverlay,"minimize");
+      var gb=window.JAGoodBadAnalysis;
+      if(gb&&gb.isOpen()){
+        var gbOverlay=document.querySelector("[data-ja-good-bad-overlay],.ja-good-bad-overlay,.ja-gb-overlay");
+        if(!gbOverlay)gbOverlay=document.querySelector("[aria-modal='true']");
+        if(gbOverlay)add(gb,gbOverlay,"minimize");
+      }
+      var saved=document.getElementById("ja-saved-records-panel");
+      if(window.JASavedRecordsPanel&&window.JASavedRecordsPanel.isOpen())add(window.JASavedRecordsPanel,saved,"hide");
+      if(!active.length)return;
+      active.sort(function(a,b){return b.z-a.z});
+      event.preventDefault();event.stopImmediatePropagation();
+      var top=active[0];if(typeof top.api[top.method]==="function")top.api[top.method]();
+    },true);
+  })();
+  </script>
+  <script src="/window/saved-records-panel.js?v=20261127-5" defer></script>
 </body>
 </html>
