@@ -3385,7 +3385,9 @@ s += `<rect x="0" y="0" width="300" height="300"
 
   for (let h = 1; h <= 12; h++) {
     const g = NORTH[h], sign = (lagnaSign + h - 1) % 12;
-    s += hideSignCards\n      ? `<text class="sign-number ja-no-sign-card" aria-hidden="true" data-layout-house="${h}" data-layout-type="sign" x="${g.n[0]}" y="${g.n[1]}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="${C.muted}" style="cursor:default;pointer-events:none">${sign + 1}</text>`\n      : `<text class="sign-number" tabindex="0" role="img" aria-label="Sign ${sign + 1} information" data-sign="${sign + 1}" data-layout-house="${h}" data-layout-type="sign" x="${g.n[0]}" y="${g.n[1]}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="${C.muted}" style="cursor:help">${sign + 1}</text>`;
+    s += hideSignCards
+      ? `<text class="sign-number ja-no-sign-card" aria-hidden="true" data-layout-house="${h}" data-layout-type="sign" x="${g.n[0]}" y="${g.n[1]}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="${C.muted}" style="cursor:default;pointer-events:none">${sign + 1}</text>`
+      : `<text class="sign-number" tabindex="0" role="img" aria-label="Sign ${sign + 1} information" data-sign="${sign + 1}" data-layout-house="${h}" data-layout-type="sign" x="${g.n[0]}" y="${g.n[1]}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="${C.muted}" style="cursor:help">${sign + 1}</text>`;
     if (savList && Array.isArray(savList) && g.sav) {
       const val = savList[sign];
       const col = val < 25 ? '#dc2626' : val > 29 ? '#16a34a' : '#2563eb';
