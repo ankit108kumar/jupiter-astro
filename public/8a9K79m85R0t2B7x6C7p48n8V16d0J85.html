@@ -129,18 +129,6 @@ window.JA_LK_FUNDAMENTAL_RULES_PROMISE = window.JA_LK_FUNDAMENTAL_RULES_PROMISE 
 .ja-gb-observation{margin:0 0 7px;padding:9px 10px;border-left:2px solid #65A98E;border-radius:0 6px 6px 0;background:rgba(38,150,109,.055);color:#303748;font-size:11.5px;line-height:1.55;overflow-wrap:anywhere}
 .ja-gb-column.bad .ja-gb-observation{border-left-color:#CF777C;background:rgba(207,98,104,.055)}
 
-#jaGoodBadMinimized[hidden]{display:none!important}
-#jaGoodBadMinimized{position:fixed;right:22px;bottom:22px;z-index:2147483006;display:flex;align-items:center;gap:9px;padding:0;border:1px solid var(--line-strong,#CBD5E1);border-radius:12px;color:var(--ink,#0F172A);background:var(--surface,#FFFFFF);box-shadow:0 8px 28px rgba(0,0,0,.20);font:inherit;cursor:pointer;overflow:hidden}
-#jaGoodBadMinimized{padding:11px 15px;font:700 13px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
-#jaGoodBadMinimized:before{content:"";width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:#B78330}
-#jaGoodBadMinimized:hover{background:var(--surface-alt,#F1F5F9)}
-#jaGoodBadMinimized:focus-visible{outline:2px solid var(--saffron,#EA580C);outline-offset:3px}
-/* Stack minimized windows vertically in one bottom-right tray. */
-body:has(#jaGoodBadMinimized:not([hidden])) #ja-transit-timeline-launcher.visible{bottom:82px!important}
-body:has(#jaGoodBadMinimized:not([hidden])) #ja-panchang-minimized-launcher.visible{bottom:142px!important}
-body:has(#ja-transit-timeline-launcher.visible) #ja-panchang-minimized-launcher.visible{bottom:82px!important}
-body:has(#jaGoodBadMinimized:not([hidden])):has(#ja-transit-timeline-launcher.visible) #ja-panchang-minimized-launcher.visible{bottom:142px!important}
-@media(max-width:760px){#jaGoodBadMinimized{right:12px;bottom:12px}body:has(#jaGoodBadMinimized:not([hidden])) #ja-transit-timeline-launcher.visible{bottom:72px!important}body:has(#jaGoodBadMinimized:not([hidden])) #ja-panchang-minimized-launcher.visible{bottom:132px!important}body:has(#ja-transit-timeline-launcher.visible) #ja-panchang-minimized-launcher.visible{bottom:72px!important}body:has(#jaGoodBadMinimized:not([hidden])):has(#ja-transit-timeline-launcher.visible) #ja-panchang-minimized-launcher.visible{bottom:132px!important}}
 .ja-gb-titlebar-tools{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex:0 0 auto;min-width:154px;position:relative}
 .ja-gb-tool-button{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;padding:0;border:1px solid rgba(220,226,237,.52);border-radius:50%;background:rgba(255,255,255,.78);color:#526078;box-shadow:0 3px 12px rgba(31,43,67,.07);font:600 15px/1 Inter,sans-serif;cursor:pointer}
 .ja-gb-tool-button:hover,.ja-gb-tool-button[aria-expanded="true"]{background:rgba(255,255,255,.98);color:#26334A;border-color:rgba(190,201,219,.85);box-shadow:0 4px 15px rgba(31,43,67,.11)}
@@ -6097,7 +6085,6 @@ function getJupiterTransitTimelineRegistry() {
   const TITLE = "Jupiter Astro · Lal Kitab Birthchart / Varshphal";
   let activeContext = null;
   let overlay = null;
-  let launcher = null;
   let maximized = false;
   let previousBounds = null;
   let dragState = null;
@@ -6164,13 +6151,6 @@ function getJupiterTransitTimelineRegistry() {
     enableDragging();
     document.body.appendChild(overlay);
 
-    launcher = document.createElement("button");
-    launcher.type = "button";
-    launcher.className = "ja-lk-restore-launcher";
-    launcher.textContent = "Restore Lal Kitab";
-    launcher.addEventListener("click", restore);
-    document.body.appendChild(launcher);
-
     return overlay;
   }
 
@@ -6186,7 +6166,6 @@ function getJupiterTransitTimelineRegistry() {
     win.style.height = "";
     win.style.transform = "";
     document.body.classList.remove("ja-lk-popup-open");
-    if (launcher) launcher.classList.remove("visible");
     maximized = false;
     if (lastFocus && typeof lastFocus.focus === "function" && lastFocus.isConnected) lastFocus.focus();
   }
@@ -6196,7 +6175,6 @@ function getJupiterTransitTimelineRegistry() {
     overlay.hidden = true;
     overlay.setAttribute("aria-hidden", "true");
     document.body.classList.remove("ja-lk-popup-open");
-    if (launcher) launcher.classList.add("visible");
   }
 
   function restore() {
@@ -6205,7 +6183,6 @@ function getJupiterTransitTimelineRegistry() {
     overlay.hidden = false;
     overlay.setAttribute("aria-hidden", "false");
     document.body.classList.add("ja-lk-popup-open");
-    if (launcher) launcher.classList.remove("visible");
     return true;
   }
 
@@ -6448,7 +6425,6 @@ function getJupiterTransitTimelineRegistry() {
     overlay.hidden = false;
     overlay.setAttribute("aria-hidden", "false");
     document.body.classList.add("ja-lk-popup-open");
-    if (launcher) launcher.classList.remove("visible");
     const closeButton = overlay.querySelector('[data-ja-lk-action="close"]');
     if (closeButton) closeButton.focus();
     return true;
@@ -9921,7 +9897,6 @@ const result = section === 'planets'
     
   </section>
 </div>
-<button id="jaGoodBadMinimized" type="button" hidden aria-label="Restore Good and Bad Analysis">Good vs Bad</button>
 <script id="ja-good-bad-analysis-controller">
 (function(){
   "use strict";
@@ -9929,7 +9904,6 @@ const result = section === 'planets'
   if(!overlay || overlay.dataset.ready==="1") return;
   overlay.dataset.ready="1";
   const windowEl=overlay.querySelector(".ja-gb-window");
-  const minimized=document.getElementById("jaGoodBadMinimized");
   const categories=[["dasha","Dasha"],["transit","Transit"],["varshphal","Varshphal"],["panchang","Panchang"]];
   let lastFocus=null, maximized=false, previousBounds=null, dragState=null;
   const normalize=value=>Array.isArray(value)?value:[];
@@ -10012,7 +9986,6 @@ const result = section === 'planets'
   }
   function open(){
     lastFocus=document.activeElement;
-    minimized.hidden=true;
     overlay.hidden=false;overlay.setAttribute("aria-hidden","false");
     const first=overlay.querySelector("summary");if(first)first.focus();
   }
@@ -10020,12 +9993,10 @@ const result = section === 'planets'
     if(overlay.hidden)return;
     if(document.fullscreenElement===windowEl&&document.exitFullscreen)document.exitFullscreen().catch(()=>{});
     overlay.hidden=true;overlay.setAttribute("aria-hidden","true");
-    minimized.hidden=false;
   }
   function close(){
     if(document.fullscreenElement===windowEl&&document.exitFullscreen)document.exitFullscreen().catch(()=>{});
     overlay.hidden=true;overlay.setAttribute("aria-hidden","true");
-    minimized.hidden=true;
     windowEl.classList.remove("is-maximized");
     maximized=false;previousBounds=null;
     windowEl.style.left="";windowEl.style.top="";windowEl.style.width="";windowEl.style.height="";windowEl.style.transform="";
