@@ -3316,7 +3316,7 @@ const ZODIAC_HOVER_DATA = {
 /* ========================================================== */
 
 
-function drawNorthChart(lagnaSign, placements, title, fs = 12, savList = null, ignoreWebsitePalette = false) {
+function drawNorthChart(lagnaSign, placements, title, fs = 12, savList = null, ignoreWebsitePalette = false, hideSignCards = false) {
   const C = getChartColors(ignoreWebsitePalette);
   const isLavenderPeach = !ignoreWebsitePalette &&
   document.documentElement.getAttribute('data-palette') === 'lavender-peach';
@@ -3385,7 +3385,7 @@ s += `<rect x="0" y="0" width="300" height="300"
 
   for (let h = 1; h <= 12; h++) {
     const g = NORTH[h], sign = (lagnaSign + h - 1) % 12;
-    s += `<text class="sign-number" tabindex="0" role="img" aria-label="Sign ${sign + 1} information" data-sign="${sign + 1}" data-layout-house="${h}" data-layout-type="sign" x="${g.n[0]}" y="${g.n[1]}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="${C.muted}" style="cursor:help">${sign + 1}</text>`;
+    s += hideSignCards\n      ? `<text class="sign-number ja-no-sign-card" aria-hidden="true" data-layout-house="${h}" data-layout-type="sign" x="${g.n[0]}" y="${g.n[1]}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="${C.muted}" style="cursor:default;pointer-events:none">${sign + 1}</text>`\n      : `<text class="sign-number" tabindex="0" role="img" aria-label="Sign ${sign + 1} information" data-sign="${sign + 1}" data-layout-house="${h}" data-layout-type="sign" x="${g.n[0]}" y="${g.n[1]}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="${C.muted}" style="cursor:help">${sign + 1}</text>`;
     if (savList && Array.isArray(savList) && g.sav) {
       const val = savList[sign];
       const col = val < 25 ? '#dc2626' : val > 29 ? '#16a34a' : '#2563eb';
@@ -5781,14 +5781,14 @@ const activeYear = (typeof window.trSelectedLkYear === 'number' && window.trSele
             <div class="ja-lk-compact-charts">
               <article class="card kchart">
                 <header><h3>Lal Kitab · Natal Chart</h3></header>
-                <div>${drawNorthChart(k.ascSign, natalLkItems, 'Natal Lal Kitab', 12, null, true)}</div>
+                <div>${drawNorthChart(k.ascSign, natalLkItems, 'Natal Lal Kitab', 12, null, true, true)}</div>
               </article>
               <article class="card kchart">
                 <header>
                   <h3>Lal Kitab · Varshphal (Year ${activeYear})</h3>
                   <span class="ja-lk-age">Age: ${activeYear - 1}–${activeYear}</span>
                 </header>
-                <div>${drawNorthChart(0, varshItems, 'Varshphal Year ' + activeYear, 12, null, true)}</div>
+                <div>${drawNorthChart(0, varshItems, 'Varshphal Year ' + activeYear, 12, null, true, true)}</div>
               </article>
             </div>
           </section>
@@ -5840,7 +5840,7 @@ const activeYear = (typeof window.trSelectedLkYear === 'number' && window.trSele
           <header style="display:flex; justify-content:space-between; align-items:center;">
             <h3>Lal Kitab · Natal Chart</h3>
             </header>
-          <div>${drawNorthChart(k.ascSign, natalLkItems, 'Natal Lal Kitab')}</div>
+          <div>${drawNorthChart(k.ascSign, natalLkItems, 'Natal Lal Kitab', 12, null, false, true)}</div>
           <p style="text-align:center; font-size:0.75rem; color:var(--muted); margin:4px 0 0;">
             Natal Grahas in Rashi Chart
           </p>
@@ -5851,7 +5851,7 @@ const activeYear = (typeof window.trSelectedLkYear === 'number' && window.trSele
             <h3>Lal Kitab · Varshphal (Year ${activeYear})</h3>
             <span style="font-size:0.8rem; color:var(--saffron); font-weight:700;">Age: ${activeYear - 1}–${activeYear}</span>
           </header>
-          <div>${drawNorthChart(0, varshItems, 'Varshphal Year ' + activeYear)}</div>
+          <div>${drawNorthChart(0, varshItems, 'Varshphal Year ' + activeYear, 12, null, false, true)}</div>
           <p style="text-align:center; font-size:0.75rem; color:var(--muted); margin:4px 0 0;">
             Lal Kitab Progressions (House Movements)
           </p>
