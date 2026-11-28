@@ -921,3 +921,74 @@ body.ja-lk-popup-open { overflow: hidden; }
   .ja-lk-analysis-results{grid-template-columns:minmax(0,1fr)!important}
   .ja-lk-analysis-toolbar{align-items:flex-start}
 }
+
+
+/* Lal Kitab Analysis: placement-aware selectors and inline, readable result rows. */
+.ja-lk-analysis-divider{
+  height:1px!important;
+  margin:22px 0 16px!important;
+  background:#171717!important;
+  opacity:1!important;
+}
+.ja-lk-analysis-section{width:100%;min-width:0;background:#fff}
+.ja-lk-analysis-toggle{
+  display:flex;align-items:baseline;gap:8px;width:100%;min-height:38px;
+  padding:4px 0 9px;border:0;border-bottom:1px solid #d9e1ec;border-radius:0;
+  background:#fff!important;color:#263247;cursor:default;box-shadow:none;
+}
+.ja-lk-analysis-heading-text{font-size:15px;font-weight:700;color:#27364d}
+.ja-lk-analysis-heading-year{font-size:13px;font-weight:600;color:#64748b}
+.ja-lk-analysis-heading-count,.ja-lk-analysis-chevron{display:none!important}
+.ja-lk-analysis-body{display:block!important;width:100%;padding:13px 0 3px;background:#fff}
+.ja-lk-analysis-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;margin-bottom:13px}
+.ja-lk-analysis-planets,.ja-lk-analysis-scope{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ja-lk-analysis-planet,.ja-lk-analysis-scope button{
+  min-height:34px;padding:6px 10px;border:1px solid #cbd5e1;border-radius:7px;
+  background:#fff;color:#52627a;font:600 12px/1.25 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;cursor:pointer;
+  white-space:nowrap;
+}
+.ja-lk-analysis-planet:hover,.ja-lk-analysis-scope button:hover{background:#f8fafc;color:#334155}
+.ja-lk-analysis-planet.ja-lk-analysis-good{border:1.5px solid #16a34a;color:#166534}
+.ja-lk-analysis-planet.ja-lk-analysis-bad{border:1.5px solid #dc2626;color:#b91c1c}
+.ja-lk-analysis-planet.ja-lk-analysis-neutral{border:1px solid #cbd5e1;color:#52627a}
+.ja-lk-analysis-planet.ja-lk-analysis-mixed{border:1.5px solid #d97706;color:#92400e}
+.ja-lk-analysis-planet[aria-pressed="true"]{
+  background:#fff7ed!important;box-shadow:inset 0 0 0 1px rgba(217,119,6,.12);
+  outline:1px solid #d97706;outline-offset:1px;
+}
+.ja-lk-analysis-scope button[aria-pressed="true"]{background:#fff7ed;border-color:#d97706;color:#9a5a19}
+.ja-lk-analysis-results{
+  display:flex!important;flex-direction:column;align-items:stretch;gap:12px;width:100%;
+}
+.ja-lk-analysis-card{
+  display:block;width:100%;max-width:none!important;min-width:0;padding:12px 14px;
+  border:1px solid #dce4ee;border-radius:9px;background:#f8fafc!important;box-shadow:none!important;
+}
+.ja-lk-analysis-card-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 7px;
+  padding:0 0 8px;border-bottom:1px solid #d5deea;
+}
+.ja-lk-analysis-card-head h4,.ja-lk-analysis-card>h4{margin:0;color:#334155;font-size:13px;font-weight:700}
+.ja-lk-analysis-house{flex:none;color:#64748b;font-size:11px;font-weight:650}
+.ja-lk-analysis-row{
+  display:grid;grid-template-columns:minmax(112px,145px) minmax(0,1fr);
+  align-items:start;gap:12px;padding:9px 2px;border-bottom:1px solid #dce4ee;
+}
+.ja-lk-analysis-row:last-child{border-bottom:0}
+.ja-lk-analysis-category-title{
+  padding:1px 0;color:#39485f;font-size:12.5px;font-weight:650;line-height:1.55;
+}
+.ja-lk-analysis-copy{
+  min-width:0;padding:0;color:#4b5d76;font-size:13px;font-weight:400;line-height:1.65;
+  white-space:pre-wrap;overflow-wrap:anywhere;
+}
+.ja-lk-analysis-status{margin:0;padding:8px 0;color:#64748b;font-size:12px;line-height:1.55}
+@media(max-width:760px){
+  .ja-lk-analysis-toolbar{align-items:flex-start;flex-direction:column}
+  .ja-lk-analysis-planets{width:100%}
+  .ja-lk-analysis-planet{flex:1 1 auto}
+  .ja-lk-analysis-row{grid-template-columns:105px minmax(0,1fr);gap:8px}
+}
+@media(max-width:420px){
+  .ja-lk-analysis-row{grid-template-columns:minmax(0,1fr);gap:3px}
+}
