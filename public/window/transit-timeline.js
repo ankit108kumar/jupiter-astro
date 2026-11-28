@@ -12,10 +12,8 @@
   window.__JA_TRANSIT_TIMELINE_LOADED = true;
 
   var WINDOW_ID = "ja-transit-timeline-window";
-  var LAUNCHER_ID = "ja-transit-timeline-launcher";
   var THEME_KEY = "ja-transit-timeline-theme-mode";
   var windowEl = null;
-  var launcher = null;
   var maximized = false;
   var previousBounds = null;
   var dragState = null;
@@ -2552,15 +2550,6 @@
 
     document.body.appendChild(windowEl);
 
-    launcher = document.createElement("div");
-    launcher.id = LAUNCHER_ID;
-    launcher.innerHTML =
-      '<button type="button" aria-label="Restore Transit Timeline">' +
-        '<span>Transit Timeline</span><span aria-hidden="true">↗</span>' +
-      '</button>';
-    launcher.querySelector("button").addEventListener("click", restoreWindow);
-    document.body.appendChild(launcher);
-
     windowEl.addEventListener("click", handleWindowClick);
     var dateInput = windowEl.querySelector('[data-jtt-field="date"]');
     var timeInput = windowEl.querySelector('[data-jtt-field="time"]');
@@ -2597,7 +2586,6 @@
     windowEl.classList.add("jtt-open");
     document.body.classList.add("jtt-window-open");
     windowEl.setAttribute("aria-hidden", "false");
-    launcher.classList.remove("visible");
     syncFromContext();
     return true;
   }
@@ -2608,7 +2596,6 @@
     windowEl.classList.remove("jtt-open", "jtt-maximized");
     document.body.classList.remove("jtt-window-open");
     windowEl.setAttribute("aria-hidden", "true");
-    launcher.classList.remove("visible");
     maximized = false;
   }
 
@@ -2617,7 +2604,6 @@
     hideNakshatraStory(true);
     windowEl.classList.remove("jtt-open");
     document.body.classList.remove("jtt-window-open");
-    launcher.classList.add("visible");
   }
 
   async function restoreWindow() {
@@ -2631,7 +2617,6 @@
     windowEl.classList.add("jtt-open");
     document.body.classList.add("jtt-window-open");
     windowEl.setAttribute("aria-hidden", "false");
-    launcher.classList.remove("visible");
     syncFromContext();
     return true;
   }
