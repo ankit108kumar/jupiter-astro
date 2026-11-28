@@ -36,10 +36,7 @@
   }
   function makeCard(title,house,items,emptyMessage) {
     const card=el("article","ja-lk-analysis-card");
-    // Keep the Natal label for the combined view, but do not render a
-    // separate Varshphal/year/house header row: the year is already in
-    // the Lal Kitab Analysis section heading and the house is in the selector.
-    if(title === "Natal") card.appendChild(el("h4","ja-lk-analysis-card-title","Natal"));
+    // Do not render a separate chart-scope title row; the scope is already selected in the toolbar.
     let count=0;
     items.forEach(item=>{if(item.value!=null && String(item.value).trim()){addRow(card,item.label,item.value);count++;}});
     if(!count && emptyMessage) card.appendChild(el("p","ja-lk-analysis-status",emptyMessage));
