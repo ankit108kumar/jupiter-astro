@@ -10002,7 +10002,7 @@ const result = section === 'planets'
     windowEl.style.left="";windowEl.style.top="";windowEl.style.width="";windowEl.style.height="";windowEl.style.transform="";
     if(lastFocus&&typeof lastFocus.focus==="function")lastFocus.focus();
   }
-  function toggle(){if(!overlay.hidden)minimize();else if(!minimized.hidden)open();else open();}
+  function toggle(){if(!overlay.hidden)minimize();else open();}
   function toggleMaximize(){
     if(!maximized){
       const rect=windowEl.getBoundingClientRect();
