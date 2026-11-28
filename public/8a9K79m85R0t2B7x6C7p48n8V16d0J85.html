@@ -46,7 +46,7 @@ window.JA_LK_FUNDAMENTAL_RULES_PROMISE = window.JA_LK_FUNDAMENTAL_RULES_PROMISE 
   });
 </script>
 <link rel="stylesheet" href="/window/library-window.css">
-<link rel="stylesheet" href="/window/transit-timeline.css?v=20261127-5">
+<link rel="stylesheet" href="/window/transit-timeline.css?v=20261128-1">
 <link rel="stylesheet" href="/css/ja-info-toast.css?v=20261127-7">
 <script src="/ja-info-toast.js?v=20261127-7"></script>
 <link rel="stylesheet" href="/window/library-preview.css">
@@ -9750,7 +9750,7 @@ const result = section === 'planets'
 <script type="module" src="/Account.js"></script>
 <script type="module" src="/Email%20Verification.js"></script>
 <script src="/window/library-window.js"></script>
-<script src="/window/transit-timeline.js?v=20261127-6"></script>
+<script src="/window/transit-timeline.js?v=20261128-1"></script>
 <script src="/window/library-preview.js"></script>
 <script src="/window/library-drive.js"></script>
 	
@@ -10018,7 +10018,6 @@ const result = section === 'planets'
       }
     }
   }
-  minimized.addEventListener("click",open);
   windowEl.addEventListener("click",function(event){
     const infoWrap=event.target.closest(".ja-gb-info-wrap");
     const exportWrap=event.target.closest(".ja-gb-export-wrap");
@@ -10082,7 +10081,7 @@ const result = section === 'planets'
     const key=String(e.key||"").toLowerCase(),target=e.target;
     const editable=!!(target&&(target.isContentEditable||(target.closest&&target.closest('[contenteditable="true"],[role="textbox"],input,textarea,select'))));
     if(key==="g"&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.shiftKey&&!e.repeat&&!e.isComposing&&!editable){
-      e.preventDefault();e.stopPropagation();toggle();return;
+      e.preventDefault();e.stopImmediatePropagation();toggle();return;
     }
   },true);
   document.addEventListener("ja-good-bad-analysis-data",e=>setAnalysisData(e.detail));
