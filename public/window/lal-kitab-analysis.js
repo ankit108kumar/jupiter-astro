@@ -4,14 +4,16 @@
   const PLANETS = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
   const DATA_URLS = {
     fundamental: "/data/lal-kitab-fundamental-rules.json",
-    varshphal: "/data/lal-kitab-varshphal-planet-in-houses.json"
+    varshphal: "/data/lal-kitab-varshphal-planet-in-houses.json",
+    activation: "/data/lal-kitab-varshphal-house-sign-activation.json"
   };
   let dataPromise;
   function loadData() {
     if (!dataPromise) dataPromise = Promise.all([
       fetch(DATA_URLS.fundamental,{cache:"force-cache"}).then(r=>{if(!r.ok)throw new Error("Fundamental rules unavailable");return r.json();}),
-      fetch(DATA_URLS.varshphal,{cache:"force-cache"}).then(r=>{if(!r.ok)throw new Error("Varshphal rules unavailable");return r.json();})
-    ]).then(([fundamental,varshphal])=>({fundamental,varshphal})).catch(e=>{dataPromise=null;throw e;});
+      fetch(DATA_URLS.varshphal,{cache:"force-cache"}).then(r=>{if(!r.ok)throw new Error("Varshphal rules unavailable");return r.json();}),
+      fetch(DATA_URLS.activation,{cache:"force-cache"}).then(r=>{if(!r.ok)throw new Error("Activation periods unavailable");return r.json();})
+    ]).then(([fundamental,varshphal,activation])=>({fundamental,varshphal,activation})).catch(e=>{dataPromise=null;throw e;});
     return dataPromise;
   }
   function el(tag,cls,text) {
@@ -52,6 +54,7 @@
     const heading=el("div","ja-lk-analysis-toggle");
     const headingText=el("span","ja-lk-analysis-heading-text","Lal Kitab Analysis");
     const yearText=el("span","ja-lk-analysis-heading-year","· Varshphal Year "+context.activeYear);
+    const activationText=el("span","ja-lk-analysis-heading-activation","");
     heading.append(headingText,yearText);
     const body=el("div","ja-lk-analysis-body");
     const toolbar=el("div","ja-lk-analysis-toolbar");
@@ -163,7 +166,17 @@
       else content.append(varshphalCard(planet,vh));
     }
     loadData().then(data=>{
-      loaded=data;updatePlanetButtons();renderResults();status.remove();
+      loaded=data;
+      const activatedHouse=(data.activation.houses||[]).find(item=>
+        Object.values(item.activationAges||{}).some(range=>
+          range && Number(context.activeYear)>=Number(range.start) && Number(context.activeYear)<=Number(range.end)
+        )
+      );
+      if(activatedHouse){
+        activationText.textContent="· "+(activatedHouse.houseLabel||activatedHouse.house+"H")+" "+activatedHouse.sign+" Activated";
+        heading.appendChild(activationText);
+      }
+      updatePlanetButtons();renderResults();status.remove();
     }).catch(error=>{status.textContent="Analysis rules could not be loaded. "+error.message;});
   }
   window.JALalKitabAnalysis={mount};
