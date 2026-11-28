@@ -6,10 +6,6 @@
    ========================================================= */
 #ja-transit-timeline-window,
 #ja-transit-timeline-window *,
-#ja-transit-timeline-launcher,
-#ja-transit-timeline-launcher * {
-  box-sizing: border-box;
-}
 
 #ja-transit-timeline-window {
   --jtt-bg: var(--paper, #F8FAFC);
@@ -468,42 +464,6 @@
   outline-offset: 2px;
 }
 
-#ja-transit-timeline-launcher {
-  position: fixed;
-  z-index: 2147483003;
-  right: 22px;
-  bottom: 22px;
-  display: none;
-  padding: 0;
-  border: 1px solid var(--line-strong, #CBD5E1);
-  border-radius: 12px;
-  color: var(--ink, #0F172A);
-  background: var(--surface, #FFFFFF);
-  box-shadow: 0 8px 28px rgba(0,0,0,.20);
-}
-
-#ja-transit-timeline-launcher.visible {
-  display: block;
-}
-
-#ja-transit-timeline-launcher button {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 11px 15px;
-  border: 0;
-  border-radius: 12px;
-  color: inherit;
-  background: transparent;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-#ja-transit-timeline-launcher button:hover {
-  background: var(--surface-alt, #F1F5F9);
-}
-
 #ja-transit-timeline-auth-prompt {
   position: fixed;
   z-index: 2147483004;
@@ -579,10 +539,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   #ja-transit-timeline-window *,
-  #ja-transit-timeline-launcher * {
-    transition: none !important;
-    animation: none !important;
-  }
 }
 
 
@@ -2790,4 +2746,3 @@ body.jtt-window-open{overflow:hidden!important;overscroll-behavior:none!importan
   white-space:nowrap;
 }
 
-/* Minimized launcher position is coordinated by the shared window stack rules. */
