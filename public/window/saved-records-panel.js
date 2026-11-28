@@ -128,9 +128,24 @@
       const btn=event.target.closest("[data-tag]"); if(!btn)return;
       const tag=btn.dataset.tag; activeTags.has(tag)?activeTags.delete(tag):activeTags.add(tag); renderTags(); renderRecords();
     });
+    let recordClickTimer=null;
     panel.querySelector(".sr-list").addEventListener("click", event => {
       const btn=event.target.closest("[data-record]"); if(!btn)return;
-      expanded=expanded===btn.dataset.record?null:btn.dataset.record; renderRecords();
+      const recordId=btn.dataset.record;
+      if(recordClickTimer)window.clearTimeout(recordClickTimer);
+      recordClickTimer=window.setTimeout(()=>{
+        recordClickTimer=null;
+        expanded=expanded===recordId?null:recordId;
+        renderRecords();
+      },240);
+    });
+    panel.querySelector(".sr-list").addEventListener("dblclick", event => {
+      const btn=event.target.closest("[data-record]"); if(!btn)return;
+      event.preventDefault();
+      if(recordClickTimer){window.clearTimeout(recordClickTimer);recordClickTimer=null;}
+      const recordId=btn.dataset.record;
+      const record=[...recentOpened,...records].find(item=>String(item.id)===String(recordId));
+      if(record)window.dispatchEvent(new CustomEvent("ja-open-recent-chart",{detail:{record}}));
     });
     return panel;
   }
