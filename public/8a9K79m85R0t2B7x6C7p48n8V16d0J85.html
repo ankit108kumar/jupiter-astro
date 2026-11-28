@@ -28,7 +28,8 @@
 <link rel="stylesheet" href="/css/main67g120kS63cY438.css?v=20261127-ai-left">
 <!-- Panchang popup CSS is loaded on first card interaction. -->
 <link rel="stylesheet" href="/css/detailed-dasha-overview.css">
-<link rel="stylesheet" href="/css/lal-kitab-popup.css?v=20261128-1">
+<link rel="stylesheet" href="/css/lal-kitab-popup.css?v=20261128-2">
+<script src="/window/lal-kitab-analysis.js?v=20261128-1" defer></script>
 <script>
 /* Load Lal Kitab fundamental placement classifications for the compact popup table. */
 window.JA_LK_FUNDAMENTAL_RULES_PROMISE = window.JA_LK_FUNDAMENTAL_RULES_PROMISE || fetch('/data/lal-kitab-fundamental-rules.json', { cache: 'force-cache' })
@@ -6408,6 +6409,28 @@ function getJupiterTransitTimelineRegistry() {
     const root = overlay.querySelector(".ja-lk-popup-content");
     root.innerHTML = RenderTabs.lalkitab(context.kData, popupPrefix, Date.now(), true);
     bindYearControls(context, popupPrefix);
+    if (window.JALalKitabAnalysis && context.kData && context.kData.pos1) {
+      const k = context.kData;
+      const birthDate = new Date(k.input.y, k.input.m - 1, k.input.d, k.input.hh || 0, k.input.mm || 0);
+      const now = new Date();
+      let runningYear = now.getFullYear() - birthDate.getFullYear();
+      if (now.getMonth() < birthDate.getMonth() ||
+          (now.getMonth() === birthDate.getMonth() && now.getDate() < birthDate.getDate())) runningYear--;
+      runningYear = Math.max(1, Math.min(120, runningYear + 1));
+      const activeYear = (typeof window.trSelectedLkYear === "number" && window.trSelectedLkYear >= 1 && window.trSelectedLkYear <= 120)
+        ? window.trSelectedLkYear : runningYear;
+      const mapping = window.LK_VARSHPHAL_MATRIX && window.LK_VARSHPHAL_MATRIX[activeYear]
+        ? window.LK_VARSHPHAL_MATRIX[activeYear]
+        : Array.from({length:12}, (_, index) => ((index + ((activeYear - 1) % 12)) % 12) + 1);
+      const natalPlanetHouses = {};
+      const varshPlanetHouses = {};
+      PL.forEach(([planet]) => {
+        const natalHouse = houseFrom(k.pos1[planet], k.ascSign);
+        natalPlanetHouses[planet] = natalHouse;
+        varshPlanetHouses[planet] = mapping[natalHouse - 1];
+      });
+      window.JALalKitabAnalysis.mount(root, { natalPlanetHouses, varshPlanetHouses, activeYear });
+    }
     syncChartSelector();
   }
 
