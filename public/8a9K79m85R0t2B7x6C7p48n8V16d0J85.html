@@ -7636,7 +7636,7 @@ function populateResearchChartForm(form, p, selectedTagsSet) {
   if (chartSection) {
     // A recent-list key is not necessarily a Google Sheets profile ID.
     // Only a real saved profile ID should activate the existing Update path.
-    const savedProfileId = p.profileId || (p.id && !/^recent-/.test(String(p.id)) && !/^profile-\\d+$/.test(String(p.id)) ? p.id : '');
+    const savedProfileId = p.profileId || (p.id && !/^recent-/.test(String(p.id)) && !/^profile-\d+$/.test(String(p.id)) ? p.id : '');
     chartSection.dataset.chartId = savedProfileId;
     const saveBtn = chartSection.querySelector('[id^="saveBtn"]');
     if (saveBtn) {
