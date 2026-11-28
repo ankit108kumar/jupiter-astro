@@ -992,3 +992,61 @@ body.ja-lk-popup-open { overflow: hidden; }
 @media(max-width:420px){
   .ja-lk-analysis-row{grid-template-columns:minmax(0,1fr);gap:3px}
 }
+
+
+/* Lal Kitab result surface: reuse the Sign/Nakshatra hover-card treatment. */
+.ja-lk-analysis-card{
+  padding:12px 14px!important;
+  background:color-mix(in srgb,var(--surface) 90%,transparent)!important;
+  color:var(--ink)!important;
+  border:1px solid rgba(212,160,74,.25)!important;
+  border-left:2px solid rgba(212,160,74,.45)!important;
+  border-radius:10px!important;
+  box-shadow:0 10px 30px rgba(0,0,0,.12)!important;
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+}
+.ja-lk-analysis-card-title{
+  margin:0 0 6px!important;
+  padding:0 0 6px!important;
+  color:#171717!important;
+  border-bottom:1px solid var(--line);
+  font-size:13px!important;
+  font-weight:600!important;
+  line-height:1.45;
+}
+.ja-lk-analysis-card-head{display:none!important}
+.ja-lk-analysis-row{
+  grid-template-columns:minmax(112px,145px) minmax(0,1fr);
+  gap:12px;
+  padding:8px 2px;
+  border-bottom:1px solid color-mix(in srgb,var(--line) 78%,transparent);
+}
+.ja-lk-analysis-category-title{
+  padding:0!important;
+  color:#171717!important;
+  font-size:12.5px!important;
+  font-weight:500!important;
+  line-height:1.55!important;
+}
+.ja-lk-analysis-copy{
+  padding:0!important;
+  color:#171717!important;
+  font-size:13px!important;
+  font-weight:400!important;
+  line-height:1.6!important;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+.ja-lk-analysis-status{
+  color:#171717!important;
+  font-size:12.5px!important;
+}
+.ja-lk-analysis-heading-year{color:#171717!important;font-weight:500!important}
+.ja-lk-analysis-planet.ja-lk-analysis-neutral{color:#171717!important}
+@media(max-width:760px){
+  .ja-lk-analysis-row{grid-template-columns:105px minmax(0,1fr);gap:8px}
+}
+@media(max-width:420px){
+  .ja-lk-analysis-row{grid-template-columns:minmax(0,1fr);gap:3px}
+}
