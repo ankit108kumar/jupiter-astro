@@ -34,9 +34,10 @@
   }
   function makeCard(title,house,items,emptyMessage) {
     const card=el("article","ja-lk-analysis-card");
-    const head=el("header","ja-lk-analysis-card-head");
-    head.append(el("h4","",title),el("span","ja-lk-analysis-house",Number.isFinite(house)?"House "+house:"House unavailable"));
-    card.appendChild(head);
+    // Keep the Natal label for the combined view, but do not render a
+    // separate Varshphal/year/house header row: the year is already in
+    // the Lal Kitab Analysis section heading and the house is in the selector.
+    if(title === "Natal") card.appendChild(el("h4","ja-lk-analysis-card-title","Natal"));
     let count=0;
     items.forEach(item=>{if(item.value!=null && String(item.value).trim()){addRow(card,item.label,item.value);count++;}});
     if(!count && emptyMessage) card.appendChild(el("p","ja-lk-analysis-status",emptyMessage));
