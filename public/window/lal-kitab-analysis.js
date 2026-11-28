@@ -30,10 +30,33 @@
     const bad=(placement.normally_bad_houses||[]).includes(house);
     return good===bad ? "neutral" : good ? "good" : "bad";
   }
+  function appendRichText(parent,value) {
+    // Render only the source formatting we support (bold and line breaks).
+    // All other HTML-like input is treated as literal text, never executed.
+    const tokens=String(value).split(/(\\*\\*.*?\\*\\*|<br\\s*\\/?\\s*>)/gi);
+    tokens.forEach(token=>{
+      if(!token)return;
+      if(/^<br\\s*\\/?\\s*>$/i.test(token)){parent.appendChild(document.createElement("br"));return;}
+      if(token.startsWith("**")&&token.endsWith("**")&&token.length>=4){
+        const strong=document.createElement("strong");
+        strong.textContent=decodeEntities(token.slice(2,-2));
+        parent.appendChild(strong);
+      } else {
+        parent.appendChild(document.createTextNode(decodeEntities(token)));
+      }
+    });
+  }
+  function decodeEntities(value) {
+    const textarea=document.createElement("textarea");
+    textarea.innerHTML=String(value);
+    return textarea.value;
+  }
   function addRow(parent,label,value) {
     if(value==null || !String(value).trim()) return;
     const row=el("div","ja-lk-analysis-row");
-    row.append(el("div","ja-lk-analysis-category-title",label),el("div","ja-lk-analysis-copy",value));
+    const copy=el("div","ja-lk-analysis-copy");
+    appendRichText(copy,value);
+    row.append(el("div","ja-lk-analysis-category-title",label),copy);
     parent.appendChild(row);
   }
   function makeCard(title,house,items,emptyMessage) {
@@ -184,6 +207,15 @@
           {label:"Symptom",value:entry.symptom},
           {label:"Impact",value:entry.impact}
         );
+      }
+      const natalRemedyPlanet=String(planet).toLowerCase();
+      const natalRemedyHouse=String(house)+"H";
+      const natalRemedyEntry=loaded.remedies && loaded.remedies.planets &&
+        loaded.remedies.planets[natalRemedyPlanet] &&
+        loaded.remedies.planets[natalRemedyPlanet].houses &&
+        loaded.remedies.planets[natalRemedyPlanet].houses[natalRemedyHouse];
+      if(natalRemedyEntry){
+        items.push({label:"Precautions",value:natalRemedyEntry.precautions_symptoms});
       }
       return makeCard("Natal",house,items,"No planet-in-house interpretation is available for this Natal placement in the shared reference data.");
     }
