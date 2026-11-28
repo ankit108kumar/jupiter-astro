@@ -761,3 +761,45 @@ body.ja-lk-popup-open { overflow: hidden; }
   .ja-lk-compact-workspace{grid-template-columns:minmax(0,1fr)!important}
   .ja-lk-compact-workspace>.ja-lk-placement-panel{grid-column:auto}
 }
+
+
+/* Fixed light appearance: isolate the Lal Kitab popup from every website palette. */
+.ja-lk-popup-window,
+.ja-lk-popup-window * { color-scheme: light; }
+.ja-lk-popup-window .ja-lk-popup-content {
+  background: #fbfcfe !important;
+  color: #172033 !important;
+}
+.ja-lk-popup-window .ja-lk-compact-controls,
+.ja-lk-popup-window .ja-lk-compact-charts > .card.kchart,
+.ja-lk-popup-window .ja-lk-placement-panel {
+  background: #fff !important;
+  border-color: #e0e6ef !important;
+  color: #172033 !important;
+  box-shadow: 0 4px 14px rgba(23,32,51,.045) !important;
+}
+.ja-lk-popup-window .ja-lk-year-field select,
+.ja-lk-popup-window .ja-lk-chart-select {
+  background: #fff !important;
+  border-color: #d5deeb !important;
+  color: #172033 !important;
+}
+.ja-lk-popup-window .ja-lk-year-buttons button,
+.ja-lk-popup-window .ja-lk-year-buttons .btn,
+.ja-lk-popup-window .ja-lk-year-buttons .sav-toggle-btn {
+  background: #f8fafc !important;
+  border: 1px solid #d5deeb !important;
+  color: #334155 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+.ja-lk-popup-window .ja-lk-year-buttons button:hover {
+  background: #eef2f7 !important;
+  border-color: #cbd5e1 !important;
+}
+.ja-lk-popup-window .ja-lk-year-buttons .sav-toggle-btn.active {
+  background: #fff7ed !important;
+  border-color: #fed7aa !important;
+  color: #9a3412 !important;
+}
