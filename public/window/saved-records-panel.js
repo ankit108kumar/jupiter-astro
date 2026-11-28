@@ -260,7 +260,7 @@
     const pick=(...keys)=>{for(const key of keys){const value=row&&row[key];if(value!==undefined&&value!==null&&String(value).trim())return String(value).trim();}return "";};
     const sourceId=pick("id","ID","profileId","Profile ID");
     const explicitProfileId=pick("profileId","savedProfileId","Saved Profile ID");
-    const profileId=explicitProfileId||(sourceId&&!/^recent-/.test(sourceId)&&!/^profile-\\d+$/.test(sourceId)?sourceId:"");
+    const profileId=explicitProfileId||(sourceId&&!/^recent-/.test(sourceId)&&!/^profile-\d+$/.test(sourceId)?sourceId:"");
     const rawTags=row&&(row.tags??row.Tags??row.tag??row.Tag);
     return {
       id:sourceId||("profile-"+index),
