@@ -258,8 +258,13 @@
   }
   function normalizeProfile(row,index){
     const pick=(...keys)=>{for(const key of keys){const value=row&&row[key];if(value!==undefined&&value!==null&&String(value).trim())return String(value).trim();}return "";};
+    const sourceId=pick("id","ID","profileId","Profile ID");
+    const explicitProfileId=pick("profileId","savedProfileId","Saved Profile ID");
+    const profileId=explicitProfileId||(sourceId&&!/^recent-/.test(sourceId)&&!/^profile-\\d+$/.test(sourceId)?sourceId:"");
+    const rawTags=row&&(row.tags??row.Tags??row.tag??row.Tag);
     return {
-      id:pick("id","ID","profileId","Profile ID")||("profile-"+index),
+      id:sourceId||("profile-"+index),
+      profileId,
       name:pick("name","Name","profileName","Profile Name"),
       dob:pick("dob","DOB","dateOfBirth","Date of Birth"),
       tob:pick("tob","TOB","timeOfBirth","Time of Birth"),
@@ -267,7 +272,7 @@
       lat:pick("lat","latitude","Latitude"),
       lon:pick("lon","lng","longitude","Longitude"),
       tz:pick("tz","timezone","timeZone","Timezone"),
-      tags:pick("tags","Tags","tag","Tag"),
+      tags:Array.isArray(rawTags)?rawTags.map(value=>String(value).trim()).filter(Boolean):pick("tags","Tags","tag","Tag"),
       desc:pick("desc","description","Description","notes","Notes","remark","Remarks"),
       keywords:pick("keywords","Keywords")
     };
