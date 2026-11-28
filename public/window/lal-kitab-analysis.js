@@ -62,6 +62,7 @@
       .ja-lk-analysis-category-title { font-size: 16px !important; }
       .ja-lk-analysis-copy { font-size: 17px !important; line-height: 1.55 !important; }
       .ja-lk-analysis-planet {
+        border-radius: 999px !important;
         transition: background-color .16s ease, color .16s ease, box-shadow .16s ease, transform .16s ease;
       }
       .ja-lk-analysis-planet[aria-pressed="true"] {
@@ -80,7 +81,8 @@
       .ja-lk-analysis-planet.ja-lk-analysis-mixed[aria-pressed="true"] {
         background: #334e75 !important; color: #fff !important;
       }
-      .ja-lk-analysis-planet:not([aria-pressed="true"]) { box-shadow: none !important; }\n      .ja-lk-analysis-planets { gap: 8px !important; }
+      .ja-lk-analysis-planet:not([aria-pressed="true"]) { box-shadow: none !important; }
+      .ja-lk-analysis-planets { gap: 8px !important; }\n      .ja-lk-analysis-planets { gap: 8px !important; }
       @media (max-width: 700px) {
         .ja-lk-analysis-copy { font-size: 16px !important; }
         .ja-lk-analysis-card { padding: 11px 12px !important; }
