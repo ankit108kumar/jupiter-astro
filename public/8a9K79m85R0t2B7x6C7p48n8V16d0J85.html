@@ -5218,7 +5218,9 @@ dasha(k, prefix, evalMs = Date.now()) {
     `;
 },
       
-  async transit(k, prefix, evalMs = Date.now(), selectedVarga = (window.trSelectedVarga || 9)) {
+  async transit(k, prefix, evalMs = Date.now(), selectedChartKey = (window.trSelectedVargaKey || `D${window.trSelectedVarga || 9}`)) {
+    const isDivisionalChart = String(selectedChartKey).startsWith('D');
+    const selectedVarga = isDivisionalChart ? (parseInt(String(selectedChartKey).slice(1), 10) || 9) : 1;
     // 1. Generate Natal D1 Birth Chart data
     const d1 = getVargaItems(k, 1);
     const evalJd = msToJd(evalMs);
@@ -5349,38 +5351,50 @@ dasha(k, prefix, evalMs = Date.now()) {
     const birthNavTaraGrid = renderNavTaraGrid(k.ch.planets);
     const transitNavTaraGrid = renderNavTaraGrid(tr);
 
-    // 2. Divisional (Varga) Calculations (Default: D9 Navamsa)
-    const natalVarga = getVargaItems(k, selectedVarga);
+    // 2. Shared Natal / Transit chart selection (Divisional + Special + House Kundalis)
+    const natalVarga = getSecondaryChart(k, selectedChartKey);
+    const chartLagna = natalVarga.lagna;
     const trVargaItems = PL.map(([p, , ab]) => {
-      const sign = selectedVarga === 1 ? signOfPosition(tr[p]) : selectedVarga === 9 ? (Number.isInteger(tr[p]?.jaReference?.indices?.navamsa) ? navamsaOfPosition(tr[p]) : vargaSign(tr[p].lon, 9)) : vargaSign(tr[p].lon, selectedVarga);
+      const sign = isDivisionalChart
+        ? (selectedVarga === 9 && Number.isInteger(tr[p]?.jaReference?.indices?.navamsa)
+            ? navamsaOfPosition(tr[p])
+            : vargaSign(tr[p].lon, selectedVarga))
+        : signOfPosition(tr[p]);
       const mockK = { ch: { planets: tr }, combust: { [p]: isCombust(p, tr) } };
-      return { 
-        t: ab, 
-        p, 
-        sign: sign,
-        deg: getVargaDeg(tr[p].lon, selectedVarga),
-        marks: getPlanetMarks(p, sign, mockK)
-      };
+      return { t: ab, p, sign, deg: getVargaDeg(tr[p].lon, isDivisionalChart ? selectedVarga : 1), marks: getPlanetMarks(p, sign, mockK) };
     });
-    trVargaItems.push({ 
-      t: 'JM', 
-      sign: vargaSign(k.ch.planets.Moon.lon, selectedVarga), 
+    trVargaItems.push({
+      t: 'JM',
+      sign: isDivisionalChart ? vargaSign(k.ch.planets.Moon.lon, selectedVarga) : signOfPosition(k.ch.planets.Moon.lon),
       al: true,
-      deg: getVargaDeg(k.ch.planets.Moon.lon, selectedVarga)
+      deg: getVargaDeg(k.ch.planets.Moon.lon, isDivisionalChart ? selectedVarga : 1)
     });
-    trVargaItems.push({ 
-      t: 'TrAs', 
-      sign: vargaSign(trAsc, selectedVarga), 
+    trVargaItems.push({
+      t: 'TrAs',
+      sign: isDivisionalChart ? vargaSign(trAsc, selectedVarga) : signOfPosition(trAsc),
       asc: true,
-      deg: getVargaDeg(trAsc, selectedVarga)
+      deg: getVargaDeg(trAsc, isDivisionalChart ? selectedVarga : 1)
     });
 
-    const currentVargaMeta = VARGAS.find(v => v[0] === selectedVarga) || [selectedVarga, `D${selectedVarga}`, ''];
+    const currentVargaMeta = isDivisionalChart
+      ? (VARGAS.find(v => v[0] === selectedVarga) || [selectedVarga, `D${selectedVarga}`, ''])
+      : (selectedChartKey === 'Chandra'
+          ? [1, 'Chandra Kundali', 'Moon-based natal reference chart']
+          : [1, `${ordinal(parseInt(selectedChartKey, 10))} House Kundali`, 'Natal house-based reference chart']);
     const currentVargaTitle = currentVargaMeta[1];
     const currentVargaDescription = currentVargaMeta[2] || '';
-    const vargaOptions = VARGAS.filter(([n]) => n > 1).map(([n, title, description]) => 
-      `<option value="${n}" title="${description || ''}" ${n === selectedVarga ? 'selected' : ''}>D${n} · ${title}</option>`
-    ).join('');
+    const currentVargaLabel = isDivisionalChart ? `D${selectedVarga} · ${currentVargaTitle}` : currentVargaTitle;
+    const transitChartOptions = `
+      <div class="chart-dd-group">Divisional Charts</div>
+      ${VARGAS.filter(([n]) => n > 1).map(([n, title, description]) => `
+        <button type="button" class="chart-dd-option ${selectedChartKey === 'D' + n ? 'selected' : ''}" data-value="D${n}" title="${description || ''}">D${n} · ${title}</button>
+      `).join('')}
+      <div class="chart-dd-group">Special & House Kundalis</div>
+      <button type="button" class="chart-dd-option ${selectedChartKey === 'Chandra' ? 'selected' : ''}" data-value="Chandra">Chandra Kundali</button>
+      ${Array.from({length:12},(_,i)=>`
+        <button type="button" class="chart-dd-option ${selectedChartKey === (i+1)+'H' ? 'selected' : ''}" data-value="${i+1}H">${ordinal(i+1)} House Kundali</button>
+      `).join('')}
+    `;
 
     const evalDate = new Date(evalMs);
     const pad = n => String(n).padStart(2, '0');
@@ -5508,34 +5522,31 @@ dasha(k, prefix, evalMs = Date.now()) {
 
       <!-- ROW 2: DIVISIONAL CHARTS (LEFT: NATAL VARGA, RIGHT: TRANSIT VARGA) -->
       <div class="two" style="margin-top:14px;">
-        <!-- LEFT: NATAL DIVISIONAL CHART WITH SELECTOR -->
+        <!-- LEFT: NATAL DIVISIONAL / SPECIAL CHART -->
         <article class="card kchart">
           <header style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-            <h3 class="ja-varga-tooltip" tabindex="0" data-varga-tooltip="${currentVargaDescription}">D${selectedVarga} · Natal ${currentVargaTitle}</h3>
-            <div style="display:flex; align-items:center; gap:6px;">
-              <label for="${prefix}-vargaSelect" style="font-size:0.72rem; color:var(--muted); font-weight:600;">SELECT:</label>
-              <select id="${prefix}-vargaSelect" style="font-size:0.8rem; font-weight:600; padding:3px 8px; border-radius:6px; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); cursor:pointer;">
-                ${vargaOptions}
-              </select>
-            </div>
+            <h3 class="ja-varga-tooltip" tabindex="0" data-varga-tooltip="${currentVargaDescription}">${currentVargaLabel} · Natal</h3>
           </header>
-          <div>${drawNorthChart(natalVarga.lagna, natalVarga.items, `Natal D${selectedVarga}`)}</div>
+          <div>${drawNorthChart(natalVarga.lagna, natalVarga.items, `Natal ${currentVargaLabel}`)}</div>
           <p style="text-align:center; font-size:0.75rem; color:var(--muted); margin:4px 0 0;">
-            Natal D${selectedVarga} Lagna: <b>${SIGNS[natalVarga.lagna][0]}</b>
+            Natal Lagna: <b>${SIGNS[natalVarga.lagna][0]}</b>
           </p>
         </article>
 
-        <!-- RIGHT: TRANSIT IN DIVISIONAL CHART -->
+        <!-- RIGHT: TRANSIT IN THE SELECTED DIVISIONAL / SPECIAL CHART -->
         <article class="card kchart">
-          <header style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 class="ja-varga-tooltip" tabindex="0" data-varga-tooltip="${currentVargaDescription}">D${selectedVarga} · Gochar (${currentVargaTitle})</h3>
-            <span style="font-size:0.82rem; color:var(--muted);">
-              From Natal D${selectedVarga} Lagna
-            </span>
+          <header style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <h3 class="ja-varga-tooltip" tabindex="0" data-varga-tooltip="${currentVargaDescription}">Gochar · ${currentVargaLabel}</h3>
+            <div class="chart-dd" id="${prefix}-trSecChartSelect">
+              <button type="button" class="chart-dd-trigger" aria-expanded="false">
+                <span>${currentVargaLabel}</span><span aria-hidden="true">▾</span>
+              </button>
+              <div class="chart-dd-menu" hidden>${transitChartOptions}</div>
+            </div>
           </header>
-          <div>${drawNorthChart(natalVarga.lagna, trVargaItems, `Transit D${selectedVarga}`)}</div>
+          <div>${drawNorthChart(chartLagna, trVargaItems, `Transit ${currentVargaLabel}`)}</div>
           <p style="text-align:center; font-size:0.75rem; color:var(--muted); margin:4px 0 0;">
-            JM = Natal Moon in D${selectedVarga} · TrAs = Transit Lagna
+            JM = Natal Moon · TrAs = Transit Lagna
           </p>
         </article>
       </div>
@@ -6695,7 +6706,7 @@ async function renderKundaliComponent(
     activeTabKey = tabKey;
     // Pass currentEvalMs to render the selected event date
     body.innerHTML = tabKey === 'transit'
-  ? await RenderTabs[tabKey](kData, prefix, currentEvalMs, window.trSelectedVarga || 9)
+  ? await RenderTabs[tabKey](kData, prefix, currentEvalMs, window.trSelectedVargaKey || `D${window.trSelectedVarga || 9}`)
   : RenderTabs[tabKey](kData, prefix, currentEvalMs);
 
     if (window.JupiterTransitTimeline && window.JupiterTransitTimeline.isOpen()) {
@@ -7153,16 +7164,34 @@ if (offsetInput) {
         });
       }
 
-      const vargaSelect = document.getElementById(`${prefix}-vargaSelect`);
+      const transitSecSelect = document.getElementById(`${prefix}-trSecChartSelect`);
       const trDateIn = document.getElementById(`${prefix}-trEvalDate`);
       const trTimeIn = document.getElementById(`${prefix}-trEvalTime`);
       const trNowBtn = document.getElementById(`${prefix}-trNowBtn`);
       const trSavBtn = document.getElementById(`${prefix}-trSavToggleBtn`);
 
-      if (vargaSelect) {
-        vargaSelect.addEventListener('change', () => {
-          window.trSelectedVarga = Number(vargaSelect.value);
-          openTab('transit');
+      if (transitSecSelect) {
+        const trigger = transitSecSelect.querySelector('.chart-dd-trigger');
+        const menu = transitSecSelect.querySelector('.chart-dd-menu');
+        trigger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isOpen = !menu.hidden;
+          menu.hidden = isOpen;
+          trigger.setAttribute('aria-expanded', String(!isOpen));
+        });
+        transitSecSelect.querySelectorAll('.chart-dd-option').forEach(option => {
+          option.addEventListener('click', () => {
+            const key = option.dataset.value;
+            window.trSelectedVargaKey = key;
+            window.trSelectedVarga = key.startsWith('D') ? Number(key.slice(1)) : 1;
+            openTab('transit');
+          });
+        });
+        document.addEventListener('click', (e) => {
+          if (!transitSecSelect.contains(e.target)) {
+            menu.hidden = true;
+            trigger.setAttribute('aria-expanded', 'false');
+          }
         });
       }
 
