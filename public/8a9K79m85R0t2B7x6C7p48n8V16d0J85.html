@@ -7627,6 +7627,57 @@ async function findSavedProfileAfterSave(payload, attempts = 10) {
   return null;
 }
 
+function populateResearchChartForm(form, p, selectedTagsSet) {
+  if (!form || !p) return false;
+  const chartSection = form.closest('.research-chart');
+  const nameField = form.querySelector('input[name="name"]');
+  if (nameField) nameField.value = p.name || '';
+
+  if (chartSection) {
+    chartSection.dataset.chartId = p.id || '';
+    const saveBtn = chartSection.querySelector('[id^="saveBtn"]');
+    if (saveBtn) {
+      saveBtn.textContent = p.id ? 'Already saved ✓' : 'Save details';
+      saveBtn.disabled = Boolean(p.id);
+      saveBtn.style.opacity = p.id ? '0.4' : '1';
+      saveBtn.style.cursor = p.id ? 'not-allowed' : 'pointer';
+      saveBtn.dataset.savedProfile = p.id ? 'true' : 'false';
+    }
+  }
+
+  // Use the existing sheet-to-form date translator for both saved and recent records.
+  const dobField = form.querySelector('input[name="dob"]');
+  if (dobField && p.dob) dobField.value = formatForForm(p.dob);
+  [['tob',p.tob],['pob',p.pob],['lat',p.lat],['lon',p.lon],['tz',p.tz]].forEach(([name,value]) => {
+    const field = form.querySelector('input[name="' + name + '"]');
+    if (field && value !== undefined && value !== null && String(value).trim() !== '') field.value = value;
+  });
+
+  const descField = form.querySelector('input[name="desc"]');
+  const descEditorBox = form.querySelector('.desc-editor');
+  const savedDesc = p.desc && p.desc !== 'None' ? p.desc : '';
+  if (descField) descField.value = savedDesc;
+  if (descEditorBox && descEditorBox.__quill) {
+    if (savedDesc.trim()) descEditorBox.__quill.clipboard.dangerouslyPasteHTML(savedDesc, 'silent');
+    else descEditorBox.__quill.setText('', 'silent');
+  }
+
+  if (selectedTagsSet) {
+    const savedTagsArr = p.tags && p.tags !== 'None'
+      ? (Array.isArray(p.tags) ? p.tags : String(p.tags).split(';')).map(tag => String(tag).trim()).filter(Boolean)
+      : [];
+    form.querySelectorAll('.tag-pill').forEach(pill => {
+      const shouldBeSelected = savedTagsArr.includes(pill.dataset.tag);
+      if (selectedTagsSet.has(pill.dataset.tag) !== shouldBeSelected) pill.click();
+    });
+  }
+
+  const collapseBox = form.querySelector('.collapsible-fields');
+  const toggleBar = form.querySelector('.collapse-toggle-bar');
+  if (collapseBox && collapseBox.style.maxHeight === '0px' && toggleBar) toggleBar.click();
+  return true;
+}
+
 function bindNameAutocomplete(inp, list, form, selectedTagsSet) {
   let items = [], idx = -1;
   let searchSeq = 0; // Discards stale async queries
@@ -7649,62 +7700,7 @@ function bindNameAutocomplete(inp, list, form, selectedTagsSet) {
 
   const pick = p => {
     if (!p) return;
-    inp.value = p.name;
-
-    // Track ID on the chart section
-    const chartSection = form.closest('.research-chart');
-    if (chartSection) {
-      chartSection.dataset.chartId = p.id || '';
-      const saveBtn = chartSection.querySelector('[id^="saveBtn"]');
-      if (saveBtn) {
-        saveBtn.textContent = 'Already saved ✓';
-        saveBtn.disabled = true;
-        saveBtn.style.opacity = '0.4';
-        saveBtn.style.cursor = 'not-allowed';
-        saveBtn.dataset.savedProfile = p.id ? 'true' : 'false';
-      }
-    }
-
-    // Auto-populate form fields
-    if (p.dob) form.querySelector('input[name="dob"]').value = formatForForm(p.dob);
-    if (p.tob) form.querySelector('input[name="tob"]').value = p.tob;
-    if (p.pob) form.querySelector('input[name="pob"]').value = p.pob;
-    if (p.lat) form.querySelector('input[name="lat"]').value = p.lat;
-    if (p.lon) form.querySelector('input[name="lon"]').value = p.lon;
-    if (p.tz) form.querySelector('input[name="tz"]').value = p.tz;
-
-    // Restore saved Tag Description in hidden input and Quill editor
-    const descField = form.querySelector('input[name="desc"]');
-    const descEditorBox = form.querySelector('.desc-editor');
-    const savedDesc = p.desc && p.desc !== 'None' ? p.desc : '';
-
-    if (descField) descField.value = savedDesc;
-    if (descEditorBox && descEditorBox.__quill) {
-      if (savedDesc.trim()) {
-        descEditorBox.__quill.clipboard.dangerouslyPasteHTML(savedDesc, 'silent');
-      } else {
-        descEditorBox.__quill.setText('', 'silent');
-      }
-    }    
-    
-    // Auto-populate tag pills
-    if (p.tags && p.tags !== 'None') {
-      const savedTagsArr = p.tags.split(';').map(t => t.trim());
-      form.querySelectorAll('.tag-pill').forEach(pill => {
-        const tag = pill.dataset.tag;
-        const isSelected = selectedTagsSet.has(tag);
-        const shouldBeSelected = savedTagsArr.includes(tag);
-        if (isSelected !== shouldBeSelected) pill.click();
-      });
-    }
-    
-    // Expand collapsible coordinates if closed
-    const collapseBox = form.querySelector('.collapsible-fields');
-    if (collapseBox && collapseBox.style.maxHeight === '0px') {
-      form.querySelector('.collapse-toggle-bar').click();
-    }
-
-    // Immediately close dropdown and release focus
+    populateResearchChartForm(form, p, selectedTagsSet);
     close();
     inp.blur();
   };
@@ -8202,6 +8198,37 @@ const AVAILABLE_TAGS = [
   "Muhurta (Auspicious Timing)",
   "Other"
 ];
+window.addEventListener('ja-open-recent-chart', event => {
+  const record = event.detail && event.detail.record;
+  if (!record) return;
+  if (researchCount >= 50) {
+    showButtonError(addBtn, '⚠️ Max charts reached.');
+    return;
+  }
+  const before = researchCount;
+  addBtn.click();
+  if (researchCount === before) return;
+  const section = document.getElementById('rcSec' + researchCount);
+  const form = section && section.querySelector('form');
+  if (!section || !form) return;
+  const nameField = form.querySelector('input[name="name"]');
+  const selectedTags = new Set();
+  sec.__jaSelectedTags = selectedTags;
+  // Reuse the same population routine as the existing name autocomplete.
+  // The tag set is the exact Set captured by the form's existing listeners.
+  const tagPills = Array.from(form.querySelectorAll('.tag-pill'));
+  const tagSet = section.__jaSelectedTags;
+  if (!tagSet) {
+    // The form builder exposes its existing Set below; do not create parallel state.
+    console.error('Recent chart could not access the form tag state.');
+    return;
+  }
+  populateResearchChartForm(form, record, tagSet);
+  section.scrollIntoView({behavior:'smooth', block:'start'});
+  const generateButton = section.querySelector('[id^="genBtn"]');
+  if (generateButton) generateButton.disabled = true;
+  form.requestSubmit();
+});
 addBtn.addEventListener('click', () => {
   if (researchCount >= 50) {
     showButtonError(addBtn, '⚠️ Max charts reached.');
@@ -8838,7 +8865,7 @@ if (data.desc && data.desc.trim()) {
         id: sec.dataset.chartId || "",
         name: data.name.trim() || `Chart ${n}`,
         dob: data.dob, tob: data.tob, pob: data.pob || "Manual Coords",
-        lat: lat.toFixed(4), lon: lon.toFixed(4),
+        lat: lat.toFixed(4), lon: lon.toFixed(4), tz,
         tags: Array.from(selectedTags), desc: data.desc || ""
       });
     }
@@ -10159,6 +10186,6 @@ const result = section === 'planets'
     },true);
   })();
   </script>
-  <script src="/window/saved-records-panel.js?v=20261127-10" defer></script>
+  <script src="/window/saved-records-panel.js?v=20261128-1" defer></script>
 </body>
 </html>
