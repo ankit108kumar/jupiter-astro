@@ -2972,7 +2972,8 @@ cosmic: {
 };
 
 // getChartColors uses the custom palette if set; otherwise respects the top-right light/dark mode
-function getChartColors() {
+function getChartColors(ignoreWebsitePalette = false) {
+  if (ignoreWebsitePalette) return { surf:'#FFFFFF', soft:'#FFF7ED', line:'#CBD5E1', ink:'#0F172A', muted:'#64748B', sa:'#EA580C', al:'#2563EB', good:'#059669', bad:'#DC2626' };
   const customPal = document.documentElement.getAttribute('data-palette');
   if (customPal && PALETTE_CHART_COLORS[customPal]) {
     return PALETTE_CHART_COLORS[customPal];
@@ -3326,9 +3327,9 @@ const ZODIAC_HOVER_DATA = {
 /* ========================================================== */
 
 
-function drawNorthChart(lagnaSign, placements, title, fs = 12, savList = null) {
-  const C = getChartColors();
-  const isLavenderPeach =
+function drawNorthChart(lagnaSign, placements, title, fs = 12, savList = null, ignoreWebsitePalette = false) {
+  const C = getChartColors(ignoreWebsitePalette);
+  const isLavenderPeach = !ignoreWebsitePalette &&
   document.documentElement.getAttribute('data-palette') === 'lavender-peach';
   const byHouse = {};
   placements.forEach(p => { 
@@ -3337,7 +3338,7 @@ function drawNorthChart(lagnaSign, placements, title, fs = 12, savList = null) {
   });
 
   
-const isCelestial =
+const isCelestial = !ignoreWebsitePalette &&
   document.documentElement.getAttribute('data-palette') === 'celestial';
 
 let s = `<svg viewBox="-6 -6 312 312"
@@ -3356,7 +3357,7 @@ if (isLavenderPeach) {
       </linearGradient>
     </defs>`;
 }
-const isCosmic =
+const isCosmic = !ignoreWebsitePalette &&
   document.documentElement.getAttribute('data-palette') === 'cosmic';
 
 if (isCosmic) {
@@ -5780,14 +5781,14 @@ const activeYear = (typeof window.trSelectedLkYear === 'number' && window.trSele
             <div class="ja-lk-compact-charts">
               <article class="card kchart">
                 <header><h3>Lal Kitab · Natal Chart</h3></header>
-                <div>${drawNorthChart(k.ascSign, natalLkItems, 'Natal Lal Kitab')}</div>
+                <div>${drawNorthChart(k.ascSign, natalLkItems, 'Natal Lal Kitab', 12, null, true)}</div>
               </article>
               <article class="card kchart">
                 <header>
                   <h3>Lal Kitab · Varshphal (Year ${activeYear})</h3>
                   <span class="ja-lk-age">Age: ${activeYear - 1}–${activeYear}</span>
                 </header>
-                <div>${drawNorthChart(0, varshItems, 'Varshphal Year ' + activeYear)}</div>
+                <div>${drawNorthChart(0, varshItems, 'Varshphal Year ' + activeYear, 12, null, true)}</div>
               </article>
             </div>
           </section>
@@ -6101,7 +6102,6 @@ function getJupiterTransitTimelineRegistry() {
   let previousBounds = null;
   let dragState = null;
   let lastFocus = null;
-  let themeMode = "website";
 
   function ensureOverlay() {
     if (overlay) return overlay;
@@ -6136,7 +6136,7 @@ function getJupiterTransitTimelineRegistry() {
               </div>
             </div>
             <button class="ja-lk-tool-button" type="button" data-ja-lk-action="fullscreen" title="Enter full screen" aria-label="Enter full screen">⛶</button>
-            <button class="ja-lk-theme-toggle" type="button" data-ja-lk-action="theme" title="Switch appearance" aria-label="Switch appearance" aria-pressed="false"></button>
+
           </div>
         </header>
         <div class="ja-lk-popup-content"></div>
@@ -6170,26 +6170,8 @@ function getJupiterTransitTimelineRegistry() {
     launcher.textContent = "Restore Lal Kitab";
     launcher.addEventListener("click", restore);
     document.body.appendChild(launcher);
-    applyTheme(themeMode, false);
-    return overlay;
-  }
 
-  function applyTheme(mode, persist) {
-    themeMode = mode === "apple" ? "apple" : "website";
-    if (overlay) overlay.querySelector(".ja-lk-popup-window").setAttribute("data-ja-lk-theme", themeMode);
-    const button = overlay && overlay.querySelector('[data-ja-lk-action="theme"]');
-    if (button) {
-      const appleActive = themeMode === "apple";
-      button.innerHTML = appleActive
-        ? '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.6"></circle><path d="M12 2v2.1M12 19.9V22M4.93 4.93l1.48 1.48m11.18 11.18 1.48 1.48M2 12h2.1m15.8 0H22M4.93 19.07l1.48-1.48M17.59 6.41l1.48-1.48"></path></svg>'
-        : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"></rect><path d="M3 8h18M7 6h.01M10 6h.01M7 12h10M7 15.5h7"></path></svg>';
-      button.title = appleActive ? "Apple Light is active · Switch to website theme" : "Following website theme · Switch to Apple Light";
-      button.setAttribute("aria-label", appleActive ? "Switch to website theme" : "Switch to Apple Light mode");
-      button.setAttribute("aria-pressed", appleActive ? "true" : "false");
-    }
-    if (persist !== false) {
-      try { localStorage.setItem("ja-lk-popup-theme", themeMode); } catch (error) {}
-    }
+    return overlay;
   }
 
   function close() {
@@ -6280,7 +6262,7 @@ function getJupiterTransitTimelineRegistry() {
     if (action === "minimize") minimize();
     if (action === "maximize") toggleMaximize();
     if (action === "fullscreen") toggleFullscreen();
-    if (action === "theme") applyTheme(themeMode === "website" ? "apple" : "website", true);
+
     if (action === "info") {
       const panel = overlay.querySelector(".ja-lk-info-popover");
       const willOpen = panel.hidden;
@@ -6568,11 +6550,6 @@ function getJupiterTransitTimelineRegistry() {
       ? event.detail.user : (window.firebaseAuth && window.firebaseAuth.currentUser);
     if (!user) close();
   });
-
-  try {
-    const savedTheme = localStorage.getItem("ja-lk-popup-theme");
-    if (savedTheme === "apple" || savedTheme === "website") themeMode = savedTheme;
-  } catch (error) {}
 
   window.JALalKitabPopup = { register, open, close, minimize, restore, isOpen: () => !!(overlay && !overlay.hidden) };
 })();
