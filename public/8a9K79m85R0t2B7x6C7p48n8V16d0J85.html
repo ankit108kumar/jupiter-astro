@@ -5526,6 +5526,12 @@ dasha(k, prefix, evalMs = Date.now()) {
         <article class="card kchart">
           <header style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
             <h3 class="ja-varga-tooltip" tabindex="0" data-varga-tooltip="${currentVargaDescription}">${currentVargaLabel} · Natal</h3>
+            <div class="chart-dd" id="${prefix}-trSecChartSelect">
+              <button type="button" class="chart-dd-trigger" aria-expanded="false">
+                <span>${currentVargaLabel}</span><span aria-hidden="true">▾</span>
+              </button>
+              <div class="chart-dd-menu" hidden>${transitChartOptions}</div>
+            </div>
           </header>
           <div>${drawNorthChart(natalVarga.lagna, natalVarga.items, `Natal ${currentVargaLabel}`)}</div>
           <p style="text-align:center; font-size:0.75rem; color:var(--muted); margin:4px 0 0;">
@@ -5537,12 +5543,6 @@ dasha(k, prefix, evalMs = Date.now()) {
         <article class="card kchart">
           <header style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
             <h3 class="ja-varga-tooltip" tabindex="0" data-varga-tooltip="${currentVargaDescription}">Gochar · ${currentVargaLabel}</h3>
-            <div class="chart-dd" id="${prefix}-trSecChartSelect">
-              <button type="button" class="chart-dd-trigger" aria-expanded="false">
-                <span>${currentVargaLabel}</span><span aria-hidden="true">▾</span>
-              </button>
-              <div class="chart-dd-menu" hidden>${transitChartOptions}</div>
-            </div>
           </header>
           <div>${drawNorthChart(chartLagna, trVargaItems, `Transit ${currentVargaLabel}`)}</div>
           <p style="text-align:center; font-size:0.75rem; color:var(--muted); margin:4px 0 0;">
