@@ -80,7 +80,7 @@
       .ja-lk-analysis-planet.ja-lk-analysis-mixed[aria-pressed="true"] {
         background: #334e75 !important; color: #fff !important;
       }
-      .ja-lk-analysis-planet:not([aria-pressed="true"]) { box-shadow: none !important; }
+      .ja-lk-analysis-planet:not([aria-pressed="true"]) { box-shadow: none !important; }\n      .ja-lk-analysis-planets { gap: 8px !important; }
       @media (max-width: 700px) {
         .ja-lk-analysis-copy { font-size: 16px !important; }
         .ja-lk-analysis-card { padding: 11px 12px !important; }
@@ -113,7 +113,7 @@
     let selectedPlanet="Sun";
     let selectedScope="varshphal";
     let loaded=null;
-    const scopeOptions=[["both","Both"],["natal","Natal"],["varshphal","Varshphal"]];
+    const scopeOptions=[["natal","Natal"],["varshphal","Varshphal"]];
     scopeOptions.forEach(([value,label])=>{
       const b=el("button","",label);
       b.type="button";b.dataset.scope=value;
