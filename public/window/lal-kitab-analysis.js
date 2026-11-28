@@ -45,8 +45,52 @@
     if(!count && emptyMessage) card.appendChild(el("p","ja-lk-analysis-status",emptyMessage));
     return card;
   }
+  function installCompactStyles() {
+    if (document.getElementById("ja-lk-analysis-refinement-styles")) return;
+    const style = document.createElement("style");
+    style.id = "ja-lk-analysis-refinement-styles";
+    style.textContent = `
+      .ja-lk-analysis-section { margin-top: 6px !important; }
+      .ja-lk-analysis-toggle { gap: 5px !important; padding-top: 4px !important; padding-bottom: 4px !important; }
+      .ja-lk-analysis-heading-year,
+      .ja-lk-analysis-heading-activation { margin-left: 0 !important; }
+      .ja-lk-analysis-body { padding-top: 5px !important; }
+      .ja-lk-analysis-toolbar { gap: 8px !important; margin-bottom: 8px !important; }
+      .ja-lk-analysis-results { gap: 10px !important; margin-top: 6px !important; }
+      .ja-lk-analysis-card { padding: 14px 18px !important; }
+      .ja-lk-analysis-row { padding-top: 8px !important; padding-bottom: 8px !important; }
+      .ja-lk-analysis-category-title { font-size: 16px !important; }
+      .ja-lk-analysis-copy { font-size: 17px !important; line-height: 1.55 !important; }
+      .ja-lk-analysis-planet {
+        transition: background-color .16s ease, color .16s ease, box-shadow .16s ease, transform .16s ease;
+      }
+      .ja-lk-analysis-planet[aria-pressed="true"] {
+        border-color: transparent !important;
+        box-shadow: 0 3px 10px rgba(25, 45, 70, .18), inset 0 1px 0 rgba(255,255,255,.35) !important;
+        transform: translateY(-1px);
+        font-weight: 700 !important;
+      }
+      .ja-lk-analysis-planet.ja-lk-analysis-good[aria-pressed="true"] {
+        background: #278b45 !important; color: #fff !important;
+      }
+      .ja-lk-analysis-planet.ja-lk-analysis-bad[aria-pressed="true"] {
+        background: #c93630 !important; color: #fff !important;
+      }
+      .ja-lk-analysis-planet.ja-lk-analysis-neutral[aria-pressed="true"],
+      .ja-lk-analysis-planet.ja-lk-analysis-mixed[aria-pressed="true"] {
+        background: #334e75 !important; color: #fff !important;
+      }
+      .ja-lk-analysis-planet:not([aria-pressed="true"]) { box-shadow: none !important; }
+      @media (max-width: 700px) {
+        .ja-lk-analysis-copy { font-size: 16px !important; }
+        .ja-lk-analysis-card { padding: 11px 12px !important; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
   function mount(root,context) {
     if(!root || !context)return;
+    installCompactStyles();
     const divider=el("div","ja-lk-analysis-divider");
     divider.setAttribute("role","separator");
     const section=el("section","ja-lk-analysis-section");
