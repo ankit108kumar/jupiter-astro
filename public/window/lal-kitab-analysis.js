@@ -186,10 +186,6 @@
           {label:"Impact",value:entry.impact}
         );
       }
-      // Preserve the existing Natal fundamental placement classification.
-      const placement=loaded.fundamental.planetary_placement&&loaded.fundamental.planetary_placement[planet];
-      const cls=classify(placement,house);
-      if(cls!=="neutral") items.push({label:"Fundamental placement",value:planet+" in House "+house+" is classified as normally "+cls+" in the supplied fundamental placement rules."});
       // Preserve existing Natal reverse-aspect evaluation.
       const reverse=loaded.fundamental.aspects&&loaded.fundamental.aspects.reverse_aspects;
       const rules=reverse&&Array.isArray(reverse.rules)?reverse.rules.filter(rule=>rule.planet===planet&&Number(rule.placement_house)===house):[];
