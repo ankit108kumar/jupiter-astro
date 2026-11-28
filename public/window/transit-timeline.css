@@ -4,9 +4,6 @@
    JUPITER ASTRO — TRANSIT TIMELINE FLOATING WINDOW
    Library-inspired shell with independent appearance modes.
    ========================================================= */
-#ja-transit-timeline-window,
-#ja-transit-timeline-window *,
-
 #ja-transit-timeline-window {
   --jtt-bg: var(--paper, #F8FAFC);
   --jtt-panel: var(--surface, #FFFFFF);
