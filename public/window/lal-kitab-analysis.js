@@ -29,12 +29,10 @@
 
   function addDetails(parent, title, value, open) {
     if (value == null || String(value).trim() === "") return;
-    const details = el("details", "ja-lk-analysis-category");
-    if (open) details.open = true;
-    const summary = el("summary", "", title);
-    details.appendChild(summary);
-    details.appendChild(el("div", "ja-lk-analysis-copy", value));
-    parent.appendChild(details);
+    const block = el("div", "ja-lk-analysis-category");
+    block.appendChild(el("div", "ja-lk-analysis-category-title", title));
+    block.appendChild(el("div", "ja-lk-analysis-copy", value));
+    parent.appendChild(block);
   }
 
   function addCard(parent, title, house, items) {
@@ -61,16 +59,13 @@
     const section = el("section", "ja-lk-analysis-section");
     section.setAttribute("aria-label", "Lal Kitab Analysis");
 
-    const heading = el("button", "ja-lk-analysis-toggle");
-    heading.type = "button";
-    heading.setAttribute("aria-expanded", "false");
+    const heading = el("div", "ja-lk-analysis-toggle");
     const headingText = el("span", "ja-lk-analysis-heading-text", "Lal Kitab Analysis");
     const countText = el("span", "ja-lk-analysis-heading-count", "Select a planet");
     const chevron = el("span", "ja-lk-analysis-chevron", "+");
     heading.append(headingText, countText, chevron);
 
     const body = el("div", "ja-lk-analysis-body");
-    body.hidden = true;
     const toolbar = el("div", "ja-lk-analysis-toolbar");
     const planetNav = el("div", "ja-lk-analysis-planets");
     planetNav.setAttribute("role", "group");
@@ -79,9 +74,9 @@
     scope.setAttribute("role", "group");
     scope.setAttribute("aria-label", "Analysis scope");
     const content = el("div", "ja-lk-analysis-results");
-    const status = el("p", "ja-lk-analysis-status", "Choose a planet to view the available source-based rules.");
+    const status = el("p", "ja-lk-analysis-status", "Loading source rules…");
     let selectedPlanet = "Sun";
-    let selectedScope = "both";
+    let selectedScope = "varshphal";
     let loaded = null;
 
     const scopeOptions = [["both","Both"],["natal","Natal"],["varshphal","Varshphal"]];
@@ -115,21 +110,12 @@
     body.append(toolbar, status, content);
     section.append(heading, body);
     root.append(divider, section);
-
-    heading.addEventListener("click", () => {
-      const expanded = heading.getAttribute("aria-expanded") !== "true";
-      heading.setAttribute("aria-expanded", String(expanded));
-      body.hidden = !expanded;
-      chevron.textContent = expanded ? "−" : "+";
-      if (expanded && !loaded) {
-        status.textContent = "Loading source rules…";
-        loadData().then(data => {
-          loaded = data;
-          renderResults();
-        }).catch(error => {
-          status.textContent = "Analysis rules could not be loaded. " + error.message;
-        });
-      }
+    chevron.remove();
+    loadData().then(data => {
+      loaded = data;
+      renderResults();
+    }).catch(error => {
+      status.textContent = "Analysis rules could not be loaded. " + error.message;
     });
 
     function renderResults() {
@@ -194,7 +180,7 @@
           head.append(el("h4", "", "Varshphal · Year " + context.activeYear), el("span", "ja-lk-analysis-house", Number.isFinite(varshHouse) ? "House " + varshHouse : "House unavailable"));
           card.appendChild(head);
           items.forEach((item,index) => { if (item.value && String(item.value).trim()) { addDetails(card,item.label,item.value,index===0); visibleCount++; } });
-          if (card.querySelector("details")) content.appendChild(card);
+          if (card.querySelector(".ja-lk-analysis-category")) content.appendChild(card);
         } else {
           const card=el("article","ja-lk-analysis-card");
           card.append(el("h4","","Varshphal · Year "+context.activeYear),el("p","ja-lk-analysis-status","No entry for this planet and house is present in the loaded Varshphal reference."));
