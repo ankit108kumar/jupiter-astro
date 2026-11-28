@@ -21,6 +21,7 @@
     {
       "house": 1,
       "sign": "Aries",
+      "houseLabel": "1H",
       "symbol": "♈",
       "activationAges": {
         "primary": {
@@ -36,6 +37,7 @@
     {
       "house": 2,
       "sign": "Taurus",
+      "houseLabel": "2H",
       "symbol": "♉",
       "activationAges": {
         "primary": {
@@ -51,6 +53,7 @@
     {
       "house": 3,
       "sign": "Gemini",
+      "houseLabel": "3H",
       "symbol": "♊",
       "activationAges": {
         "primary": {
@@ -66,6 +69,7 @@
     {
       "house": 4,
       "sign": "Cancer",
+      "houseLabel": "4H",
       "symbol": "♋",
       "activationAges": {
         "primary": {
@@ -81,6 +85,7 @@
     {
       "house": 5,
       "sign": "Leo",
+      "houseLabel": "5H",
       "symbol": "♌",
       "activationAges": {
         "primary": {
@@ -96,6 +101,7 @@
     {
       "house": 6,
       "sign": "Virgo",
+      "houseLabel": "6H",
       "symbol": "♍",
       "activationAges": {
         "primary": {
@@ -108,6 +114,7 @@
     {
       "house": 7,
       "sign": "Libra",
+      "houseLabel": "7H",
       "symbol": "♎",
       "activationAges": {
         "primary": {
@@ -120,6 +127,7 @@
     {
       "house": 8,
       "sign": "Scorpio",
+      "houseLabel": "8H",
       "symbol": "♏",
       "activationAges": {
         "primary": {
@@ -132,6 +140,7 @@
     {
       "house": 9,
       "sign": "Sagittarius",
+      "houseLabel": "9H",
       "symbol": "♐",
       "activationAges": {
         "primary": {
@@ -144,6 +153,7 @@
     {
       "house": 10,
       "sign": "Capricorn",
+      "houseLabel": "10H",
       "symbol": "♑",
       "activationAges": {
         "primary": {
@@ -159,6 +169,7 @@
     {
       "house": 11,
       "sign": "Aquarius",
+      "houseLabel": "11H",
       "symbol": "♒",
       "activationAges": {
         "primary": {
@@ -174,6 +185,7 @@
     {
       "house": 12,
       "sign": "Pisces",
+      "houseLabel": "12H",
       "symbol": "♓",
       "activationAges": {
         "primary": {
