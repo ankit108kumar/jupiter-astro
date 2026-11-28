@@ -172,10 +172,25 @@
       });
     }
     function natalCard(planet,house) {
+      const items=[];
+      const rows=(loaded.varshphal&&loaded.varshphal.houses&&loaded.varshphal.houses[String(house)])||[];
+      const entry=rows.find(row=>row.planet===planet);
+      if(entry){
+        items.push(
+          {label:"Good result",value:entry.good_result},
+          {label:"If bad",value:entry.if_bad},
+          {label:"Special rules",value:entry.special_rules},
+          {label:"Offline class notes",value:entry.offline_class_notes},
+          {label:"Recommendation",value:entry.recommendation},
+          {label:"Symptom",value:entry.symptom},
+          {label:"Impact",value:entry.impact}
+        );
+      }
+      // Preserve the existing Natal fundamental placement classification.
       const placement=loaded.fundamental.planetary_placement&&loaded.fundamental.planetary_placement[planet];
       const cls=classify(placement,house);
-      const items=[];
-      if(cls!=="neutral") items.push({label:cls==="good"?"Normally good placement":"Normally bad placement",value:planet+" in House "+house+" is classified as normally "+cls+" in the supplied fundamental placement rules."});
+      if(cls!=="neutral") items.push({label:"Fundamental placement",value:planet+" in House "+house+" is classified as normally "+cls+" in the supplied fundamental placement rules."});
+      // Preserve existing Natal reverse-aspect evaluation.
       const reverse=loaded.fundamental.aspects&&loaded.fundamental.aspects.reverse_aspects;
       const rules=reverse&&Array.isArray(reverse.rules)?reverse.rules.filter(rule=>rule.planet===planet&&Number(rule.placement_house)===house):[];
       rules.forEach(rule=>{
@@ -184,7 +199,7 @@
           if(occupants.length)items.push({label:"Special reverse aspect · House "+a.receiving_house,value:occupants.join(", ")+": "+a.effect});
         });
       });
-      return makeCard("Natal",house,items,"No applicable natal classification or reverse-aspect rule is recorded for this placement in the loaded reference data.");
+      return makeCard("Natal",house,items,"No planet-in-house interpretation is available for this Natal placement in the shared reference data.");
     }
     function varshphalCard(planet,house) {
       const rows=(loaded.varshphal&&loaded.varshphal.houses&&loaded.varshphal.houses[String(house)])||[];
