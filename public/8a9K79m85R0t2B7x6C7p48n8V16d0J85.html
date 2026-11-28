@@ -7634,14 +7634,17 @@ function populateResearchChartForm(form, p, selectedTagsSet) {
   if (nameField) nameField.value = p.name || '';
 
   if (chartSection) {
-    chartSection.dataset.chartId = p.id || '';
+    // A recent-list key is not necessarily a Google Sheets profile ID.
+    // Only a real saved profile ID should activate the existing Update path.
+    const savedProfileId = p.profileId || (p.id && !/^recent-/.test(String(p.id)) && !/^profile-\\d+$/.test(String(p.id)) ? p.id : '');
+    chartSection.dataset.chartId = savedProfileId;
     const saveBtn = chartSection.querySelector('[id^="saveBtn"]');
     if (saveBtn) {
-      saveBtn.textContent = p.id ? 'Already saved ✓' : 'Save details';
-      saveBtn.disabled = Boolean(p.id);
-      saveBtn.style.opacity = p.id ? '0.4' : '1';
-      saveBtn.style.cursor = p.id ? 'not-allowed' : 'pointer';
-      saveBtn.dataset.savedProfile = p.id ? 'true' : 'false';
+      saveBtn.textContent = savedProfileId ? 'Already saved ✓' : 'Save details';
+      saveBtn.disabled = Boolean(savedProfileId);
+      saveBtn.style.opacity = savedProfileId ? '0.4' : '1';
+      saveBtn.style.cursor = savedProfileId ? 'not-allowed' : 'pointer';
+      saveBtn.dataset.savedProfile = savedProfileId ? 'true' : 'false';
     }
   }
 
@@ -7664,7 +7667,7 @@ function populateResearchChartForm(form, p, selectedTagsSet) {
 
   if (selectedTagsSet) {
     const savedTagsArr = p.tags && p.tags !== 'None'
-      ? (Array.isArray(p.tags) ? p.tags : String(p.tags).split(';')).map(tag => String(tag).trim()).filter(Boolean)
+      ? (Array.isArray(p.tags) ? p.tags : String(p.tags).split(/[;,|]/)).map(tag => String(tag).trim()).filter(Boolean)
       : [];
     form.querySelectorAll('.tag-pill').forEach(pill => {
       const shouldBeSelected = savedTagsArr.includes(pill.dataset.tag);
@@ -8856,6 +8859,7 @@ if (data.desc && data.desc.trim()) {
     if (window.JASavedRecordsPanel && typeof window.JASavedRecordsPanel.trackOpened === "function") {
       window.JASavedRecordsPanel.trackOpened({
         id: sec.dataset.chartId || "",
+        profileId: sec.dataset.chartId || "",
         name: data.name.trim() || `Chart ${n}`,
         dob: data.dob, tob: data.tob, pob: data.pob || "Manual Coords",
         lat: lat.toFixed(4), lon: lon.toFixed(4), tz,
