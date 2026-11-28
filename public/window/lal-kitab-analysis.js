@@ -5,15 +5,17 @@
   const DATA_URLS = {
     fundamental: "/data/lal-kitab-fundamental-rules.json",
     varshphal: "/data/lal-kitab-varshphal-planet-in-houses.json",
-    activation: "/data/lal-kitab-varshphal-house-sign-activation.json"
+    activation: "/data/lal-kitab-varshphal-house-sign-activation.json",
+    remedies: "/data/lal-kitab-remedies-planet-in-houses.json"
   };
   let dataPromise;
   function loadData() {
     if (!dataPromise) dataPromise = Promise.all([
       fetch(DATA_URLS.fundamental,{cache:"force-cache"}).then(r=>{if(!r.ok)throw new Error("Fundamental rules unavailable");return r.json();}),
       fetch(DATA_URLS.varshphal,{cache:"force-cache"}).then(r=>{if(!r.ok)throw new Error("Varshphal rules unavailable");return r.json();}),
-      fetch(DATA_URLS.activation,{cache:"force-cache"}).then(r=>{if(!r.ok)throw new Error("Activation periods unavailable");return r.json();})
-    ]).then(([fundamental,varshphal,activation])=>({fundamental,varshphal,activation})).catch(e=>{dataPromise=null;throw e;});
+      fetch(DATA_URLS.activation,{cache:"force-cache"}).then(r=>{if(!r.ok)throw new Error("Activation periods unavailable");return r.json();}),
+      fetch(DATA_URLS.remedies,{cache:"force-cache"}).then(r=>{if(!r.ok)throw new Error("Planet-in-house remedies unavailable");return r.json();})
+    ]).then(([fundamental,varshphal,activation,remedies])=>({fundamental,varshphal,activation,remedies})).catch(e=>{dataPromise=null;throw e;});
     return dataPromise;
   }
   function el(tag,cls,text) {
@@ -183,22 +185,13 @@
           {label:"Impact",value:entry.impact}
         );
       }
-      // Preserve existing Natal reverse-aspect evaluation.
-      const reverse=loaded.fundamental.aspects&&loaded.fundamental.aspects.reverse_aspects;
-      const rules=reverse&&Array.isArray(reverse.rules)?reverse.rules.filter(rule=>rule.planet===planet&&Number(rule.placement_house)===house):[];
-      rules.forEach(rule=>{
-        (rule.aspects||[]).forEach(a=>{
-          const occupants=Object.keys(context.natalPlanetHouses||{}).filter(p=>Number(context.natalPlanetHouses[p])===Number(a.receiving_house));
-          if(occupants.length)items.push({label:"Special reverse aspect · House "+a.receiving_house,value:occupants.join(", ")+": "+a.effect});
-        });
-      });
       return makeCard("Natal",house,items,"No planet-in-house interpretation is available for this Natal placement in the shared reference data.");
     }
     function varshphalCard(planet,house) {
       const rows=(loaded.varshphal&&loaded.varshphal.houses&&loaded.varshphal.houses[String(house)])||[];
       const entry=rows.find(row=>row.planet===planet);
       if(!entry)return makeCard("Varshphal · Year "+context.activeYear,house,[],"No entry for this planet and house is present in the loaded Varshphal reference.");
-      return makeCard("Varshphal · Year "+context.activeYear,house,[
+      const items=[
         {label:"Good result",value:entry.good_result},
         {label:"If bad",value:entry.if_bad},
         {label:"Special rules",value:entry.special_rules},
@@ -206,7 +199,21 @@
         {label:"Recommendation",value:entry.recommendation},
         {label:"Symptom",value:entry.symptom},
         {label:"Impact",value:entry.impact}
-      ],"No result fields are populated for this entry.");
+      ];
+      // Remedies and precautions are evaluated only against the selected Varshphal house.
+      const remedyPlanet=String(planet).toLowerCase();
+      const remedyHouse=String(house)+"H";
+      const remedyEntry=loaded.remedies && loaded.remedies.planets &&
+        loaded.remedies.planets[remedyPlanet] &&
+        loaded.remedies.planets[remedyPlanet].houses &&
+        loaded.remedies.planets[remedyPlanet].houses[remedyHouse];
+      if(remedyEntry){
+        items.push(
+          {label:"Precautions / Symptoms",value:remedyEntry.precautions_symptoms},
+          {label:"Remedies",value:remedyEntry.remedies}
+        );
+      }
+      return makeCard("Varshphal · Year "+context.activeYear,house,items,"No result fields are populated for this entry.");
     }
     function renderResults() {
       if(!loaded)return;
