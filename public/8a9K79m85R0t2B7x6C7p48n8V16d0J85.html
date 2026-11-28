@@ -3379,8 +3379,8 @@ s += `<rect x="0" y="0" width="300" height="300"
 
   s += `<polygon points="150,0 225,75 150,150 75,75" fill="${C.soft}"/>`;
   for (let h = 1; h <= 12; h++) s += `<polygon class="hz" data-h="${h}" points="${NORTH_POLY[h]}" fill="transparent"/>`;
-  s += `<path d="M0 0L300 300M300 0L0 300M150 0L300 150L150 300L0 150Z" fill="none" stroke="${C.line}" stroke-width="1.2"/>`;
-  s += `<rect x="0" y="0" width="300" height="300" fill="none" stroke="${C.line}" stroke-width="1.6"/>`;
+  s += `<path d="M0 0L300 300M300 0L0 300M150 0L300 150L150 300L0 150Z" fill="none" stroke="${C.line}" stroke-width="1"/>`;
+  s += `<rect x="0" y="0" width="300" height="300" fill="none" stroke="${C.line}" stroke-width="1"/>`;
 
   for (let h = 1; h <= 12; h++) {
     const g = NORTH[h], sign = (lagnaSign + h - 1) % 12;
