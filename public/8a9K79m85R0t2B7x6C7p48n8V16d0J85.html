@@ -8211,22 +8211,14 @@ window.addEventListener('ja-open-recent-chart', event => {
   const section = document.getElementById('rcSec' + researchCount);
   const form = section && section.querySelector('form');
   if (!section || !form) return;
-  const nameField = form.querySelector('input[name="name"]');
-  const selectedTags = new Set();
-  sec.__jaSelectedTags = selectedTags;
-  // Reuse the same population routine as the existing name autocomplete.
-  // The tag set is the exact Set captured by the form's existing listeners.
-  const tagPills = Array.from(form.querySelectorAll('.tag-pill'));
+  // Reuse the Set already created and captured by this form's tag handlers.
   const tagSet = section.__jaSelectedTags;
   if (!tagSet) {
-    // The form builder exposes its existing Set below; do not create parallel state.
     console.error('Recent chart could not access the form tag state.');
     return;
   }
   populateResearchChartForm(form, record, tagSet);
   section.scrollIntoView({behavior:'smooth', block:'start'});
-  const generateButton = section.querySelector('[id^="genBtn"]');
-  if (generateButton) generateButton.disabled = true;
   form.requestSubmit();
 });
 addBtn.addEventListener('click', () => {
@@ -8669,6 +8661,7 @@ toggleBar.addEventListener('click', () => {
 
   // Interactive Tag Pills Selection Logic
   const selectedTags = new Set();
+  sec.__jaSelectedTags = selectedTags;
   sec.querySelectorAll('.tag-pill').forEach(pill => {
     pill.addEventListener('click', () => {
       const tag = pill.dataset.tag;
